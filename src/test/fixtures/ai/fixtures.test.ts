@@ -19,7 +19,10 @@ describe("AI fixtures", () => {
     it(`${file} parses with Evaluation schema`, () => {
       const text = fs.readFileSync(path.join(FIXTURES_DIR, file), "utf8");
       const parsed = parseJson(Evaluation, text);
-      expect(parsed.ok, parsed.ok ? "" : String(parsed.cause)).toBe(true);
+      if (!parsed.ok) {
+        throw new Error(String(parsed.cause));
+      }
+      expect(parsed.ok).toBe(true);
     });
   }
 

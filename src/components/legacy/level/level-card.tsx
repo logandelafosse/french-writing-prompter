@@ -97,7 +97,9 @@ export function LevelCard() {
             <LevelBadge level={data.level} />
             <LevelSelector
               currentLevel={data.level}
-              onSelect={handleSelectLevel}
+              onSelect={(level) => {
+                void handleSelectLevel(level);
+              }}
             />
           </div>
         ) : (
@@ -105,7 +107,12 @@ export function LevelCard() {
             <p className="text-sm text-zinc-600">
               What is your French level? You can change it at any time.
             </p>
-            <LevelSelector currentLevel={null} onSelect={handleSelectLevel} />
+            <LevelSelector
+              currentLevel={null}
+              onSelect={(level) => {
+                void handleSelectLevel(level);
+              }}
+            />
             <p className="text-xs text-zinc-400">
               You can also{" "}
               <span className="font-medium text-zinc-600">

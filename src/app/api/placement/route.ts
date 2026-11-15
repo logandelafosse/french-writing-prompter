@@ -14,7 +14,7 @@ const openai = new OpenAiClient();
 const promptGenerator = new PromptGenerator(openai);
 const evaluator = new WritingEvaluator(openai);
 
-export async function GET() {
+export function GET() {
   if (!placementTest) {
     return NextResponse.json({ state: "idle", step: 0 });
   }

@@ -40,22 +40,26 @@ describe("POST /api/evaluate", () => {
     });
 
     const fakeMalformedModelText = '{"score": 5}';
-    evaluateMock.mockImplementation(async (schema: z.ZodType) => {
+    evaluateMock.mockImplementation((schema: z.ZodType) => {
       const result = parseJson(schema, fakeMalformedModelText);
       if (result.ok) {
-        return result.value;
+        return Promise.resolve(result.value);
       }
       if (result.reason === "invalid_json") {
-        throw new AiOutputError(
-          "invalid_json",
-          "AI response was not valid JSON",
-          result.cause,
+        return Promise.reject(
+          new AiOutputError(
+            "invalid_json",
+            "AI response was not valid JSON",
+            result.cause,
+          ),
         );
       }
-      throw new AiOutputError(
-        "schema_mismatch",
-        "AI response did not match the expected schema",
-        result.cause,
+      return Promise.reject(
+        new AiOutputError(
+          "schema_mismatch",
+          "AI response did not match the expected schema",
+          result.cause,
+        ),
       );
     });
 

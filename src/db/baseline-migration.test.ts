@@ -48,7 +48,7 @@ describe("baseline migration on push-created database", () => {
         "2026-01-01T00:00:00.000Z",
       ],
     });
-    await client.close();
+    client.close();
 
     await migrateWithBackup(databaseUrl);
 
@@ -62,6 +62,6 @@ describe("baseline migration on push-created database", () => {
       "SELECT hash FROM __drizzle_migrations",
     );
     expect(journal.rows.length).toBeGreaterThan(0);
-    await migrated.close();
+    migrated.close();
   });
 });

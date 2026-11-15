@@ -13,11 +13,11 @@ export type SubmitResult =
   | { type: "next_prompt"; prompt: WritingPrompt; step: number }
   | { type: "complete"; finalLevel: CefrLevel; evaluations: Evaluation[] };
 
-interface PromptGeneratorLike {
+export interface PromptGeneratorLike {
   generate(level: CefrLevel, dialect: FrenchDialect): Promise<WritingPrompt>;
 }
 
-interface EvaluatorLike {
+export interface EvaluatorLike {
   evaluate(
     writing: string,
     prompt: WritingPrompt,

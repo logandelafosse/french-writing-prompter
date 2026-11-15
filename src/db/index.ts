@@ -12,7 +12,10 @@ export const db: AppDatabase = new Proxy({} as AppDatabase, {
     dbInstance ??= drizzle(createLibsqlClient(getEnv().DATABASE_URL), {
       schema,
     });
-    const value = Reflect.get(dbInstance, prop, dbInstance);
-    return typeof value === "function" ? value.bind(dbInstance) : value;
+    const value: unknown = Reflect.get(dbInstance, prop, dbInstance);
+    if (typeof value === "function") {
+      return (value as (...args: unknown[]) => unknown).bind(dbInstance);
+    }
+    return value;
   },
 });

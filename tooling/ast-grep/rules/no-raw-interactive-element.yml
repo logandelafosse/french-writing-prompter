@@ -10,4 +10,9 @@ rule:
     field: name
     regex: "^(button|input|textarea|select)$"
 files: ["src/**/*.tsx"]
-ignores: ["src/components/ui/**", "src/components/legacy/**"]
+ignores:
+  [
+    "src/components/ui/**",
+    "src/components/legacy/**",
+    "src/test/lint-fixtures/**",
+  ]

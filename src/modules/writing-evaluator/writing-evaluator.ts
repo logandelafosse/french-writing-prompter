@@ -7,7 +7,7 @@ import { renderForEvaluator } from "@/modules/dialect/render";
 
 export type { Evaluation } from "@/contracts/evaluation";
 
-interface OpenAiClientLike {
+export interface OpenAiClientLike {
   chatCompletionJSON<S extends z.ZodType>(
     schema: S,
     params: {
