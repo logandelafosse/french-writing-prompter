@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, it, expect, afterEach } from "vitest";
-import { createClient } from "@libsql/client";
+import { createLibsqlClient } from "@/db/libsql-client";
 import { migrateWithBackup } from "@/db/migrate-run";
 
 const PUSH_CREATED_DDL = `
@@ -31,7 +31,7 @@ describe("baseline migration on push-created database", () => {
     const dbPath = path.join(tempDir, "legacy.db");
     const databaseUrl = `file:${dbPath}`;
 
-    const client = createClient({ url: databaseUrl });
+    const client = createLibsqlClient(databaseUrl);
     await client.execute(PUSH_CREATED_DDL);
     await client.execute({
       sql: `INSERT INTO sessions (
@@ -52,7 +52,7 @@ describe("baseline migration on push-created database", () => {
 
     await migrateWithBackup(databaseUrl);
 
-    const migrated = createClient({ url: databaseUrl });
+    const migrated = createLibsqlClient(databaseUrl);
     const row = await migrated.execute(
       "SELECT evaluation_json FROM sessions WHERE id = 35",
     );

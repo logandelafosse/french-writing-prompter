@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createClient, type Client } from "@libsql/client";
+import type { Client } from "@libsql/client";
+import { databaseUrlToFilePath } from "./database-url";
+import { createLibsqlClient } from "./libsql-client";
 import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
 import { readMigrationFiles } from "drizzle-orm/migrator";
@@ -45,16 +47,7 @@ export function hasPendingMigrations(lastAppliedMillis: number | null): boolean 
   return lastAppliedMillis === null || lastAppliedMillis < latest;
 }
 
-export function databaseUrlToFilePath(databaseUrl: string): string | null {
-  if (!databaseUrl.startsWith("file:")) {
-    return null;
-  }
-  const raw = databaseUrl.slice("file:".length);
-  if (raw.startsWith("//")) {
-    return raw;
-  }
-  return path.resolve(process.cwd(), raw);
-}
+export { databaseUrlToFilePath } from "./database-url";
 
 export async function applyMigrations(
   db: LibSQLDatabase<typeof schema>,
@@ -65,7 +58,7 @@ export async function applyMigrations(
 export async function createDatabase(
   databaseUrl: string,
 ): Promise<{ client: Client; db: LibSQLDatabase<typeof schema> }> {
-  const client = createClient({ url: databaseUrl });
+  const client = createLibsqlClient(databaseUrl);
   const db = drizzle(client, { schema });
   return { client, db };
 }

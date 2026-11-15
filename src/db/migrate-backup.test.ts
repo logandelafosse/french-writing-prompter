@@ -2,7 +2,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, it, expect, afterEach } from "vitest";
-import { createClient } from "@libsql/client";
+import { createLibsqlClient } from "@/db/libsql-client";
 import { migrateWithBackup } from "@/db/migrate-run";
 
 function listBackups(dbPath: string): string[] {
@@ -27,7 +27,7 @@ describe("migrateWithBackup", () => {
     const dbPath = path.join(tempDir, "app.db");
     const databaseUrl = `file:${dbPath}`;
 
-    const seed = createClient({ url: databaseUrl });
+    const seed = createLibsqlClient(databaseUrl);
     await seed.execute(
       "CREATE TABLE sessions (id integer PRIMARY KEY AUTOINCREMENT NOT NULL, prompt_text text NOT NULL)",
     );
@@ -55,6 +55,6 @@ describe("migrateWithBackup", () => {
     expect(listBackups(dbPath)).toHaveLength(0);
     expect(fs.existsSync(dbPath)).toBe(true);
 
-    await createClient({ url: databaseUrl }).close();
+    await createLibsqlClient(databaseUrl).close();
   });
 });
