@@ -11,6 +11,7 @@
     "lint": "eslint --max-warnings=0",
     "typecheck": "tsc --noEmit --incremental false",
     "test": "TZ=America/Chicago vitest run",
+    "test:e2e": "playwright test",
     "test:watch": "TZ=America/Chicago vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -39,7 +40,9 @@
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@ast-grep/cli": "^0.51.2",
+    "@playwright/test": "^1.56.1",
     "@eslint-community/eslint-plugin-eslint-comments": "^4.8.1",
     "@tailwindcss/node": "^4.3.5",
     "@tailwindcss/postcss": "^4",
@@ -56,6 +59,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "eslint-plugin-jest-dom": "^5.10.2",
+    "eslint-plugin-playwright": "^2.4.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-testing-library": "^7.16.2",
     "jsdom": "^29.1.1",

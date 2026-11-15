@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { OpenAiClient } from "@/modules/openai-client/openai-client";
+import { getAiClient, scenarioFromRequest } from "@/server/ai-client";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
 import { getSession, saveSession } from "@/modules/history-store/history-store";
@@ -11,10 +11,10 @@ import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
 
-const openai = new OpenAiClient();
-const evaluator = new WritingEvaluator(openai);
-
 export async function POST(request: Request) {
+  const evaluator = new WritingEvaluator(
+    getAiClient(scenarioFromRequest(request)),
+  );
   const parsed = await parseRequestBody(request, EvaluatePostBody);
   if (!parsed.ok) {
     return parsed.response;

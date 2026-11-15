@@ -126,6 +126,22 @@ describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
     expect(ruleIds(messages)).not.toContain("react/no-unescaped-entities");
   });
 
+  it("blocks raw CSS locators in e2e specs", async () => {
+    const messages = await lintFixtureAs(
+      "src/test/lint-fixtures/e2e/raw-locator-snippet.ts",
+      "e2e/probe.spec.ts",
+    );
+    expect(ruleIds(messages)).toContain("playwright/no-raw-locators");
+  });
+
+  it("blocks waitForTimeout in e2e specs", async () => {
+    const messages = await lintFixtureAs(
+      "src/test/lint-fixtures/e2e/wait-timeout-snippet.ts",
+      "e2e/probe.spec.ts",
+    );
+    expect(ruleIds(messages)).toContain("playwright/no-wait-for-timeout");
+  });
+
   it("configures react/no-unescaped-entities to forbid > in JSX text", async () => {
     const eslint = createEslint();
     const config = await eslint.calculateConfigForFile(

@@ -1,0 +1,16 @@
+id: no-direct-ai-client
+language: Tsx
+severity: error
+message: "Get the AI client from getAiClient() in src/server/ai-client.ts so e2e can swap in the fake."
+note: |
+  language must be Tsx. sgconfig maps *.ts to Tsx, so language: TypeScript never scans src.
+rule:
+  any:
+    - pattern: new OpenAiClient($$$)
+    - pattern: new OpenAI($$$)
+    - pattern: new FakeAiClient($$$)
+files: ["src/**"]
+ignores:
+  - src/server/ai-client.ts
+  - src/server/ai-client.test.ts
+  - src/modules/openai-client/**
