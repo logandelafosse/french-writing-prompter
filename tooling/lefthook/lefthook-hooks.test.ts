@@ -181,7 +181,10 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
       path.join(resolvedHooks, "pre-commit"),
       "utf8",
     );
-    const prePush = await readFile(path.join(resolvedHooks, "pre-push"), "utf8");
+    const prePush = await readFile(
+      path.join(resolvedHooks, "pre-push"),
+      "utf8",
+    );
     expect(preCommit).toMatch(/lefthook/i);
     expect(prePush).toMatch(/lefthook/i);
 
@@ -259,7 +262,9 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     const result = tryGitCommit(clone!.dir, "docs only");
     expect(result.ok).toBe(true);
     expect(result.output).toMatch(/eslint \(skip\)|no files for inspection/i);
-    expect(result.output).toMatch(/typecheck \(skip\)|no matching staged files/i);
+    expect(result.output).toMatch(
+      /typecheck \(skip\)|no matching staged files/i,
+    );
     expect(result.output).toMatch(/ast-grep \(skip\)|no files for inspection/i);
 
     const committed = gitShow(clone!.dir, `HEAD:${rel}`);
@@ -285,7 +290,9 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
 
       const push = tryGitPush(clone!.dir);
       expect(push.ok).toBe(false);
-      expect(push.output).toMatch(/> french-writing-prompter@.*\s+check|npm run check/i);
+      expect(push.output).toMatch(
+        /> french-writing-prompter@.*\s+check|npm run check/i,
+      );
     } finally {
       await rm(bareParent, { recursive: true, force: true });
     }
