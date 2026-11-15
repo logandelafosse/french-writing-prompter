@@ -1,14 +1,17 @@
 import { execSync, spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import {
   copyFile,
   mkdir,
   mkdtemp,
+  readdir,
   readFile,
   rm,
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import Ajv2020 from "ajv/dist/2020.js";
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
 import { z } from "zod";
 import { parseJson } from "@/lib/json";
@@ -31,27 +34,34 @@ const GIT_IDENTITY = [
 
 const hookEnv = { ...process.env, LEFTHOOK: "1" };
 
-async function createHookWorktree(): Promise<{
+const personalProjectsHooks = path.join(
+  process.env.HOME ?? "",
+  "Personal-Projects",
+  ".git",
+  "hooks",
+);
+
+async function listHookNames(dir: string): Promise<string[]> {
+  if (!existsSync(dir)) {
+    return [];
+  }
+  return (await readdir(dir)).toSorted();
+}
+
+async function createHookClone(): Promise<{
   dir: string;
   dispose: () => Promise<void>;
 }> {
   const parent = await mkdtemp(path.join(tmpdir(), "fwp-lefthook-"));
-  const dir = path.join(parent, "repo");
-  execSync(`git worktree add "${dir}" HEAD`, { cwd: root, stdio: "pipe" });
+  const dir = path.join(parent, "clone");
+  execSync(`git clone "${root}" "${dir}"`, { cwd: root, stdio: "pipe" });
   for (const file of SYNC_FROM_WORKING_TREE) {
     await copyFile(path.join(root, file), path.join(dir, file));
   }
   return {
     dir,
     dispose: async () => {
-      try {
-        execSync(`git worktree remove -f "${dir}"`, {
-          cwd: root,
-          stdio: "pipe",
-        });
-      } finally {
-        await rm(parent, { recursive: true, force: true });
-      }
+      await rm(parent, { recursive: true, force: true });
     },
   };
 }
@@ -67,6 +77,10 @@ function git(cwd: string, args: string[]): string {
     );
   }
   return result.stdout;
+}
+
+function gitShow(cwd: string, objectPath: string): string {
+  return git(cwd, ["show", objectPath]);
 }
 
 function tryGitCommit(
@@ -87,15 +101,26 @@ function tryGitCommit(
   };
 }
 
+function tryGitPush(cwd: string): { ok: boolean; output: string } {
+  const result = spawnSync(
+    "git",
+    [...GIT_IDENTITY, "push", "origin", "HEAD"],
+    { cwd, encoding: "utf8", env: hookEnv },
+  );
+  return {
+    ok: result.status === 0,
+    output: `${result.stdout || ""}${result.stderr || ""}`,
+  };
+}
+
 async function writeScratchFile(
   cwd: string,
   rel: string,
   contents: string,
-): Promise<string> {
+): Promise<void> {
   const abs = path.join(cwd, rel);
   await mkdir(path.dirname(abs), { recursive: true });
   await writeFile(abs, contents);
-  return abs;
 }
 
 function runHooksInstall(cwd: string): void {
@@ -107,176 +132,194 @@ function runHooksInstall(cwd: string): void {
 }
 
 describe("lefthook git hooks", { timeout: 600_000 }, () => {
-  let worktree: { dir: string; dispose: () => Promise<void> };
+  let clone: { dir: string; dispose: () => Promise<void> } | undefined;
 
   beforeAll(async () => {
-    worktree = await createHookWorktree();
-    runHooksInstall(worktree.dir);
+    clone = await createHookClone();
+    runHooksInstall(clone.dir);
   }, 600_000);
 
   afterAll(async () => {
-    await worktree.dispose();
+    await clone?.dispose();
   }, 60_000);
 
-  async function resetWorktree(): Promise<void> {
-    git(worktree.dir, ["reset", "--hard", "HEAD"]);
-    git(worktree.dir, ["clean", "-fd"]);
+  async function resetClone(): Promise<void> {
+    if (!clone) return;
+    git(clone.dir, ["reset", "--hard", "HEAD"]);
+    git(clone.dir, ["clean", "-fd"]);
+    spawnSync("git", [...GIT_IDENTITY, "remote", "remove", "origin"], {
+      cwd: clone.dir,
+      encoding: "utf8",
+    });
     for (const file of SYNC_FROM_WORKING_TREE) {
-      await copyFile(path.join(root, file), path.join(worktree.dir, file));
+      await copyFile(path.join(root, file), path.join(clone.dir, file));
     }
   }
 
   it("installs hooks inside the app repo only", async () => {
+    if (!clone) throw new Error("clone not ready");
+
+    const parentHooksBefore = existsSync(personalProjectsHooks)
+      ? await listHookNames(personalProjectsHooks)
+      : null;
+
     const appRoot = execSync("git rev-parse --show-toplevel", {
-      cwd: root,
+      cwd: clone.dir,
       encoding: "utf8",
     }).trim();
+    const resolvedHooks = path.join(appRoot, ".git", "hooks");
     const hooksPath = execSync("git rev-parse --git-path hooks", {
-      cwd: worktree.dir,
+      cwd: clone.dir,
       encoding: "utf8",
     }).trim();
-    expect(path.resolve(hooksPath)).toBe(
-      path.resolve(appRoot, ".git", "hooks"),
-    );
+    expect(path.resolve(appRoot, hooksPath)).toBe(path.resolve(resolvedHooks));
 
     const preCommit = await readFile(
-      path.join(hooksPath, "pre-commit"),
+      path.join(resolvedHooks, "pre-commit"),
       "utf8",
     );
-    const prePush = await readFile(path.join(hooksPath, "pre-push"), "utf8");
+    const prePush = await readFile(path.join(resolvedHooks, "pre-push"), "utf8");
     expect(preCommit).toMatch(/lefthook/i);
     expect(prePush).toMatch(/lefthook/i);
+
+    if (parentHooksBefore !== null) {
+      const after = await listHookNames(personalProjectsHooks);
+      expect(after).toEqual(parentHooksBefore);
+    }
   });
 
   it("rejects a commit with a UTC date key", async () => {
-    await resetWorktree();
+    await resetClone();
     const rel = "src/lib/hooks-utc-date.ts";
     await writeScratchFile(
-      worktree.dir,
+      clone!.dir,
       rel,
       `export const day = new Date().toISOString().split("T")[0];\n`,
     );
-    git(worktree.dir, ["add", rel]);
-    const result = tryGitCommit(worktree.dir, "utc date should fail");
+    git(clone!.dir, ["add", rel]);
+    const result = tryGitCommit(clone!.dir, "utc date should fail");
     expect(result.ok).toBe(false);
-    expect(result.output).toMatch(/ast-grep|no-utc-date-key|utc/i);
-    await resetWorktree();
+    expect(result.output).toMatch(/no-utc-date-key|ast-grep scan/i);
   });
 
   it("rejects a commit with a floating promise", async () => {
-    await resetWorktree();
+    await resetClone();
     const rel = "src/lib/hooks-floating-promise.ts";
     await writeScratchFile(
-      worktree.dir,
+      clone!.dir,
       rel,
       `export function scratch() {\n  fetch("/api/example");\n}\n`,
     );
-    git(worktree.dir, ["add", rel]);
-    const result = tryGitCommit(worktree.dir, "floating promise should fail");
+    git(clone!.dir, ["add", rel]);
+    const result = tryGitCommit(clone!.dir, "floating promise should fail");
     expect(result.ok).toBe(false);
-    expect(result.output).toMatch(/floating-promises|eslint/i);
-    await resetWorktree();
+    expect(result.output).toMatch(/floating-promises|@typescript-eslint/i);
   });
 
   it("rejects a commit with a type error", async () => {
-    await resetWorktree();
+    await resetClone();
     const rel = "src/lib/hooks-type-error.ts";
     await writeScratchFile(
-      worktree.dir,
+      clone!.dir,
       rel,
       `export const broken: number = "not-a-number";\n`,
     );
-    git(worktree.dir, ["add", rel]);
-    const result = tryGitCommit(worktree.dir, "type error should fail");
+    git(clone!.dir, ["add", rel]);
+    const result = tryGitCommit(clone!.dir, "type error should fail");
     expect(result.ok).toBe(false);
-    expect(result.output).toMatch(/tsc|typecheck|error TS/i);
-    await resetWorktree();
+    expect(result.output).toMatch(/error TS\d+/i);
   });
 
   it("formats a mis-staged file and commits successfully", async () => {
-    await resetWorktree();
+    await resetClone();
     const rel = "src/lib/hooks-prettier-fix.ts";
-    const abs = await writeScratchFile(
-      worktree.dir,
-      rel,
-      `export const x=1;\n`,
-    );
-    git(worktree.dir, ["add", rel]);
-    const result = tryGitCommit(worktree.dir, "prettier should fix spacing");
+    await writeScratchFile(clone!.dir, rel, `export const x=1;\n`);
+    git(clone!.dir, ["add", rel]);
+    const result = tryGitCommit(clone!.dir, "prettier should fix spacing");
     expect(result.ok).toBe(true);
-
-    const committed = await readFile(abs, "utf8");
+    const committed = gitShow(clone!.dir, `HEAD:${rel}`);
     expect(committed).toBe("export const x = 1;\n");
-
-    git(worktree.dir, ["reset", "--hard", "HEAD~1"]);
-    await resetWorktree();
+    git(clone!.dir, ["reset", "--hard", "HEAD~1"]);
   });
 
   it("runs prettier but skips code hooks on docs-only commits", async () => {
-    await resetWorktree();
+    await resetClone();
     const rel = "docs/lefthook-scratch-note.md";
-    const abs = path.join(worktree.dir, rel);
-    await writeFile(abs, `# scratch\n\nno   extra   spaces   stay\n`);
-    git(worktree.dir, ["add", rel]);
-    const hookRun = spawnSync("npx", ["lefthook", "run", "pre-commit"], {
-      cwd: worktree.dir,
-      encoding: "utf8",
-      env: hookEnv,
-    });
-    expect(hookRun.status).toBe(0);
-    const hookLog = `${hookRun.stdout || ""}${hookRun.stderr || ""}`;
-    expect(hookLog).toMatch(/eslint \(skip\)|no files for inspection/i);
-    expect(hookLog).toMatch(/typecheck \(skip\)|no matching staged files/i);
-
-    const result = tryGitCommit(worktree.dir, "docs only");
+    await writeScratchFile(
+      clone!.dir,
+      rel,
+      `# scratch\n\nno   extra   spaces   stay\n`,
+    );
+    git(clone!.dir, ["add", rel]);
+    const result = tryGitCommit(clone!.dir, "docs only");
     expect(result.ok).toBe(true);
-    git(worktree.dir, ["reset", "--hard", "HEAD~1"]);
-    await resetWorktree();
+    expect(result.output).toMatch(/eslint \(skip\)|no files for inspection/i);
+    expect(result.output).toMatch(/typecheck \(skip\)|no matching staged files/i);
+    expect(result.output).toMatch(/ast-grep \(skip\)|no files for inspection/i);
+
+    const committed = gitShow(clone!.dir, `HEAD:${rel}`);
+    expect(committed).not.toMatch(/no   extra   spaces/);
+
+    git(clone!.dir, ["reset", "--hard", "HEAD~1"]);
   });
 
   it("runs npm run check on pre-push and fails when check would fail", async () => {
-    await resetWorktree();
-    const rel = "src/lib/hooks-push-block.ts";
-    await writeScratchFile(
-      worktree.dir,
-      rel,
-      `export const day = new Date().toISOString().split("T")[0];\n`,
-    );
-    git(worktree.dir, ["add", rel]);
-    spawnSync(
-      "git",
-      [...GIT_IDENTITY, "commit", "--no-verify", "-m", "seed bad file"],
-      { cwd: worktree.dir, encoding: "utf8", env: hookEnv },
-    );
+    await resetClone();
+    const bareParent = await mkdtemp(path.join(tmpdir(), "fwp-bare-"));
+    const bare = path.join(bareParent, "remote.git");
+    try {
+      execSync(`git init --bare "${bare}"`, { stdio: "pipe" });
+      git(clone!.dir, ["remote", "add", "origin", bare]);
 
-    const pushHook = spawnSync("npx", ["lefthook", "run", "pre-push"], {
-      cwd: worktree.dir,
-      encoding: "utf8",
-      env: hookEnv,
-    });
-    expect(pushHook.status).not.toBe(0);
-    expect(`${pushHook.stdout || ""}${pushHook.stderr || ""}`).toMatch(
-      /check|ast-grep|eslint|error/i,
-    );
-    git(worktree.dir, ["reset", "--hard", "HEAD~1"]);
-    await resetWorktree();
+      const rel = "src/lib/hooks-push-block.ts";
+      await writeScratchFile(
+        clone!.dir,
+        rel,
+        `export const day = new Date().toISOString().split("T")[0];\n`,
+      );
+      git(clone!.dir, ["add", rel]);
+      const seed = spawnSync(
+        "git",
+        [...GIT_IDENTITY, "commit", "--no-verify", "-m", "seed bad file"],
+        { cwd: clone!.dir, encoding: "utf8", env: hookEnv },
+      );
+      expect(seed.status).toBe(0);
+
+      const push = tryGitPush(clone!.dir);
+      expect(push.ok).toBe(false);
+      expect(push.output).toMatch(/> french-writing-prompter@.*\s+check|npm run check/i);
+      git(clone!.dir, ["reset", "--hard", "HEAD~1"]);
+    } finally {
+      await rm(bareParent, { recursive: true, force: true });
+    }
   });
 });
 
 describe("opencode.json destructive escapes", () => {
   it("denies --no-verify, force push, rm -rf, and sqlite3 data.db", async () => {
     const raw = await readFile(path.join(root, "opencode.json"), "utf8");
-    const OpencodeConfig = z.object({
-      $schema: z.string(),
-      permission: z.object({
-        bash: z.record(z.string(), z.string()),
-      }),
-    });
-    const parsed = parseJson(OpencodeConfig, raw);
+    const OpenCodeConfig = z.object({$schema: z.string(),permission: z.object({bash: z.record(z.string(), z.string())})});
+    const parsed = parseJson(OpenCodeConfig, raw);
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const config = parsed.value;
-    expect(config.$schema).toBe("https://opencode.ai/config.json");
+    const schemaResponse = await fetch(config.$schema);
+    expect(schemaResponse.ok).toBe(true);
+    const schema = (await schemaResponse.json()) as object;
+    const ajv = new Ajv2020({
+      allErrors: true,
+      strict: false,
+      loadSchema: async (uri) => {
+        const response = await fetch(uri);
+        if (!response.ok) {
+          throw new Error(`Failed to load schema ${uri}`);
+        }
+        return response.json() as Promise<object>;
+      },
+    });
+    const validate = await ajv.compileAsync(schema);
+    expect(validate(config)).toBe(true);
+
     const bash = config.permission.bash;
     expect(bash["*"]).toBe("allow");
     expect(bash["*--no-verify*"]).toBe("deny");
