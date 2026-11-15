@@ -29,6 +29,8 @@ const GIT_IDENTITY = [
   "user.name=Hooks Test",
 ];
 
+const hookEnv = { ...process.env, LEFTHOOK: "1" };
+
 async function createHookWorktree(): Promise<{
   dir: string;
   dispose: () => Promise<void>;
@@ -77,6 +79,7 @@ function tryGitCommit(
   const result = spawnSync("git", [...GIT_IDENTITY, "commit", "-m", message], {
     cwd,
     encoding: "utf8",
+    env: hookEnv,
   });
   return {
     ok: result.status === 0,
@@ -215,13 +218,18 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     const abs = path.join(worktree.dir, rel);
     await writeFile(abs, `# scratch\n\nno   extra   spaces   stay\n`);
     git(worktree.dir, ["add", rel]);
+    const hookRun = spawnSync("npx", ["lefthook", "run", "pre-commit"], {
+      cwd: worktree.dir,
+      encoding: "utf8",
+      env: hookEnv,
+    });
+    expect(hookRun.status).toBe(0);
+    const hookLog = `${hookRun.stdout || ""}${hookRun.stderr || ""}`;
+    expect(hookLog).toMatch(/eslint \(skip\)|no files for inspection/i);
+    expect(hookLog).toMatch(/typecheck \(skip\)|no matching staged files/i);
+
     const result = tryGitCommit(worktree.dir, "docs only");
     expect(result.ok).toBe(true);
-
-    expect(result.output).toMatch(/eslint \(skip\)|no files for inspection/i);
-    expect(result.output).toMatch(
-      /typecheck \(skip\)|no matching staged files/i,
-    );
     git(worktree.dir, ["reset", "--hard", "HEAD~1"]);
     await resetWorktree();
   });
@@ -238,13 +246,13 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     spawnSync(
       "git",
       [...GIT_IDENTITY, "commit", "--no-verify", "-m", "seed bad file"],
-      { cwd: worktree.dir, encoding: "utf8" },
+      { cwd: worktree.dir, encoding: "utf8", env: hookEnv },
     );
 
     const pushHook = spawnSync("npx", ["lefthook", "run", "pre-push"], {
       cwd: worktree.dir,
       encoding: "utf8",
-      env: { ...process.env },
+      env: hookEnv,
     });
     expect(pushHook.status).not.toBe(0);
     expect(`${pushHook.stdout || ""}${pushHook.stderr || ""}`).toMatch(
