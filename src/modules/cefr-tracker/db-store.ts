@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { levelChanges } from "@/db/schema";
+import { first } from "@/lib/first";
 import { desc } from "drizzle-orm";
 import type { CefrLevel, LevelChange } from "./cefr-tracker";
 
@@ -11,7 +12,8 @@ export async function getCurrentLevel(): Promise<CefrLevel | null> {
     .limit(1);
 
   if (rows.length === 0) return null;
-  return rows[0].toLevel as CefrLevel;
+  const row = first(rows, "latest level_changes row");
+  return row.toLevel as CefrLevel;
 }
 
 export async function setLevel(

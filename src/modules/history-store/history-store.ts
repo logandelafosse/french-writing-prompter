@@ -1,5 +1,6 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
+import { first } from "@/lib/first";
 import { eq, desc, sql } from "drizzle-orm";
 
 export interface SessionData {
@@ -40,7 +41,9 @@ export async function saveSession(data: SessionData): Promise<Session> {
       .where(eq(sessions.id, data.id))
       .limit(1);
 
-    return rowToSession(rows[0]);
+    return rowToSession(
+      first(rows, `session id ${data.id} after update`),
+    );
   }
 
   const result = await db.insert(sessions).values({
@@ -71,7 +74,8 @@ export async function getSession(id: number): Promise<Session | null> {
     .limit(1);
 
   if (rows.length === 0) return null;
-  return rowToSession(rows[0]);
+  const row = first(rows, `session id ${id}`);
+  return rowToSession(row);
 }
 
 export async function getAllSessions(): Promise<Session[]> {
@@ -85,7 +89,8 @@ export async function getAllSessions(): Promise<Session[]> {
 
 export async function sessionCount(): Promise<number> {
   const rows = await db.select({ count: sql`count(*)` }).from(sessions);
-  return Number(rows[0].count);
+  const row = first(rows, "session count");
+  return Number(row.count);
 }
 
 function rowToSession(row: typeof sessions.$inferSelect): Session {

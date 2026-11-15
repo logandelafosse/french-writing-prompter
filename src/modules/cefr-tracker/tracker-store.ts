@@ -16,7 +16,8 @@ export async function initTracker(): Promise<CefrTracker> {
 
   for (let i = history.length - 1; i >= 0; i--) {
     const h = history[i];
-    trackerInstance.setLevel(h.toLevel, h.source as "auto" | "manual");
+    if (h === undefined) continue;
+    trackerInstance.setLevel(h.toLevel, h.source);
   }
 
   return trackerInstance;

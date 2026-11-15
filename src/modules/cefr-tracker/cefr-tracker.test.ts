@@ -92,9 +92,10 @@ describe("CefrTracker", () => {
       const result = tracker.recordEvaluation({ overallCefr: "A2" });
 
       expect(result).not.toBeNull();
-      expect(result!.toLevel).toBe("A2");
-      expect(result!.fromLevel).toBe("A1");
-      expect(result!.source).toBe("auto");
+      if (result === null) throw new Error("expected promotion");
+      expect(result.toLevel).toBe("A2");
+      expect(result.fromLevel).toBe("A1");
+      expect(result.source).toBe("auto");
       expect(tracker.getLevel()).toBe("A2");
     });
 
@@ -114,7 +115,9 @@ describe("CefrTracker", () => {
       tracker.recordEvaluation({ overallCefr: "C1" });
       const result = tracker.recordEvaluation({ overallCefr: "C1" });
 
-      expect(result!.toLevel).toBe("A2");
+      expect(result).not.toBeNull();
+      if (result === null) throw new Error("expected promotion");
+      expect(result.toLevel).toBe("A2");
       expect(tracker.getLevel()).toBe("A2");
     });
 
@@ -150,8 +153,9 @@ describe("CefrTracker", () => {
       const result = tracker.recordEvaluation({ overallCefr: "B2" });
 
       expect(result).not.toBeNull();
-      expect(result!.toLevel).toBe("B2");
-      expect(result!.source).toBe("auto");
+      if (result === null) throw new Error("expected promotion");
+      expect(result.toLevel).toBe("B2");
+      expect(result.source).toBe("auto");
       expect(tracker.getLevel()).toBe("B2");
     });
 
@@ -202,9 +206,10 @@ describe("CefrTracker", () => {
 
       const history = tracker.getHistory();
       expect(history).toHaveLength(3);
-      expect(history[0].toLevel).toBe("A1");
-      expect(history[1].toLevel).toBe("A2");
-      expect(history[2].toLevel).toBe("B1");
+      const [firstChange, secondChange, thirdChange] = history;
+      expect(firstChange?.toLevel).toBe("A1");
+      expect(secondChange?.toLevel).toBe("A2");
+      expect(thirdChange?.toLevel).toBe("B1");
     });
   });
 });

@@ -62,7 +62,9 @@ describe("WritingEvaluator", () => {
     const evaluator = new WritingEvaluator(mockClient as any);
     await evaluator.evaluate("Test writing.", makePrompt("A2"), "louisiana");
 
-    const callArgs = mockClient.chatCompletionJSON.mock.calls[0][0];
+    const callArgs = mockClient.chatCompletionJSON.mock.calls[0]?.[0];
+    expect(callArgs).toBeDefined();
+    if (callArgs === undefined) throw new Error("expected chatCompletionJSON call");
     const systemMsg = callArgs.messages.find(
       (m: any) => m.role === "system"
     );
@@ -84,7 +86,9 @@ describe("WritingEvaluator", () => {
       "louisiana"
     );
 
-    const callArgs = mockClient.chatCompletionJSON.mock.calls[0][0];
+    const callArgs = mockClient.chatCompletionJSON.mock.calls[0]?.[0];
+    expect(callArgs).toBeDefined();
+    if (callArgs === undefined) throw new Error("expected chatCompletionJSON call");
     const userMsg = callArgs.messages.find((m: any) => m.role === "user");
 
     expect(userMsg.content).toContain("Mon texte en français");

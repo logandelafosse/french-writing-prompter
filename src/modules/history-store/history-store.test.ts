@@ -33,8 +33,9 @@ describe("HistoryStore", () => {
 
     const retrieved = await getSession(session.id);
     expect(retrieved).not.toBeNull();
-    expect(retrieved!.promptText).toBe("Décrivez votre chien.");
-    expect(retrieved!.writingText).toBe("Mon chien est petit et brun.");
+    if (retrieved === null) throw new Error("expected session");
+    expect(retrieved.promptText).toBe("Décrivez votre chien.");
+    expect(retrieved.writingText).toBe("Mon chien est petit et brun.");
   });
 
   it("returns all sessions ordered by most recent first", async () => {
@@ -58,8 +59,9 @@ describe("HistoryStore", () => {
 
     const all = await getAllSessions();
     expect(all).toHaveLength(2);
-    expect(all[0].promptText).toBe("Second");
-    expect(all[1].promptText).toBe("First");
+    const [newest, oldest] = all;
+    expect(newest?.promptText).toBe("Second");
+    expect(oldest?.promptText).toBe("First");
   });
 
   it("counts sessions correctly", async () => {
@@ -95,8 +97,23 @@ describe("HistoryStore", () => {
     });
 
     const updated = await getSession(session.id);
-    expect(updated!.writingText).toBe("My writing");
-    expect(updated!.evaluationJson).toBe('{"score": 5}');
-    expect(updated!.cefrLevel).toBe("A2");
+    expect(updated).not.toBeNull();
+    if (updated === null) throw new Error("expected session");
+    expect(updated.writingText).toBe("My writing");
+    expect(updated.evaluationJson).toBe('{"score": 5}');
+    expect(updated.cefrLevel).toBe("A2");
+  });
+
+  it("throws when updating a session that does not exist", async () => {
+    await expect(
+      saveSession({
+        promptText: "Ghost",
+        promptConstraints: "{}",
+        writingText: null,
+        evaluationJson: null,
+        cefrLevel: "A1",
+        id: 99_999,
+      }),
+    ).rejects.toThrow(/No row found: session id 99999/);
   });
 });

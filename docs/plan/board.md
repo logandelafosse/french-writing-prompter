@@ -12,13 +12,13 @@ _None._
 
 ## In progress
 
-| ID | Ticket | Why |
-|---|---|---|
-| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | Implementer Composer `inherit`, branch `ticket/t02-baseline-green`, started 2026-11-15. Partial CI already on main from T01. |
+_None._
 
 ## In review
 
-_None._
+| ID | Ticket | Why |
+|---|---|---|
+| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39); CI green; Grok 4.7 reviewers dispatched. |
 
 ## Blocked
 

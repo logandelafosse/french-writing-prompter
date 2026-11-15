@@ -17,7 +17,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:studio": "drizzle-kit studio",
-    "pr:size": "git diff --numstat origin/main...HEAD -- src scripts ':!src/**/*.test.*' ':!src/test/**' | awk '{a+=$1} END {print a\" production lines added\"; exit (a>500)}'"
+    "pr:size": "tsx scripts/pr-size.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
