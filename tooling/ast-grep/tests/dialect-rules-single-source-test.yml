@@ -5,3 +5,4 @@ valid:
 invalid:
   - "const prompt = 'utilise eux-autre';"
   - "const prompt = 'utilise vous-autre';"
+  - "const prompt = 'ils eusse parlent';"

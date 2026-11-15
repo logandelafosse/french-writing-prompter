@@ -1,5 +1,5 @@
 id: no-json-parse-script
-language: JavaScript
+language: Tsx
 severity: error
 message: "JSON.parse in scripts needs a schema. Import LOUISIANA_VOCABULARY_HEADWORDS instead."
 rule:

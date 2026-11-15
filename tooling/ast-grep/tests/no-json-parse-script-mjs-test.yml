@@ -1,0 +1,5 @@
+id: no-json-parse-script-mjs
+valid:
+  - "const lines = text.split('\\n');"
+invalid:
+  - "const x = JSON.parse(line);"

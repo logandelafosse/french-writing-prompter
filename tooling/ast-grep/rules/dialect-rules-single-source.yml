@@ -7,6 +7,6 @@ rule:
     - kind: string
     - kind: template_string
     - kind: jsx_text
-  regex: "(?i)(eux-autre|vous-autre|nous-autre|\beusse\b|être après|futur proche|cocodrie|maringouin|chaoui)"
+  regex: '(?i)(eux-autre|vous-autre|nous-autre|\beusse\b|être après|futur proche|cocodrie|maringouin|chaoui)'
 files: ["src/**"]
 ignores: ["src/modules/dialect/**", "src/copy/**"]

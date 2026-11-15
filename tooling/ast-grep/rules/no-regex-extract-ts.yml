@@ -1,5 +1,5 @@
 id: no-regex-extract-ts
-language: JavaScript
+language: Tsx
 severity: error
 message: "Do not readFileSync a .ts file and regex out an export."
 rule:
