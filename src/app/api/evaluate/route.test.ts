@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { z } from "zod";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
+import { parseJson } from "@/lib/json";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 
@@ -34,9 +36,25 @@ describe("POST /api/evaluate", () => {
       cefrLevel: "A2",
     });
 
-    evaluateMock.mockRejectedValue(
-      new AiOutputError("schema_mismatch", "bad shape", new Error("zod")),
-    );
+    const fakeMalformedModelText = '{"score": 5}';
+    evaluateMock.mockImplementation(async (schema: z.ZodType) => {
+      const result = parseJson(schema, fakeMalformedModelText);
+      if (result.ok) {
+        return result.value;
+      }
+      if (result.reason === "invalid_json") {
+        throw new AiOutputError(
+          "invalid_json",
+          "AI response was not valid JSON",
+          result.cause,
+        );
+      }
+      throw new AiOutputError(
+        "schema_mismatch",
+        "AI response did not match the expected schema",
+        result.cause,
+      );
+    });
 
     const { POST } = await import("./route");
     const response = await POST(
