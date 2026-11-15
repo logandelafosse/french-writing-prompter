@@ -3,5 +3,14 @@ ruleDirs:
 testConfigs:
   - testDir: tooling/ast-grep/tests
 languageGlobs:
-  tsx: ["*.ts"]
-  javascript: ["*.mjs", "*.js", "*.cjs"]
+  tsx:
+    - "src/**/*.ts"
+    - "tooling/**/*.ts"
+    - "vitest.config.ts"
+    - "next.config.ts"
+    - "drizzle.config.ts"
+  javascript:
+    - "scripts/**/*.ts"
+    - "*.mjs"
+    - "*.js"
+    - "*.cjs"
