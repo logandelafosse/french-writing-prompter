@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T06 merged PR #43; T07 dispatched).
+Last updated: 2026-11-15 by coordinator (T07 PR #44 in review).
 
 ## Ready
 
@@ -15,13 +15,13 @@ Last updated: 2026-11-15 by coordinator (T06 merged PR #43; T07 dispatched).
 
 ## In progress
 
-| ID  | Ticket                                                                                         | Why                                                                        |
-| --- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| T07 | ast-grep guardrails ([#9](https://github.com/logandelafosse/french-writing-prompter/issues/9)) | Branch `ticket/t07-ast-grep`; implementer dispatched 2026-11-15 after T06. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                         | Why                                                                                            |
+| --- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| T07 | ast-grep guardrails ([#9](https://github.com/logandelafosse/french-writing-prompter/issues/9)) | [PR #44](https://github.com/logandelafosse/french-writing-prompter/pull/44); parallel reviews. |
 
 ## Blocked
 
@@ -36,7 +36,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                                                                                        |
 | T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                                                                                        |
 | T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                                                                                        |
-| T07 | ast-grep guardrails                                                 | AFK  | —          | **In progress**                                                                                                 |
+| T07 | ast-grep guardrails                                                 | AFK  | —          | **In review** — PR #44                                                                                          |
 | T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | T05, T07   | Needs boundaries typed so `no-unsafe-*` is quiet                                                                |
 | T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | In **Ready**. Either order with T07: whichever merges second adds the scaffold-leftovers rule (see both specs). |
 | T10 | UI primitives                                                       | AFK  | T09        | Built on tokens. If T06's knip pass deleted `ui/button.tsx` or its deps, T10 recreates them.                    |
