@@ -1,0 +1,5 @@
+id: no-raw-color-css
+valid:
+  - ".card { color: var(--foreground); }"
+invalid:
+  - ":root { --x: oklch(1 0 0); }"

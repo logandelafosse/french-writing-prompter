@@ -1,0 +1,5 @@
+id: dialect-rules-single-source
+valid:
+  - "import { LOUISIANA_RULES } from '@/modules/dialect/louisiana-rules';"
+invalid:
+  - "const prompt = 'utilise vous-autre';"

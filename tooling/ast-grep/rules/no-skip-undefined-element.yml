@@ -1,0 +1,7 @@
+id: no-skip-undefined-element
+language: Tsx
+severity: error
+message: "Do not continue past an undefined index."
+rule:
+  pattern: if ($EL === undefined) continue
+files: ["src/**"]

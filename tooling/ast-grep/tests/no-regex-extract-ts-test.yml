@@ -1,0 +1,5 @@
+id: no-regex-extract-ts
+valid:
+  - "import { LOUISIANA_VOCABULARY_HEADWORDS } from './louisiana-rules.ts';"
+invalid:
+  - 'const src = fs.readFileSync("src/modules/dialect/louisiana-rules.ts", "utf8");'

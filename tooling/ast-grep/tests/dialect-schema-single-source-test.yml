@@ -1,0 +1,5 @@
+id: dialect-schema-single-source
+valid:
+  - "import { FrenchDialect } from '@/contracts/prompt';"
+invalid:
+  - "export const DialectSchema = z.literal(DEFAULT_DIALECT);"

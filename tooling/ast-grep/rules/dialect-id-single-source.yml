@@ -1,0 +1,9 @@
+id: dialect-id-single-source
+language: Tsx
+severity: error
+message: 'Use DEFAULT_DIALECT / FrenchDialect from src/contracts instead of the literal "louisiana".'
+rule:
+  kind: string
+  regex: '^["'']louisiana["'']$'
+files: ["src/**"]
+ignores: ["src/modules/dialect/**", "src/contracts/**"]

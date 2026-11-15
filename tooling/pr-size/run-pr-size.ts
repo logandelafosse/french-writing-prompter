@@ -1,4 +1,4 @@
-import { execSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 import { parseNumstatAddedLines, totalAddedLines } from "./parse-numstat";
 
 export const PRODUCTION_LINE_LIMIT = 500;
@@ -11,14 +11,14 @@ export type PrSizeResult = {
 };
 
 export function mergeBaseRef(baseRef: string, cwd: string): string {
-  return execSync(`git merge-base ${baseRef} HEAD`, {
+  return execFileSync("git", ["merge-base", baseRef, "HEAD"], {
     cwd,
     encoding: "utf8",
   }).trim();
 }
 
 export function gitNumstat(mergeBase: string, cwd: string): string {
-  return execSync(`git diff --numstat ${mergeBase}...HEAD`, {
+  return execFileSync("git", ["diff", "--numstat", `${mergeBase}...HEAD`], {
     cwd,
     encoding: "utf8",
   });

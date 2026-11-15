@@ -1,14 +1,16 @@
+import type { FrenchDialect } from "@/contracts/prompt";
 import {
   DEFAULT_DIALECT,
   LOUISIANA_RULES,
   LOUISIANA_VOCABULARY_HEADWORDS,
-  type Dialect,
 } from "./louisiana-rules";
 import { LEVEL_DESCRIPTIONS } from "./level-descriptions";
 
 export { LEVEL_DESCRIPTIONS };
 
-export function renderForGenerator(dialect: Dialect = DEFAULT_DIALECT): string {
+export function renderForGenerator(
+  dialect: FrenchDialect = DEFAULT_DIALECT,
+): string {
   if (dialect !== DEFAULT_DIALECT) {
     return "";
   }
@@ -27,7 +29,9 @@ ${grammar}
 Vocabulary (Louisiana headwords from the DLF; treat as correct): ${vocab}`;
 }
 
-export function renderForEvaluator(dialect: Dialect = DEFAULT_DIALECT): string {
+export function renderForEvaluator(
+  dialect: FrenchDialect = DEFAULT_DIALECT,
+): string {
   if (dialect !== DEFAULT_DIALECT) {
     return "";
   }

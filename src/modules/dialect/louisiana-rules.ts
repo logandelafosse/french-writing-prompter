@@ -1,8 +1,4 @@
-import { z } from "zod";
-
 export const DEFAULT_DIALECT = "louisiana" as const;
-export const DialectSchema = z.literal(DEFAULT_DIALECT);
-export type Dialect = z.infer<typeof DialectSchema>;
 
 export type LouisianaRule = {
   id: string;
@@ -12,7 +8,7 @@ export type LouisianaRule = {
   neverFlag: true;
 };
 
-/** DLF headwords (≤30); verified via `node scripts/verify-dlf-seed.mjs`. */
+/** DLF headwords (≤30); verified via `tsx scripts/verify-dlf-seed.ts`. */
 export const LOUISIANA_VOCABULARY_HEADWORDS = [
   "asteur",
   "berceuse",

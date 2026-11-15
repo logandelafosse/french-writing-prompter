@@ -1,0 +1,5 @@
+id: no-boolean-loading-state
+valid:
+  - "const [status, setStatus] = useState<'idle' | 'generating'>('idle');"
+invalid:
+  - "const [loading, setLoading] = useState(false);"

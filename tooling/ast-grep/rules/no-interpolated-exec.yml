@@ -1,0 +1,9 @@
+id: no-interpolated-exec
+language: Tsx
+severity: error
+message: "Use execFileSync(bin, args). A template string passed to execSync is a shell."
+rule:
+  kind: call_expression
+  regex: '^execSync\(`'
+files: ["scripts/**", "tooling/**", "src/**"]
+ignores: ["**/*.test.ts"]

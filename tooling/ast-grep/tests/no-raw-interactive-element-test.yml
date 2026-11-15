@@ -1,0 +1,5 @@
+id: no-raw-interactive-element
+valid:
+  - "import { Button } from '@/components/ui/button';"
+invalid:
+  - "return <button type='button'>Go</button>;"

@@ -1,0 +1,5 @@
+id: no-json-parse-script
+valid:
+  - "import { LOUISIANA_VOCABULARY_HEADWORDS } from '../src/modules/dialect/louisiana-rules.ts';"
+invalid:
+  - "const x = JSON.parse(line);"

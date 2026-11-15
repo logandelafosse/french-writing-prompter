@@ -1,0 +1,7 @@
+ruleDirs:
+  - tooling/ast-grep/rules
+testConfigs:
+  - testDir: tooling/ast-grep/tests
+languageGlobs:
+  tsx: ["*.ts"]
+  javascript: ["*.mjs", "*.js", "*.cjs"]

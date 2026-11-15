@@ -4,6 +4,8 @@ import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { readResponseJson } from "@/test/read-response-json";
+import { ApiErrorBody } from "@/test/api-response-schemas";
 
 vi.mock("@/modules/openai-client/openai-client", () => ({
   OpenAiClient: class {
@@ -31,7 +33,7 @@ describe("POST /api/evaluate body validation", () => {
     );
 
     expect(response.status).toBe(400);
-    const json = await response.json();
+    const json = await readResponseJson(response, ApiErrorBody);
     expect(json.error).toMatch(/sessionId/i);
   });
 
@@ -60,7 +62,7 @@ describe("POST /api/evaluate body validation", () => {
     );
 
     expect(response.status).toBe(400);
-    const json = await response.json();
+    const json = await readResponseJson(response, ApiErrorBody);
     expect(json.error).toMatch(/writing/i);
 
     const stored = await getSession(session.id);
@@ -94,7 +96,7 @@ describe("POST /api/evaluate body validation", () => {
     );
 
     expect(response.status).toBe(400);
-    const json = await response.json();
+    const json = await readResponseJson(response, ApiErrorBody);
     expect(json.error).toMatch(/extra/i);
 
     const rows = await db

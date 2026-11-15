@@ -1,0 +1,9 @@
+id: no-inline-model-name
+language: Tsx
+severity: error
+message: "Model names live in src/config/ai.ts."
+rule:
+  kind: string
+  regex: '^["''](gpt-|o\d|chatgpt-)'
+files: ["src/**"]
+ignores: ["src/config/**"]

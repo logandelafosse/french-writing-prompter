@@ -1,0 +1,20 @@
+id: no-raw-json-body
+language: Tsx
+severity: error
+message: "Read request/response bodies with parseRequestBody(request, Schema) or fetchJson(url, Schema)."
+rule:
+  any:
+    - pattern: $R.json()
+    - pattern: $R?.json()
+    - pattern: $R.json?.()
+    - pattern: $R["json"]()
+    - pattern: $R['json']()
+    - pattern: ($R.json)()
+    - pattern: (0, $R.json)()
+    - pattern: Reflect.apply($R.json, $$$)
+    - pattern: const { json } = $R
+    - pattern: "const { json: $NAME } = $R"
+    - pattern: const $NAME = $R.json
+    - pattern: let $NAME = $R.json
+files: ["src/**"]
+ignores: ["src/lib/http/parse-request-body.ts"]

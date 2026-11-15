@@ -1,0 +1,11 @@
+id: no-raw-color-css
+language: Css
+severity: error
+message: "Colors are defined once in src/styles/tokens.css; reference var(--color-*) elsewhere."
+rule:
+  any:
+    - kind: color_value
+    - kind: call_expression
+      regex: '^(rgba?|hsla?|oklch)\('
+files: ["src/**/*.css"]
+ignores: ["src/styles/tokens.css"]

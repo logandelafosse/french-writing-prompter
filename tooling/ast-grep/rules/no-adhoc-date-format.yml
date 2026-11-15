@@ -1,0 +1,12 @@
+id: no-adhoc-date-format
+language: Tsx
+severity: error
+message: "Format dates through src/lib/dates.ts (French formats like `21 h 42` live there once)."
+rule:
+  any:
+    - pattern: $D.toLocaleDateString($$$)
+    - pattern: $D.toLocaleTimeString($$$)
+    - pattern: $D.toLocaleString($$$)
+    - pattern: new Intl.DateTimeFormat($$$)
+files: ["src/**"]
+ignores: ["src/lib/dates.ts", "src/components/legacy/**"]

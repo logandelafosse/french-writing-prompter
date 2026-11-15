@@ -1,0 +1,8 @@
+id: dialect-schema-single-source
+language: Tsx
+severity: error
+message: "One dialect schema: FrenchDialect in src/contracts."
+rule:
+  pattern: z.literal(DEFAULT_DIALECT)
+files: ["src/**"]
+ignores: ["src/contracts/**"]

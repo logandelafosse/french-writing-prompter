@@ -1,0 +1,9 @@
+id: no-json-parse-script
+language: JavaScript
+severity: error
+message: "JSON.parse in scripts needs a schema. Import LOUISIANA_VOCABULARY_HEADWORDS instead."
+rule:
+  any:
+    - pattern: JSON.parse($$$ARGS)
+    - pattern: JSON["parse"]($$$ARGS)
+files: ["scripts/**", "tooling/**"]

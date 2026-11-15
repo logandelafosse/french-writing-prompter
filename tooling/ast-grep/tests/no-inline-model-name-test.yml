@@ -1,0 +1,5 @@
+id: no-inline-model-name
+valid:
+  - "import { DEFAULT_CHAT_MODEL } from '@/config/ai';"
+invalid:
+  - "const model = 'gpt-4o';"

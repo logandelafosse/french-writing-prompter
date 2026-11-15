@@ -1,0 +1,24 @@
+id: no-process-env
+language: Tsx
+severity: error
+message: "Read configuration through getEnv() from src/server/env.ts."
+rule:
+  any:
+    - pattern: process.env
+    - pattern: process?.env
+    - pattern: process["env"]
+    - pattern: process['env']
+    - pattern: globalThis.process.env
+    - pattern: global.process.env
+    - pattern: globalThis.process["env"]
+    - pattern: global.process["env"]
+    - pattern: (process).env
+    - pattern: const { env } = process
+    - pattern: "const { env: $NAME } = process"
+    - pattern: const { $$$ env $$$ } = process
+    - pattern: import { env } from "node:process"
+    - pattern: 'import { env as $NAME } from "node:process"'
+    - pattern: import { env } from 'node:process'
+    - pattern: "import { env as $NAME } from 'node:process'"
+files: ["src/**"]
+ignores: ["src/server/env.ts"]

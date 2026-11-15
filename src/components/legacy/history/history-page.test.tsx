@@ -4,9 +4,17 @@ import userEvent from "@testing-library/user-event";
 import { HistoryPage } from "./history-page";
 import type { SessionView } from "@/contracts/session";
 import evaluationFixtureJson from "@/test/fixtures/ai/evaluation.valid.json";
-import type { Evaluation } from "@/contracts/evaluation";
+import { Evaluation } from "@/contracts/evaluation";
+import { parseJson } from "@/lib/json";
 
-const evaluationFixture = evaluationFixtureJson as Evaluation;
+const evaluationParsed = parseJson(
+  Evaluation,
+  JSON.stringify(evaluationFixtureJson),
+);
+if (!evaluationParsed.ok) {
+  throw new Error("fixture invalid");
+}
+const evaluationFixture = evaluationParsed.value;
 
 const MALFORMED_NOTICE =
   "Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.";

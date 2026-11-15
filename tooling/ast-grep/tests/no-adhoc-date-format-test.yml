@@ -1,0 +1,5 @@
+id: no-adhoc-date-format
+valid:
+  - "return formatFrenchDate(date);"
+invalid:
+  - "const s = date.toLocaleDateString('fr-FR');"

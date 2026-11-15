@@ -1,0 +1,8 @@
+id: word-target-single-source
+language: Tsx
+severity: error
+message: "Word-count ranges live only in WORD_TARGET_BY_LEVEL (src/config/limits.ts)."
+rule:
+  kind: string
+  regex: '\d+\s*[–—-]\s*\d+\s*mots'
+files: ["src/**"]
