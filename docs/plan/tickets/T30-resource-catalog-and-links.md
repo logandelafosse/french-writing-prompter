@@ -2,9 +2,9 @@
 
 | Phase | Type | Blocked by | Production lines (est.) |
 |---|---|---|---|
-| 3 | HITL (Q7) | T28 | ~200 (excluding catalog data) |
+| 3 | AFK (Q7 answered) | T28 | ~200 (excluding catalog data) |
 
-**Owner question Q7:** What goes in the Resource catalog? **Default if accepted:** the implementer drafts a starter catalog of well-known free French grammar and comprehensible-input sources, and Logan edits it in the PR before merge.
+**Resource catalog (Q7, answered 2026-11-15):** implementer drafts a starter catalog of well-known **general** free French grammar + comprehensible-input sources; Logan edits in the PR. Louisiana-specific CI is not required for v1 (not easily accessible). Prefer `dialect: "standard"` entries that still help with shared Romance grammar; add Louisiana sources later when available.
 
 ## User stories
 

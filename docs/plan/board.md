@@ -73,7 +73,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 |---|---|---|---|---|
 | T28 | Weakness memory and Carnet "À travailler" | AFK | T22, T26 | Needs Mistakes and the Carnet page |
 | T29 | Focus du jour driving prompts; "Pratiquer ça" | AFK | T15, T28 | Needs Weaknesses and generator v2. ~420 lines: split into T29a (Focus) / T29b (Pratiquer ça) is pre-approved, see spec. |
-| T30 | Resource catalog and links | HITL (Q7) | T28 | Needs Weakness categories; catalog contents |
+| T30 | Resource catalog and links | AFK | T28 | Needs Weakness categories. Q7: general French starter catalog; LA CI later. |
 
 ### Phase 4 — Archive and polish
 
