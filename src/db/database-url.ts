@@ -24,8 +24,8 @@ export function databaseUrlToFilePath(databaseUrl: string): string | null {
   return path.resolve(process.cwd(), rest);
 }
 
-export function assertVitestDatabaseUrl(url: string): void {
-  if (!process.env.VITEST) {
+export function assertVitestDatabaseUrl(url: string, vitest: boolean): void {
+  if (!vitest) {
     return;
   }
 

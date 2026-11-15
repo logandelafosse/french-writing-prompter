@@ -4,6 +4,8 @@ import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
 import { PlacementTest } from "@/modules/placement-test/placement-test";
 import { setLevel } from "@/modules/cefr-tracker/db-store";
+import { PlacementPostBody } from "@/contracts/api";
+import { parseRequestBody } from "@/lib/http";
 
 let placementTest: PlacementTest | null = null;
 
@@ -23,7 +25,12 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
+  const parsed = await parseRequestBody(request, PlacementPostBody);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
+  const body = parsed.value;
 
   if (body.action === "start") {
     placementTest = new PlacementTest(promptGenerator, evaluator, "louisiana");
@@ -36,31 +43,27 @@ export async function POST(request: Request) {
     });
   }
 
-  if (body.action === "submit") {
-    if (!placementTest) {
-      return NextResponse.json(
-        { error: "No active placement test." },
-        { status: 400 },
-      );
-    }
+  if (!placementTest) {
+    return NextResponse.json(
+      { error: "No active placement test." },
+      { status: 400 },
+    );
+  }
 
-    const result = await placementTest.submitWriting(body.writing);
+  const result = await placementTest.submitWriting(body.writing);
 
-    if (result.type === "complete") {
-      await setLevel(result.finalLevel, "manual");
-      return NextResponse.json({
-        type: "complete",
-        finalLevel: result.finalLevel,
-        evaluations: result.evaluations,
-      });
-    }
-
+  if (result.type === "complete") {
+    await setLevel(result.finalLevel, "manual");
     return NextResponse.json({
-      type: "next_prompt",
-      prompt: result.prompt,
-      step: result.step,
+      type: "complete",
+      finalLevel: result.finalLevel,
+      evaluations: result.evaluations,
     });
   }
 
-  return NextResponse.json({ error: "Invalid action." }, { status: 400 });
+  return NextResponse.json({
+    type: "next_prompt",
+    prompt: result.prompt,
+    step: result.step,
+  });
 }

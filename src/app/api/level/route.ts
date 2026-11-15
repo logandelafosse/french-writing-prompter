@@ -4,7 +4,8 @@ import {
   getLevelHistory,
 } from "@/modules/cefr-tracker/db-store";
 import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
-import type { CefrLevel } from "@/modules/cefr-tracker/cefr-tracker";
+import { LevelPutBody } from "@/contracts/api";
+import { parseRequestBody } from "@/lib/http";
 
 export async function GET() {
   const level = await getCurrentLevel();
@@ -13,8 +14,11 @@ export async function GET() {
 }
 
 export async function PUT(request: Request) {
-  const body: { level: CefrLevel; source: "auto" | "manual" } =
-    await request.json();
-  const change = await setTrackerLevel(body.level, body.source);
+  const parsed = await parseRequestBody(request, LevelPutBody);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
+  const change = await setTrackerLevel(parsed.value.level, "manual");
   return NextResponse.json({ change });
 }

@@ -1,11 +1,27 @@
-import { drizzle } from "drizzle-orm/libsql";
+import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 import { createLibsqlClient } from "./libsql-client";
+import { getEnv } from "@/server/env";
 
-function databaseUrl(): string {
-  return process.env.DATABASE_URL ?? "file:./data.db";
+type AppDatabase = LibSQLDatabase<typeof schema>;
+
+let dbInstance: AppDatabase | undefined;
+
+function getDbInstance(): AppDatabase {
+  if (!dbInstance) {
+    const client = createLibsqlClient(getEnv().DATABASE_URL);
+    dbInstance = drizzle(client, { schema });
+  }
+  return dbInstance;
 }
 
-const client = createLibsqlClient(databaseUrl());
-
-export const db = drizzle(client, { schema });
+export const db = new Proxy({} as AppDatabase, {
+  get(_target, prop, receiver) {
+    const instance = getDbInstance();
+    const value = Reflect.get(instance, prop, receiver);
+    if (typeof value === "function") {
+      return value.bind(instance);
+    }
+    return value;
+  },
+});

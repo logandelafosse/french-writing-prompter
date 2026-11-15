@@ -6,11 +6,24 @@ import type { Evaluation } from "@/contracts/evaluation";
 import type { CefrLevel } from "@/components/level/level-components";
 import { LevelBadge } from "@/components/level/level-components";
 import { EvaluationCard } from "@/components/prompt/evaluation-card";
+import { PlacementPostResponse } from "@/contracts/api";
+import { fetchJson } from "@/lib/http";
 
 type FlowState =
   | { phase: "idle" }
   | { phase: "prompt"; prompt: WritingPrompt; step: number }
   | { phase: "complete"; finalLevel: CefrLevel; evaluations: Evaluation[] };
+
+function resolveFetchError(
+  kind: "network" | "http" | "invalid",
+  message: string | undefined,
+  fallback: string,
+): string {
+  if (kind === "http" && message) {
+    return message;
+  }
+  return fallback;
+}
 
 export function PlacementTestCard() {
   const [flow, setFlow] = useState<FlowState>({ phase: "idle" });
@@ -23,24 +36,31 @@ export function PlacementTestCard() {
     setError(null);
     setWriting("");
 
-    try {
-      const res = await fetch("/api/placement", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "start" }),
-      });
-      const data = await res.json();
+    const result = await fetchJson("/api/placement", PlacementPostResponse, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "start" }),
+    });
 
-      if (!res.ok) {
-        setError(data.error);
-      } else {
-        setFlow({ phase: "prompt", prompt: data.prompt, step: data.step });
-      }
-    } catch {
+    if (!result.ok) {
+      setError(
+        resolveFetchError(
+          result.error.kind,
+          result.error.kind === "http" ? result.error.message : undefined,
+          "Error starting the test.",
+        ),
+      );
+    } else if (result.value.type === "prompt") {
+      setFlow({
+        phase: "prompt",
+        prompt: result.value.prompt,
+        step: result.value.step,
+      });
+    } else {
       setError("Error starting the test.");
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const handleSubmit = async () => {
@@ -49,35 +69,38 @@ export function PlacementTestCard() {
     setLoading(true);
     setError(null);
 
-    try {
-      const res = await fetch("/api/placement", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "submit", writing: writing.trim() }),
-      });
-      const data = await res.json();
+    const result = await fetchJson("/api/placement", PlacementPostResponse, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "submit", writing: writing.trim() }),
+    });
 
-      if (!res.ok) {
-        setError(data.error);
-      } else if (data.type === "next_prompt") {
-        setFlow({
-          phase: "prompt",
-          prompt: data.prompt,
-          step: data.step,
-        });
-        setWriting("");
-      } else if (data.type === "complete") {
-        setFlow({
-          phase: "complete",
-          finalLevel: data.finalLevel,
-          evaluations: data.evaluations,
-        });
-      }
-    } catch {
+    if (!result.ok) {
+      setError(
+        resolveFetchError(
+          result.error.kind,
+          result.error.kind === "http" ? result.error.message : undefined,
+          "Error during evaluation.",
+        ),
+      );
+    } else if (result.value.type === "next_prompt") {
+      setFlow({
+        phase: "prompt",
+        prompt: result.value.prompt,
+        step: result.value.step,
+      });
+      setWriting("");
+    } else if (result.value.type === "complete") {
+      setFlow({
+        phase: "complete",
+        finalLevel: result.value.finalLevel,
+        evaluations: result.value.evaluations,
+      });
+    } else {
       setError("Error during evaluation.");
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   if (flow.phase === "complete") {
@@ -177,7 +200,7 @@ export function PlacementTestCard() {
               Cancel
             </button>
             <button
-              onClick={handleSubmit}
+              onClick={() => void handleSubmit()}
               disabled={loading || !writing.trim()}
               className="flex-1 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -198,8 +221,13 @@ export function PlacementTestCard() {
         Don't know your level? Take a 3-prompt writing test to determine it
         automatically.
       </p>
+      {error && (
+        <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+          <p>{error}</p>
+        </div>
+      )}
       <button
-        onClick={handleStart}
+        onClick={() => void handleStart()}
         disabled={loading}
         className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
       >

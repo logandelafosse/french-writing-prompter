@@ -4,7 +4,11 @@ async function expectDbImportRejects(envUrl: string): Promise<void> {
   vi.stubEnv("DATABASE_URL", envUrl);
   await expect(async () => {
     vi.resetModules();
-    await import("@/db");
+    const { clearEnvCache } = await import("@/server/env");
+    clearEnvCache();
+    const { db } = await import("@/db");
+    const { sessions } = await import("@/db/schema");
+    await db.select().from(sessions);
   }).rejects.toThrow(/Refusing to open .+ under Vitest/);
   vi.unstubAllEnvs();
 }

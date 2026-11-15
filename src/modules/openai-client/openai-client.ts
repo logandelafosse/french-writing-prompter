@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import type { z } from "zod";
 import { parseJson } from "@/lib/json";
+import { getEnv } from "@/server/env";
 import { AiOutputError } from "./ai-output-error";
 
 export interface ChatCompletionParams {
@@ -14,19 +15,23 @@ export interface ChatCompletionParams {
 }
 
 export class OpenAiClient {
-  private openai: OpenAI;
+  private openai: OpenAI | null = null;
 
-  constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY ?? "sk-placeholder",
-      maxRetries: 2,
-      timeout: 30000,
-    });
+  private client(): OpenAI {
+    if (!this.openai) {
+      const { OPENAI_API_KEY } = getEnv();
+      this.openai = new OpenAI({
+        apiKey: OPENAI_API_KEY ?? "",
+        maxRetries: 2,
+        timeout: 30000,
+      });
+    }
+    return this.openai;
   }
 
   async chatCompletion(params: ChatCompletionParams): Promise<string> {
     try {
-      const response = await this.openai.chat.completions.create({
+      const response = await this.client().chat.completions.create({
         model: params.model,
         messages:
           params.messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],

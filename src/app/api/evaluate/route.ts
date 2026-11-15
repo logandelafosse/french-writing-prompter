@@ -6,14 +6,21 @@ import { getSession, saveSession } from "@/modules/history-store/history-store";
 import { getTracker } from "@/modules/cefr-tracker/tracker-store";
 import { parseCefrLevel } from "@/contracts/cefr";
 import { PromptConstraints } from "@/contracts/prompt";
+import { EvaluatePostBody } from "@/contracts/api";
 import type { FrenchDialect } from "@/contracts/prompt";
 import { parseJson } from "@/lib/json";
+import { parseRequestBody } from "@/lib/http";
 
 const openai = new OpenAiClient();
 const evaluator = new WritingEvaluator(openai);
 
 export async function POST(request: Request) {
-  const body: { writing: string; sessionId: number } = await request.json();
+  const parsed = await parseRequestBody(request, EvaluatePostBody);
+  if (!parsed.ok) {
+    return parsed.response;
+  }
+
+  const body = parsed.value;
 
   const session = await getSession(body.sessionId);
   if (!session) {

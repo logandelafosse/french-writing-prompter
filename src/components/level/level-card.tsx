@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { LevelBadge, LevelSelector, type CefrLevel } from "./level-components";
+import { LevelGetResponse } from "@/contracts/api";
+import { fetchJson } from "@/lib/http";
 
-interface LevelData {
+type LevelData = {
   level: CefrLevel | null;
   history: Array<{
     fromLevel: CefrLevel | null;
@@ -11,23 +13,29 @@ interface LevelData {
     source: "auto" | "manual";
     createdAt: string;
   }>;
-}
+};
+
+const LOAD_ERROR = "An error occurred. Please try again.";
 
 export function LevelCard() {
   const [data, setData] = useState<LevelData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     async function loadLevel() {
-      const res = await fetch("/api/level");
-      const json = await res.json();
-      if (!cancelled) {
-        setData(json);
+      const result = await fetchJson("/api/level", LevelGetResponse);
+      if (cancelled) return;
+      if (!result.ok) {
+        setError(LOAD_ERROR);
         setLoading(false);
+        return;
       }
+      setData(result.value);
+      setLoading(false);
     }
-    loadLevel();
+    void loadLevel();
     return () => {
       cancelled = true;
     };
@@ -35,9 +43,14 @@ export function LevelCard() {
 
   async function fetchLevel() {
     setLoading(true);
-    const res = await fetch("/api/level");
-    const json = await res.json();
-    setData(json);
+    setError(null);
+    const result = await fetchJson("/api/level", LevelGetResponse);
+    if (!result.ok) {
+      setError(LOAD_ERROR);
+      setLoading(false);
+      return;
+    }
+    setData(result.value);
     setLoading(false);
   }
 
@@ -45,9 +58,9 @@ export function LevelCard() {
     await fetch("/api/level", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ level, source: "manual" }),
+      body: JSON.stringify({ level }),
     });
-    fetchLevel();
+    await fetchLevel();
   };
 
   if (loading) {
@@ -55,6 +68,14 @@ export function LevelCard() {
       <div className="animate-pulse rounded-xl border bg-white p-6">
         <div className="h-5 w-24 rounded bg-zinc-100" />
         <div className="mt-3 h-8 w-48 rounded bg-zinc-100" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border bg-white p-6">
+        <p className="text-sm text-red-600">{error}</p>
       </div>
     );
   }
