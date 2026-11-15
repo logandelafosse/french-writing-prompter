@@ -164,7 +164,7 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
 
     const parentHooksBefore = existsSync(personalProjectsHooks)
       ? await listHookNames(personalProjectsHooks)
-      : null;
+      : [];
 
     const appRoot = execSync("git rev-parse --show-toplevel", {
       cwd: clone.dir,
@@ -188,10 +188,10 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     expect(preCommit).toMatch(/lefthook/i);
     expect(prePush).toMatch(/lefthook/i);
 
-    if (parentHooksBefore !== null) {
-      const after = await listHookNames(personalProjectsHooks);
-      expect(after).toEqual(parentHooksBefore);
-    }
+    const parentHooksAfter = existsSync(personalProjectsHooks)
+      ? await listHookNames(personalProjectsHooks)
+      : [];
+    expect(parentHooksAfter).toEqual(parentHooksBefore);
   });
 
   it("rejects a commit with a UTC date key", async () => {
