@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T11 merged PR #48; T13 Ready).
+Last updated: 2026-11-15 by coordinator (T12 PR #49 in review).
 
 ## Ready
 
@@ -14,13 +14,13 @@ Last updated: 2026-11-15 by coordinator (T11 merged PR #48; T13 Ready).
 
 ## In progress
 
-| ID  | Ticket                                                                                           | Why                                      |
-| --- | ------------------------------------------------------------------------------------------------ | ---------------------------------------- |
-| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14)) | `ticket/t12-lefthook`; T08 merged (#46). |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                           | Why                                                                                                                   |
+| --- | ------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14)) | [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49); `check`+`e2e` green; reviews dispatched. |
 
 ## Blocked
 
@@ -30,18 +30,18 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 0 — Foundations
 
-| ID  | Ticket                                                              | Type | Blocked by | Why not ready                           |
-| --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------------------- |
-| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                |
-| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                |
-| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44                |
-| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **Done** — merged PR #46                |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **Done** — merged PR #45                |
-| T10 | UI primitives                                                       | AFK  | —          | **Done** — merged PR #47                |
-| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | **Done** — merged PR #48                |
-| T12 | Lefthook pre-commit                                                 | AFK  | —          | **In progress** — `ticket/t12-lefthook` |
-| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **Ready** — T06/T10/T11 merged          |
+| ID  | Ticket                                                              | Type | Blocked by | Why not ready                  |
+| --- | ------------------------------------------------------------------- | ---- | ---------- | ------------------------------ |
+| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40       |
+| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42       |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43       |
+| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44       |
+| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **Done** — merged PR #46       |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **Done** — merged PR #45       |
+| T10 | UI primitives                                                       | AFK  | —          | **Done** — merged PR #47       |
+| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | **Done** — merged PR #48       |
+| T12 | Lefthook pre-commit                                                 | AFK  | —          | **In review** — PR #49         |
+| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **Ready** — T06/T10/T11 merged |
 
 ### Phase 1 — Core loop
 
