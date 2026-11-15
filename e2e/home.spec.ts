@@ -8,10 +8,8 @@ const HAPPY_WRITING =
 
 async function selectLevel(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: "Select your level" }).click();
-  await page.getByRole("button", { name: "A2 Elementary" }).click();
-  await expect(
-    page.getByRole("button", { name: /A2.*Elementary/ }),
-  ).toBeVisible();
+  await page.getByRole("button", { name: "A2 Survie" }).click();
+  await expect(page.getByRole("button", { name: /A2.*Survie/ })).toBeVisible();
 }
 
 test("learner generates a prompt, writes, and sees the Evaluation and the History entry", async ({
@@ -34,7 +32,7 @@ test("learner generates a prompt, writes, and sees the Evaluation and the Histor
   await expect(page.getByRole("heading", { name: "Evaluation" })).toBeVisible();
   await captureEvidence(page, testInfo, "evaluation");
 
-  await page.getByRole("link", { name: "History" }).click();
+  await page.getByRole("link", { name: "Historique" }).click();
   await expect(page.getByRole("heading", { name: "History" })).toBeVisible();
   await expectNoAxeViolations(page, LEGACY_AXE_DISABLED);
   await expect(page.getByText(/Sessions \(1\)/)).toBeVisible();
