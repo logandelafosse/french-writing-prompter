@@ -14,7 +14,9 @@ export const db: AppDatabase = new Proxy({} as AppDatabase, {
     });
     const value: unknown = Reflect.get(dbInstance, prop, dbInstance);
     if (typeof value === "function") {
-      return (value as (...args: unknown[]) => unknown).bind(dbInstance);
+      // Proxy forwards Drizzle's dynamic API; bind keeps the correct `this`.
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- Drizzle proxy forwards bound instance methods
+      return value.bind(dbInstance);
     }
     return value;
   },

@@ -126,6 +126,19 @@ export default defineConfig([
               ],
               message: "Domain modules are framework-free (orthogonality).",
             },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/modules/**"],
+    ignores: ["src/modules/openai-client/**"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
             {
               group: ["openai", "openai/*"],
               message:
@@ -155,12 +168,7 @@ export default defineConfig([
   },
   {
     files: ["src/**"],
-    ignores: [
-      "src/modules/openai-client/**",
-      "src/modules/**/*-store.ts",
-      "src/modules/**/db-store.ts",
-      "src/modules/**/*.test.ts",
-    ],
+    ignores: ["src/modules/openai-client/**"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -186,7 +194,6 @@ export default defineConfig([
       "vitest/no-conditional-expect": "error",
       "vitest/expect-expect": "error",
       "@typescript-eslint/no-non-null-assertion": "off",
-      "@typescript-eslint/unbound-method": "off",
       "@typescript-eslint/unbound-method": "off",
     },
   },
