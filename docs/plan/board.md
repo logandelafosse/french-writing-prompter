@@ -4,20 +4,19 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T02 merged; T03 dispatch).
+Last updated: 2026-11-15 by coordinator (T03 merged; T04 dispatch).
 
 ## Ready
 
 | ID  | Ticket                                                                                                                   | Why                                                           |
 | --- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6))  | T02 merged.                                                   |
 | T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | T02 merged. Not alongside T07 seam (scaffold-leftovers rule). |
 
 ## In progress
 
-| ID  | Ticket                                                                                               | Why                                                                      |
-| --- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5)) | Implementer `inherit`, branch `ticket/t03-prettier`, started 2026-11-15. |
+| ID  | Ticket                                                                                                                        | Why                                                         |
+| --- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6)) | Implementer `inherit`, branch `ticket/t04-zod-contracts`. |
 
 ## In review
 
@@ -33,7 +32,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 | ID  | Ticket                                                              | Type | Blocked by | Why not ready                                                                                                   |
 | --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------------------------------------------------------------------------------------------- |
-| T03 | Prettier format-only pass                                           | AFK  | —          | **In progress**                                                                                                 |
+| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                                                                                        |
 | T04 | Zod contracts for LLM output and stored JSON                        | AFK  | —          | In **Ready**                                                                                                    |
 | T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | T04        | Builds on the contracts module                                                                                  |
 | T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | T04        | Needs contracts. Q2 answered 2026-11-15; approved rules are in the spec.                                        |
@@ -94,3 +93,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T00 | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2))                           | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue.                                         |
 | T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3))        | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules. |
 | T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | Merged [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39) 2026-11-15. Adversarial blocking fix: root-level `fixtures/` in `pr:size`.                    |
+| T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5))                          | Merged [PR #40](https://github.com/logandelafosse/french-writing-prompter/pull/40) 2026-11-15 merge commit; `size-exempt`.                                                        |
