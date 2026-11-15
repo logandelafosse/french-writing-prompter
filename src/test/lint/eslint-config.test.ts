@@ -101,8 +101,9 @@ describe("eslint.config.mjs guardrails", () => {
   });
 
   it("fails vitest/no-focused-tests on it.only", async () => {
-    const messages = await lintFixtureFile(
-      "src/test/lint-fixtures/misc/focused.test.ts",
+    const messages = await lintFixtureAs(
+      "src/test/lint-fixtures/misc/vitest-focused-snippet.ts",
+      "src/modules/lint-probe/focused.test.ts",
     );
     expect(ruleIds(messages)).toContain("vitest/no-focused-tests");
   });
