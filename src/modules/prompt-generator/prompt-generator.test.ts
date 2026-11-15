@@ -33,7 +33,9 @@ describe("PromptGenerator", () => {
     const generator = new PromptGenerator(mockClient as any);
     await generator.generate("B1", "louisiana");
 
-    const callArgs = mockClient.chatCompletion.mock.calls[0][0];
+    const callArgs = mockClient.chatCompletion.mock.calls[0]?.[0];
+    expect(callArgs).toBeDefined();
+    if (callArgs === undefined) throw new Error("expected chatCompletion call");
     const systemMessage = callArgs.messages.find(
       (m: any) => m.role === "system"
     );

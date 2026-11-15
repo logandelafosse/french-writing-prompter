@@ -25,7 +25,7 @@ const CEFR_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 function nextLevel(current: CefrLevel): CefrLevel | null {
   const idx = CEFR_ORDER[current];
   if (idx >= CEFR_LEVELS.length - 1) return null;
-  return CEFR_LEVELS[idx + 1];
+  return CEFR_LEVELS[idx + 1] ?? null;
 }
 
 export class CefrTracker {

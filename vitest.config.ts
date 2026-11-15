@@ -21,7 +21,7 @@ export default defineConfig({
         extends: true,
         test: {
           name: "node",
-          include: ["src/**/*.test.ts"],
+          include: ["src/**/*.test.ts", "tooling/**/*.test.ts"],
           environment: "node",
           setupFiles: ["src/test/setup-db.ts"],
         },

@@ -66,9 +66,13 @@ export class PlacementTest {
     this.currentStep = 1;
     this.evaluations = [];
 
+    const initialLevel = STARTING_LEVELS[0];
+    if (initialLevel === undefined) {
+      throw new Error("Placement test has no starting level configured");
+    }
     this.currentPrompt = await this.promptGenerator.generate(
-      STARTING_LEVELS[0],
-      this.dialect
+      initialLevel,
+      this.dialect,
     );
 
     return this.currentPrompt;
@@ -108,10 +112,11 @@ export class PlacementTest {
     }
 
     this.currentStep++;
-    this.currentPrompt = await this.promptGenerator.generate(
-      STARTING_LEVELS[this.currentStep - 1],
-      this.dialect
-    );
+    const level = STARTING_LEVELS[this.currentStep - 1];
+    if (level === undefined) {
+      throw new Error(`No starting level for placement step ${this.currentStep}`);
+    }
+    this.currentPrompt = await this.promptGenerator.generate(level, this.dialect);
 
     return {
       type: "next_prompt",
@@ -124,6 +129,10 @@ export class PlacementTest {
     const sorted = [...cefrLevels].sort(
       (a, b) => CEFR_ORDER[a] - CEFR_ORDER[b]
     );
-    return sorted[1];
+    const median = sorted[1];
+    if (median === undefined) {
+      throw new Error("computeLevel requires at least two CEFR levels");
+    }
+    return median;
   }
 }
