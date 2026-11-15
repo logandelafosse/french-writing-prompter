@@ -45,16 +45,18 @@ describe("HistoryPage", () => {
       vi.fn((input: RequestInfo | URL) => {
         const url = String(input);
         if (url.endsWith("/api/sessions")) {
-          return Promise.resolve({
-            ok: true,
-            json: async () => ({ sessions: mockSessions }),
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify({ sessions: mockSessions }), {
+              status: 200,
+            }),
+          );
         }
         if (url.endsWith("/api/level")) {
-          return Promise.resolve({
-            ok: true,
-            json: async () => ({ level: null, history: [] }),
-          });
+          return Promise.resolve(
+            new Response(JSON.stringify({ level: null, history: [] }), {
+              status: 200,
+            }),
+          );
         }
         return Promise.reject(new Error(`unexpected fetch ${url}`));
       }),

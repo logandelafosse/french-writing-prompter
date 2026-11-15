@@ -6,7 +6,11 @@ import type { CefrLevel } from "@/components/level/level-components";
 import type { LevelChange } from "@/modules/cefr-tracker/cefr-tracker";
 import { EvaluationCard } from "@/components/prompt/evaluation-card";
 import type { SessionView } from "@/contracts/session";
+import { LevelGetResponse, SessionsGetResponse } from "@/contracts/api";
+import { fetchJson } from "@/lib/http";
 import Link from "next/link";
+
+const LOAD_ERROR = "An error occurred. Please try again.";
 
 const MALFORMED_NOTICE =
   "Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.";
@@ -123,25 +127,30 @@ export function HistoryPage() {
     history: LevelChange[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-      const [sessionsRes, levelRes] = await Promise.all([
-        fetch("/api/sessions"),
-        fetch("/api/level"),
+      const [sessionsResult, levelResult] = await Promise.all([
+        fetchJson("/api/sessions", SessionsGetResponse),
+        fetchJson("/api/level", LevelGetResponse),
       ]);
       if (cancelled) return;
-      const sessionsData = await sessionsRes.json();
-      const levelJson = await levelRes.json();
 
-      setSessions(sessionsData.sessions);
-      setLevelData(levelJson);
+      if (!sessionsResult.ok || !levelResult.ok) {
+        setError(LOAD_ERROR);
+        setLoading(false);
+        return;
+      }
+
+      setSessions(sessionsResult.value.sessions);
+      setLevelData(levelResult.value);
       setLoading(false);
     }
 
-    load();
+    void load();
 
     return () => {
       cancelled = true;
@@ -157,6 +166,16 @@ export function HistoryPage() {
             <div className="h-40 rounded-xl bg-zinc-100" />
             <div className="h-40 rounded-xl bg-zinc-100" />
           </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-1 flex-col bg-zinc-50">
+        <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
+          <p className="text-sm text-red-600">{error}</p>
         </main>
       </div>
     );

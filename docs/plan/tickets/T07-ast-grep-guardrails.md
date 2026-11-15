@@ -27,6 +27,8 @@ P1 rules from §4 (`no-type-assertion`, `no-mocking-own-modules`) are in scope o
 
 **From T04 tooling review (PR #41):** widen `no-json-parse` (optional chaining, `JSON["parse"]`, destructuring, `globalThis`, `eval`/`Function`); add `no-permissive-boundary-schema` (`z.any`, `z.json`, etc.); widen `no-raw-json-body` (`request["json"]()`, destructuring); switch fixture tests from raw `JSON.parse` to `parseJson`.
 
+**From T05 tooling review (PR #42):** widen `no-raw-json-body` (optional `.json?.()`, parenthesized callee, saved method, `Reflect.apply`); widen `no-process-env` (computed access, `globalThis`, destructuring, `import { env } from "node:process"`); `env.test.ts` → `vi.stubEnv` when rules land.
+
 ## Acceptance criteria
 
 - [ ] `[check]` `npx ast-grep --version` prints the ast-grep version from `node_modules`; `package.json` scripts never invoke `sg`.

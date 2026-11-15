@@ -5,6 +5,15 @@ import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator"
 import { LevelBadge } from "@/components/level/level-components";
 import { EvaluationCard } from "./evaluation-card";
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
+import {
+  EvaluatePostResponse,
+  PromptPostResponse,
+  QuotaGetResponse,
+} from "@/contracts/api";
+import { fetchJson, messageFromFetchError } from "@/lib/http";
+
+const LOAD_ERROR = "An error occurred. Please try again.";
+const EVAL_ERROR = "An error occurred during evaluation.";
 
 export function PromptCard() {
   const [prompt, setPrompt] = useState<WritingPrompt | null>(null);
@@ -23,21 +32,26 @@ export function PromptCard() {
   } | null>(null);
 
   async function refreshQuota() {
-    const res = await fetch("/api/quota");
-    const data = await res.json();
-    setQuota(data);
+    const result = await fetchJson("/api/quota", QuotaGetResponse);
+    if (result.ok) {
+      setQuota(result.value);
+      return;
+    }
+    setError(messageFromFetchError(result.error, LOAD_ERROR));
   }
 
   useEffect(() => {
     let cancelled = false;
     async function loadQuota() {
-      const res = await fetch("/api/quota");
-      const data = await res.json();
-      if (!cancelled) {
-        setQuota(data);
+      const result = await fetchJson("/api/quota", QuotaGetResponse);
+      if (cancelled) return;
+      if (result.ok) {
+        setQuota(result.value);
+        return;
       }
+      setError(messageFromFetchError(result.error, LOAD_ERROR));
     }
-    loadQuota();
+    void loadQuota();
     return () => {
       cancelled = true;
     };
@@ -49,22 +63,19 @@ export function PromptCard() {
     setEvaluation(null);
     setWriting("");
 
-    try {
-      const res = await fetch("/api/prompt", { method: "POST" });
-      const data = await res.json();
+    const result = await fetchJson("/api/prompt", PromptPostResponse, {
+      method: "POST",
+    });
 
-      if (!res.ok) {
-        setError(data.error);
-      } else {
-        setPrompt(data.prompt);
-        setSessionId(data.sessionId);
-        refreshQuota();
-      }
-    } catch {
-      setError("An error occurred. Please try again.");
-    } finally {
-      setLoading(false);
+    if (!result.ok) {
+      setError(messageFromFetchError(result.error, LOAD_ERROR));
+    } else {
+      setPrompt(result.value.prompt);
+      setSessionId(result.value.sessionId);
+      await refreshQuota();
     }
+
+    setLoading(false);
   };
 
   const handleSubmit = async () => {
@@ -73,28 +84,22 @@ export function PromptCard() {
     setLoading(true);
     setError(null);
 
-    try {
-      const res = await fetch("/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ writing: writing.trim(), sessionId }),
-      });
+    const result = await fetchJson("/api/evaluate", EvaluatePostResponse, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ writing: writing.trim(), sessionId }),
+    });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.error);
-      } else {
-        setEvaluation(data.evaluation);
-        if (data.advancement) {
-          setAdvancement(data.advancement);
-        }
+    if (!result.ok) {
+      setError(messageFromFetchError(result.error, EVAL_ERROR));
+    } else {
+      setEvaluation(result.value.evaluation);
+      if (result.value.advancement) {
+        setAdvancement(result.value.advancement);
       }
-    } catch {
-      setError("An error occurred during evaluation.");
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   };
 
   const canGenerate = quota ? quota.remaining > 0 : true;
@@ -114,7 +119,7 @@ export function PromptCard() {
 
       {!evaluation && (
         <button
-          onClick={handleGenerate}
+          onClick={() => void handleGenerate()}
           disabled={loading || !canGenerate}
           className="w-full rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
@@ -160,14 +165,14 @@ export function PromptCard() {
           <p>{error}</p>
           <div className="flex gap-2">
             <button
-              onClick={handleGenerate}
+              onClick={() => void handleGenerate()}
               className="text-xs font-medium underline hover:no-underline"
             >
               Regenerate prompt
             </button>
             {sessionId && !evaluation && (
               <button
-                onClick={handleSubmit}
+                onClick={() => void handleSubmit()}
                 className="text-xs font-medium underline hover:no-underline"
               >
                 Retry evaluation
@@ -201,7 +206,7 @@ export function PromptCard() {
               className="w-full resize-y rounded-lg border border-zinc-300 p-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-transparent focus:ring-2 focus:ring-zinc-900 focus:outline-none"
             />
             <button
-              onClick={handleSubmit}
+              onClick={() => void handleSubmit()}
               disabled={loading || !writing.trim()}
               className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
@@ -248,7 +253,7 @@ export function PromptCard() {
 
       {evaluation && (
         <button
-          onClick={handleGenerate}
+          onClick={() => void handleGenerate()}
           disabled={loading || !canGenerate}
           className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
         >

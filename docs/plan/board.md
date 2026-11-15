@@ -8,10 +8,10 @@ Last updated: 2026-11-15 by coordinator (T05 in review).
 
 ## Ready
 
-| ID  | Ticket                                                                                                                   | Why        |
-| --- | ------------------------------------------------------------------------------------------------------------------------ | ---------- |
-| T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | T04 merged. |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | T02 merged. Not alongside T07 seam. |
+| ID  | Ticket                                                                                                                            | Why                                 |
+| --- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | T04 merged.                         |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11))          | T02 merged. Not alongside T07 seam. |
 
 ## In progress
 
@@ -19,8 +19,8 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                    | Why                                                                  |
-| --- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| ID  | Ticket                                                                                                                       | Why                                                                                            |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | T05 | Zod contracts for API bodies, client fetches, env ([#7](https://github.com/logandelafosse/french-writing-prompter/issues/7)) | [PR #42](https://github.com/logandelafosse/french-writing-prompter/pull/42); parallel reviews. |
 
 ## Blocked
@@ -94,4 +94,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3))        | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules. |
 | T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | Merged [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39) 2026-11-15. Adversarial blocking fix: root-level `fixtures/` in `pr:size`.                    |
 | T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5))                        | Merged [PR #40](https://github.com/logandelafosse/french-writing-prompter/pull/40) 2026-11-15 merge commit; `size-exempt`.                                                       |
-| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6))     | Merged [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41) 2026-11-15; History evidence `docs/evidence/6/`.                                             |
+| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6))     | Merged [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41) 2026-11-15; History evidence `docs/evidence/6/`.                                              |
