@@ -14,6 +14,7 @@ describe("KbdHint", () => {
     const { unmount } = render(<KbdHint />);
     const hint = screen.getByText("⌘ ↵");
     expect(hint).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByText("Ctrl ↵")).not.toBeInTheDocument();
     unmount();
 
     vi.stubGlobal("navigator", {
@@ -21,5 +22,6 @@ describe("KbdHint", () => {
     });
     render(<KbdHint />);
     expect(screen.getByText("Ctrl ↵")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.queryByText("⌘ ↵")).not.toBeInTheDocument();
   });
 });
