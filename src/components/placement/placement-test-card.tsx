@@ -7,23 +7,12 @@ import type { CefrLevel } from "@/components/level/level-components";
 import { LevelBadge } from "@/components/level/level-components";
 import { EvaluationCard } from "@/components/prompt/evaluation-card";
 import { PlacementPostResponse } from "@/contracts/api";
-import { fetchJson } from "@/lib/http";
+import { fetchJson, messageFromFetchError } from "@/lib/http";
 
 type FlowState =
   | { phase: "idle" }
   | { phase: "prompt"; prompt: WritingPrompt; step: number }
   | { phase: "complete"; finalLevel: CefrLevel; evaluations: Evaluation[] };
-
-function resolveFetchError(
-  kind: "network" | "http" | "invalid",
-  message: string | undefined,
-  fallback: string,
-): string {
-  if (kind === "http" && message) {
-    return message;
-  }
-  return fallback;
-}
 
 export function PlacementTestCard() {
   const [flow, setFlow] = useState<FlowState>({ phase: "idle" });
@@ -43,13 +32,7 @@ export function PlacementTestCard() {
     });
 
     if (!result.ok) {
-      setError(
-        resolveFetchError(
-          result.error.kind,
-          result.error.kind === "http" ? result.error.message : undefined,
-          "Error starting the test.",
-        ),
-      );
+      setError(messageFromFetchError(result.error, "Error starting the test."));
     } else if (result.value.type === "prompt") {
       setFlow({
         phase: "prompt",
@@ -76,13 +59,7 @@ export function PlacementTestCard() {
     });
 
     if (!result.ok) {
-      setError(
-        resolveFetchError(
-          result.error.kind,
-          result.error.kind === "http" ? result.error.message : undefined,
-          "Error during evaluation.",
-        ),
-      );
+      setError(messageFromFetchError(result.error, "Error during evaluation."));
     } else if (result.value.type === "next_prompt") {
       setFlow({
         phase: "prompt",

@@ -10,7 +10,7 @@ import {
   PromptPostResponse,
   QuotaGetResponse,
 } from "@/contracts/api";
-import { fetchJson } from "@/lib/http";
+import { fetchJson, messageFromFetchError } from "@/lib/http";
 
 export function PromptCard() {
   const [prompt, setPrompt] = useState<WritingPrompt | null>(null);
@@ -28,31 +28,35 @@ export function PromptCard() {
     max: number;
   } | null>(null);
 
-  function resolveFetchError(
-    kind: "network" | "http" | "invalid",
-    message: string | undefined,
-    fallback: string,
-  ): string {
-    if (kind === "http" && message) {
-      return message;
-    }
-    return fallback;
-  }
-
   async function refreshQuota() {
     const result = await fetchJson("/api/quota", QuotaGetResponse);
     if (result.ok) {
       setQuota(result.value);
+      return;
     }
+    setError(
+      messageFromFetchError(
+        result.error,
+        "An error occurred. Please try again.",
+      ),
+    );
   }
 
   useEffect(() => {
     let cancelled = false;
     async function loadQuota() {
       const result = await fetchJson("/api/quota", QuotaGetResponse);
-      if (!cancelled && result.ok) {
+      if (cancelled) return;
+      if (result.ok) {
         setQuota(result.value);
+        return;
       }
+      setError(
+        messageFromFetchError(
+          result.error,
+          "An error occurred. Please try again.",
+        ),
+      );
     }
     void loadQuota();
     return () => {
@@ -72,9 +76,8 @@ export function PromptCard() {
 
     if (!result.ok) {
       setError(
-        resolveFetchError(
-          result.error.kind,
-          result.error.kind === "http" ? result.error.message : undefined,
+        messageFromFetchError(
+          result.error,
           "An error occurred. Please try again.",
         ),
       );
@@ -101,9 +104,8 @@ export function PromptCard() {
 
     if (!result.ok) {
       setError(
-        resolveFetchError(
-          result.error.kind,
-          result.error.kind === "http" ? result.error.message : undefined,
+        messageFromFetchError(
+          result.error,
           "An error occurred during evaluation.",
         ),
       );

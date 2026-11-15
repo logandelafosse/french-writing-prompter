@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { LevelBadge, LevelSelector, type CefrLevel } from "./level-components";
-import { LevelGetResponse } from "@/contracts/api";
-import { fetchJson } from "@/lib/http";
+import { LevelGetResponse, LevelPutResponse } from "@/contracts/api";
+import { fetchJson, messageFromFetchError } from "@/lib/http";
 
 type LevelData = {
   level: CefrLevel | null;
@@ -28,7 +28,7 @@ export function LevelCard() {
       const result = await fetchJson("/api/level", LevelGetResponse);
       if (cancelled) return;
       if (!result.ok) {
-        setError(LOAD_ERROR);
+        setError(messageFromFetchError(result.error, LOAD_ERROR));
         setLoading(false);
         return;
       }
@@ -46,7 +46,7 @@ export function LevelCard() {
     setError(null);
     const result = await fetchJson("/api/level", LevelGetResponse);
     if (!result.ok) {
-      setError(LOAD_ERROR);
+      setError(messageFromFetchError(result.error, LOAD_ERROR));
       setLoading(false);
       return;
     }
@@ -55,11 +55,16 @@ export function LevelCard() {
   }
 
   const handleSelectLevel = async (level: CefrLevel) => {
-    await fetch("/api/level", {
+    setError(null);
+    const result = await fetchJson("/api/level", LevelPutResponse, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ level }),
     });
+    if (!result.ok) {
+      setError(messageFromFetchError(result.error, LOAD_ERROR));
+      return;
+    }
     await fetchLevel();
   };
 

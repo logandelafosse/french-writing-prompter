@@ -59,3 +59,13 @@ export async function fetchJson<S extends ZodType>(
 
   return { ok: true, value: parsed.value };
 }
+
+export function messageFromFetchError(
+  error: FetchError,
+  fallback: string,
+): string {
+  if (error.kind === "http") {
+    return error.message || fallback;
+  }
+  return fallback;
+}
