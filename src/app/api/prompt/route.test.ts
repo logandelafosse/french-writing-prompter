@@ -68,4 +68,32 @@ describe("POST /api/prompt quota", { concurrent: false }, () => {
     const body = await readResponseJson(response, PromptPostResponse);
     expect(body.sessionId).toBeGreaterThan(0);
   });
+
+  it("never exceeds the daily max under concurrent requests", async () => {
+    for (let i = 0; i < 2; i++) {
+      await saveSession({
+        promptText: `p${i}`,
+        promptConstraints: JSON.stringify({
+          cefrLevel: "B1",
+          dialect: DEFAULT_DIALECT,
+        }),
+        writingText: null,
+        evaluationJson: null,
+        cefrLevel: "B1",
+        localDate: "2026-11-14",
+      });
+    }
+
+    const [first, second] = await Promise.all([
+      POST(new Request("http://localhost/api/prompt", { method: "POST" })),
+      POST(new Request("http://localhost/api/prompt", { method: "POST" })),
+    ]);
+
+    const statuses = [first.status, second.status].sort();
+    expect(statuses).toEqual([200, 429]);
+
+    const rows = await db.select().from(sessions);
+    const todayRows = rows.filter((row) => row.localDate === "2026-11-14");
+    expect(todayRows).toHaveLength(3);
+  });
 });

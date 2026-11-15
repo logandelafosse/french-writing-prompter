@@ -15,7 +15,10 @@ import { quotaTimeZone } from "@/server/quota-time-zone";
 let quotaPromptChain: Promise<unknown> = Promise.resolve();
 
 function withQuotaPromptLock<T>(fn: () => Promise<T>): Promise<T> {
-  const run = quotaPromptChain.then(fn, fn);
+  const run = quotaPromptChain.then(
+    () => fn(),
+    () => fn(),
+  );
   quotaPromptChain = run.then(
     () => undefined,
     () => undefined,
@@ -33,52 +36,41 @@ export async function POST(request: Request) {
   }
 
   try {
-    await withQuotaPromptLock(async () => assertQuotaAvailable());
-  } catch (error) {
-    if (error instanceof QuotaExhaustedError) {
-      return NextResponse.json(
-        { error: "QUOTA_EXHAUSTED", resetsAt: error.resetsAt },
-        { status: 429 },
+    return await withQuotaPromptLock(async () => {
+      await assertQuotaAvailable();
+
+      const promptGenerator = new PromptGenerator(
+        getAiClient(scenarioFromRequest(request)),
       );
-    }
-    throw error;
-  }
 
-  const promptGenerator = new PromptGenerator(
-    getAiClient(scenarioFromRequest(request)),
-  );
+      let prompt;
+      try {
+        prompt = await promptGenerator.generate(level, DEFAULT_DIALECT);
+      } catch {
+        return NextResponse.json(
+          { error: "Prompt generation failed." },
+          { status: 502 },
+        );
+      }
 
-  let prompt;
-  try {
-    prompt = await promptGenerator.generate(level, DEFAULT_DIALECT);
-  } catch {
-    return NextResponse.json(
-      { error: "Prompt generation failed." },
-      { status: 502 },
-    );
-  }
+      const now = new Date().toISOString();
+      const localDate = localDateKey(new Date(now), quotaTimeZone());
 
-  const now = new Date().toISOString();
-  const localDate = localDateKey(new Date(now), quotaTimeZone());
+      await assertQuotaAvailable();
+      const inserted = await db.insert(sessions).values({
+        promptText: prompt.text,
+        promptConstraints: JSON.stringify(prompt.constraints),
+        writingText: null,
+        evaluationJson: null,
+        cefrLevel: level,
+        createdAt: now,
+        kind: "daily",
+        localDate,
+      });
+      const sessionId = Number(inserted.lastInsertRowid);
 
-  let sessionId: number;
-  try {
-    sessionId = await withQuotaPromptLock(async () =>
-      db.transaction(async (tx) => {
-        await assertQuotaAvailable(tx);
-        const inserted = await tx.insert(sessions).values({
-          promptText: prompt.text,
-          promptConstraints: JSON.stringify(prompt.constraints),
-          writingText: null,
-          evaluationJson: null,
-          cefrLevel: level,
-          createdAt: now,
-          kind: "daily",
-          localDate,
-        });
-        return Number(inserted.lastInsertRowid);
-      }),
-    );
+      return NextResponse.json({ prompt, sessionId });
+    });
   } catch (error) {
     if (error instanceof QuotaExhaustedError) {
       return NextResponse.json(
@@ -91,6 +83,4 @@ export async function POST(request: Request) {
     }
     throw error;
   }
-
-  return NextResponse.json({ prompt, sessionId });
 }

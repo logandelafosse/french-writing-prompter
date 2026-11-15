@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { LevelBadge, LevelSelector, type CefrLevel } from "./level-components";
 import { LevelGetResponse, LevelPutResponse } from "@/contracts/api";
+import { HEADER_SHELL_REFRESH_EVENT } from "@/components/shell/header-shell";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 
 type LevelData = {
@@ -66,6 +67,7 @@ export function LevelCard() {
       return;
     }
     await fetchLevel();
+    window.dispatchEvent(new Event(HEADER_SHELL_REFRESH_EVENT));
   };
 
   if (loading) {

@@ -24,6 +24,8 @@ type HeaderContextValue = {
   refreshQuota: () => Promise<void>;
 };
 
+export const HEADER_SHELL_REFRESH_EVENT = "fwp:header-shell-refresh";
+
 const HeaderContext = createContext<HeaderContextValue | null>(null);
 
 export function useHeaderShell(): HeaderContextValue {
@@ -62,10 +64,16 @@ export function HeaderShell({ children }: { children: ReactNode }) {
         setQuota(result.value);
       }
     }
+    function refreshShell() {
+      void loadLevel();
+      void loadQuota();
+    }
     void loadLevel();
     void loadQuota();
+    window.addEventListener(HEADER_SHELL_REFRESH_EVENT, refreshShell);
     return () => {
       cancelled = true;
+      window.removeEventListener(HEADER_SHELL_REFRESH_EVENT, refreshShell);
     };
   }, []);
 
