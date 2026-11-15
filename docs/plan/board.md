@@ -2,11 +2,15 @@
 
 Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states **why** it is in its column; update the why on every move. Specs: `docs/plan/tickets/<ID>-*.md`. Open owner questions (Q1–Q8): `docs/plan/plan.md`.
 
-Last updated: 2026-11-14 by planning session.
+GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
+
+Last updated: 2026-11-15 by planning session.
 
 ## Ready
 
-_None yet. T00 is waiting on Q1._
+| ID | Ticket | Why |
+|---|---|---|
+| T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3)) | T00 merged; no other blockers. |
 
 ## In progress
 
@@ -18,9 +22,7 @@ _None._
 
 ## Blocked
 
-| ID | Ticket | Why |
-|---|---|---|
-| T00 | Own repo and gitignore | Waiting on Q1 (repo name, visibility, how `Personal-Projects` treats the folder). Every other ticket needs a repo to open PRs against. |
+_None. HITL tickets below wait on owner questions as well as their blockers._
 
 ## Backlog
 
@@ -28,7 +30,6 @@ _None._
 
 | ID | Ticket | Type | Blocked by | Why not ready |
 |---|---|---|---|---|
-| T01 | Isolated test DB and generated migrations | AFK | T00 | Needs the repo |
 | T02 | Baseline green: TS flags, `check`, `pr:size`, CI | AFK | T01 | `check` runs tests, which must not touch `data.db` |
 | T03 | Prettier format-only pass | AFK | T02 | Needs `check` to include `format:check` |
 | T04 | Zod contracts for LLM output and stored JSON | AFK | T02 | Needs strict baseline |
@@ -86,4 +87,6 @@ _None._
 
 ## Done
 
-_None._
+| ID | Ticket | Why |
+|---|---|---|
+| T00 | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2)) | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue. |

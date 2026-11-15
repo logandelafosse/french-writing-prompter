@@ -28,6 +28,8 @@ Every card carries a one-line **why** for its current column, updated on every m
 
 A ticket moves to `Ready` only when every ticket in its "Blocked by" list is `Done`. Tickets marked HITL stay in `Blocked` until Logan answers the open question recorded on the card.
 
+**GitHub mirror.** Each ticket is a sub-issue of the parent spec issue #1 (issue number = ticket number + 2), with native "blocked by" links. `board.md` stays the source of truth for status and why. On every move the coordinator also comments the same why on the issue; the PR body says `Closes #<n>`; triage labels follow `docs/agents/triage-labels.md` (`needs-info` while an owner question is open, `ready-for-agent` once answered). If a ticket spec changes, edit the file in `docs/plan/tickets/` and update the issue body to match.
+
 The coordinator keeps at most three tickets `In progress` at once, and never two that touch the same module seam.
 
 ## Ticket loop

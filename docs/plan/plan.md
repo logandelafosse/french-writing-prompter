@@ -46,7 +46,7 @@ Tickets that depend on one of these are HITL and stay `Blocked` until it is answ
 
 | ID | Question | Default if accepted | Blocks |
 |---|---|---|---|
-| Q1 | Repo name, visibility, and whether `Personal-Projects` keeps the folder as a submodule or ignores it | Private repo `french-writing-prompter`; parent ignores the folder | T00 |
+| Q1 | ~~Repo name, visibility, submodule or ignore~~ **Answered 2026-11-15:** private `logandelafosse/french-writing-prompter`; parent ignores the folder | — | T00 (done) |
 | Q2 | Approve the Louisiana base rule wording and dialect-aware CEFR level descriptions | Wording in `backend-requirements.md` §4.4 | T06 |
 | Q3 | App name (wordmark "Lâche pas." is a placeholder) | Keep "Lâche pas." | T13 |
 | Q4 | Mistake category taxonomy (15 categories) | `backend-requirements.md` §1.1 | T21 |
