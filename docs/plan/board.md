@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T06 PR #43 in review).
+Last updated: 2026-11-15 by coordinator (T06 merged PR #43; T07 dispatched).
 
 ## Ready
 
@@ -15,13 +15,13 @@ Last updated: 2026-11-15 by coordinator (T06 PR #43 in review).
 
 ## In progress
 
-_None._
+| ID  | Ticket                                                                                         | Why                                                                        |
+| --- | ---------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| T07 | ast-grep guardrails ([#9](https://github.com/logandelafosse/french-writing-prompter/issues/9)) | Branch `ticket/t07-ast-grep`; implementer dispatched 2026-11-15 after T06. |
 
 ## In review
 
-| ID  | Ticket                                                                                                                            | Why                                                                                            |
-| --- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | [PR #43](https://github.com/logandelafosse/french-writing-prompter/pull/43); parallel reviews. |
+_None._
 
 ## Blocked
 
@@ -35,8 +35,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------------------------------------------------------------------------------------------- |
 | T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                                                                                        |
 | T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                                                                                        |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **In review** — PR #43                                                                                          |
-| T07 | ast-grep guardrails                                                 | AFK  | T06        | Rules reference the single-source modules                                                                       |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                                                                                        |
+| T07 | ast-grep guardrails                                                 | AFK  | —          | **In progress**                                                                                                 |
 | T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | T05, T07   | Needs boundaries typed so `no-unsafe-*` is quiet                                                                |
 | T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | In **Ready**. Either order with T07: whichever merges second adds the scaffold-leftovers rule (see both specs). |
 | T10 | UI primitives                                                       | AFK  | T09        | Built on tokens. If T06's knip pass deleted `ui/button.tsx` or its deps, T10 recreates them.                    |
@@ -88,11 +88,12 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ## Done
 
-| ID  | Ticket                                                                                                                       | Why                                                                                                                                                                              |
-| --- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T00 | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2))                            | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue.                                         |
-| T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3))         | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules. |
-| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4))  | Merged [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39) 2026-11-15. Adversarial blocking fix: root-level `fixtures/` in `pr:size`.                    |
-| T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5))                         | Merged [PR #40](https://github.com/logandelafosse/french-writing-prompter/pull/40) 2026-11-15 merge commit; `size-exempt`.                                                       |
-| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6))      | Merged [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41) 2026-11-15; History evidence `docs/evidence/6/`.                                              |
-| T05 | Zod contracts for API bodies, client fetches, env ([#7](https://github.com/logandelafosse/french-writing-prompter/issues/7)) | Merged [PR #42](https://github.com/logandelafosse/french-writing-prompter/pull/42) 2026-11-15; error-state evidence `docs/evidence/7/`; `pr:size` 494.                           |
+| ID  | Ticket                                                                                                                            | Why                                                                                                                                                                              |
+| --- | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T00 | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2))                                 | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue.                                         |
+| T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3))              | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules. |
+| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4))       | Merged [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39) 2026-11-15. Adversarial blocking fix: root-level `fixtures/` in `pr:size`.                    |
+| T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5))                              | Merged [PR #40](https://github.com/logandelafosse/french-writing-prompter/pull/40) 2026-11-15 merge commit; `size-exempt`.                                                       |
+| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6))           | Merged [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41) 2026-11-15; History evidence `docs/evidence/6/`.                                              |
+| T05 | Zod contracts for API bodies, client fetches, env ([#7](https://github.com/logandelafosse/french-writing-prompter/issues/7))      | Merged [PR #42](https://github.com/logandelafosse/french-writing-prompter/pull/42) 2026-11-15; error-state evidence `docs/evidence/7/`; `pr:size` 494.                           |
+| T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | Merged [PR #43](https://github.com/logandelafosse/french-writing-prompter/pull/43) 2026-11-15; History evidence `docs/evidence/8/`; knip in `check`.                             |
