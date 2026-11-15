@@ -742,6 +742,9 @@ If the owner later wants hand-edits in markdown to flow back, add an explicit `d
 
 ### 6.2 DLF integration (measured)
 
+> **Update (Q6, 2026-11-15):** Consigne does **not** stop at a spellings index. DLF-extract publishes a trimmed **lexicon artifact** (headword, forms, glosses, Louisiana examples + translations). Consigne pins a version and, at Evaluation time, looks up words from the Student Writing / Corrections and injects short definition+example cards into the evaluator prompt. Spelling/`DLF` badges remain positive evidence only. Prefer this over a git submodule (`out/` is gitignored in DLF-extract anyway).
+
+
 Source: `~/Personal-Projects/DLF-extract/out/canonical.jsonl`, 20.6 MB. Numbers come from one-off node scripts run outside the repo.
 
 | Measure | Value |

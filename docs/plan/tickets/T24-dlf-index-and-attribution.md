@@ -1,61 +1,72 @@
-# T24 — DLF index and attribution
+# T24 — DLF lexicon, grader context, and attribution
 
 | Phase | Type | Blocked by | Production lines (est.) |
 |---|---|---|---|
-| 2 | HITL (Q6) | T23 | ~250 |
+| 2 | AFK (Q6 answered) | T23 | ~250 |
 
-**Owner question Q6:** Is the DLF-derived index committed or generated locally (licensing, repo visibility)? **Default if accepted:** gitignored and generated locally from `../DLF-extract/out/canonical.jsonl`. This spec assumes the default.
+**Q6 (answered 2026-11-15):** inherit DLF via a **published lexicon artifact** from `logandelafosse/DLF-extract` (option 1), not a spellings-only index and not a git submodule. Consigne pins a version; graders receive definitions and Louisiana usage examples for relevant words.
 
 ## User stories
 
-- As Logan, I want a Louisiana suggestion to carry a `DLF` badge when the Dictionary of Louisiana French attests that form, so that I know which suggestions are backed by the dictionary.
-- As Logan, I want a word that is in the DLF never to be flagged as a Faute, so that the tutor doesn't correct real Louisiana words.
+- As Logan, I want the tutor to know how a Louisiana word is used (gloss + example), so that Corrections and tips match real usage, not Standard French guesses.
+- As Logan, I want a Louisiana suggestion to carry a `DLF` badge when the form is attested, so that I can trust the spelling.
+- As an agent implementing Consigne, I want a versioned lexicon dependency, so that DLF improvements flow down when we bump the pin without cloning extract pipelines.
 
 ## What to build
 
-`npm run dlf:build` runs a build script that reads `DLF_CANONICAL_PATH` (default `../DLF-extract/out/canonical.jsonl`). It normalizes spellings (NFC, lowercase, `’`→`'`) and drops noisy forms, entries without senses, and capitalized headwords. It writes `src/data/dlf/spellings.json` with a `meta` block (source hash, entry count, build date). The output path is gitignored.
+### Lexicon artifact (contract with DLF-extract)
 
-A server-only `dlf` module loads the index lazily, once per process. `lookup(word)` tries an exact match, then plural stripping, then accent folding; accent-folded hits are flagged `accentMismatch`. If the index file is missing, the module logs once and every lookup returns no hits. The evaluation never fails because of the DLF.
+Document the contract in this PR (and link an issue/PR on DLF-extract if the publisher lands separately):
 
-The evaluator uses the DLF in two ways:
+- Artifact: JSON (or JSONL) of entries `{ id, headword, forms[], senses: [{ pos, glosses[], examples: [{ louisiana_french_text, translation }] }] }` — trimmed, no raw OCR articles.
+- Built in DLF-extract from `out/canonical.jsonl` via something like `npm run export:lexicon`.
+- Published as a **GitHub Release asset** and/or **GitHub Package** from the private DLF-extract repo (e.g. `@logandelafosse/dlf-lexicon@x.y.z`).
+- Consigne pins the version in `package.json` or a lock file (`dlf-lexicon.version` + download script). Bumping the pin is how DLF changes inherit.
 
-1. **Before the model call:** content words of 4+ letters in the learner text that are found in the DLF (capped at about 40) are injected as "attested in DLF, don't flag".
-2. **After the model call:** for each `standard` Correction, the post-processor looks up `dlf_headword`, then the full suggestion, then each token of 3+ letters. The first hit that is exact or plural-stripped sets `dlf = { entryId, headword }`. A miss or an accent-only match sets `dlf = null`. The Correction stays, and only the badge is hidden.
+Until the publisher exists in DLF-extract, this ticket may land with:
 
-DLF is positive evidence only: a miss never removes a Correction, changes its kind, or makes something a Mistake. A `standard` card with `dlf` set shows `<abbr title="Dictionary of Louisiana French">DLF</abbr>` after the Louisiana form.
+1. The Consigne-side loader, lookup, prompt injection, and badge wiring against a **committed fixture lexicon** (20–50 entries with real glosses/examples), and  
+2. A `npm run dlf:fetch` script that installs/updates the artifact when `DLF_LEXICON_VERSION` is set,
 
-Tests and Playwright never read `../DLF-extract`. They point `DLF_INDEX_PATH` at a small committed fixture index containing a handful of entries (e.g. `asteur`, `icitte`, `boucoup`).
+with a follow-up HITL note on the board: “cut first DLF lexicon release.” Do not block the Correction UI on the first Release if the fixture covers e2e.
+
+### Runtime in Consigne
+
+- Server-only `dlf` module: lazy-load lexicon once per process; `lookup(word)` exact → plural-strip → accent-fold (`accentMismatch` flagged).
+- **Before the model call:** content words (4+ letters) in the Student Writing that hit the lexicon (cap ~25–40) are injected as short cards: headword, gloss(es), one LA example (+ translation). Instruction: treat these as attested Louisiana usage; do not “correct” them toward Standard.
+- **After the model call:** `standard` Corrections get `dlf = { entryId, headword }` when the suggestion/form is attested; miss → `dlf = null`, Correction kept, badge hidden. DLF is **positive evidence only**.
+- UI: `DLF` `<abbr title="Dictionary of Louisiana French">` on attested Standard→Louisiana cards.
+- Tests/Playwright use `DLF_LEXICON_PATH` → committed fixture; never require `../DLF-extract` or network to OpenAI/DLF in CI.
 
 ## Acceptance criteria
 
-- [ ] `[unit]` The build transform, run on a fixture JSONL, normalizes spellings, drops digit/punctuation/over-30-char forms, entries without senses, and capitalized headwords, and emits `meta` with an entry count.
-- [ ] `[unit]` `lookup` returns an exact hit, a plural-stripped hit (`chevrettes` → `chevrette`), and an accent-folded hit flagged `accentMismatch`.
-- [ ] `[unit]` With a missing index file, `lookup` returns `[]` and does not throw.
-- [ ] `[unit]` The post-processor sets `dlf` for a `standard` Correction whose suggestion is in the fixture index, and leaves `dlf = null` but keeps the Correction when it is not.
-- [ ] `[unit]` The post-processor never changes a Correction's kind or drops it because of a DLF miss.
-- [ ] `[unit]` The evaluator prompt builder lists the DLF hits found in the learner text, capped at 40.
-- [ ] `[check]` `src/data/dlf/` is in `.gitignore`. The `dlf` module imports `server-only`. No client bundle imports it.
-- [ ] `[e2e]` With the fixture index, a `standard` Correction `Maintenant` → `Asteur` shows a `DLF` abbreviation with title `Dictionary of Louisiana French`. A second `standard` Correction whose suggestion is not in the index shows no badge. Check at 1280 px and 390 px.
-- [ ] `[check]` `npm run check` passes. The production diff is under 500 lines, excluding the generated index and fixtures.
+- [ ] `[unit]` Fixture lexicon load + `lookup`: exact, plural-stripped, accent-folded (`accentMismatch`).
+- [ ] `[unit]` Missing lexicon file → empty lookups, no throw; Evaluation still completes.
+- [ ] `[unit]` Prompt builder injects gloss + at least one LA example for hits found in learner text (capped); entries are truncated to a max token budget documented in code.
+- [ ] `[unit]` Post-processor sets `dlf` on attested `standard` suggestions; miss keeps Correction, `dlf = null`.
+- [ ] `[unit]` A miss never changes kind or creates a Mistake.
+- [ ] `[check]` Lexicon loader is `server-only`; no client import of the full lexicon.
+- [ ] `[check]` README or `docs/plan/` note describes how to bump `DLF_LEXICON_VERSION` / publish from DLF-extract.
+- [ ] `[e2e]` Fixture: `Maintenant` → `Asteur` shows DLF badge; unattested suggestion shows none (1280 and 390).
+- [ ] `[check]` Production diff under 500 lines excluding fixture data.
 
 ## Tests to write first
 
-- dlf build: drops noisy forms and capitalized headwords
-- dlf lookup: exact, plural-stripped, and accent-folded hits
-- dlf lookup: missing index yields no hits
-- post-processor: attaches dlf on a hit and keeps the Correction on a miss
-- evaluator prompt: injects attested words from the learner text
-- review e2e: DLF badge only on attested suggestions
+- dlf lookup: exact / plural / accent
+- prompt injection includes gloss + example for fixture headword in text
+- post-processor badge attach / miss
+- e2e DLF badge on standard Correction
 
 ## Out of scope
 
-- Committing the index: depends on the Q6 answer. If Logan chooses "commit", a follow-up removes the gitignore entry.
-- Supplementing lost entries (`char`, `maringouin`) through `dlfRef` in the base rules: needs owner verification, not planned.
-- DLF examples as comprehensible input: later.
+- Implementing the DLF-extract `export:lexicon` + Release pipeline (sibling repo; track as a linked issue; Consigne documents the contract).
+- Full-text search / embedding RAG over DLF.
+- Using DLF examples as the Resource catalog (T30).
+- Git submodule of DLF-extract.
 
 ## References
 
-- `backend-requirements.md`: §6.2 (measurements and plan), §4.2 prompt item 2 and post-processing item 5, §8 Q1.
-- `implementation-map.md`: §2.4 CorrectionCard (`DLF` badge), §6 gap list (badge as `<abbr>`).
-- `HANDOFF.md`: Correction table (Standard→Louisiana row).
-- `plan.md`: Q6.
+- `backend-requirements.md` §6.2 (measurements; extend from spellings-only to lexicon).
+- `HANDOFF.md` Standard→Louisiana + DLF attribution.
+- `plan.md` Q6.
+- Conversation: graders need definitions/usage; option 1 artifact inheritance chosen over submodule.

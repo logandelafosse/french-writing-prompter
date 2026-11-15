@@ -52,7 +52,7 @@ Tickets that depend on one of these are HITL and stay `Blocked` until it is answ
 | Q3 | ~~App name~~ **Answered 2026-11-15:** feature **Consigne** under product **Louisiana Languages**; tab title `Consigne · Louisiana Languages` | — | T13 |
 | Q4 | ~~Mistake category taxonomy~~ **Answered 2026-11-15:** §1.1 as-is for v1 (15 + `autre`) | — | T21 |
 | Q5 | ~~Score display~~ **Answered 2026-11-15:** CECR sub-levels per dimension + hover/tap “what it is / pour monter”; holistic tip inside Scores | — | T22 |
-| Q6 | Is the DLF-derived index committed or generated locally (licensing, repo visibility) | Gitignored, generated locally from `DLF-extract` | T24 |
+| Q6 | ~~DLF inheritance~~ **Answered 2026-11-15:** DLF-extract publishes a **lexicon artifact** (headwords, glosses, LA examples); Consigne pins a version and injects relevant entries into grader prompts. Not spellings-only; not submodule | — | T24 |
 | Q7 | Resource catalog contents | Agent drafts a starter catalog of well-known free French sources; Logan edits | T30 |
 | Q8 | Word target at A1/A2; does swapping a prompt use a daily slot; do Placement writings feed Weakness memory | 250–300 at all levels as a soft nudge; swap uses a slot; Placement feeds memory | T15, T18. The Placement part does not block: T28 builds the default, and a "no" is a one-line filter. |
 

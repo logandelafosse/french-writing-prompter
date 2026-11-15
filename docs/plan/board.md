@@ -62,7 +62,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | ID | Ticket | Type | Blocked by | Why not ready |
 |---|---|---|---|---|
 | T23 | Standard→Louisiana suggestions | AFK | T22 | Needs the review screen |
-| T24 | DLF index and attribution | HITL (Q6) | T23 | Needs `standard` kind; licensing |
+| T24 | DLF lexicon, grader context, and attribution | AFK | T23 | Needs `standard` kind. Q6: versioned lexicon artifact from DLF-extract (definitions + examples). |
 | T25 | Dialect checks, pushback, Add Dialect Note sheet | AFK | T22 | Needs the review screen. Run after T23, not alongside it: both edit `CorrectionCard` and `MarkedText`. ~480 lines: split into T25a (server) / T25b (UI) is pre-approved, see spec. |
 | T26 | Carnet page with Dialect Notes list | AFK | T25 | Needs notes to exist |
 | T27 | Dialect Notes markdown export | AFK | T26 | Needs note CRUD |
