@@ -25,7 +25,10 @@ export function isProductionPath(filePath: string): boolean {
     return false;
   }
 
-  if (normalized.includes("/fixtures/") || normalized.includes("/__fixtures__/")) {
+  if (
+    /(?:^|\/)fixtures\//.test(normalized) ||
+    /(?:^|\/)__fixtures__\//.test(normalized)
+  ) {
     return false;
   }
 
