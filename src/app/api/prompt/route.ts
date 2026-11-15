@@ -10,7 +10,7 @@ import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { localDateKey } from "@/lib/dates";
-import { quotaTimeZone } from "@/server/quota-time-zone";
+import { quotaTimeZone } from "@/modules/quota-manager/quota-db-store";
 
 let quotaPromptChain: Promise<unknown> = Promise.resolve();
 
@@ -56,7 +56,6 @@ export async function POST(request: Request) {
       const now = new Date().toISOString();
       const localDate = localDateKey(new Date(now), quotaTimeZone());
 
-      await assertQuotaAvailable();
       const inserted = await db.insert(sessions).values({
         promptText: prompt.text,
         promptConstraints: JSON.stringify(prompt.constraints),

@@ -1,6 +1,6 @@
 import type { Client } from "@libsql/client";
 import { localDateKey } from "@/lib/dates";
-import { quotaTimeZone } from "@/server/quota-time-zone";
+import { quotaTimeZone } from "@/modules/quota-manager/quota-db-store";
 
 export async function backfillSessionsLocalDate(client: Client): Promise<void> {
   const result = await client.execute(

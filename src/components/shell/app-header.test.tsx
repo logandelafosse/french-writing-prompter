@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { AppHeader } from "./app-header";
+import { AppHeader } from "./header-shell";
 
 describe("AppHeader placement variant", () => {
   it("renders wordmark and placement link without nav, quota or chip", () => {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { CefrLevel } from "@/contracts/cefr";
 import { CEFR_LEVELS } from "@/contracts/cefr";
-import { CEFR_UI_LABELS } from "@/config/cefr-labels";
+import { CEFR_UI_LABELS } from "@/contracts/cefr";
 
 export type { CefrLevel };
 

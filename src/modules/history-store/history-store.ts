@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { localDateKey } from "@/lib/dates";
-import { quotaTimeZone } from "@/server/quota-time-zone";
+import { quotaTimeZone } from "@/modules/quota-manager/quota-db-store";
 import { Evaluation } from "@/contracts/evaluation";
 import { PromptConstraints } from "@/contracts/prompt";
 import type { SessionView } from "@/contracts/session";

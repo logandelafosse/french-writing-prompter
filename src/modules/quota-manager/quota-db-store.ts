@@ -1,8 +1,8 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DAILY_PROMPT_QUOTA } from "@/config/limits";
-import { nextLocalMidnightIso, todayLocalDateKey } from "@/lib/dates";
-import { quotaTimeZone } from "@/server/quota-time-zone";
+import { appTimeZone, nextLocalMidnightIso, todayLocalDateKey } from "@/lib/dates";
+import { getEnv } from "@/server/env";
 import { first } from "@/lib/first";
 import { and, eq, sql } from "drizzle-orm";
 import type { LibSQLDatabase } from "drizzle-orm/libsql";
@@ -16,6 +16,11 @@ export type QuotaState = {
 };
 
 type DbLike = Pick<LibSQLDatabase<typeof schema>, "select" | "insert">;
+
+export function quotaTimeZone(): string {
+  const configured = getEnv().APP_TIME_ZONE;
+  return configured ?? appTimeZone();
+}
 
 function todayKey(): string {
   return todayLocalDateKey(quotaTimeZone());
