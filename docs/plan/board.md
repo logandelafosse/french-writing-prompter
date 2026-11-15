@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T13 PR #50 in review).
+Last updated: 2026-11-15 by coordinator (T12/T13 in review; T13 `pr:size` → split T13a/T13b).
 
 ## Ready
 
