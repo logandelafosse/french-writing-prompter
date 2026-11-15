@@ -34,6 +34,14 @@ const GIT_IDENTITY = [
 
 const hookEnv = { ...process.env, LEFTHOOK: "1" };
 
+function stripAnsi(text: string): string {
+  return text.replace(/\u001b\[[0-9;]*m/g, "");
+}
+
+function hookOutput(stdout: string | null, stderr: string | null): string {
+  return stripAnsi(`${stdout ?? ""}${stderr ?? ""}`);
+}
+
 const personalProjectsHooks = path.join(
   process.env.HOME ?? "",
   "Personal-Projects",
@@ -97,7 +105,7 @@ function tryGitCommit(
   });
   return {
     ok: result.status === 0,
-    output: `${result.stdout || ""}${result.stderr || ""}`,
+    output: hookOutput(result.stdout, result.stderr),
   };
 }
 
@@ -110,7 +118,7 @@ function tryGitPush(cwd: string): { ok: boolean; output: string } {
   );
   return {
     ok: result.status === 0,
-    output: `${result.stdout || ""}${result.stderr || ""}`,
+    output: hookOutput(result.stdout, result.stderr),
   };
 }
 
