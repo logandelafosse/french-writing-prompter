@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 vi.mock("@/modules/openai-client/openai-client", () => ({
   OpenAiClient: class {
@@ -39,7 +40,7 @@ describe("POST /api/evaluate body validation", () => {
       promptText: "Prompt",
       promptConstraints: JSON.stringify({
         cefrLevel: "A2",
-        dialect: "louisiana",
+        dialect: DEFAULT_DIALECT,
       }),
       writingText: null,
       evaluationJson: null,
@@ -72,7 +73,7 @@ describe("POST /api/evaluate body validation", () => {
       promptText: "Prompt",
       promptConstraints: JSON.stringify({
         cefrLevel: "A2",
-        dialect: "louisiana",
+        dialect: DEFAULT_DIALECT,
       }),
       writingText: null,
       evaluationJson: null,

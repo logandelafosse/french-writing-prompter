@@ -7,7 +7,7 @@ import { getTracker } from "@/modules/cefr-tracker/tracker-store";
 import { parseCefrLevel } from "@/contracts/cefr";
 import { PromptConstraints } from "@/contracts/prompt";
 import { EvaluatePostBody } from "@/contracts/api";
-import type { FrenchDialect } from "@/contracts/prompt";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
 
@@ -43,14 +43,14 @@ export async function POST(request: Request) {
     ? constraintsResult.value
     : {
         cefrLevel: fallbackLevel ?? "A2",
-        dialect: "louisiana" as FrenchDialect,
+        dialect: DEFAULT_DIALECT,
       };
 
   try {
     const evaluation = await evaluator.evaluate(
       body.writing,
       { text: session.promptText, constraints },
-      "louisiana",
+      DEFAULT_DIALECT,
     );
 
     await saveSession({

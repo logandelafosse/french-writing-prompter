@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T05 merged PR #42; T06 dispatched).
+Last updated: 2026-11-15 by coordinator (T06 PR #43 in review).
 
 ## Ready
 
@@ -15,13 +15,13 @@ Last updated: 2026-11-15 by coordinator (T05 merged PR #42; T06 dispatched).
 
 ## In progress
 
-| ID  | Ticket                                                                                                                            | Why                                                                    |
-| --- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | Branch `ticket/t06-single-sources`; implementer dispatched 2026-11-15. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                                                            | Why                                                                                            |
+| --- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | [PR #43](https://github.com/logandelafosse/french-writing-prompter/pull/43); parallel reviews. |
 
 ## Blocked
 
@@ -35,7 +35,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------------------------------------------------------------------------------------------- |
 | T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                                                                                        |
 | T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                                                                                        |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **In progress**                                                                                                 |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **In review** — PR #43                                                                                          |
 | T07 | ast-grep guardrails                                                 | AFK  | T06        | Rules reference the single-source modules                                                                       |
 | T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | T05, T07   | Needs boundaries typed so `no-unsafe-*` is quiet                                                                |
 | T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | In **Ready**. Either order with T07: whichever merges second adds the scaffold-leftovers rule (see both specs). |

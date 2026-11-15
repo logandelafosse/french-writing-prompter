@@ -8,6 +8,7 @@ import { LevelBadge } from "@/components/level/level-components";
 import { EvaluationCard } from "@/components/prompt/evaluation-card";
 import { PlacementPostResponse } from "@/contracts/api";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
+import { PLACEMENT_STEPS } from "@/config/limits";
 
 type FlowState =
   | { phase: "idle" }
@@ -129,13 +130,15 @@ export function PlacementTestCard() {
           <h2 className="text-sm font-medium tracking-wide text-zinc-500 uppercase">
             Placement test
           </h2>
-          <span className="text-xs text-zinc-400">Step {flow.step} / 3</span>
+          <span className="text-xs text-zinc-400">
+            Step {flow.step} / {PLACEMENT_STEPS}
+          </span>
         </div>
 
         <div className="h-1 w-full rounded-full bg-zinc-200">
           <div
             className="h-1 rounded-full bg-zinc-900 transition-all"
-            style={{ width: `${(flow.step / 3) * 100}%` }}
+            style={{ width: `${(flow.step / PLACEMENT_STEPS) * 100}%` }}
           />
         </div>
 
@@ -195,7 +198,7 @@ export function PlacementTestCard() {
         Placement test
       </h2>
       <p className="text-sm text-zinc-600">
-        Don't know your level? Take a 3-prompt writing test to determine it
+        {`Don't know your level? Take a ${PLACEMENT_STEPS}-prompt writing test to determine it`}
         automatically.
       </p>
       {error && (

@@ -7,6 +7,7 @@ import {
   sessionCount,
 } from "./history-store";
 import { sessions } from "@/db/schema";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 async function clearSessions() {
   await db.delete(sessions).execute();
@@ -22,7 +23,7 @@ describe("HistoryStore", () => {
       promptText: "Décrivez votre chien.",
       promptConstraints: JSON.stringify({
         cefrLevel: "A1",
-        dialect: "louisiana",
+        dialect: DEFAULT_DIALECT,
       }),
       writingText: "Mon chien est petit et brun.",
       evaluationJson: null,

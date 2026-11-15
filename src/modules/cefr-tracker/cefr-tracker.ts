@@ -1,4 +1,5 @@
 import { CEFR_LEVELS, CEFR_ORDER, type CefrLevel } from "@/contracts/cefr";
+import { ADVANCEMENT_STREAK } from "@/config/limits";
 
 export type { CefrLevel } from "@/contracts/cefr";
 
@@ -59,7 +60,7 @@ export class CefrTracker {
 
     this.consecutiveAbove++;
 
-    if (this.consecutiveAbove >= 3) {
+    if (this.consecutiveAbove >= ADVANCEMENT_STREAK) {
       const promotion = nextLevel(this.currentLevel);
       if (promotion && promotion !== this.currentLevel) {
         const change = this.setLevel(promotion, "auto");

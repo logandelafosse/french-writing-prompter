@@ -6,6 +6,7 @@ import { PlacementTest } from "@/modules/placement-test/placement-test";
 import { setLevel } from "@/modules/cefr-tracker/db-store";
 import { PlacementPostBody } from "@/contracts/api";
 import { parseRequestBody } from "@/lib/http";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 let placementTest: PlacementTest | null = null;
 
@@ -33,7 +34,11 @@ export async function POST(request: Request) {
   const body = parsed.value;
 
   if (body.action === "start") {
-    placementTest = new PlacementTest(promptGenerator, evaluator, "louisiana");
+    placementTest = new PlacementTest(
+      promptGenerator,
+      evaluator,
+      DEFAULT_DIALECT,
+    );
     const prompt = await placementTest.start();
 
     return NextResponse.json({

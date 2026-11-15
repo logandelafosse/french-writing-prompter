@@ -4,6 +4,8 @@ import type {
 } from "@/modules/prompt-generator/prompt-generator";
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
 import { CEFR_ORDER, type CefrLevel } from "@/contracts/cefr";
+import { PLACEMENT_STEPS } from "@/config/limits";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 export type PlacementTestState = "idle" | "waiting_for_writing" | "complete";
 
@@ -34,7 +36,7 @@ export class PlacementTest {
   constructor(
     private promptGenerator: PromptGeneratorLike,
     private evaluator: EvaluatorLike,
-    private dialect: FrenchDialect = "louisiana",
+    private dialect: FrenchDialect = DEFAULT_DIALECT,
   ) {}
 
   getState(): PlacementTestState {
@@ -87,7 +89,7 @@ export class PlacementTest {
 
     this.evaluations.push(evaluation);
 
-    if (this.currentStep >= 3) {
+    if (this.currentStep >= PLACEMENT_STEPS) {
       this.state = "complete";
       const finalLevel = PlacementTest.computeLevel(
         this.evaluations.map((e) => e.overall_cefr),

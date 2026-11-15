@@ -1,0 +1,11 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "project": ["src/**/*.{ts,tsx}"],
+  "ignoreDependencies": ["tailwindcss", "tw-animate-css", "shadcn", "postcss"],
+  "ignoreExportsUsedInFile": true,
+  "ignoreIssues": {
+    "src/db/**": ["exports"],
+    "src/contracts/evaluation.ts": ["types"],
+    "src/contracts/session.ts": ["types"]
+  }
+}

@@ -7,6 +7,8 @@ import {
 } from "@/modules/quota-manager/quota-store";
 import { getCurrentLevel } from "@/modules/cefr-tracker/db-store";
 import { saveSession } from "@/modules/history-store/history-store";
+import { DAILY_PROMPT_QUOTA } from "@/config/limits";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 const openai = new OpenAiClient();
 const promptGenerator = new PromptGenerator(openai);
@@ -21,14 +23,14 @@ export async function POST() {
   }
 
   const used = await getTodayQuota();
-  if (used >= 3) {
+  if (used >= DAILY_PROMPT_QUOTA) {
     return NextResponse.json(
       { error: "Daily quota exhausted. Try again tomorrow." },
       { status: 429 },
     );
   }
 
-  const prompt = await promptGenerator.generate(level, "louisiana");
+  const prompt = await promptGenerator.generate(level, DEFAULT_DIALECT);
 
   const session = await saveSession({
     promptText: prompt.text,

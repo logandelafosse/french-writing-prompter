@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { saveSession } from "@/modules/history-store/history-store";
 import evaluationFixture from "@/test/fixtures/ai/evaluation.valid.json";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { GET } from "./route";
 
 async function clearSessions() {
@@ -19,7 +20,7 @@ describe("GET /api/sessions", () => {
       promptText: "Valid session",
       promptConstraints: JSON.stringify({
         cefrLevel: "B1",
-        dialect: "louisiana",
+        dialect: DEFAULT_DIALECT,
       }),
       writingText: "Mon texte.",
       evaluationJson: JSON.stringify(evaluationFixture),
@@ -38,7 +39,7 @@ describe("GET /api/sessions", () => {
       promptText: "Broken JSON row",
       promptConstraints: JSON.stringify({
         cefrLevel: "A2",
-        dialect: "louisiana",
+        dialect: DEFAULT_DIALECT,
       }),
       writingText: "Encore du texte.",
       evaluationJson: '"{oops"',

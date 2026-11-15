@@ -1,11 +1,11 @@
 import { db } from "@/db";
 import { dailyQuota } from "@/db/schema";
 import { first } from "@/lib/first";
-import { todayUtcDateKey } from "@/lib/utc-date-key";
+import { todayLocalDateKey } from "@/lib/dates";
 import { eq } from "drizzle-orm";
 
 export async function getTodayQuota(): Promise<number> {
-  const today = todayUtcDateKey();
+  const today = todayLocalDateKey();
   const rows = await db
     .select()
     .from(dailyQuota)
@@ -17,7 +17,7 @@ export async function getTodayQuota(): Promise<number> {
 }
 
 export async function incrementQuota(): Promise<number> {
-  const today = todayUtcDateKey();
+  const today = todayLocalDateKey();
   const existing = await db
     .select()
     .from(dailyQuota)

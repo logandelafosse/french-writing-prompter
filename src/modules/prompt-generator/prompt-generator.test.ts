@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi } from "vitest";
 import { PromptGenerator } from "./prompt-generator";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { renderForGenerator } from "@/modules/dialect/render";
 
 function createMockClient(responseText: string) {
   return {
@@ -15,23 +17,23 @@ describe("PromptGenerator", () => {
     );
 
     const generator = new PromptGenerator(mockClient as any);
-    const prompt = await generator.generate("A2", "louisiana");
+    const prompt = await generator.generate("A2", DEFAULT_DIALECT);
 
     expect(prompt).toHaveProperty("text");
     expect(prompt).toHaveProperty("constraints");
     expect(prompt.constraints.cefrLevel).toBe("A2");
-    expect(prompt.constraints.dialect).toBe("louisiana");
+    expect(prompt.constraints.dialect).toBe(DEFAULT_DIALECT);
     expect(typeof prompt.text).toBe("string");
     expect(prompt.text.length).toBeGreaterThan(0);
   });
 
-  it("passes CEFR level and dialect rules in the system prompt", async () => {
+  it("embeds renderForGenerator() output in the system prompt", async () => {
     const mockClient = {
       chatCompletion: vi.fn().mockResolvedValue("Sample prompt text."),
     };
 
     const generator = new PromptGenerator(mockClient as any);
-    await generator.generate("B1", "louisiana");
+    await generator.generate("B1", DEFAULT_DIALECT);
 
     const callArgs = mockClient.chatCompletion.mock.calls[0]?.[0];
     expect(callArgs).toBeDefined();
@@ -40,8 +42,8 @@ describe("PromptGenerator", () => {
       (m: any) => m.role === "system",
     );
 
+    expect(systemMessage.content).toContain(renderForGenerator());
     expect(systemMessage.content).toContain("B1");
-    expect(systemMessage.content).toContain("Louisiana French");
   });
 
   it("includes all required constraint types in the prompt", async () => {
@@ -50,11 +52,11 @@ describe("PromptGenerator", () => {
     );
 
     const generator = new PromptGenerator(mockClient as any);
-    const prompt = await generator.generate("B2", "louisiana");
+    const prompt = await generator.generate("B2", DEFAULT_DIALECT);
 
     expect(prompt.constraints).toMatchObject({
       cefrLevel: "B2",
-      dialect: "louisiana",
+      dialect: DEFAULT_DIALECT,
     });
   });
 });

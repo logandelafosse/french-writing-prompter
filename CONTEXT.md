@@ -13,8 +13,44 @@ The text a learner submits in response to a Writing Prompt.
 _Avoid_: answer, response, submission, essay
 
 **Evaluation**:
-An AI-generated assessment of a Student Writing across four dimensions (grammatical accuracy, vocabulary range & control, coherence & cohesion, register & style), yielding per-dimension scores and an overall CEFR level.
-_Avoid_: grading, marking, feedback (Evaluation includes the scores, not just free-text)
+An AI-generated assessment of a Student Writing across four dimensions (grammatical accuracy, vocabulary range & control, coherence & cohesion, register & style), yielding per-dimension scores, an overall CEFR level, and **Corrections** (tutor notes on quoted spans).
+_Avoid_: grading, marking, feedback (Evaluation includes the scores and Corrections, not only free text)
+
+**Correction**:
+One tutor note tied to a quoted span in Student Writing. Its kind is **Mistake**, **Standard→Louisiana suggestion**, or **Dialect check**.
+_Avoid_: error, fix (too vague)
+
+**Mistake**:
+Wrong in both Standard and Louisiana French; feeds **Weakness** memory.
+_Avoid_: typo only when it is also ungrammatical in the learner's dialect
+
+**Standard→Louisiana suggestion**:
+Standard French that is acceptable but could be phrased in Louisiana French; never counted as a Mistake or toward quotas.
+_Avoid_: error, correction (use Correction kind)
+
+**Dialect check**:
+The tutor asks whether a non-standard form is intentional Louisiana usage; **Yes** creates a **Dialect Note**, **No** makes it a Mistake.
+_Avoid_: guess, assumption
+
+**Dialect Note**:
+A learner-confirmed Louisiana form the tutor never flags again.
+_Avoid_: whitelist entry, custom dictionary row
+
+**Weakness**:
+A Mistake category with a trend over recent sessions.
+_Avoid_: mistake list, error type
+
+**Focus du jour**:
+Up to two Weaknesses steering today's Writing Prompt constraints.
+_Avoid_: theme of the day, random topic
+
+**Resource**:
+A catalog link per Weakness category; never invented by the model.
+_Avoid_: suggested reading from the LLM
+
+**Carnet**:
+The page holding Weaknesses and Dialect Notes.
+_Avoid_: notebook page, profile settings
 
 **CEFR Level**:
 A proficiency tier on the Common European Framework of Reference for Languages scale: A1, A2, B1, B2, C1, C2. Each learner has a current CEFR Level, initially self-declared or determined by a Placement Test.
@@ -41,12 +77,12 @@ An Evaluation dimension measuring formality, tone, rhetorical devices, and natur
 _Avoid_: style (not specific enough), voice, tone
 
 **French Dialect**:
-The variety of French the learner uses, which determines what counts as correct. Currently only "Louisiana French" is supported — Evaluations judge Student Writing against Louisiana French norms, not Standard French.
-_Avoid_: variant, regionalism
+The variety of French the learner practices. Currently only Louisiana French is supported. **Standard French in Student Writing is never wrong**: it yields a Standard→Louisiana suggestion and never counts as a Mistake.
+_Avoid_: variant, regionalism, “not Standard French” as the default judgment
 
 **Louisiana French** (Cajun French):
-A dialect of French spoken in Louisiana with distinct grammar and vocabulary. Key features Evaluations must accept as correct: third-person plural using `ça`/`eusse`/`eux-autre` instead of `ils`; `vous-autre` for plural you (singular `tu`); `on`/`nous-autre` instead of `nous` as subject pronoun; `être après <verb>` for present progressive; passé composé with `avoir` for coming/going verbs; futur proche preferred over futur simple; minimal subjunctive usage; regional vocabulary (chaoui, cocodrie, maringouin, berceuse, etc.).
-_Avoid_: dialectal French, Creole (it's a dialect of French, not a creole)
+A dialect of French spoken in Louisiana. The canonical grammar and vocabulary rules live in `src/modules/dialect/louisiana-rules.ts` (single source of truth for prompts and Evaluations).
+_Avoid_: dialectal French, Creole (it's a dialect of French, not a creole); inline feature lists in this file
 
 ## Example dialogue
 
