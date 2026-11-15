@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { OpenAiClient } from "@/modules/openai-client/openai-client";
+import { getAiClient, scenarioFromRequest } from "@/server/ai-client";
 import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
 import { PlacementTest } from "@/modules/placement-test/placement-test";
@@ -9,10 +9,6 @@ import { parseRequestBody } from "@/lib/http";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 let placementTest: PlacementTest | null = null;
-
-const openai = new OpenAiClient();
-const promptGenerator = new PromptGenerator(openai);
-const evaluator = new WritingEvaluator(openai);
 
 export function GET() {
   if (!placementTest) {
@@ -34,9 +30,10 @@ export async function POST(request: Request) {
   const body = parsed.value;
 
   if (body.action === "start") {
+    const client = getAiClient(scenarioFromRequest(request));
     placementTest = new PlacementTest(
-      promptGenerator,
-      evaluator,
+      new PromptGenerator(client),
+      new WritingEvaluator(client),
       DEFAULT_DIALECT,
     );
     const prompt = await placementTest.start();

@@ -1,6 +1,15 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "project": ["src/**/*.{ts,tsx}", "!src/test/lint-fixtures/**"],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "e2e/**/*.{ts,tsx}",
+    "playwright.config.ts",
+    "!src/test/lint-fixtures/**"
+  ],
+  "playwright": {
+    "config": ["playwright.config.ts"],
+    "entry": ["e2e/**/*.ts"]
+  },
   "ignoreDependencies": [
     "tailwindcss",
     "tw-animate-css",

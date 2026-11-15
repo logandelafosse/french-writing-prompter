@@ -1,0 +1,8 @@
+id: no-direct-ai-client
+language: TypeScript
+severity: error
+message: "Get the AI client from getAiClient() in src/server/ai-client.ts so e2e can swap in the fake."
+rule:
+  pattern: new OpenAiClient($$$)
+files: ["src/**"]
+ignores: ["src/server/ai-client.ts", "src/modules/openai-client/**"]

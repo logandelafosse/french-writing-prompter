@@ -1,0 +1,5 @@
+id: no-direct-ai-client
+valid:
+  - "const client = getAiClient(scenarioFromRequest(request));"
+invalid:
+  - "const openai = new OpenAiClient();"

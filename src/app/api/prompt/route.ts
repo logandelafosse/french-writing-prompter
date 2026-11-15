@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { OpenAiClient } from "@/modules/openai-client/openai-client";
+import { getAiClient, scenarioFromRequest } from "@/server/ai-client";
 import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import {
   getTodayQuota,
@@ -10,10 +10,10 @@ import { saveSession } from "@/modules/history-store/history-store";
 import { DAILY_PROMPT_QUOTA } from "@/config/limits";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
-const openai = new OpenAiClient();
-const promptGenerator = new PromptGenerator(openai);
-
-export async function POST() {
+export async function POST(request: Request) {
+  const promptGenerator = new PromptGenerator(
+    getAiClient(scenarioFromRequest(request)),
+  );
   const level = await getCurrentLevel();
   if (!level) {
     return NextResponse.json(

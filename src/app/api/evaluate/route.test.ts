@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { clearEnvCache } from "@/server/env";
 import type { z } from "zod";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
@@ -23,8 +24,16 @@ async function clearSessions() {
 
 describe("POST /api/evaluate", () => {
   beforeEach(async () => {
+    vi.stubEnv("AI_CLIENT", "openai");
+    vi.stubEnv("OPENAI_API_KEY", "sk-test");
+    clearEnvCache();
     await clearSessions();
     evaluateMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    clearEnvCache();
   });
 
   it("returns 502 and leaves evaluation_json null when the model output is invalid", async () => {

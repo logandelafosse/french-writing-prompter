@@ -7,6 +7,7 @@ import vitest from "@vitest/eslint-plugin";
 import testingLibrary from "eslint-plugin-testing-library";
 import jestDom from "eslint-plugin-jest-dom";
 import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
+import playwright from "eslint-plugin-playwright";
 
 const LEGACY = ["src/components/legacy/**"];
 const TESTS = ["src/**/*.test.{ts,tsx}"];
@@ -204,6 +205,19 @@ export default defineConfig([
   },
   { files: ["src/**/*.test.tsx"], ...testingLibrary.configs["flat/react"] },
   { files: ["src/**/*.test.tsx"], ...jestDom.configs["flat/recommended"] },
+  {
+    ...playwright.configs["flat/recommended"],
+    files: ["e2e/**/*.{ts,tsx}"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+      ...playwright.configs["flat/recommended"].rules,
+      "playwright/no-raw-locators": "error",
+      "playwright/prefer-web-first-assertions": "error",
+      "playwright/no-wait-for-timeout": "error",
+      "playwright/no-networkidle": "error",
+      "playwright/no-force-option": "error",
+    },
+  },
   {
     files: LEGACY,
     rules: {
