@@ -1,0 +1,17 @@
+id: no-dropped-dlf-headword
+language: Tsx
+severity: error
+message: "maringouin is missing from the DLF extract. Do not put it back until T24."
+rule:
+  any:
+    - kind: string
+      regex: '(?i)\bmaringouin\b'
+    - kind: template_string
+      regex: "(?i)maringouin"
+files:
+  - src/modules/dialect/louisiana-rules.ts
+  - src/modules/dialect/render.ts
+  - src/modules/prompt-generator/**/*.ts
+  - src/modules/writing-evaluator/**/*.ts
+ignores:
+  - "**/*.test.ts"

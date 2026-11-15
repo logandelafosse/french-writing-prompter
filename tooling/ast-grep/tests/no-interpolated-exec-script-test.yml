@@ -1,0 +1,5 @@
+id: no-interpolated-exec-script
+valid:
+  - "execFileSync('git', ['status']);"
+invalid:
+  - "execSync(`git merge-base ${baseRef} HEAD`);"

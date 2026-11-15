@@ -1,0 +1,5 @@
+id: no-cached-timezone
+valid:
+  - "function resolvedTimeZone(tz?: string) { return tz ?? Intl.DateTimeFormat().resolvedOptions().timeZone; }"
+invalid:
+  - "const DEFAULT_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;"

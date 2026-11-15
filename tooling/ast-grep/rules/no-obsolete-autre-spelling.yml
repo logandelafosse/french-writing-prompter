@@ -1,0 +1,11 @@
+id: no-obsolete-autre-spelling
+language: Tsx
+severity: error
+message: "DLF spelling is nous-autres, vous-autres, eux-autres (final s)."
+rule:
+  any:
+    - kind: string
+      regex: '(?i)\b(nous|vous|eux)-autre\b'
+    - kind: template_string
+      regex: "(?i)(nous|vous|eux)-autre"
+files: ["src/**"]

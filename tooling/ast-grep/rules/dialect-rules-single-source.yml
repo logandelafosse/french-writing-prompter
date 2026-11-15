@@ -1,0 +1,12 @@
+id: dialect-rules-single-source
+language: Tsx
+severity: error
+message: "Louisiana French rule text lives only in src/modules/dialect. Import it; tests assert against the exported constant."
+rule:
+  any:
+    - kind: string
+    - kind: template_string
+    - kind: jsx_text
+  regex: '(?i)(eux-autre|vous-autre|nous-autre|\beusse\b|être après|futur proche|cocodrie|maringouin|chaoui)'
+files: ["src/**"]
+ignores: ["src/modules/dialect/**", "src/copy/**"]

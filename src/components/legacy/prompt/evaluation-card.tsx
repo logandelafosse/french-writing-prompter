@@ -1,6 +1,6 @@
 "use client";
 
-import { LevelBadge } from "@/components/level/level-components";
+import { LevelBadge } from "@/components/legacy/level/level-components";
 import type { Evaluation } from "@/contracts/evaluation";
 
 export function EvaluationCard({ evaluation }: { evaluation: Evaluation }) {

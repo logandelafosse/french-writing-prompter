@@ -1,0 +1,18 @@
+id: no-utc-date-key
+language: Tsx
+severity: error
+message: "Calendar days are local (localDateKey). Do not take the date prefix of an ISO string."
+rule:
+  any:
+    - pattern: $D.toISOString().split($$$)
+    - pattern: $D.toISOString().slice($$$)
+    - pattern: $D.toISOString().substring($$$)
+    - pattern: $D.toISOString().substr($$$)
+    - pattern: $S.indexOf("T")
+    - pattern: $S.indexOf('T')
+    - pattern: $S.split("T")
+    - pattern: $S.split('T')
+    - kind: identifier
+      regex: utcDateKey
+files: ["src/**"]
+ignores: ["src/lib/dates.ts"]

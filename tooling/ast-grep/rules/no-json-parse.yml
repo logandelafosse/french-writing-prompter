@@ -1,0 +1,26 @@
+id: no-json-parse
+language: Tsx
+severity: error
+message: "Parse text only with parseJson(Schema, text) from src/lib/json.ts."
+rule:
+  any:
+    - pattern: JSON.parse
+    - pattern: JSON?.parse
+    - pattern: globalThis.JSON.parse
+    - pattern: globalThis.JSON?.parse
+    - pattern: window.JSON.parse
+    - pattern: JSON["parse"]
+    - pattern: JSON['parse']
+    - pattern: globalThis["JSON"]
+    - pattern: globalThis['JSON']
+    - pattern: window["JSON"]
+    - pattern: window['JSON']
+    - pattern: const { parse } = JSON
+    - pattern: "const { parse: $NAME } = JSON"
+    - pattern: let { parse } = JSON
+    - pattern: "let { parse: $NAME } = JSON"
+    - pattern: eval($$$)
+    - pattern: new Function($$$)
+    - pattern: Function($$$)
+files: ["src/**"]
+ignores: ["src/lib/json.ts"]

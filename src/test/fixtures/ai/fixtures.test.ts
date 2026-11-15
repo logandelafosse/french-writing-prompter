@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
 import { Evaluation } from "@/contracts/evaluation";
+import { parseJson } from "@/lib/json";
 
 const FIXTURES_DIR = path.join(import.meta.dirname, ".");
 
@@ -17,18 +18,16 @@ describe("AI fixtures", () => {
   for (const file of validFiles) {
     it(`${file} parses with Evaluation schema`, () => {
       const text = fs.readFileSync(path.join(FIXTURES_DIR, file), "utf8");
-      const parsed = Evaluation.safeParse(JSON.parse(text));
-      expect(parsed.success, parsed.success ? "" : String(parsed.error)).toBe(
-        true,
-      );
+      const parsed = parseJson(Evaluation, text);
+      expect(parsed.ok, parsed.ok ? "" : String(parsed.cause)).toBe(true);
     });
   }
 
   for (const file of invalidFiles) {
     it(`${file} fails Evaluation schema`, () => {
       const text = fs.readFileSync(path.join(FIXTURES_DIR, file), "utf8");
-      const parsed = Evaluation.safeParse(JSON.parse(text));
-      expect(parsed.success).toBe(false);
+      const parsed = parseJson(Evaluation, text);
+      expect(parsed.ok).toBe(false);
     });
   }
 });

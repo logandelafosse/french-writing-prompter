@@ -1,0 +1,5 @@
+id: no-skip-undefined-element
+valid:
+  - "if (row === undefined) throw new Error('missing');"
+invalid:
+  - "if (h === undefined) continue;"

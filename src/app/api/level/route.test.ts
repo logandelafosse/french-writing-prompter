@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { db } from "@/db";
 import { levelChanges } from "@/db/schema";
+import { LevelGetResponse, LevelPutResponse } from "@/contracts/api";
+import { readResponseJson } from "@/test/read-response-json";
+import { ApiErrorBody } from "@/test/api-response-schemas";
 import { GET, PUT } from "./route";
 
 async function clearLevelChanges() {
@@ -22,7 +25,7 @@ describe("PUT /api/level", () => {
     );
 
     expect(response.status).toBe(400);
-    const body = await response.json();
+    const body = await readResponseJson(response, ApiErrorBody);
     expect(body.error).toMatch(/level/i);
 
     const rows = await db.select().from(levelChanges);
@@ -39,7 +42,7 @@ describe("PUT /api/level", () => {
     );
 
     expect(response.status).toBe(400);
-    const body = await response.json();
+    const body = await readResponseJson(response, ApiErrorBody);
     expect(body.error).toMatch(/source/i);
 
     const rows = await db.select().from(levelChanges);
@@ -56,7 +59,7 @@ describe("PUT /api/level", () => {
     );
 
     expect(response.status).toBe(200);
-    const body = await response.json();
+    const body = await readResponseJson(response, LevelPutResponse);
     expect(body.change.source).toBe("manual");
 
     const rows = await db.select().from(levelChanges);
@@ -75,7 +78,7 @@ describe("PUT /api/level", () => {
     );
 
     expect(response.status).toBe(400);
-    const body = await response.json();
+    const body = await readResponseJson(response, ApiErrorBody);
     expect(body.error).toMatch(/level/i);
 
     const rows = await db.select().from(levelChanges);
@@ -98,7 +101,7 @@ describe("GET /api/level", () => {
     );
 
     const response = await GET();
-    const body = await response.json();
+    const body = await readResponseJson(response, LevelGetResponse);
     expect(body.level).toBe("A2");
     expect(body.history).toHaveLength(1);
   });

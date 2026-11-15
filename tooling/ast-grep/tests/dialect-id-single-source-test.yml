@@ -1,0 +1,5 @@
+id: dialect-id-single-source
+valid:
+  - "import { DEFAULT_DIALECT } from '@/modules/dialect/louisiana-rules';"
+invalid:
+  - "const dialect = 'louisiana';"

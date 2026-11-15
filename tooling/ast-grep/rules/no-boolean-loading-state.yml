@@ -1,0 +1,13 @@
+id: no-boolean-loading-state
+language: Tsx
+severity: error
+message: "Model async UI as a discriminated union (idle | generating | evaluating | error), not a boolean."
+rule:
+  any:
+    - pattern: const [$STATE, $SETTER] = useState($$$INIT)
+    - pattern: const [$STATE, $SETTER] = useState<$T>($$$INIT)
+constraints:
+  STATE:
+    regex: "(?i)^(is)?(loading|busy|pending|submitting|generating|evaluating)$"
+files: ["src/**/*.tsx"]
+ignores: ["src/components/legacy/**"]

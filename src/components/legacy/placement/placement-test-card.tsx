@@ -3,9 +3,9 @@
 import { useState } from "react";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import type { Evaluation } from "@/contracts/evaluation";
-import type { CefrLevel } from "@/components/level/level-components";
-import { LevelBadge } from "@/components/level/level-components";
-import { EvaluationCard } from "@/components/prompt/evaluation-card";
+import type { CefrLevel } from "@/components/legacy/level/level-components";
+import { LevelBadge } from "@/components/legacy/level/level-components";
+import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
 import { PlacementPostResponse } from "@/contracts/api";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { PLACEMENT_STEPS } from "@/config/limits";

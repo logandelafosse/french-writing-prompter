@@ -1,0 +1,7 @@
+id: no-raw-json-body
+valid:
+  - "const p = await parseRequestBody(request, Schema);"
+  - "return NextResponse.json(body);"
+invalid:
+  - "const raw = await request.json();"
+  - "const body = await response.json();"

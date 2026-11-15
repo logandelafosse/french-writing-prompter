@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { db } from "@/db";
 import { levelChanges } from "@/db/schema";
+import { readResponseJson } from "@/test/read-response-json";
+import { ApiErrorBody } from "@/test/api-response-schemas";
 
 vi.mock("@/modules/openai-client/openai-client", () => ({
   OpenAiClient: class {
@@ -30,7 +32,7 @@ describe("POST /api/placement body validation", () => {
     );
 
     expect(response.status).toBe(400);
-    const json = await response.json();
+    const json = await readResponseJson(response, ApiErrorBody);
     expect(json.error).toMatch(/action/i);
 
     const rows = await db.select().from(levelChanges);
@@ -49,7 +51,7 @@ describe("POST /api/placement body validation", () => {
     );
 
     expect(response.status).toBe(400);
-    const json = await response.json();
+    const json = await readResponseJson(response, ApiErrorBody);
     expect(json.error).toMatch(/writing/i);
   });
 
@@ -65,7 +67,7 @@ describe("POST /api/placement body validation", () => {
     );
 
     expect(response.status).toBe(400);
-    const json = await response.json();
+    const json = await readResponseJson(response, ApiErrorBody);
     expect(json.error).toMatch(/extra/i);
 
     const rows = await db.select().from(levelChanges);

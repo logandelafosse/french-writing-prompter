@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LevelBadge } from "@/components/level/level-components";
-import type { CefrLevel } from "@/components/level/level-components";
+import { LevelBadge } from "@/components/legacy/level/level-components";
+import type { CefrLevel } from "@/components/legacy/level/level-components";
 import type { LevelChange } from "@/modules/cefr-tracker/cefr-tracker";
-import { EvaluationCard } from "@/components/prompt/evaluation-card";
+import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
 import type { SessionView } from "@/contracts/session";
 import { LevelGetResponse, SessionsGetResponse } from "@/contracts/api";
 import { fetchJson } from "@/lib/http";

@@ -6,6 +6,8 @@ import { parseJson } from "@/lib/json";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { readResponseJson } from "@/test/read-response-json";
+import { EvaluateFailureBody } from "@/test/api-response-schemas";
 
 const evaluateMock = vi.fn();
 
@@ -67,7 +69,7 @@ describe("POST /api/evaluate", () => {
     );
 
     expect(response.status).toBe(502);
-    const body = await response.json();
+    const body = await readResponseJson(response, EvaluateFailureBody);
     expect(body.code).toBe("schema_mismatch");
 
     const stored = await getSession(session.id);

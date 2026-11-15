@@ -1,0 +1,6 @@
+id: no-obsolete-autre-spelling
+valid:
+  - "const ok = 'vous-autres allez';"
+invalid:
+  - "const bad = 'use vous-autre';"
+  - "const bad = `prompt ${'vous-autre'}`;"

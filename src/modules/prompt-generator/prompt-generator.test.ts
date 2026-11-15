@@ -48,7 +48,7 @@ describe("PromptGenerator", () => {
 
   it("includes all required constraint types in the prompt", async () => {
     const mockClient = createMockClient(
-      "Décrivez votre ville idéale en 150-200 mots, au conditionnel, ton descriptif.",
+      "Décrivez votre ville idéale au conditionnel, ton descriptif.",
     );
 
     const generator = new PromptGenerator(mockClient as any);

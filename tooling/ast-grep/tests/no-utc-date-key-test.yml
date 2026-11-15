@@ -1,0 +1,7 @@
+id: no-utc-date-key
+valid:
+  - "const key = localDateKey(new Date());"
+  - "const stamp = new Date().toISOString();"
+invalid:
+  - "const today = new Date().toISOString().split('T')[0];"
+  - "const d = now.toISOString().slice(0, 10);"

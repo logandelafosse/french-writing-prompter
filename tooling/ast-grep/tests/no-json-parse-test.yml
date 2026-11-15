@@ -1,0 +1,7 @@
+id: no-json-parse
+valid:
+  - "const v = parseJson(Evaluation, text);"
+  - "const s = JSON.stringify(value);"
+invalid:
+  - "const x = JSON.parse(text) as Evaluation;"
+  - "const y = JSON?.parse(text);"

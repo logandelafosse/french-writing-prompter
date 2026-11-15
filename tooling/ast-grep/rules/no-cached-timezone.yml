@@ -1,0 +1,14 @@
+id: no-cached-timezone
+language: Tsx
+severity: error
+message: "Call Intl.DateTimeFormat().resolvedOptions().timeZone inside the formatting function."
+rule:
+  pattern: Intl.DateTimeFormat().resolvedOptions().timeZone
+  not:
+    inside:
+      any:
+        - kind: function_declaration
+        - kind: arrow_function
+        - kind: method_definition
+      stopBy: end
+files: ["src/**"]

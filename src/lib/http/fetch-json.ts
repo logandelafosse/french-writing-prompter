@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { z, type ZodType } from "zod";
 import { parseJson } from "@/lib/json";
 
@@ -15,8 +14,8 @@ export type FetchError =
 export type FetchJsonResult<T> =
   { ok: true; value: T } | { ok: false; error: FetchError };
 
-export type ParseRequestBodyResult<T> =
-  { ok: true; value: T } | { ok: false; response: Response };
+export type { ParseRequestBodyResult } from "./parse-request-body";
+export { parseRequestBody } from "./parse-request-body";
 
 function errorMessageFromBody(text: string, fallback: string): string {
   const parsed = parseJson(ErrorBodySchema, text);
@@ -72,35 +71,4 @@ export function messageFromFetchError(
     return error.message || fallback;
   }
   return fallback;
-}
-
-export async function parseRequestBody<S extends z.ZodType>(
-  request: Request,
-  schema: S,
-): Promise<ParseRequestBodyResult<z.infer<S>>> {
-  let raw: unknown;
-  try {
-    raw = await request.json();
-  } catch {
-    return {
-      ok: false,
-      response: NextResponse.json(
-        { error: "Request body was not valid JSON." },
-        { status: 400 },
-      ),
-    };
-  }
-
-  const parsed = schema.safeParse(raw);
-  if (!parsed.success) {
-    return {
-      ok: false,
-      response: NextResponse.json(
-        { error: z.prettifyError(parsed.error) },
-        { status: 400 },
-      ),
-    };
-  }
-
-  return { ok: true, value: parsed.data };
 }

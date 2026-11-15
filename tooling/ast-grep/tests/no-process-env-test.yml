@@ -1,0 +1,5 @@
+id: no-process-env
+valid:
+  - "const env = getEnv();"
+invalid:
+  - "const key = process.env.OPENAI_API_KEY;"

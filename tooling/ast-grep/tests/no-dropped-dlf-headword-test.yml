@@ -1,0 +1,5 @@
+id: no-dropped-dlf-headword
+valid:
+  - "const w = 'cocodrie';"
+invalid:
+  - "const w = 'maringouin';"

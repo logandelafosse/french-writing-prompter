@@ -1,0 +1,7 @@
+id: no-interpolated-exec
+valid:
+  - "execFileSync('git', ['diff', '--numstat']);"
+invalid:
+  - |
+    import { execSync } from "node:child_process";
+    execSync(`git merge-base ${baseRef} HEAD`);

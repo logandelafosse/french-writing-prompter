@@ -1,0 +1,5 @@
+id: word-target-single-source
+valid:
+  - "const t = WORD_TARGET_BY_LEVEL[level];"
+invalid:
+  - "const blurb = 'Cible : 10–20 mots.';"

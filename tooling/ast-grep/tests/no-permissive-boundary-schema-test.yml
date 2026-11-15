@@ -1,0 +1,5 @@
+id: no-permissive-boundary-schema
+valid:
+  - "const Schema = z.object({ id: z.string() });"
+invalid:
+  - "parseJson(z.any(), text);"

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
-import { LevelBadge } from "@/components/level/level-components";
+import { LevelBadge } from "@/components/legacy/level/level-components";
 import { EvaluationCard } from "./evaluation-card";
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
 import {

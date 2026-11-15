@@ -1,0 +1,12 @@
+id: no-permissive-boundary-schema
+language: Tsx
+severity: error
+message: "Boundary schemas must reject bad shapes. z.any(), z.unknown(), z.json(), and z.custom() do not."
+rule:
+  any:
+    - pattern: z.any()
+    - pattern: z.unknown()
+    - pattern: z.json()
+    - pattern: z.json($$$)
+    - pattern: z.custom($$$)
+files: ["src/**"]
