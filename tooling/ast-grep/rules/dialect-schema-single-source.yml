@@ -5,4 +5,4 @@ message: "One dialect schema: FrenchDialect in src/contracts."
 rule:
   pattern: z.literal(DEFAULT_DIALECT)
 files: ["src/**"]
-ignores: ["src/contracts/**"]
+ignores: ["src/contracts/**", "src/test/lint-fixtures/**"]

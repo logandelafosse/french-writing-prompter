@@ -8,4 +8,4 @@ rule:
     - kind: template_string
   regex: '#[0-9a-fA-F]{3,8}\b|\b(rgba?|hsla?|oklch)\('
 files: ["src/**"]
-ignores: ["src/components/legacy/**"]
+ignores: ["src/components/legacy/**", "src/test/lint-fixtures/**"]

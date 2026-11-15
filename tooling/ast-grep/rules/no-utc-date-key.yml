@@ -15,4 +15,4 @@ rule:
     - kind: identifier
       regex: utcDateKey
 files: ["src/**"]
-ignores: ["src/lib/dates.ts"]
+ignores: ["src/lib/dates.ts", "src/test/lint-fixtures/**"]

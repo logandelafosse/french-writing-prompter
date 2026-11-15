@@ -9,3 +9,4 @@ rule:
     - kind: template_string
       regex: "(?i)(nous|vous|eux)-autre"
 files: ["src/**"]
+ignores: [\"src/test/lint-fixtures/**\"]

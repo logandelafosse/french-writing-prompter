@@ -5,3 +5,4 @@ message: "Do not continue past an undefined index."
 rule:
   pattern: if ($EL === undefined) continue
 files: ["src/**"]
+ignores: [\"src/test/lint-fixtures/**\"]
