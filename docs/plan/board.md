@@ -4,12 +4,13 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T08 PR #46; T09 PR #45 adversarial fixes).
+Last updated: 2026-11-15 by coordinator (T09 merged PR #45; T08 PR #46 lockfile fix).
 
 ## Ready
 
 | ID  | Ticket                                                                                                                            | Why               |
 | --- | --------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| T10 | UI primitives ([#12](https://github.com/logandelafosse/french-writing-prompter/issues/12))                                        | T09 merged (#45). |
 | T11 | Playwright tracer bullet with fake AI client and axe ([#13](https://github.com/logandelafosse/french-writing-prompter/issues/13)) | T05 + T07 merged. |
 
 ## In progress
@@ -18,10 +19,9 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                   | Why                                                                                                                                          |
-| --- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| T08 | ESLint hardening and AGENTS.md rules ([#10](https://github.com/logandelafosse/french-writing-prompter/issues/10))        | [PR #46](https://github.com/logandelafosse/french-writing-prompter/pull/46); adversarial / test / tooling reviews dispatched.                |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | [PR #45](https://github.com/logandelafosse/french-writing-prompter/pull/45); desk evidence `b3a8632`; merge when `check` green, no blockers. |
+| ID  | Ticket                                                                                                            | Why                                                                                                |
+| --- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| T08 | ESLint hardening and AGENTS.md rules ([#10](https://github.com/logandelafosse/french-writing-prompter/issues/10)) | [PR #46](https://github.com/logandelafosse/french-writing-prompter/pull/46); `check` on `3e9ece0`. |
 
 ## Blocked
 
@@ -31,17 +31,17 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 0 — Foundations
 
-| ID  | Ticket                                                              | Type | Blocked by | Why not ready                                                                                |
-| --- | ------------------------------------------------------------------- | ---- | ---------- | -------------------------------------------------------------------------------------------- |
-| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                                                                     |
-| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                                                                     |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                                                                     |
-| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44                                                                     |
-| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **In review** — PR #46                                                                       |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **In review** — PR #45                                                                       |
-| T10 | UI primitives                                                       | AFK  | T09        | Built on tokens. If T06's knip pass deleted `ui/button.tsx` or its deps, T10 recreates them. |
-| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | In **Ready** — T07 merged.                                                                   |
-| T12 | Lefthook pre-commit                                                 | AFK  | T08        | Hooks run the full lint set                                                                  |
+| ID  | Ticket                                                              | Type | Blocked by | Why not ready               |
+| --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------- |
+| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40    |
+| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42    |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43    |
+| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44    |
+| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **In review** — PR #46      |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **Done** — merged PR #45    |
+| T10 | UI primitives                                                       | AFK  | —          | **Ready** — T09 merged      |
+| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | In **Ready** — T07 merged.  |
+| T12 | Lefthook pre-commit                                                 | AFK  | T08        | Hooks run the full lint set |
 
 ### Phase 1 — Core loop
 
@@ -97,3 +97,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6))           | Merged [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41) 2026-11-15; History evidence `docs/evidence/6/`.                                              |
 | T05 | Zod contracts for API bodies, client fetches, env ([#7](https://github.com/logandelafosse/french-writing-prompter/issues/7))      | Merged [PR #42](https://github.com/logandelafosse/french-writing-prompter/pull/42) 2026-11-15; error-state evidence `docs/evidence/7/`; `pr:size` 494.                           |
 | T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | Merged [PR #43](https://github.com/logandelafosse/french-writing-prompter/pull/43) 2026-11-15; History evidence `docs/evidence/8/`; knip in `check`.                             |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11))          | Merged [PR #45](https://github.com/logandelafosse/french-writing-prompter/pull/45) 2026-11-15; evidence `docs/evidence/11/`; T10 unblocked.                                      |
