@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T12/T13 in review; T13 `pr:size` → split T13a/T13b).
+Last updated: 2026-11-15 by coordinator (T13 split: PR #51 T13a; T13b on `ticket/t13b-app-header` after #51 merges).
 
 ## Ready
 
@@ -18,8 +18,8 @@ _None._
 
 | ID  | Ticket                                                                                                                    | Why                                                                                                         |
 | --- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                          | [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49); hook test hardening on branch. |
-| T13 | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15)) | [PR #50](https://github.com/logandelafosse/french-writing-prompter/pull/50); e2e + evidence follow-ups.     |
+| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                          | [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49); ANSI-safe hook test output; awaiting green `check`. |
+| T13 | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15)) | [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) **T13a** quota (~231 lines); **T13b** branch ready (~333 vs T13a); [PR #50](https://github.com/logandelafosse/french-writing-prompter/pull/50) superseded. |
 
 ## Blocked
 
