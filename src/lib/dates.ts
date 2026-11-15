@@ -1,10 +1,9 @@
-const DEFAULT_TIME_ZONE =
-  typeof Intl !== "undefined"
-    ? Intl.DateTimeFormat().resolvedOptions().timeZone
-    : "UTC";
-
 function resolvedTimeZone(timeZone?: string): string {
-  return timeZone ?? DEFAULT_TIME_ZONE;
+  if (timeZone) return timeZone;
+  if (typeof Intl !== "undefined") {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  }
+  return "UTC";
 }
 
 /** Local calendar date key (YYYY-MM-DD) for quota and sessions. */

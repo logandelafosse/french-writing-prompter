@@ -13,7 +13,7 @@
 
 ast-grep becomes a first-class check. `@ast-grep/cli` is a devDependency and every script calls the `ast-grep` binary, never `sg` (on this machine `/usr/bin/sg` is shadow-utils). `sgconfig.yml` sits at the repo root with rules in `tooling/ast-grep/rules/` and rule tests in `tooling/ast-grep/tests/`, laid out as in `tooling-review.md` §4 (including the `languageGlobs` entry that parses `.ts` as TSX).
 
-All P0 rules from §4 land, each with a test that has at least one `valid` and one `invalid` snippet so a rule can't silently match nothing: `no-json-parse`, `no-raw-json-body`, `no-utc-date-key`, `no-adhoc-date-format`, `no-app-db-in-tests`, `dialect-rules-single-source`, `dialect-id-single-source`, `no-raw-interactive-element`, `no-raw-color`, `no-raw-color-css`, `no-tailwind-default-palette`, `no-boolean-loading-state`, `no-process-env`, `no-inline-model-name`. Rule `files`/`ignores` point at the real single-source modules T04–T06 created (`src/lib/json.ts`, `src/lib/http/**`, `src/lib/dates.ts`, `src/modules/dialect/**`, `src/server/env.ts`, `src/config/**`); if a path differs from §4, the rule follows the code, not the doc.
+All P0 rules from §4 land, each with a test that has at least one `valid` and one `invalid` snippet so a rule can't silently match nothing: `no-json-parse`, `no-raw-json-body`, `no-utc-date-key`, `no-adhoc-date-format`, `dialect-rules-single-source`, `dialect-id-single-source`, `no-raw-interactive-element`, `no-raw-color`, `no-raw-color-css`, `no-tailwind-default-palette`, `no-boolean-loading-state`, `no-process-env`, `no-inline-model-name`, plus the T06-derived rules listed below. Rule `files`/`ignores` point at the real single-source modules T04–T06 created (`src/lib/json.ts`, `src/lib/http/**`, `src/lib/dates.ts`, `src/modules/dialect/**`, `src/server/env.ts`, `src/config/**`); if a path differs from §4, the rule follows the code, not the doc.
 
 `no-scaffold-leftovers` is added by whichever of T07 and T09 merges second (Geist and "Create Next App" are still in `layout.tsx` until T09).
 
@@ -29,13 +29,15 @@ P1 rules from §4 (`no-type-assertion`, `no-mocking-own-modules`) are in scope o
 
 **From T05 tooling review (PR #42):** widen `no-raw-json-body` (optional `.json?.()`, parenthesized callee, saved method, `Reflect.apply`); widen `no-process-env` (computed access, `globalThis`, destructuring, `import { env } from "node:process"`); `env.test.ts` → `vi.stubEnv` when rules land.
 
+**From T06 tooling review (PR #43):** drop planned `no-app-db-in-tests` (T06 deleted `createTestDb`; Vitest uses `@/db` against `:memory:` via `setup-db.ts`). Add: `word-target-single-source`, `no-obsolete-autre-spelling`, `no-dropped-dlf-headword` (maringouin only), `no-cached-timezone`, `no-json-parse-script`, `no-regex-extract-ts`, `dialect-schema-single-source`. Add `languageGlobs.javascript` for `*.mjs` in `sgconfig.yml`. Record on T08: `no-restricted-imports` on `src/contracts/**` (no `@/modules`). Retarget `dialect-id-single-source` ignores to `src/contracts/**` after `FrenchDialect` owns the literal.
+
 ## Acceptance criteria
 
 - [ ] `[check]` `npx ast-grep --version` prints the ast-grep version from `node_modules`; `package.json` scripts never invoke `sg`.
 - [ ] `[check]` `npm run lint:ast` exits 0 and is part of `npm run check`.
 - [ ] `[check]` Every file in `tooling/ast-grep/rules/` has a matching test in `tooling/ast-grep/tests/` with ≥ 1 `valid` and ≥ 1 `invalid` case; `ast-grep test` reports them all passing.
 - [ ] `[check]` In a scratch file under `src/`, each of these makes `npm run check` fail with the rule's message: `JSON.parse(x) as T`; `new Date().toISOString().split("T")[0]`; `await request.json()`; `process.env.OPENAI_API_KEY`; the string `"louisiana"`; the string `"gpt-4o"`; `"#ff0000"` in a TSX string; `bg-zinc-900` in a className; `const [loading, setLoading] = useState(false)` in a `.tsx`; a raw `<button>` in `src/components/home/`.
-- [ ] `[check]` A scratch `*.test.ts` that imports `@/db` fails `no-app-db-in-tests`.
+- [ ] `[check]` Scratch files trip the T06-derived rules (word-target in prose, obsolete `-autre` spelling, module-level cached `Intl…timeZone`, etc.) per `tooling/ast-grep/tests/*`.
 - [ ] `[check]` A raw `<button>` or `bg-zinc-*` inside `src/components/legacy/` passes; the same inside `src/components/ui/` passes only for `no-raw-interactive-element`.
 - [ ] `[check]` `ls src/components` shows only `legacy/` and `ui/` (plus anything T04–T06 added that isn't legacy UI); `src/app/page.tsx` contains no Tailwind palette classes.
 - [ ] `[check]` `npm run build` succeeds and `npm run dev` renders Home and History unchanged (manual; the e2e harness arrives in T11).
