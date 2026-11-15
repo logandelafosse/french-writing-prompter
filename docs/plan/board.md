@@ -4,17 +4,17 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by planning session.
+Last updated: 2026-11-15 by coordinator (T01 dispatch).
 
 ## Ready
 
-| ID | Ticket | Why |
-|---|---|---|
-| T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3)) | T00 merged; no other blockers. |
+_None._
 
 ## In progress
 
-_None._
+| ID | Ticket | Why |
+|---|---|---|
+| T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3)) | Implementer `inherit` (Composer), branch `ticket/t01-isolated-test-db`, started 2026-11-15. |
 
 ## In review
 
