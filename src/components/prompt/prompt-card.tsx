@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import { LevelBadge } from "@/components/level/level-components";
-import type { CefrLevel } from "@/components/level/level-components";
 import { EvaluationCard } from "./evaluation-card";
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
 
@@ -182,7 +181,7 @@ export function PromptCard() {
         <>
           <div className="space-y-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
             <div className="flex items-center gap-2">
-              <LevelBadge level={prompt.constraints.cefrLevel as CefrLevel} />
+              <LevelBadge level={prompt.constraints.cefrLevel} />
               <span className="text-xs text-zinc-400">Louisiana French</span>
             </div>
             <p className="leading-relaxed whitespace-pre-wrap text-zinc-800">

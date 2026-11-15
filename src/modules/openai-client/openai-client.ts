@@ -1,4 +1,8 @@
 import OpenAI from "openai";
+import { zodResponseFormat } from "openai/helpers/zod";
+import type { z } from "zod";
+import { parseJson } from "@/lib/json";
+import { AiOutputError } from "./ai-output-error";
 
 export interface ChatCompletionParams {
   model: string;
@@ -6,7 +10,7 @@ export interface ChatCompletionParams {
     role: "system" | "user" | "assistant";
     content: string;
   }>;
-  response_format?: { type: "json_object" };
+  response_format?: OpenAI.Chat.Completions.ChatCompletionCreateParams["response_format"];
 }
 
 export class OpenAiClient {
@@ -37,14 +41,33 @@ export class OpenAiClient {
     }
   }
 
-  async chatCompletionJSON<T = Record<string, unknown>>(
+  async chatCompletionJSON<S extends z.ZodType>(
+    schema: S,
     params: Omit<ChatCompletionParams, "response_format">,
-  ): Promise<T> {
+    schemaName = "response",
+  ): Promise<z.infer<S>> {
     const text = await this.chatCompletion({
       ...params,
-      response_format: { type: "json_object" },
+      response_format: zodResponseFormat(schema, schemaName),
     });
 
-    return JSON.parse(text) as T;
+    const result = parseJson(schema, text);
+    if (result.ok) {
+      return result.value;
+    }
+
+    if (result.reason === "invalid_json") {
+      throw new AiOutputError(
+        "invalid_json",
+        "AI response was not valid JSON",
+        result.cause,
+      );
+    }
+
+    throw new AiOutputError(
+      "schema_mismatch",
+      "AI response did not match the expected schema",
+      result.cause,
+    );
   }
 }

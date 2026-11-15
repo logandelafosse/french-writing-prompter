@@ -1,8 +1,10 @@
 import { db } from "@/db";
 import { levelChanges } from "@/db/schema";
+import { LevelSource, parseCefrLevel } from "@/contracts/cefr";
 import { first } from "@/lib/first";
 import { desc } from "drizzle-orm";
-import type { CefrLevel, LevelChange } from "./cefr-tracker";
+import type { CefrLevel } from "@/contracts/cefr";
+import type { LevelChange } from "./cefr-tracker";
 
 export async function getCurrentLevel(): Promise<CefrLevel | null> {
   const rows = await db
@@ -13,7 +15,7 @@ export async function getCurrentLevel(): Promise<CefrLevel | null> {
 
   if (rows.length === 0) return null;
   const row = first(rows, "latest level_changes row");
-  return row.toLevel as CefrLevel;
+  return parseCefrLevel(row.toLevel);
 }
 
 export async function setLevel(
@@ -43,10 +45,20 @@ export async function getLevelHistory(): Promise<LevelChange[]> {
     .from(levelChanges)
     .orderBy(desc(levelChanges.createdAt));
 
-  return rows.map((r) => ({
-    fromLevel: r.fromLevel as CefrLevel | null,
-    toLevel: r.toLevel as CefrLevel,
-    source: r.source as "auto" | "manual",
-    createdAt: r.createdAt,
-  }));
+  const history: LevelChange[] = [];
+  for (const r of rows) {
+    const toLevel = parseCefrLevel(r.toLevel);
+    if (toLevel === null) continue;
+    const fromLevel = parseCefrLevel(r.fromLevel);
+    const sourceParsed = LevelSource.safeParse(r.source);
+    if (!sourceParsed.success) continue;
+
+    history.push({
+      fromLevel,
+      toLevel,
+      source: sourceParsed.data,
+      createdAt: r.createdAt,
+    });
+  }
+  return history;
 }

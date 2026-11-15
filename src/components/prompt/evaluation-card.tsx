@@ -1,8 +1,7 @@
 "use client";
 
 import { LevelBadge } from "@/components/level/level-components";
-import type { CefrLevel } from "@/components/level/level-components";
-import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
+import type { Evaluation } from "@/contracts/evaluation";
 
 export function EvaluationCard({ evaluation }: { evaluation: Evaluation }) {
   const dimensions = [
@@ -28,7 +27,7 @@ export function EvaluationCard({ evaluation }: { evaluation: Evaluation }) {
     <div className="space-y-4 rounded-lg border border-emerald-200 bg-emerald-50/50 p-4">
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-medium text-emerald-800">Evaluation</h3>
-        <LevelBadge level={evaluation.overall_cefr as CefrLevel} />
+        <LevelBadge level={evaluation.overall_cefr} />
       </div>
 
       <div className="space-y-3">

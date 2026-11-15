@@ -3,17 +3,13 @@
 import { useState, useEffect } from "react";
 import { LevelBadge } from "@/components/level/level-components";
 import type { CefrLevel } from "@/components/level/level-components";
+import type { LevelChange } from "@/modules/cefr-tracker/cefr-tracker";
 import { EvaluationCard } from "@/components/prompt/evaluation-card";
-import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
-import type { Session } from "@/modules/history-store/history-store";
+import type { SessionView } from "@/contracts/session";
 import Link from "next/link";
 
-interface LevelChange {
-  fromLevel: string | null;
-  toLevel: string;
-  source: string;
-  createdAt: string;
-}
+const MALFORMED_NOTICE =
+  "Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.";
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -26,15 +22,16 @@ function formatDate(iso: string): string {
   });
 }
 
-function SessionRow({ session }: { session: Session }) {
-  const [expanded, setExpanded] = useState(false);
+function sessionBadgeLevel(session: SessionView): CefrLevel | null {
+  if (session.evaluation?.ok === true) {
+    return session.evaluation.value.overall_cefr;
+  }
+  return session.promptLevel;
+}
 
-  const constraints = session.promptConstraints
-    ? JSON.parse(session.promptConstraints)
-    : null;
-  const evaluation: Evaluation | null = session.evaluationJson
-    ? JSON.parse(session.evaluationJson)
-    : null;
+function SessionRow({ session }: { session: SessionView }) {
+  const [expanded, setExpanded] = useState(false);
+  const badgeLevel = sessionBadgeLevel(session);
 
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200">
@@ -52,9 +49,7 @@ function SessionRow({ session }: { session: Session }) {
           </span>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          {session.cefrLevel && (
-            <LevelBadge level={session.cefrLevel as CefrLevel} />
-          )}
+          {badgeLevel && <LevelBadge level={badgeLevel} />}
           <svg
             className={`h-4 w-4 text-zinc-400 transition-transform ${
               expanded ? "rotate-180" : ""
@@ -82,14 +77,10 @@ function SessionRow({ session }: { session: Session }) {
             <p className="text-sm whitespace-pre-wrap text-zinc-800">
               {session.promptText}
             </p>
-            {constraints && (
+            {session.promptLevel && (
               <div className="mt-2 flex items-center gap-2">
-                <LevelBadge level={constraints.cefrLevel as CefrLevel} />
-                <span className="text-xs text-zinc-400">
-                  {constraints.dialect === "louisiana"
-                    ? "Louisiana French"
-                    : constraints.dialect}
-                </span>
+                <LevelBadge level={session.promptLevel} />
+                <span className="text-xs text-zinc-400">Louisiana French</span>
               </div>
             )}
           </div>
@@ -105,13 +96,19 @@ function SessionRow({ session }: { session: Session }) {
             </div>
           )}
 
-          {evaluation && (
+          {session.evaluation?.ok === true && (
             <div>
               <h4 className="mb-2 text-xs font-medium text-zinc-500 uppercase">
                 Evaluation
               </h4>
-              <EvaluationCard evaluation={evaluation} />
+              <EvaluationCard evaluation={session.evaluation.value} />
             </div>
+          )}
+
+          {session.evaluation?.ok === false && (
+            <p className="text-sm text-amber-800" role="status">
+              {MALFORMED_NOTICE}
+            </p>
           )}
         </div>
       )}
@@ -120,7 +117,7 @@ function SessionRow({ session }: { session: Session }) {
 }
 
 export function HistoryPage() {
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<SessionView[]>([]);
   const [levelData, setLevelData] = useState<{
     level: CefrLevel | null;
     history: LevelChange[];
@@ -193,13 +190,13 @@ export function HistoryPage() {
                   </span>
                   {change.fromLevel ? (
                     <>
-                      <LevelBadge level={change.fromLevel as CefrLevel} />
+                      <LevelBadge level={change.fromLevel} />
                       <span className="text-zinc-400">→</span>
                     </>
                   ) : (
                     <span className="text-xs text-zinc-400">Start</span>
                   )}
-                  <LevelBadge level={change.toLevel as CefrLevel} />
+                  <LevelBadge level={change.toLevel} />
                   <span
                     className={`rounded px-1.5 py-0.5 text-xs ${
                       change.source === "auto"

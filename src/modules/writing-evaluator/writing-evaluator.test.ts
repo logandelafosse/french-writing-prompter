@@ -2,6 +2,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { WritingEvaluator } from "./writing-evaluator";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
+import evaluationFixture from "@/test/fixtures/ai/evaluation.valid.json";
 
 function makePrompt(cefr: string): WritingPrompt {
   return {
@@ -11,24 +12,7 @@ function makePrompt(cefr: string): WritingPrompt {
 }
 
 describe("WritingEvaluator", () => {
-  const mockEvaluation = {
-    dimensions: {
-      grammatical_accuracy: { score: 4, max: 6, comment: "Good grammar" },
-      vocabulary: { score: 3, max: 6, comment: "Decent vocab" },
-      coherence: { score: 4, max: 6, comment: "Well structured" },
-      register_style: { score: 3, max: 6, comment: "Ok register" },
-    },
-    overall_cefr: "B1",
-    tips: {
-      per_dimension: {
-        grammatical_accuracy: "Work on conjugations",
-        vocabulary: "Expand your word choice",
-        coherence: "Use more connectors",
-        register_style: "Vary your register",
-      },
-      holistic: "To reach B2, focus on more complex sentence structures.",
-    },
-  };
+  const mockEvaluation = evaluationFixture;
 
   it("returns a structured evaluation", async () => {
     const mockClient = {
@@ -62,15 +46,17 @@ describe("WritingEvaluator", () => {
     const evaluator = new WritingEvaluator(mockClient as any);
     await evaluator.evaluate("Test writing.", makePrompt("A2"), "louisiana");
 
-    const callArgs = mockClient.chatCompletionJSON.mock.calls[0]?.[0];
+    const callArgs = mockClient.chatCompletionJSON.mock.calls[0];
     expect(callArgs).toBeDefined();
-    if (callArgs === undefined)
+    const params = callArgs?.[1];
+    if (params === undefined)
       throw new Error("expected chatCompletionJSON call");
-    const systemMsg = callArgs.messages.find((m: any) => m.role === "system");
+    const systemMsg = params.messages.find((m: any) => m.role === "system");
 
     expect(systemMsg.content).toContain("Louisiana French");
     expect(systemMsg.content).toContain("chaoui");
     expect(systemMsg.content).toContain("être après");
+    expect(systemMsg.content).not.toContain('"overall_cefr"');
   });
 
   it("includes the student writing and prompt in the user message", async () => {
@@ -85,11 +71,11 @@ describe("WritingEvaluator", () => {
       "louisiana",
     );
 
-    const callArgs = mockClient.chatCompletionJSON.mock.calls[0]?.[0];
-    expect(callArgs).toBeDefined();
-    if (callArgs === undefined)
+    const callArgs = mockClient.chatCompletionJSON.mock.calls[0];
+    const params = callArgs?.[1];
+    if (params === undefined)
       throw new Error("expected chatCompletionJSON call");
-    const userMsg = callArgs.messages.find((m: any) => m.role === "user");
+    const userMsg = params.messages.find((m: any) => m.role === "user");
 
     expect(userMsg.content).toContain("Mon texte en français");
     expect(userMsg.content).toContain("Décrivez votre ville natale");

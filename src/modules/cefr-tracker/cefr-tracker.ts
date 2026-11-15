@@ -1,4 +1,6 @@
-export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+import { CEFR_LEVELS, CEFR_ORDER, type CefrLevel } from "@/contracts/cefr";
+
+export type { CefrLevel } from "@/contracts/cefr";
 
 export interface EvaluationResult {
   overallCefr: CefrLevel;
@@ -10,17 +12,6 @@ export interface LevelChange {
   source: "auto" | "manual";
   createdAt: string;
 }
-
-const CEFR_ORDER: Record<CefrLevel, number> = {
-  A1: 0,
-  A2: 1,
-  B1: 2,
-  B2: 3,
-  C1: 4,
-  C2: 5,
-};
-
-const CEFR_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
 function nextLevel(current: CefrLevel): CefrLevel | null {
   const idx = CEFR_ORDER[current];

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { CefrLevel } from "@/contracts/cefr";
+import { CEFR_LEVELS } from "@/contracts/cefr";
 
-export type CefrLevel = "A1" | "A2" | "B1" | "B2" | "C1" | "C2";
+export type { CefrLevel };
 
 const LEVEL_COLORS: Record<CefrLevel, string> = {
   A1: "bg-emerald-100 text-emerald-800 border-emerald-300",
@@ -35,7 +37,7 @@ export function LevelBadge({ level }: { level: CefrLevel | null }) {
   );
 }
 
-const ALL_LEVELS: CefrLevel[] = ["A1", "A2", "B1", "B2", "C1", "C2"];
+const ALL_LEVELS: CefrLevel[] = [...CEFR_LEVELS];
 
 export function LevelSelector({
   currentLevel,
