@@ -12,6 +12,9 @@ import {
 } from "@/contracts/api";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 
+const LOAD_ERROR = "An error occurred. Please try again.";
+const EVAL_ERROR = "An error occurred during evaluation.";
+
 export function PromptCard() {
   const [prompt, setPrompt] = useState<WritingPrompt | null>(null);
   const [sessionId, setSessionId] = useState<number | null>(null);
@@ -34,12 +37,7 @@ export function PromptCard() {
       setQuota(result.value);
       return;
     }
-    setError(
-      messageFromFetchError(
-        result.error,
-        "An error occurred. Please try again.",
-      ),
-    );
+    setError(messageFromFetchError(result.error, LOAD_ERROR));
   }
 
   useEffect(() => {
@@ -51,12 +49,7 @@ export function PromptCard() {
         setQuota(result.value);
         return;
       }
-      setError(
-        messageFromFetchError(
-          result.error,
-          "An error occurred. Please try again.",
-        ),
-      );
+      setError(messageFromFetchError(result.error, LOAD_ERROR));
     }
     void loadQuota();
     return () => {
@@ -75,12 +68,7 @@ export function PromptCard() {
     });
 
     if (!result.ok) {
-      setError(
-        messageFromFetchError(
-          result.error,
-          "An error occurred. Please try again.",
-        ),
-      );
+      setError(messageFromFetchError(result.error, LOAD_ERROR));
     } else {
       setPrompt(result.value.prompt);
       setSessionId(result.value.sessionId);
@@ -103,12 +91,7 @@ export function PromptCard() {
     });
 
     if (!result.ok) {
-      setError(
-        messageFromFetchError(
-          result.error,
-          "An error occurred during evaluation.",
-        ),
-      );
+      setError(messageFromFetchError(result.error, EVAL_ERROR));
     } else {
       setEvaluation(result.value.evaluation);
       if (result.value.advancement) {
