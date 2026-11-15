@@ -41,10 +41,7 @@ function ruleIds(messages: Linter.LintMessage[]): string[] {
   return ids;
 }
 
-describe(
-  "eslint.config.mjs guardrails",
-  { timeout: 60_000 },
-  () => {
+describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
   it("blocks @/db import from component layer", async () => {
     const messages = await lintFixtureAs(
       "src/test/lint-fixtures/components/home/db-import.tsx",
