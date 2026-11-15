@@ -3,3 +3,5 @@ valid:
   - "const [status, setStatus] = useState<'idle' | 'generating'>('idle');"
 invalid:
   - "const [loading, setLoading] = useState(false);"
+  - "const [isLoading, setIsLoading] = useState(false);"
+  - "const [generating, setGenerating] = useState(true);"

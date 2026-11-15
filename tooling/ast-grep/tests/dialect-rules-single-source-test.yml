@@ -1,5 +1,7 @@
+# ignores (src/modules/dialect/**) apply at scan time; ast-grep rule tests do not filter by path.
 id: dialect-rules-single-source
 valid:
   - "import { LOUISIANA_RULES } from '@/modules/dialect/louisiana-rules';"
 invalid:
+  - "const prompt = 'utilise eux-autre';"
   - "const prompt = 'utilise vous-autre';"
