@@ -14,13 +14,13 @@ Last updated: 2026-11-15 by coordinator (T03 merged; T04 dispatch).
 
 ## In progress
 
-| ID  | Ticket                                                                                                                  | Why                                                       |
-| --- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6)) | Implementer `inherit`, branch `ticket/t04-zod-contracts`. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                                                  | Why                                                                  |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6)) | [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41); reviewers dispatched. |
 
 ## Blocked
 
