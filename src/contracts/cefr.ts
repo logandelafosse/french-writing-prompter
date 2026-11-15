@@ -17,3 +17,13 @@ export function parseCefrLevel(text: string | null): CefrLevel | null {
   const parsed = CefrLevel.safeParse(text);
   return parsed.success ? parsed.data : null;
 }
+
+/** French CEFR short names for menus and chips (implementation-map §5). */
+export const CEFR_UI_LABELS: Record<CefrLevel, string> = {
+  A1: "Découverte",
+  A2: "Survie",
+  B1: "Seuil",
+  B2: "Avancé",
+  C1: "Autonome",
+  C2: "Maîtrise",
+};
