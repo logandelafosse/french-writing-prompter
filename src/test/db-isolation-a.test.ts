@@ -1,10 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { saveSession, sessionCount } from "@/modules/history-store/history-store";
+import {
+  getAllSessions,
+  saveSession,
+  sessionCount,
+} from "@/modules/history-store/history-store";
+
+const MARKER_A = "isolation-marker-file-a";
+const MARKER_B = "isolation-marker-file-b";
 
 describe("test DB isolation (file A)", () => {
-  it("writes a session tagged for file A", async () => {
+  it("sees only its own session", async () => {
     await saveSession({
-      promptText: "isolation-marker-file-a",
+      promptText: MARKER_A,
       promptConstraints: "{}",
       writingText: null,
       evaluationJson: null,
@@ -12,5 +19,8 @@ describe("test DB isolation (file A)", () => {
     });
 
     expect(await sessionCount()).toBe(1);
+    const all = await getAllSessions();
+    expect(all.some((s) => s.promptText === MARKER_A)).toBe(true);
+    expect(all.some((s) => s.promptText === MARKER_B)).toBe(false);
   });
 });
