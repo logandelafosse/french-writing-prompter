@@ -2,7 +2,7 @@
 
 | Phase | Type | Blocked by | Production lines (est.) |
 |---|---|---|---|
-| 0 | HITL (Q2) | T04 | ~250 added (net negative after deletions) |
+| 0 | AFK (Q2 answered) | T04 | ~250 added (net negative after deletions) |
 
 ## User stories
 
@@ -12,7 +12,26 @@
 
 ## What to build
 
-**Owner question Q2:** approve the Louisiana base rule wording and the dialect-aware CEFR Level descriptions. **Default if accepted:** the wording in `backend-requirements.md` §4.4. B2 becomes "large éventail de temps; le subjonctif est rare en français louisianais et n'est jamais exigé". C1/C2 become "registres variés, structures complexes; pas de passé simple ni de subjonctif exigés". The PR body quotes the full rule list and all six descriptions for Logan to approve.
+**Base rules approved by Logan (Q2, 2026-11-15).** These are the content of `louisiana-rules.ts`. Every form below is correct Louisiana French and is never flagged as a Mistake or turned into a Standard→Louisiana suggestion.
+
+1. **Third-person plural subject:** `ça`, `eusse`, `eux-autres`, `eux`, `ils`. With any of them, including `ils`, accept `-ont` endings on the verb (`ils mangeont`, `ça parlont`); this is used in some parts of Louisiana.
+2. **Second-person plural:** `vous-autres` or `vous`; singular `tu`.
+3. **First-person plural subject:** `on` or `nous-autres` (subject `nous` is rare).
+4. **Progressive:** `être après` + infinitive (`je suis après manger`).
+5. **Auxiliary:** `avoir` with motion verbs in the passé composé (`il a tombé`, `j'ai venu`).
+6. **Future:** futur proche is the default. Futur simple is also correct, typically for something that will happen at an unknown time (`tu vas connaître que t'es vieux quand tu pourras, tu voudras, tu seras capable, mais pas tout à la même fois`).
+7. **Subjunctive:** rare and never required; the indicative is always acceptable (`faut que tu viens`). The subjunctive is also correct, and common in many regions, after constructions like `il faut que` and `veux que`, most often with `être` and `avoir` (`faut que tu sois`, `veux que t'aies`) and sometimes with other verbs.
+8. **`je vas`** for "I go".
+9. **Third-person plural `-ont` endings** in the present (`ils mangeont`, `ça parlont`).
+10. **Questions:** `quoi` questions (`Quoi tu fais ?`, `Quoi faire ?`). `est-ce que` is also correct, mostly in more formal situations.
+11. **Negation** without `ne` (`je connais pas`).
+12. **Third-person plural imperfect and conditional of common verbs:** `ils étiont` (être), `ils onvait` / `ils onvaiont` (avoir), and the past conditional with `auraiont` / `auriont` (`ils auriont eu une bande qui jouait`).
+
+**Spelling:** follow DLF headword forms. `nous-autres`, `vous-autres` and `eux-autres` always take the final `s`; the old `-autre` spelling in the code is an error to remove.
+
+**Vocabulary:** Louisiana vocabulary comes from the DLF, not a hand-picked list. Until T24 ships the full DLF index, the module carries a small seed list (≤ 30 distinctly Louisiana headwords such as `asteur`, `icitte`, `chevrette`, `cocodrie`), each verified present in `../DLF-extract/out/canonical.jsonl` by a one-off script whose command is recorded in the PR. Do not include words the extract lost in parsing (e.g. `maringouin`, `char` are missing from it).
+
+**CEFR Level descriptions:** dialect-aware. None requires the subjunctive, the passé simple, or the futur simple. B2: "large éventail de temps; le subjonctif est rare en français louisianais et n'est jamais exigé". C1/C2: "registres variés, structures complexes; pas de passé simple ni de subjonctif exigés".
 
 **Dialect module** (`src/modules/dialect/`):
 
@@ -54,7 +73,8 @@ The generator, the evaluator, the placement test and the History page use this m
 - [ ] `[unit]` Two quota increments at 21:30 Chicago time on 14 November count against the date key `2026-11-14`.
 - [ ] `[check]` `npm run knip` exits 0 and runs inside `npm run check`; the listed dependencies are gone from `package.json`.
 - [ ] `[check]` `CONTEXT.md` defines each term listed above and states that Standard French is never wrong; the "not Standard French" wording is gone.
-- [ ] `[check]` Logan's Q2 approval is recorded on the PR before merge.
+- [ ] `[unit]` `renderForEvaluator()` includes every approved rule, with the examples `ils mangeont`, `vous`, `faut que tu viens`, `faut que tu sois`, `est-ce que`, `ils étiont`, `ils onvaiont` and `ils auriont eu` listed as correct.
+- [ ] `[check]` `rg -n '\b(nous|vous|eux)-autre\b' src CONTEXT.md` prints nothing.
 
 ## Tests to write first
 

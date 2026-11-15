@@ -34,7 +34,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T03 | Prettier format-only pass | AFK | T02 | Needs `check` to include `format:check` |
 | T04 | Zod contracts for LLM output and stored JSON | AFK | T02 | Needs strict baseline |
 | T05 | Zod contracts for API bodies, client fetches, env | AFK | T04 | Builds on the contracts module |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | HITL (Q2) | T04 | Needs contracts; owner approves rule wording |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK | T04 | Needs contracts. Q2 answered 2026-11-15; approved rules are in the spec. |
 | T07 | ast-grep guardrails | AFK | T06 | Rules reference the single-source modules |
 | T08 | ESLint hardening and AGENTS.md engineering rules | AFK | T05, T07 | Needs boundaries typed so `no-unsafe-*` is quiet |
 | T09 | Design tokens, fonts, `lang="fr"`, metadata | AFK | T02 | Needs `check`. Either order with T07: whichever merges second adds the scaffold-leftovers rule (see both specs). |
