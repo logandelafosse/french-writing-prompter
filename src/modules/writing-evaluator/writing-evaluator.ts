@@ -1,41 +1,19 @@
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import type { FrenchDialect } from "@/modules/prompt-generator/prompt-generator";
-import type { CefrLevel } from "@/modules/cefr-tracker/cefr-tracker";
+import { Evaluation } from "@/contracts/evaluation";
+import type { z } from "zod";
 
-export interface DimensionScore {
-  score: number;
-  max: number;
-  comment: string;
-}
-
-export interface EvaluationDimensions {
-  grammatical_accuracy: DimensionScore;
-  vocabulary: DimensionScore;
-  coherence: DimensionScore;
-  register_style: DimensionScore;
-}
-
-export interface EvaluationTips {
-  per_dimension: {
-    grammatical_accuracy: string;
-    vocabulary: string;
-    coherence: string;
-    register_style: string;
-  };
-  holistic: string;
-}
-
-export interface Evaluation {
-  dimensions: EvaluationDimensions;
-  overall_cefr: CefrLevel;
-  tips: EvaluationTips;
-}
+export type { Evaluation } from "@/contracts/evaluation";
 
 interface OpenAiClientLike {
-  chatCompletionJSON<T>(params: {
-    model: string;
-    messages: Array<{ role: "system" | "user"; content: string }>;
-  }): Promise<T>;
+  chatCompletionJSON<S extends z.ZodType>(
+    schema: S,
+    params: {
+      model: string;
+      messages: Array<{ role: "system" | "user"; content: string }>;
+    },
+    schemaName?: string,
+  ): Promise<z.infer<S>>;
 }
 
 const LOUISIANA_FRENCH_RULES = `Louisiana French (Cajun French) grammar and vocabulary rules. You MUST treat the following as CORRECT (not errors):
@@ -73,25 +51,7 @@ Evaluate the student writing across four dimensions on a scale of 1-6:
 3. Coherence & Cohesion — logical flow, paragraph structure, connectors
 4. Register & Style — formality, tone, rhetorical devices, naturalness
 
-Return a JSON object in this EXACT format:
-{
-  "dimensions": {
-    "grammatical_accuracy": { "score": <1-6>, "max": 6, "comment": "<specific observation>" },
-    "vocabulary": { "score": <1-6>, "max": 6, "comment": "<specific observation>" },
-    "coherence": { "score": <1-6>, "max": 6, "comment": "<specific observation>" },
-    "register_style": { "score": <1-6>, "max": 6, "comment": "<specific observation>" }
-  },
-  "overall_cefr": "<A1|A2|B1|B2|C1|C2>",
-  "tips": {
-    "per_dimension": {
-      "grammatical_accuracy": "<specific tip for improvement>",
-      "vocabulary": "<specific tip for improvement>",
-      "coherence": "<specific tip for improvement>",
-      "register_style": "<specific tip for improvement>"
-    },
-    "holistic": "<overall recommendation framed around reaching the next CEFR level>"
-  }
-}`;
+Return structured JSON matching the provided schema.`;
 
     const userPrompt = `Writing Prompt:
 ${prompt.text}
@@ -101,12 +61,16 @@ ${writing}
 
 Please evaluate this writing according to the above criteria.`;
 
-    return this.openai.chatCompletionJSON<Evaluation>({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-    });
+    return this.openai.chatCompletionJSON(
+      Evaluation,
+      {
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+      },
+      "evaluation",
+    );
   }
 }

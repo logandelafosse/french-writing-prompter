@@ -3,7 +3,7 @@ import type {
   FrenchDialect,
 } from "@/modules/prompt-generator/prompt-generator";
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
-import type { CefrLevel } from "@/modules/cefr-tracker/cefr-tracker";
+import { CEFR_ORDER, type CefrLevel } from "@/contracts/cefr";
 
 export type PlacementTestState = "idle" | "waiting_for_writing" | "complete";
 
@@ -22,15 +22,6 @@ interface EvaluatorLike {
     dialect: FrenchDialect,
   ): Promise<Evaluation>;
 }
-
-const CEFR_ORDER: Record<CefrLevel, number> = {
-  A1: 0,
-  A2: 1,
-  B1: 2,
-  B2: 3,
-  C1: 4,
-  C2: 5,
-};
 
 const STARTING_LEVELS: CefrLevel[] = ["A2", "B1", "B2"];
 

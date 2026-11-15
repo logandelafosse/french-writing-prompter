@@ -1,6 +1,10 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
+import { Evaluation } from "@/contracts/evaluation";
+import { PromptConstraints } from "@/contracts/prompt";
+import type { SessionView } from "@/contracts/session";
 import { first } from "@/lib/first";
+import { parseJson } from "@/lib/json";
 import { eq, desc, sql } from "drizzle-orm";
 
 export interface SessionData {
@@ -85,6 +89,15 @@ export async function getAllSessions(): Promise<Session[]> {
   return rows.map(rowToSession);
 }
 
+export async function getSessionViews(): Promise<SessionView[]> {
+  const rows = await db
+    .select()
+    .from(sessions)
+    .orderBy(desc(sessions.createdAt));
+
+  return rows.map(rowToSessionView);
+}
+
 export async function sessionCount(): Promise<number> {
   const rows = await db.select({ count: sql`count(*)` }).from(sessions);
   const row = first(rows, "session count");
@@ -100,5 +113,27 @@ function rowToSession(row: typeof sessions.$inferSelect): Session {
     evaluationJson: row.evaluationJson,
     cefrLevel: row.cefrLevel,
     createdAt: row.createdAt,
+  };
+}
+
+function rowToSessionView(row: typeof sessions.$inferSelect): SessionView {
+  const constraints = parseJson(PromptConstraints, row.promptConstraints);
+  const promptLevel = constraints.ok ? constraints.value.cefrLevel : null;
+
+  let evaluation: SessionView["evaluation"] = null;
+  if (row.evaluationJson !== null) {
+    const parsed = parseJson(Evaluation, row.evaluationJson);
+    evaluation = parsed.ok
+      ? { ok: true, value: parsed.value }
+      : { ok: false, reason: "unreadable" };
+  }
+
+  return {
+    id: row.id,
+    createdAt: row.createdAt,
+    promptText: row.promptText,
+    writingText: row.writingText,
+    promptLevel,
+    evaluation,
   };
 }

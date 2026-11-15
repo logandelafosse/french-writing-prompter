@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
-import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
+import type { Evaluation } from "@/contracts/evaluation";
 import type { CefrLevel } from "@/components/level/level-components";
 import { LevelBadge } from "@/components/level/level-components";
 import { EvaluationCard } from "@/components/prompt/evaluation-card";
@@ -10,7 +10,7 @@ import { EvaluationCard } from "@/components/prompt/evaluation-card";
 type FlowState =
   | { phase: "idle" }
   | { phase: "prompt"; prompt: WritingPrompt; step: number }
-  | { phase: "complete"; finalLevel: string; evaluations: Evaluation[] };
+  | { phase: "complete"; finalLevel: CefrLevel; evaluations: Evaluation[] };
 
 export function PlacementTestCard() {
   const [flow, setFlow] = useState<FlowState>({ phase: "idle" });
@@ -91,7 +91,7 @@ export function PlacementTestCard() {
             Your CEFR level has been determined
           </p>
           <div className="flex justify-center pt-2">
-            <LevelBadge level={flow.finalLevel as CefrLevel} />
+            <LevelBadge level={flow.finalLevel} />
           </div>
         </div>
 
@@ -141,9 +141,7 @@ export function PlacementTestCard() {
 
         <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
           <div className="mb-2 flex items-center gap-2">
-            <LevelBadge
-              level={flow.prompt.constraints.cefrLevel as CefrLevel}
-            />
+            <LevelBadge level={flow.prompt.constraints.cefrLevel} />
             <span className="text-xs text-zinc-400">Louisiana French</span>
           </div>
           <p className="leading-relaxed whitespace-pre-wrap text-zinc-800">

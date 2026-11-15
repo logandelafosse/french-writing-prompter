@@ -25,6 +25,8 @@ P1 rules from §4 (`no-type-assertion`, `no-mocking-own-modules`) are in scope o
 
 **From T02 tooling review (PR #39):** widen `no-utc-date-key` for `indexOf/split("T")` date extraction and `utcDateKey`-named helpers; add `no-skip-undefined-element` (`if ($EL === undefined) continue`); add `no-interpolated-exec` on `execSync(\`...\`)`in`scripts/**`and`tooling/**`.
 
+**From T04 tooling review (PR #41):** widen `no-json-parse` (optional chaining, `JSON["parse"]`, destructuring, `globalThis`, `eval`/`Function`); add `no-permissive-boundary-schema` (`z.any`, `z.json`, etc.); widen `no-raw-json-body` (`request["json"]()`, destructuring); switch fixture tests from raw `JSON.parse` to `parseJson`.
+
 ## Acceptance criteria
 
 - [ ] `[check]` `npx ast-grep --version` prints the ast-grep version from `node_modules`; `package.json` scripts never invoke `sg`.

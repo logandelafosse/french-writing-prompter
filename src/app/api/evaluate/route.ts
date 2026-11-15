@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { OpenAiClient } from "@/modules/openai-client/openai-client";
+import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
 import { getSession, saveSession } from "@/modules/history-store/history-store";
 import { getTracker } from "@/modules/cefr-tracker/tracker-store";
-import type { CefrLevel } from "@/modules/cefr-tracker/cefr-tracker";
+import { parseCefrLevel } from "@/contracts/cefr";
+import { PromptConstraints } from "@/contracts/prompt";
+import type { FrenchDialect } from "@/contracts/prompt";
+import { parseJson } from "@/lib/json";
 
 const openai = new OpenAiClient();
 const evaluator = new WritingEvaluator(openai);
@@ -23,37 +27,57 @@ export async function POST(request: Request) {
     );
   }
 
-  const promptConstraints = JSON.parse(session.promptConstraints);
-
-  const evaluation = await evaluator.evaluate(
-    body.writing,
-    { text: session.promptText, constraints: promptConstraints },
-    "louisiana",
+  const constraintsResult = parseJson(
+    PromptConstraints,
+    session.promptConstraints,
   );
+  const fallbackLevel = parseCefrLevel(session.cefrLevel);
+  const constraints = constraintsResult.ok
+    ? constraintsResult.value
+    : {
+        cefrLevel: fallbackLevel ?? "A2",
+        dialect: "louisiana" as FrenchDialect,
+      };
 
-  await saveSession({
-    promptText: session.promptText,
-    promptConstraints: session.promptConstraints,
-    writingText: body.writing,
-    evaluationJson: JSON.stringify(evaluation),
-    cefrLevel: evaluation.overall_cefr,
-    id: body.sessionId,
-  });
+  try {
+    const evaluation = await evaluator.evaluate(
+      body.writing,
+      { text: session.promptText, constraints },
+      "louisiana",
+    );
 
-  const tracker = getTracker();
-  if (!tracker.getLevel()) {
-    await tracker.setLevel("A2", "manual");
+    await saveSession({
+      promptText: session.promptText,
+      promptConstraints: session.promptConstraints,
+      writingText: body.writing,
+      evaluationJson: JSON.stringify(evaluation),
+      cefrLevel: evaluation.overall_cefr,
+      id: body.sessionId,
+    });
+
+    const tracker = getTracker();
+    if (!tracker.getLevel()) {
+      await tracker.setLevel("A2", "manual");
+    }
+
+    const advancement = tracker.recordEvaluation({
+      overallCefr: evaluation.overall_cefr,
+    });
+
+    if (advancement) {
+      const { setTrackerLevel } =
+        await import("@/modules/cefr-tracker/tracker-store");
+      await setTrackerLevel(advancement.toLevel, "auto");
+    }
+
+    return NextResponse.json({ evaluation, advancement });
+  } catch (error) {
+    if (error instanceof AiOutputError) {
+      return NextResponse.json(
+        { error: "AI output was invalid.", code: error.code },
+        { status: 502 },
+      );
+    }
+    throw error;
   }
-
-  const advancement = tracker.recordEvaluation({
-    overallCefr: evaluation.overall_cefr as CefrLevel,
-  });
-
-  if (advancement) {
-    const { setTrackerLevel } =
-      await import("@/modules/cefr-tracker/tracker-store");
-    await setTrackerLevel(advancement.toLevel, "auto");
-  }
-
-  return NextResponse.json({ evaluation, advancement });
 }

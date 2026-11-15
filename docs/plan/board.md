@@ -14,13 +14,13 @@ Last updated: 2026-11-15 by coordinator (T03 merged; T04 dispatch).
 
 ## In progress
 
-| ID  | Ticket                                                                                                                        | Why                                                         |
-| --- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6)) | Implementer `inherit`, branch `ticket/t04-zod-contracts`. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                                                  | Why                                                                                                |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6)) | [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41); reviewers dispatched. |
 
 ## Blocked
 
@@ -93,4 +93,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T00 | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2))                           | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue.                                         |
 | T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3))        | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules. |
 | T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | Merged [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39) 2026-11-15. Adversarial blocking fix: root-level `fixtures/` in `pr:size`.                    |
-| T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5))                          | Merged [PR #40](https://github.com/logandelafosse/french-writing-prompter/pull/40) 2026-11-15 merge commit; `size-exempt`.                                                        |
+| T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5))                        | Merged [PR #40](https://github.com/logandelafosse/french-writing-prompter/pull/40) 2026-11-15 merge commit; `size-exempt`.                                                       |

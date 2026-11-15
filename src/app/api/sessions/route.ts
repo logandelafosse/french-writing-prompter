@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getAllSessions } from "@/modules/history-store/history-store";
+import { getSessionViews } from "@/modules/history-store/history-store";
 
 export async function GET() {
-  const sessions = await getAllSessions();
+  const sessions = await getSessionViews();
   return NextResponse.json({ sessions });
 }

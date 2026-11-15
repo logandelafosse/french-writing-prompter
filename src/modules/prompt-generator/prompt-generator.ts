@@ -1,15 +1,14 @@
-import type { CefrLevel } from "@/modules/cefr-tracker/cefr-tracker";
+import type { CefrLevel } from "@/contracts/cefr";
 
-export type FrenchDialect = "louisiana";
-
-export interface PromptConstraints {
-  cefrLevel: CefrLevel;
-  dialect: FrenchDialect;
-}
+export type { FrenchDialect } from "@/contracts/prompt";
+export type { PromptConstraints } from "@/contracts/prompt";
 
 export interface WritingPrompt {
   text: string;
-  constraints: PromptConstraints;
+  constraints: {
+    cefrLevel: CefrLevel;
+    dialect: import("@/contracts/prompt").FrenchDialect;
+  };
 }
 
 interface OpenAiClientLike {
@@ -37,7 +36,7 @@ const LEVEL_DESCRIPTIONS: Record<CefrLevel, string> = {
   A2: "Can write a series of simple phrases and sentences linked with basic connectors. Can describe everyday aspects of environment. Present, passé composé, and futur proche.",
   B1: "Can write straightforward connected text on familiar topics. Can describe experiences, events, dreams, and ambitions. Present, past tenses, future, conditional.",
   B2: "Can write clear detailed text on a wide range of subjects. Can explain a viewpoint with advantages and disadvantages. All major tenses including subjunctive.",
-  C1: "Can write well-structured text expressing points of view at length. Good command of idiomatic expressions and collocations. All tenses, complex structures.",
+  C1: "Can write well-structured text expressing points of view at length. Good command of idiomatic expressions and collocations. All major tenses, complex structures.",
   C2: "Can write complex text in an assured, personal style. Can summarise information from different sources. Full range of linguistic devices.",
 };
 
@@ -46,7 +45,7 @@ export class PromptGenerator {
 
   async generate(
     level: CefrLevel,
-    dialect: FrenchDialect,
+    dialect: import("@/contracts/prompt").FrenchDialect,
   ): Promise<WritingPrompt> {
     const dialectRules = dialect === "louisiana" ? LOUISIANA_FRENCH_RULES : "";
 
