@@ -21,6 +21,7 @@ Turn the CEFR grading demo into the Louisiana French writing tutor designed in `
 - Resources come from a curated catalog of general French grammar and comprehensible-input sources, picked per Weakness category. The model chooses catalog IDs; it never invents URLs.
 - Keep CEFR Level, Placement Test, and the 3-per-day quota (reset at local midnight).
 - Dialect Notes: the database is the runtime source of truth; `docs/dialect/louisiana-french.md` is generated from it for coding agents and never read back.
+- **Registre:** every Writing Prompt declares `formel` | `familier` | `mixt` in structured meta and in the prompt text. Logan practises both formal and informal styles; the Evaluation’s Register & Style dimension is judged against that declaration. Louisiana French is the dialect, not a permanent “always casual” mode.
 
 ## Phases
 
@@ -50,7 +51,7 @@ Tickets that depend on one of these are HITL and stay `Blocked` until it is answ
 | Q2 | ~~Louisiana base rules and CEFR level descriptions~~ **Answered 2026-11-15:** 12 rules, DLF spelling (`-autres`), DLF-sourced vocabulary, subjunctive accepted but never required; full list in the T06 spec | — | T06 |
 | Q3 | ~~App name~~ **Answered 2026-11-15:** feature **Consigne** under product **Louisiana Languages**; tab title `Consigne · Louisiana Languages` | — | T13 |
 | Q4 | ~~Mistake category taxonomy~~ **Answered 2026-11-15:** §1.1 as-is for v1 (15 + `autre`) | — | T21 |
-| Q5 | Score dimensions: keep 1–6, or show CEFR sub-levels like the mockup's "Grammaire A2+"; French labels; where the old `tips` go | 1–6 with French labels; holistic tip as one line inside Scores | T22 |
+| Q5 | ~~Score display~~ **Answered 2026-11-15:** CECR sub-levels per dimension + hover/tap “what it is / pour monter”; holistic tip inside Scores | — | T22 |
 | Q6 | Is the DLF-derived index committed or generated locally (licensing, repo visibility) | Gitignored, generated locally from `DLF-extract` | T24 |
 | Q7 | Resource catalog contents | Agent drafts a starter catalog of well-known free French sources; Logan edits | T30 |
 | Q8 | Word target at A1/A2; does swapping a prompt use a daily slot; do Placement writings feed Weakness memory | 250–300 at all levels as a soft nudge; swap uses a slot; Placement feeds memory | T15, T18. The Placement part does not block: T28 builds the default, and a "no" is a one-line filter. |

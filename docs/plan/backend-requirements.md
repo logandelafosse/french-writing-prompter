@@ -186,8 +186,10 @@ export const DataIssue = z.enum([
   "evaluation_unreadable", "evaluation_legacy", "prompt_meta_unreadable", "focus_unreadable",
 ]);
 
+export const Registre = z.enum(["formel", "familier", "mixt"]);
 export const PromptMeta = z.object({
   genre: z.string(), tense: z.string(), tone: z.string(),
+  registre: Registre, // required: prompt text states it; Evaluation judges Register & Style against it
   wordTarget: z.object({ min: z.number().int(), max: z.number().int() }),
   topic: z.string(), topicTags: z.array(z.string()).max(3),
 });
@@ -627,7 +629,7 @@ The output is `{ evaluation: EvaluationV2, corrections: Correction[] }`. The raw
   dialect: "louisiana" }
 ```
 
-**Output schema:** `{ text, genre, tense, tone, topic, topic_tags: string[≤3] }`, all in French. The server attaches `wordTarget` itself, so the model can't change it. That gives the meta line `genre · temps · 250–300 mots · ton`.
+**Output schema:** `{ text, genre, tense, tone, registre: "formel"|"familier"|"mixt", topic, topic_tags: string[≤3] }`, all in French. The server attaches `wordTarget` itself, so the model can't change it. That gives the meta line `genre · temps · 250–300 mots · registre`. The prompt text must declare the registre; the generator varies formel / familier / mixt across sessions so the learner practises both formal and informal styles.
 
 **Instructions:**
 
