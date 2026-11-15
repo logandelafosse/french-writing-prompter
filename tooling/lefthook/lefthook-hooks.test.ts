@@ -102,9 +102,10 @@ function tryGitCommit(
 }
 
 function tryGitPush(cwd: string): { ok: boolean; output: string } {
+  git(cwd, ["checkout", "-B", "main"]);
   const result = spawnSync(
     "git",
-    [...GIT_IDENTITY, "push", "-u", "origin", "HEAD"],
+    [...GIT_IDENTITY, "push", "-u", "origin", "main"],
     { cwd, encoding: "utf8", env: hookEnv },
   );
   return {
@@ -287,7 +288,6 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
         rel,
         `export const day = new Date().toISOString().split("T")[0];\n`,
       );
-
       const push = tryGitPush(clone!.dir);
       expect(push.ok).toBe(false);
       expect(push.output).toMatch(
