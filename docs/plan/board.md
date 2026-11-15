@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T07 merged PR #44; T08/T09 dispatched).
+Last updated: 2026-11-15 by coordinator (T08 PR #46; T09 PR #45 adversarial fixes).
 
 ## Ready
 
@@ -14,14 +14,14 @@ Last updated: 2026-11-15 by coordinator (T07 merged PR #44; T08/T09 dispatched).
 
 ## In progress
 
-| ID  | Ticket                                                                                                                   | Why                                                                                                     |
-| --- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| T08 | ESLint hardening and AGENTS.md rules ([#10](https://github.com/logandelafosse/french-writing-prompter/issues/10))        | Branch `ticket/t08-eslint`; implementer [T08 implementer](5a019492-472f-4f85-aced-f0d4ff0b9e9c).        |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | Branch `ticket/t09-design-tokens`; implementer [T09 implementer](ec8ef9fd-8ff2-402e-b3e6-f7ceea0943d3). |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                                                   | Why                                                                                                                                          |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| T08 | ESLint hardening and AGENTS.md rules ([#10](https://github.com/logandelafosse/french-writing-prompter/issues/10))        | [PR #46](https://github.com/logandelafosse/french-writing-prompter/pull/46); adversarial / test / tooling reviews dispatched.                |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | [PR #45](https://github.com/logandelafosse/french-writing-prompter/pull/45); desk evidence `b3a8632`; merge when `check` green, no blockers. |
 
 ## Blocked
 
@@ -37,8 +37,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                                                                     |
 | T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                                                                     |
 | T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44                                                                     |
-| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **In progress**                                                                              |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **In progress** (`no-scaffold-leftovers`)                                                    |
+| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **In review** — PR #46                                                                       |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **In review** — PR #45                                                                       |
 | T10 | UI primitives                                                       | AFK  | T09        | Built on tokens. If T06's knip pass deleted `ui/button.tsx` or its deps, T10 recreates them. |
 | T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | In **Ready** — T07 merged.                                                                   |
 | T12 | Lefthook pre-commit                                                 | AFK  | T08        | Hooks run the full lint set                                                                  |

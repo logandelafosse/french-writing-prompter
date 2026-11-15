@@ -5,7 +5,7 @@ import { PlacementTestCard } from "@/components/legacy/placement/placement-test-
 
 export function LegacyHome() {
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50">
+    <div className="flex flex-1 flex-col">
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
