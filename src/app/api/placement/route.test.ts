@@ -65,6 +65,9 @@ describe("POST /api/placement body validation", () => {
     );
 
     expect(response.status).toBe(400);
+    const json = await response.json();
+    expect(json.error).toMatch(/extra/i);
+
     const rows = await db.select().from(levelChanges);
     expect(rows).toHaveLength(0);
   });

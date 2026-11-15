@@ -51,13 +51,20 @@ describe("POST /api/evaluate body validation", () => {
       new Request("http://localhost/api/evaluate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ writing: "texte", sessionId: "nan" }),
+        body: JSON.stringify({
+          writing: 123,
+          sessionId: session.id,
+        }),
       }),
     );
 
     expect(response.status).toBe(400);
+    const json = await response.json();
+    expect(json.error).toMatch(/writing/i);
+
     const stored = await getSession(session.id);
     expect(stored?.evaluationJson).toBeNull();
+    expect(stored?.writingText).toBeNull();
   });
 
   it("returns 400 for extra fields without persisting an evaluation", async () => {
@@ -86,6 +93,8 @@ describe("POST /api/evaluate body validation", () => {
     );
 
     expect(response.status).toBe(400);
+    const json = await response.json();
+    expect(json.error).toMatch(/extra/i);
 
     const rows = await db
       .select()

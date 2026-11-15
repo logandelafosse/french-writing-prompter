@@ -12,6 +12,23 @@ describe("PUT /api/level", () => {
     await clearLevelChanges();
   });
 
+  it("returns 400 when level is missing without writing a row", async () => {
+    const response = await PUT(
+      new Request("http://localhost/api/level", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/level/i);
+
+    const rows = await db.select().from(levelChanges);
+    expect(rows).toHaveLength(0);
+  });
+
   it("returns 400 for a body that includes source auto", async () => {
     const response = await PUT(
       new Request("http://localhost/api/level", {
