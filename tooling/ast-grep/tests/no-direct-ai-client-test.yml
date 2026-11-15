@@ -3,3 +3,5 @@ valid:
   - "const client = getAiClient(scenarioFromRequest(request));"
 invalid:
   - "const openai = new OpenAiClient();"
+  - 'const sdk = new OpenAI({ apiKey: "sk-test" });'
+  - 'const fake = new FakeAiClient("happy");'

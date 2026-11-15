@@ -7,12 +7,11 @@ const HAPPY_WRITING =
   "Hier, je me suis promené dans mon quartier. J'ai vu des voisins et nous avons parlé du carnaval.";
 
 async function selectLevel(page: import("@playwright/test").Page) {
-  await page.getByRole("button", { name: /Select your level|A2/i }).click();
-  await page
-    .getByRole("button", { name: /A2.*Elementary/i })
-    .last()
-    .click();
-  await expect(page.getByText(/Elementary/).first()).toBeVisible();
+  await page.getByRole("button", { name: "Select your level" }).click();
+  await page.getByRole("button", { name: "A2 Elementary" }).click();
+  await expect(
+    page.getByRole("button", { name: /A2.*Elementary/ }),
+  ).toBeVisible();
 }
 
 test("learner generates a prompt, writes, and sees the Evaluation and the History entry", async ({
