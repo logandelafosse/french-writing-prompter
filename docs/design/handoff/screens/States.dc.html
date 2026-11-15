@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>États — erreurs, chargement, passage de niveau</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F5A4A}a:hover{color:#123C31}
+</style>
+</helmet>
+<div style="width: 880px; height: 820px; box-sizing: border-box; padding: 40px; display: flex; flex-direction: column; gap: 22px; font-family: 'Bricolage Grotesque', 'Trebuchet MS', sans-serif; color: #17211D; background: #E6EBE6">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #55625C">L'ÉVALUATION A PAS PASSÉ · LE TEXTE RESTE</span>
+<div role="alert" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding: 14px 18px; border: 1px solid #A8321A; border-radius: 6px; background: #FCFDFA">
+<p style="margin: 0; flex: 1 1 320px; font-size: 15px; line-height: 1.45"><strong style="font-weight: 600">J'ai pas pu lire ton texte ce coup-ci.</strong> Il est toujours là, y a rien de perdu.</p>
+<button type="button" style="min-height: 44px; padding: 0 18px; border: 0; border-radius: 6px; background: #1F5A4A; font: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; cursor: pointer">Essayer encore</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #55625C">HORS LIGNE · PAS DE SQUELETTE SANS FIN</span>
+<div role="status" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding: 14px 18px; border: 1px solid #B9C4BC; border-radius: 6px; background: #EEF2ED">
+<p style="margin: 0; flex: 1 1 320px; font-size: 15px; line-height: 1.45"><strong style="font-weight: 600">Pas de connexion.</strong> Ton brouillon est gardé sur cet appareil. Tu peux continuer à écrire.</p>
+<button type="button" style="min-height: 44px; padding: 0 18px; border: 1px solid #8D9A92; border-radius: 6px; background: #FCFDFA; font: inherit; font-size: 15px; font-weight: 500; color: #17211D; cursor: pointer">Réessayer</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #55625C">CHANGER DE CONSIGNE AVEC UN BROUILLON</span>
+<div role="alertdialog" aria-label="Changer de consigne" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding: 14px 18px; border: 1px solid #B9C4BC; border-radius: 6px; background: #FCFDFA; box-shadow: 0 14px 30px -22px rgba(23,33,29,0.5)">
+<p style="margin: 0; flex: 1 1 320px; font-size: 15px; line-height: 1.45"><strong style="font-weight: 600">Changer de consigne ?</strong> Ton brouillon de 202 mots va rester dans l'Historique.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button type="button" style="min-height: 44px; padding: 0 16px; border: 1px solid #8D9A92; border-radius: 6px; background: #FCFDFA; font: inherit; font-size: 15px; font-weight: 500; color: #17211D; cursor: pointer">Garder celle-là</button>
+<button type="button" style="min-height: 44px; padding: 0 16px; border: 0; border-radius: 6px; background: #1F5A4A; font: inherit; font-size: 15px; font-weight: 600; color: #FFFFFF; cursor: pointer">Changer</button>
+</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #55625C">PASSAGE DE NIVEAU · S'EFFACE À LA PROCHAINE CONSIGNE</span>
+<div role="status" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding: 14px 18px; border: 1px solid #1F5A4A; border-radius: 6px; background: #E3EEE8">
+<p style="margin: 0; flex: 1 1 320px; font-size: 15px; line-height: 1.45"><strong style="font-weight: 600">Te voilà en B2.</strong> Tes dernières évaluations étaient au-dessus de B1, ça fait que les consignes vont monter d'un cran.</p>
+<button type="button" style="min-height: 44px; padding: 0 4px; border: 0; background: none; font: inherit; font-size: 14px; color: #17211D; text-decoration: underline; cursor: pointer">Rester en B1</button>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #55625C">CHARGEMENT · DEUX ÉTATS, DEUX LIBELLÉS</span>
+<div style="display: flex; flex-wrap: wrap; gap: 14px">
+<button type="button" disabled aria-busy="true" style="min-height: 48px; padding: 0 24px; border: 0; border-radius: 6px; background: #2F4A40; font: inherit; font-size: 16px; font-weight: 600; color: #FFFFFF">Je cherche une consigne…</button>
+<button type="button" disabled aria-busy="true" style="min-height: 48px; padding: 0 24px; border: 0; border-radius: 6px; background: #2F4A40; font: inherit; font-size: 16px; font-weight: 600; color: #FFFFFF">Je lis ton texte…</button>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":880,"height":820}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

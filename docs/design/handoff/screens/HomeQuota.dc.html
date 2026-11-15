@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Accueil — quota atteint</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F5A4A}a:hover{color:#123C31}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; font-family: 'Bricolage Grotesque', 'Trebuchet MS', sans-serif; color: #17211D; background-color: #E6EBE6; background-image: radial-gradient(rgba(23,33,29,0.05) 1px, transparent 1px), radial-gradient(900px 500px at 15% 0%, #F3F6F1, rgba(243,246,241,0)); background-size: 5px 5px, auto">
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding: 18px 40px">
+<a href="Main.dc.html" style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; min-height: 44px; text-decoration: none; color: #17211D">
+<span style="font-size: 32px; font-weight: 700; letter-spacing: -0.03em">Lâche pas<span style="color: #A8321A">.</span></span>
+<span style="font-size: 13px; color: #55625C">atelier d'écriture · français louisianais</span>
+</a>
+<nav aria-label="Navigation" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px 22px; font-size: 15px">
+<a href="Carnet.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; color: #17211D; text-decoration: none; font-weight: 500">Carnet</a>
+<a href="History.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; color: #17211D; text-decoration: none; font-weight: 500">Historique</a>
+<span style="color: #55625C">3 consignes sur 3 prises</span>
+<button type="button" aria-label="Niveau CECR B1, changer" style="min-height: 44px; padding: 0 14px; border: 1px solid #B9C4BC; border-radius: 22px; background: #FCFDFA; font: inherit; font-weight: 600; color: #17211D; cursor: pointer">B1 ▾</button>
+</nav>
+</header>
+<main style="max-width: 760px; margin: 0 auto; padding: 20px 24px 80px; display: flex; flex-direction: column; gap: 22px">
+<h1 style="margin: 0; font-size: 46px; line-height: 1.05; font-weight: 600; letter-spacing: -0.03em">Samedi 14 novembre</h1>
+<div role="status" style="display: flex; flex-direction: column; gap: 6px; padding: 18px 22px; border: 1px solid #B9C4BC; border-radius: 6px; background: #EEF2ED">
+<p style="margin: 0; font-size: 18px; font-weight: 600">T'as pris tes trois consignes pour aujourd'hui.</p>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #3A4640">La prochaine arrive à minuit, dans 1 h 46. Ton brouillon reste icitte : tu peux le finir et l'envoyer quand tu veux.</p>
+</div>
+<section style="background: #FCFDFA; border: 1px solid #D0D8D1; border-radius: 6px; box-shadow: 0 18px 40px -28px rgba(23,33,29,0.45); padding: 36px 44px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #55625C">CONSIGNE D'ÉCRITURE · 3 SUR 3</span>
+<p style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-size: 22px; line-height: 1.45; text-wrap: pretty">Écris un mot à un voisin pour l'inviter à un fais-do-do chez toi samedi au soir. Dis-lui ce qui va se passer et ce qu'il peut amener.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 16px; padding-bottom: 14px; border-bottom: 1px solid #D0D8D1">
+<span style="font-size: 14px; color: #55625C">lettre · futur proche · 250–300 mots · ton amical</span>
+<button type="button" disabled style="min-height: 44px; padding: 0 4px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 500; color: #6B7770; cursor: not-allowed">↻ Une autre consigne · à minuit</button>
+</div>
+<label for="texte" style="font-size: 12px; font-weight: 700; letter-spacing: 0.12em; color: #55625C">TON TEXTE</label>
+<textarea id="texte" lang="fr" spellcheck="false" style="display: block; width: 100%; height: 352px; box-sizing: border-box; margin: 0; padding: 0; border: 0; outline: 0; resize: none; overflow: hidden; background-color: transparent; background-image: repeating-linear-gradient(transparent 0, transparent 31px, #DCE3DD 31px, #DCE3DD 32px); background-attachment: local; font-family: 'Newsreader', Georgia, serif; font-size: 18px; line-height: 32px; color: #17211D">Cher Monsieur Broussard,
+
+Je vous écris pour vous inviter chez nous-autres samedi au soir. On va avoir un fais-do-do dans la cour, avec de la musique et un gros gombo. Mon frère va amener son violon, et ma mère va cuire assez pour tout le voisinage. Vous pouvez venir avec votre famille.</textarea>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; padding-top: 6px">
+<div style="display: flex; flex-direction: column; gap: 8px; min-width: 240px">
+<div aria-hidden="true" style="position: relative; width: 240px; height: 6px; border-radius: 3px; background: #DCE3DD">
+<div style="position: absolute; left: 83.3%; right: 0; top: -3px; bottom: -3px; border-radius: 3px; background: #BCD3C8"></div>
+<div style="position: absolute; left: 0; top: 0; bottom: 0; width: 17.3%; border-radius: 3px; background: #1F5A4A"></div>
+</div>
+<span style="font-size: 14px; color: #55625C"><strong style="color: #17211D; font-weight: 600">52</strong> / 250–300 mots · Brouillon sauvé à 22 h 14</span>
+</div>
+<div style="display: flex; align-items: center; gap: 14px">
+<span style="font-size: 13px; color: #55625C">⌘ ↵</span>
+<button type="button" style="min-height: 48px; padding: 0 26px; border: 0; border-radius: 6px; background: #1F5A4A; font: inherit; font-size: 17px; font-weight: 600; color: #FFFFFF; cursor: pointer">Corrige-moi</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

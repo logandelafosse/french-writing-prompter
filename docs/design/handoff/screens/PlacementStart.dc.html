@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Test de placement — début</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F5A4A}a:hover{color:#123C31}
+</style>
+</helmet>
+<div style="min-height: 100vh; box-sizing: border-box; font-family: 'Bricolage Grotesque', 'Trebuchet MS', sans-serif; color: #17211D; background-color: #E6EBE6; background-image: radial-gradient(rgba(23,33,29,0.05) 1px, transparent 1px), radial-gradient(900px 500px at 15% 0%, #F3F6F1, rgba(243,246,241,0)); background-size: 5px 5px, auto">
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding: 18px 40px">
+<a href="HomeEmpty.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 32px; font-weight: 700; letter-spacing: -0.03em; text-decoration: none; color: #17211D">Lâche pas<span style="color: #A8321A">.</span></a>
+<a href="HomeEmpty.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; font-size: 15px; font-weight: 500">Je connais mon niveau</a>
+</header>
+<main style="max-width: 760px; margin: 0 auto; padding: 20px 24px 80px; display: flex; flex-direction: column; gap: 22px">
+<h1 style="margin: 0; font-size: 46px; line-height: 1.05; font-weight: 600; letter-spacing: -0.03em">Test de placement</h1>
+<section style="background: #FCFDFA; border: 1px solid #D0D8D1; border-radius: 6px; box-shadow: 0 18px 40px -28px rgba(23,33,29,0.45); padding: 40px 44px; display: flex; flex-direction: column; gap: 26px">
+<p style="margin: 0; font-family: 'Newsreader', Georgia, serif; font-size: 24px; line-height: 1.4; text-wrap: pretty">Trois consignes, une après l'autre. Écris ce que tu peux pour chacune. À la fin, je te donne ton niveau CECR et on commence pour de vrai.</p>
+<ol style="margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr)); gap: 12px">
+<li style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #1F5A4A"><span style="font-size: 13px; color: #55625C">Étape 1</span><span style="font-size: 17px; font-weight: 600">Première consigne</span></li>
+<li style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #B9C4BC"><span style="font-size: 13px; color: #55625C">Étape 2</span><span style="font-size: 17px; font-weight: 600">Deuxième consigne</span></li>
+<li style="display: flex; flex-direction: column; gap: 4px; padding-top: 12px; border-top: 3px solid #B9C4BC"><span style="font-size: 13px; color: #55625C">Étape 3</span><span style="font-size: 17px; font-weight: 600">Troisième consigne</span></li>
+</ol>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #55625C">Écris comme tu parles : le français de la Louisiane, c'est ça qui compte icitte. Tes brouillons sont gardés à mesure.</p>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px">
+<a href="PlacementStep.dc.html" style="display: inline-flex; align-items: center; min-height: 48px; padding: 0 26px; border-radius: 6px; background: #1F5A4A; font-size: 17px; font-weight: 600; color: #FFFFFF; text-decoration: none">Commencer</a>
+</div>
+</section>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":820}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
