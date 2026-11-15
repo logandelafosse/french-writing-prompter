@@ -4,23 +4,24 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T03 merged; T04 dispatch).
+Last updated: 2026-11-15 by coordinator (T04 merged; T05 dispatch).
 
 ## Ready
 
-| ID  | Ticket                                                                                                                   | Why                                                           |
-| --- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | T02 merged. Not alongside T07 seam (scaffold-leftovers rule). |
+| ID  | Ticket                                                                                                                   | Why        |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| T06 | Single sources: dialect, limits, dates, knip, glossary ([#8](https://github.com/logandelafosse/french-writing-prompter/issues/8)) | T04 merged. |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | T02 merged. Not alongside T07 seam. |
 
 ## In progress
 
-_None._
+| ID  | Ticket                                                                                                    | Why                                                    |
+| --- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| T05 | Zod contracts for API bodies, client fetches, env ([#7](https://github.com/logandelafosse/french-writing-prompter/issues/7)) | Implementer `inherit`, branch `ticket/t05-api-contracts`. |
 
 ## In review
 
-| ID  | Ticket                                                                                                                  | Why                                                                                                |
-| --- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6)) | [PR #41](https://github.com/logandelafosse/french-writing-prompter/pull/41); reviewers dispatched. |
+_None._
 
 ## Blocked
 
@@ -33,9 +34,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | ID  | Ticket                                                              | Type | Blocked by | Why not ready                                                                                                   |
 | --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------------------------------------------------------------------------------------------- |
 | T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                                                                                        |
-| T04 | Zod contracts for LLM output and stored JSON                        | AFK  | —          | In **Ready**                                                                                                    |
-| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | T04        | Builds on the contracts module                                                                                  |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | T04        | Needs contracts. Q2 answered 2026-11-15; approved rules are in the spec.                                        |
+| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **In progress**                                                                                                 |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | In **Ready**                                                                                                    |
 | T07 | ast-grep guardrails                                                 | AFK  | T06        | Rules reference the single-source modules                                                                       |
 | T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | T05, T07   | Needs boundaries typed so `no-unsafe-*` is quiet                                                                |
 | T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | In **Ready**. Either order with T07: whichever merges second adds the scaffold-leftovers rule (see both specs). |
