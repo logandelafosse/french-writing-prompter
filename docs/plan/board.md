@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T04 merged; T05 dispatch).
+Last updated: 2026-11-15 by coordinator (T05 in review).
 
 ## Ready
 
@@ -15,13 +15,13 @@ Last updated: 2026-11-15 by coordinator (T04 merged; T05 dispatch).
 
 ## In progress
 
-| ID  | Ticket                                                                                                    | Why                                                    |
-| --- | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| T05 | Zod contracts for API bodies, client fetches, env ([#7](https://github.com/logandelafosse/french-writing-prompter/issues/7)) | Implementer `inherit`, branch `ticket/t05-api-contracts`. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                                    | Why                                                                  |
+| --- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| T05 | Zod contracts for API bodies, client fetches, env ([#7](https://github.com/logandelafosse/french-writing-prompter/issues/7)) | [PR #42](https://github.com/logandelafosse/french-writing-prompter/pull/42); parallel reviews. |
 
 ## Blocked
 
