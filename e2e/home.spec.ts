@@ -30,9 +30,7 @@ test("learner generates a prompt, writes, and sees the Evaluation and the Histor
   await expect(page.getByText(PROMPT_SNIPPET)).toBeVisible();
   await captureEvidence(page, testInfo, "generated-prompt");
 
-  await page
-    .getByPlaceholder("Write your response here in French...")
-    .fill(HAPPY_WRITING);
+  await page.getByRole("textbox").fill(HAPPY_WRITING);
   await page.getByRole("button", { name: "Submit for evaluation" }).click();
   await expect(page.getByRole("heading", { name: "Evaluation" })).toBeVisible();
   await captureEvidence(page, testInfo, "evaluation");
@@ -58,9 +56,7 @@ test("malformed AI output shows an error and retry recovers", async ({
 
   await page.getByRole("button", { name: "Generate a prompt" }).click();
   await expect(page.getByText(PROMPT_SNIPPET)).toBeVisible();
-  await page
-    .getByPlaceholder("Write your response here in French...")
-    .fill(HAPPY_WRITING);
+  await page.getByRole("textbox").fill(HAPPY_WRITING);
 
   await scenario("malformed");
   await page.getByRole("button", { name: "Submit for evaluation" }).click();
