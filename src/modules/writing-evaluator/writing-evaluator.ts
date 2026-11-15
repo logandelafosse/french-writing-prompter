@@ -2,6 +2,8 @@ import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator"
 import type { FrenchDialect } from "@/modules/prompt-generator/prompt-generator";
 import { Evaluation } from "@/contracts/evaluation";
 import type { z } from "zod";
+import { AI_MODEL } from "@/config/ai";
+import { renderForEvaluator } from "@/modules/dialect/render";
 
 export type { Evaluation } from "@/contracts/evaluation";
 
@@ -16,21 +18,6 @@ interface OpenAiClientLike {
   ): Promise<z.infer<S>>;
 }
 
-const LOUISIANA_FRENCH_RULES = `Louisiana French (Cajun French) grammar and vocabulary rules. You MUST treat the following as CORRECT (not errors):
-
-Grammar rules:
-- Third-person plural: "ça", "eusse", or "eux-autre" instead of "ils" — CORRECT
-- Plural you: "vous-autre" (singular "tu") — CORRECT
-- First-person plural: "on" or "nous-autre" instead of "nous" as subject pronoun — CORRECT
-- Present progressive: "être après <verb>" (e.g., "je suis après manger") — CORRECT
-- Passé composé: using "avoir" as auxiliary for coming/going verbs — CORRECT
-- Futur proche preferred over futur simple — CORRECT
-- Minimal or absent subjunctive usage — CORRECT
-
-Accepted Louisiana French vocabulary (not errors): chaoui, cocodrie, maringouin, berceuse, and other regional Louisiana French words.
-
-CRITICAL: Do NOT penalize or mark as errors any of the above Louisiana French features. Evaluate the writing as Louisiana French, not Standard French.`;
-
 export class WritingEvaluator {
   constructor(private openai: OpenAiClientLike) {}
 
@@ -39,7 +26,7 @@ export class WritingEvaluator {
     prompt: WritingPrompt,
     dialect: FrenchDialect,
   ): Promise<Evaluation> {
-    const dialectRules = dialect === "louisiana" ? LOUISIANA_FRENCH_RULES : "";
+    const dialectRules = renderForEvaluator(dialect);
 
     const systemPrompt = `You are a French writing evaluator specializing in CEFR-aligned assessment. You evaluate Louisiana French writing.
 
@@ -64,7 +51,7 @@ Please evaluate this writing according to the above criteria.`;
     return this.openai.chatCompletionJSON(
       Evaluation,
       {
-        model: "gpt-4o",
+        model: AI_MODEL,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },

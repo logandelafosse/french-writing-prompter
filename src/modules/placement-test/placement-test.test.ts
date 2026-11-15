@@ -3,11 +3,12 @@ import { describe, it, expect, vi } from "vitest";
 import { PlacementTest } from "./placement-test";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 function makePrompt(level: string): WritingPrompt {
   return {
     text: `Prompt for ${level}`,
-    constraints: { cefrLevel: level as any, dialect: "louisiana" },
+    constraints: { cefrLevel: level as any, dialect: DEFAULT_DIALECT },
   };
 }
 
@@ -53,7 +54,7 @@ describe("PlacementTest", () => {
     return new PlacementTest(
       mockPromptGenerator as any,
       mockEvaluator as any,
-      "louisiana",
+      DEFAULT_DIALECT,
     );
   }
 

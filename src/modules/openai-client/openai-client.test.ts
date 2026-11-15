@@ -4,6 +4,7 @@ import { z } from "zod";
 import { OpenAiClient } from "./openai-client";
 import { AiOutputError } from "./ai-output-error";
 import { Evaluation } from "@/contracts/evaluation";
+import { AI_MODEL } from "@/config/ai";
 
 describe("OpenAiClient", () => {
   let client: OpenAiClient;
@@ -29,7 +30,7 @@ describe("OpenAiClient", () => {
       };
 
       const result = await client.chatCompletion({
-        model: "gpt-4o",
+        model: AI_MODEL,
         messages: [
           { role: "system", content: "You are a French tutor." },
           { role: "user", content: "Generate a prompt." },
@@ -37,7 +38,7 @@ describe("OpenAiClient", () => {
       });
 
       expect(mockCreate).toHaveBeenCalledWith({
-        model: "gpt-4o",
+        model: AI_MODEL,
         messages: [
           { role: "system", content: "You are a French tutor." },
           { role: "user", content: "Generate a prompt." },
@@ -56,7 +57,7 @@ describe("OpenAiClient", () => {
 
       await expect(
         client.chatCompletion({
-          model: "gpt-4o",
+          model: AI_MODEL,
           messages: [{ role: "user", content: "test" }],
         }),
       ).rejects.toThrow("AI service error");
@@ -87,7 +88,7 @@ describe("OpenAiClient", () => {
       });
 
       const result = await client.chatCompletionJSON(schema, {
-        model: "gpt-4o",
+        model: AI_MODEL,
         messages: [{ role: "user", content: "Evaluate this." }],
       });
 
@@ -105,7 +106,7 @@ describe("OpenAiClient", () => {
       });
 
       await client.chatCompletionJSON(schema, {
-        model: "gpt-4o",
+        model: AI_MODEL,
         messages: [{ role: "user", content: "Evaluate this." }],
       });
 
@@ -124,7 +125,7 @@ describe("OpenAiClient", () => {
 
       await expect(
         client.chatCompletionJSON(Evaluation, {
-          model: "gpt-4o",
+          model: AI_MODEL,
           messages: [{ role: "user", content: "test" }],
         }),
       ).rejects.toSatisfy((error: unknown) => {
@@ -141,7 +142,7 @@ describe("OpenAiClient", () => {
 
       await expect(
         client.chatCompletionJSON(Evaluation, {
-          model: "gpt-4o",
+          model: AI_MODEL,
           messages: [{ role: "user", content: "test" }],
         }),
       ).rejects.toSatisfy((error: unknown) => {

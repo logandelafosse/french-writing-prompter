@@ -5,6 +5,7 @@ import { sessions } from "@/db/schema";
 import { parseJson } from "@/lib/json";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
 const evaluateMock = vi.fn();
 
@@ -29,7 +30,7 @@ describe("POST /api/evaluate", () => {
       promptText: "Écrivez sur la Louisiane.",
       promptConstraints: JSON.stringify({
         cefrLevel: "A2",
-        dialect: "louisiana",
+        dialect: DEFAULT_DIALECT,
       }),
       writingText: null,
       evaluationJson: null,

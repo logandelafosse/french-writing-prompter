@@ -3,11 +3,13 @@ import { describe, it, expect, vi } from "vitest";
 import { WritingEvaluator } from "./writing-evaluator";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import evaluationFixture from "@/test/fixtures/ai/evaluation.valid.json";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { renderForEvaluator } from "@/modules/dialect/render";
 
 function makePrompt(cefr: string): WritingPrompt {
   return {
     text: "Décrivez votre ville natale en 100 mots.",
-    constraints: { cefrLevel: cefr as any, dialect: "louisiana" },
+    constraints: { cefrLevel: cefr as any, dialect: DEFAULT_DIALECT },
   };
 }
 
@@ -24,7 +26,7 @@ describe("WritingEvaluator", () => {
     const result = await evaluator.evaluate(
       "Ma ville est belle.",
       prompt,
-      "louisiana",
+      DEFAULT_DIALECT,
     );
 
     expect(result).toHaveProperty("dimensions");
@@ -38,13 +40,17 @@ describe("WritingEvaluator", () => {
     expect(result.tips).toHaveProperty("holistic");
   });
 
-  it("includes Louisiana French dialect rules in system prompt", async () => {
+  it("embeds renderForEvaluator() output in the system prompt", async () => {
     const mockClient = {
       chatCompletionJSON: vi.fn().mockResolvedValue(mockEvaluation),
     };
 
     const evaluator = new WritingEvaluator(mockClient as any);
-    await evaluator.evaluate("Test writing.", makePrompt("A2"), "louisiana");
+    await evaluator.evaluate(
+      "Test writing.",
+      makePrompt("A2"),
+      DEFAULT_DIALECT,
+    );
 
     const callArgs = mockClient.chatCompletionJSON.mock.calls[0];
     expect(callArgs).toBeDefined();
@@ -53,9 +59,7 @@ describe("WritingEvaluator", () => {
       throw new Error("expected chatCompletionJSON call");
     const systemMsg = params.messages.find((m: any) => m.role === "system");
 
-    expect(systemMsg.content).toContain("Louisiana French");
-    expect(systemMsg.content).toContain("chaoui");
-    expect(systemMsg.content).toContain("être après");
+    expect(systemMsg.content).toContain(renderForEvaluator());
     expect(systemMsg.content).not.toContain('"overall_cefr"');
   });
 
@@ -68,7 +72,7 @@ describe("WritingEvaluator", () => {
     await evaluator.evaluate(
       "Mon texte en français.",
       makePrompt("B1"),
-      "louisiana",
+      DEFAULT_DIALECT,
     );
 
     const callArgs = mockClient.chatCompletionJSON.mock.calls[0];

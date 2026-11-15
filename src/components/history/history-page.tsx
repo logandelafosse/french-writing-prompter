@@ -9,6 +9,7 @@ import type { SessionView } from "@/contracts/session";
 import { LevelGetResponse, SessionsGetResponse } from "@/contracts/api";
 import { fetchJson } from "@/lib/http";
 import Link from "next/link";
+import { formatFrenchDateTime } from "@/lib/dates";
 
 const LOAD_ERROR = "An error occurred. Please try again.";
 
@@ -16,14 +17,7 @@ const MALFORMED_NOTICE =
   "Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.";
 
 function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-US", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return formatFrenchDateTime(new Date(iso));
 }
 
 function sessionBadgeLevel(session: SessionView): CefrLevel | null {

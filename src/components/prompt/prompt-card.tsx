@@ -11,6 +11,7 @@ import {
   QuotaGetResponse,
 } from "@/contracts/api";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
+import { DAILY_PROMPT_QUOTA } from "@/config/limits";
 
 const LOAD_ERROR = "An error occurred. Please try again.";
 const EVAL_ERROR = "An error occurred during evaluation.";
@@ -156,7 +157,7 @@ export function PromptCard() {
 
       {!canGenerate && !prompt && (
         <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-600">
-          You've used your 3 prompts for today. Come back tomorrow!
+          {`You've used your ${DAILY_PROMPT_QUOTA} prompts for today. Come back tomorrow!`}
         </p>
       )}
 
