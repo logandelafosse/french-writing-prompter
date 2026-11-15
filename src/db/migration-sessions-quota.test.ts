@@ -4,7 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { createLibsqlClient } from "@/db/libsql-client";
 import { migrateWithBackup } from "@/db/migrate-run";
-import { backfillSessionsLocalDate } from "@/db/backfills/sessions-local-date";
+import { backfillSessionsLocalDate } from "@/db/migrate-run";
 
 const PUSH_CREATED_DDL = `
 CREATE TABLE sessions (

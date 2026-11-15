@@ -256,37 +256,26 @@ export function HeaderShell({ children }: { children: ReactNode }) {
 
   const refreshQuota = useCallback(async () => {
     const result = await fetchJson("/api/quota", QuotaGetResponse);
-    if (result.ok) {
-      setQuota(result.value);
-    }
+    if (result.ok) setQuota(result.value);
   }, []);
 
   useEffect(() => {
     let cancelled = false;
-    async function loadLevel() {
-      const result = await fetchJson("/api/level", LevelGetResponse);
+    async function loadAll() {
+      const [levelRes, quotaRes] = await Promise.all([
+        fetchJson("/api/level", LevelGetResponse),
+        fetchJson("/api/quota", QuotaGetResponse),
+      ]);
       if (cancelled) return;
-      if (result.ok) {
-        setLevel(result.value.level);
-      }
+      if (levelRes.ok) setLevel(levelRes.value.level);
+      if (quotaRes.ok) setQuota(quotaRes.value);
     }
-    async function loadQuota() {
-      const result = await fetchJson("/api/quota", QuotaGetResponse);
-      if (cancelled) return;
-      if (result.ok) {
-        setQuota(result.value);
-      }
-    }
-    function refreshShell() {
-      void loadLevel();
-      void loadQuota();
-    }
-    void loadLevel();
-    void loadQuota();
-    window.addEventListener(HEADER_SHELL_REFRESH_EVENT, refreshShell);
+    const onRefresh = () => void loadAll();
+    void loadAll();
+    window.addEventListener(HEADER_SHELL_REFRESH_EVENT, onRefresh);
     return () => {
       cancelled = true;
-      window.removeEventListener(HEADER_SHELL_REFRESH_EVENT, refreshShell);
+      window.removeEventListener(HEADER_SHELL_REFRESH_EVENT, onRefresh);
     };
   }, []);
 

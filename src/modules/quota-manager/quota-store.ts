@@ -1,7 +1,11 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DAILY_PROMPT_QUOTA } from "@/config/limits";
-import { appTimeZone, nextLocalMidnightIso, todayLocalDateKey } from "@/lib/dates";
+import {
+  appTimeZone,
+  nextLocalMidnightIso,
+  todayLocalDateKey,
+} from "@/lib/dates";
 import { getEnv } from "@/server/env";
 import { first } from "@/lib/first";
 import { and, eq, sql } from "drizzle-orm";

@@ -16,7 +16,10 @@ let quotaPromptChain = Promise.resolve();
 
 function withQuotaPromptLock<T>(fn: () => Promise<T>): Promise<T> {
   const run = quotaPromptChain.then(fn, fn);
-  quotaPromptChain = run.then(() => undefined, () => undefined);
+  quotaPromptChain = run.then(
+    () => undefined,
+    () => undefined,
+  );
   return run;
 }
 
