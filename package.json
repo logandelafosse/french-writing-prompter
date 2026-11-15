@@ -4,13 +4,20 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev": "tsx scripts/migrate.ts",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "prestart": "tsx scripts/migrate.ts",
+    "lint": "eslint --max-warnings=0",
+    "typecheck": "tsc --noEmit --incremental false",
+    "test": "TZ=America/Chicago vitest run",
+    "test:watch": "TZ=America/Chicago vitest",
+    "check": "npm run typecheck && npm run lint && npm run test",
+    "ci": "npm run check && npm run build",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "pr:size": "git diff --numstat origin/main...HEAD -- src scripts ':!src/**/*.test.*' ':!src/test/**' | awk '{a+=$1} END {print a\" production lines added\"; exit (a>500)}'"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -43,6 +50,7 @@
     "eslint-config-next": "16.2.6",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5",
     "vitest": "^4.1.7"
   }
