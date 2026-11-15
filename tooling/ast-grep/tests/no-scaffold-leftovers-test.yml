@@ -3,3 +3,8 @@ valid:
   - 'export const metadata = { title: "Consigne · Louisiana Languages" };'
 invalid:
   - 'import { Geist } from "next/font/google";'
+  - 'import { Geist_Mono } from "next/font/google";'
+  - 'export const metadata = { title: "Create Next App" };'
+  - 'const path = "/vercel.svg";'
+  - "const msg = `Geist was here`;"
+  - "// Geist comment"

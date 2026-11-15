@@ -1,0 +1,11 @@
+id: no-scaffold-leftovers-css
+valid:
+  - |
+    body {
+      font-family: var(--font-bricolage), sans-serif;
+    }
+invalid:
+  - |
+    :root {
+      --font-mono: var(--font-geist-mono);
+    }
