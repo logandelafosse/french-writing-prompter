@@ -9,4 +9,5 @@ rule:
     - pattern: $D.toLocaleString($$$)
     - pattern: new Intl.DateTimeFormat($$$)
 files: ["src/**"]
-ignores: ["src/lib/dates.ts", "src/components/legacy/**"]
+ignores:
+  ["src/lib/dates.ts", "src/components/legacy/**", "src/test/lint-fixtures/**"]

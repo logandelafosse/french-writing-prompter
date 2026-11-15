@@ -1,4 +1,4 @@
-export const DEFAULT_DIALECT = "louisiana" as const;
+export { DEFAULT_DIALECT } from "@/contracts/prompt";
 
 export type LouisianaRule = {
   id: string;

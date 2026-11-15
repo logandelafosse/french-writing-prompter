@@ -6,4 +6,5 @@ rule:
   kind: string
   regex: '^["'']louisiana["'']$'
 files: ["src/**"]
-ignores: ["src/modules/dialect/**", "src/contracts/**"]
+ignores:
+  ["src/modules/dialect/**", "src/contracts/**", "src/test/lint-fixtures/**"]

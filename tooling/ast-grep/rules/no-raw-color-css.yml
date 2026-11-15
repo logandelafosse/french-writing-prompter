@@ -8,4 +8,4 @@ rule:
     - kind: call_expression
       regex: '^(rgba?|hsla?|oklch)\('
 files: ["src/**/*.css"]
-ignores: ["src/styles/tokens.css"]
+ignores: ["src/styles/tokens.css", "src/test/lint-fixtures/**"]

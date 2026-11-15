@@ -59,9 +59,10 @@ export async function applyMigrations(
   await migrate(db, { migrationsFolder: MIGRATIONS_FOLDER });
 }
 
-export async function createDatabase(
-  databaseUrl: string,
-): Promise<{ client: Client; db: LibSQLDatabase<typeof schema> }> {
+export function createDatabase(databaseUrl: string): {
+  client: Client;
+  db: LibSQLDatabase<typeof schema>;
+} {
   const client = createLibsqlClient(databaseUrl);
   const db = drizzle(client, { schema });
   return { client, db };
@@ -79,12 +80,12 @@ export async function migrateWithBackup(
   const filePath = databaseUrlToFilePath(databaseUrl);
   const fileExists = filePath !== null && fs.existsSync(filePath);
 
-  const { client, db } = await createDatabase(databaseUrl);
+  const { client, db } = createDatabase(databaseUrl);
   const lastApplied = await getLastAppliedMigrationMillis(client);
   const pending = hasPendingMigrations(lastApplied);
 
   if (!pending) {
-    await client.close();
+    client.close();
     return { backedUp: false, backupPath: null, migrated: false };
   }
 
@@ -95,7 +96,7 @@ export async function migrateWithBackup(
   }
 
   await applyMigrations(db);
-  await client.close();
+  client.close();
 
   return { backedUp: backupPath !== null, backupPath, migrated: true };
 }

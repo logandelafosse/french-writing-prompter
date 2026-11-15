@@ -6,4 +6,4 @@ rule:
   kind: string
   regex: '^["''](gpt-|o\d|chatgpt-)'
 files: ["src/**"]
-ignores: ["src/config/**"]
+ignores: ["src/config/**", "src/test/lint-fixtures/**"]

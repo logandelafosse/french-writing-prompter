@@ -9,4 +9,4 @@ rule:
     - kind: jsx_text
   regex: '(?i)(eux-autre|vous-autre|nous-autre|\beusse\b|être après|futur proche|cocodrie|maringouin|chaoui)'
 files: ["src/**"]
-ignores: ["src/modules/dialect/**", "src/copy/**"]
+ignores: ["src/modules/dialect/**", "src/copy/**", "src/test/lint-fixtures/**"]

@@ -64,7 +64,7 @@ export async function POST(request: Request) {
 
     const tracker = getTracker();
     if (!tracker.getLevel()) {
-      await tracker.setLevel("A2", "manual");
+      tracker.setLevel("A2", "manual");
     }
 
     const advancement = tracker.recordEvaluation({

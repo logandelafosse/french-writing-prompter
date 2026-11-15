@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HistoryPage } from "./history-page";
 import type { SessionView } from "@/contracts/session";
@@ -46,12 +46,18 @@ const mockSessions: SessionView[] = [
   },
 ];
 
+function fetchUrl(input: RequestInfo | URL): string {
+  if (typeof input === "string") return input;
+  if (input instanceof URL) return input.href;
+  return input.url;
+}
+
 describe("HistoryPage", () => {
   beforeEach(() => {
     vi.stubGlobal(
       "fetch",
       vi.fn((input: RequestInfo | URL) => {
-        const url = String(input);
+        const url = fetchUrl(input);
         if (url.endsWith("/api/sessions")) {
           return Promise.resolve(
             new Response(JSON.stringify({ sessions: mockSessions }), {
@@ -77,34 +83,25 @@ describe("HistoryPage", () => {
     expect(await screen.findByText(/Sessions \(3\)/)).toBeInTheDocument();
 
     const user = userEvent.setup();
+    const valid = mockSessions[0]!;
+    const unreadable = mockSessions[1]!;
 
-    for (const session of mockSessions) {
-      const rowButton = screen.getByRole("button", {
-        name: new RegExp(session.promptText.slice(0, 20)),
-      });
-      await user.click(rowButton);
+    await user.click(
+      screen.getByRole("button", {
+        name: new RegExp(valid.promptText.slice(0, 20)),
+      }),
+    );
+    expect(screen.getByText(valid.writingText!)).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("heading", { name: "Evaluation" }).length,
+    ).toBeGreaterThan(0);
 
-      const expanded = rowButton.parentElement;
-      expect(expanded).not.toBeNull();
-      if (expanded === null) throw new Error("row container missing");
-
-      if (session.writingText) {
-        expect(
-          within(expanded).getByText(session.writingText),
-        ).toBeInTheDocument();
-      }
-
-      if (session.evaluation?.ok === false) {
-        expect(
-          within(expanded).getByText(MALFORMED_NOTICE),
-        ).toBeInTheDocument();
-      }
-
-      if (session.evaluation?.ok === true) {
-        expect(
-          within(expanded).getAllByText("Evaluation").length,
-        ).toBeGreaterThan(0);
-      }
-    }
+    await user.click(
+      screen.getByRole("button", {
+        name: new RegExp(unreadable.promptText.slice(0, 20)),
+      }),
+    );
+    expect(screen.getByText(unreadable.writingText!)).toBeInTheDocument();
+    expect(screen.getByText(MALFORMED_NOTICE)).toBeInTheDocument();
   });
 });

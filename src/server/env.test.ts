@@ -12,8 +12,8 @@ describe("getEnv", () => {
     vi.stubEnv("OPENAI_API_KEY", "");
     vi.stubEnv("AI_CLIENT", "openai");
 
-    expect(() => getEnv()).toThrowError(EnvError);
-    expect(() => getEnv()).toThrowError(/OPENAI_API_KEY/);
+    expect(() => getEnv()).toThrow(EnvError);
+    expect(() => getEnv()).toThrow(/OPENAI_API_KEY/);
   });
 
   it("succeeds without OPENAI_API_KEY when AI_CLIENT is fake", () => {

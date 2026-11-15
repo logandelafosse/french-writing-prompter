@@ -17,7 +17,7 @@ export interface WritingPrompt {
   };
 }
 
-interface OpenAiClientLike {
+export interface OpenAiClientLike {
   chatCompletion(params: {
     model: string;
     messages: Array<{ role: "system" | "user"; content: string }>;

@@ -10,3 +10,4 @@ rule:
     - pattern: z.json($$$)
     - pattern: z.custom($$$)
 files: ["src/**"]
+ignores: [\"src/test/lint-fixtures/**\"]

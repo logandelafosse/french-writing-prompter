@@ -12,3 +12,4 @@ rule:
         - kind: method_definition
       stopBy: end
 files: ["src/**"]
+ignores: [\"src/test/lint-fixtures/**\"]

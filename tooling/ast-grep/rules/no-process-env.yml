@@ -21,4 +21,4 @@ rule:
     - pattern: import { env } from 'node:process'
     - pattern: "import { env as $NAME } from 'node:process'"
 files: ["src/**"]
-ignores: ["src/server/env.ts"]
+ignores: ["src/server/env.ts", "src/test/lint-fixtures/**"]

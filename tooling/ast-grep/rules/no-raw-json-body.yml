@@ -17,4 +17,4 @@ rule:
     - pattern: const $NAME = $R.json
     - pattern: let $NAME = $R.json
 files: ["src/**"]
-ignores: ["src/lib/http/parse-request-body.ts"]
+ignores: ["src/lib/http/parse-request-body.ts", "src/test/lint-fixtures/**"]

@@ -22,6 +22,7 @@ export default defineConfig({
         test: {
           name: "node",
           include: ["src/**/*.test.ts", "tooling/**/*.test.ts"],
+          exclude: ["src/test/lint-fixtures/**"],
           environment: "node",
           setupFiles: ["src/test/setup-db.ts"],
         },
@@ -31,6 +32,7 @@ export default defineConfig({
         test: {
           name: "dom",
           include: ["src/**/*.test.tsx"],
+          exclude: ["src/test/lint-fixtures/**"],
           environment: "jsdom",
           setupFiles: ["src/test/setup-dom.ts"],
         },

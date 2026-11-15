@@ -29,7 +29,7 @@ describe("migrateWithBackup", () => {
     await seed.execute(
       "CREATE TABLE sessions (id integer PRIMARY KEY AUTOINCREMENT NOT NULL, prompt_text text NOT NULL)",
     );
-    await seed.close();
+    seed.close();
 
     const first = await migrateWithBackup(databaseUrl);
     expect(first.migrated).toBe(true);
@@ -53,6 +53,6 @@ describe("migrateWithBackup", () => {
     expect(listBackups(dbPath)).toHaveLength(0);
     expect(fs.existsSync(dbPath)).toBe(true);
 
-    await createLibsqlClient(databaseUrl).close();
+    createLibsqlClient(databaseUrl).close();
   });
 });

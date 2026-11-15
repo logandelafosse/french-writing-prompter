@@ -6,3 +6,4 @@ rule:
   kind: string
   regex: '\d+\s*[–—-]\s*\d+\s*mots'
 files: ["src/**"]
+ignores: [\"src/test/lint-fixtures/**\"]

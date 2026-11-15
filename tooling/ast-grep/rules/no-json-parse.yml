@@ -23,4 +23,4 @@ rule:
     - pattern: new Function($$$)
     - pattern: Function($$$)
 files: ["src/**"]
-ignores: ["src/lib/json.ts"]
+ignores: ["src/lib/json.ts", "src/test/lint-fixtures/**"]

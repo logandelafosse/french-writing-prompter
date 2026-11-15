@@ -6,4 +6,4 @@ rule:
   kind: call_expression
   regex: '^execSync\(`'
 files: ["scripts/**", "tooling/**", "src/**"]
-ignores: ["**/*.test.ts"]
+ignores: ["**/*.test.ts", "src/test/lint-fixtures/**"]

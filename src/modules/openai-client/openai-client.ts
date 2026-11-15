@@ -33,14 +33,17 @@ export class OpenAiClient {
     try {
       const response = await this.client().chat.completions.create({
         model: params.model,
-        messages:
-          params.messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+        messages: params.messages,
         ...(params.response_format && {
           response_format: params.response_format,
         }),
       });
 
-      return response.choices[0]?.message?.content ?? "";
+      const choice = response.choices[0];
+      if (choice === undefined) {
+        return "";
+      }
+      return choice.message.content ?? "";
     } catch {
       throw new Error("AI service error");
     }

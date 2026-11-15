@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { CefrLevel } from "./cefr";
-import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+
+export const DEFAULT_DIALECT = "louisiana" as const;
 
 export const FrenchDialect = z.literal(DEFAULT_DIALECT);
 export type FrenchDialect = z.infer<typeof FrenchDialect>;

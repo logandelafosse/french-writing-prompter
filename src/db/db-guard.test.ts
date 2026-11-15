@@ -15,12 +15,14 @@ async function expectDbImportRejects(envUrl: string): Promise<void> {
 
 describe("database guard under Vitest", () => {
   it("refuses file URLs that point inside the repo", async () => {
+    expect.assertions(3);
     await expectDbImportRejects("file:./data.db");
     await expectDbImportRejects("File:./data.db");
     await expectDbImportRejects("FILE:./data.db");
   });
 
   it("refuses remote database URLs", async () => {
+    expect.assertions(2);
     await expectDbImportRejects("libsql://example.turso.io");
     await expectDbImportRejects("https://example.db");
   });
