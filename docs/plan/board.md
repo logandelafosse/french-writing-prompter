@@ -4,11 +4,13 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T01 reviews clear).
+Last updated: 2026-11-15 by coordinator (T01 merged; CI live).
 
 ## Ready
 
-_None._
+| ID | Ticket | Why |
+|---|---|---|
+| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | T01 merged ([PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38)). Partial overlap: `check.yml` + lint apostrophe rule already on `main`; remaining work in ticket spec. |
 
 ## In progress
 
@@ -16,9 +18,7 @@ _None._
 
 ## In review
 
-| ID | Ticket | Why |
-|---|---|---|
-| T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3)) | [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38): all reviews clear (adversarial non-blocking only). **Awaiting merge.** |
+_None._
 
 ## Blocked
 
@@ -30,7 +30,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 | ID | Ticket | Type | Blocked by | Why not ready |
 |---|---|---|---|---|
-| T02 | Baseline green: TS flags, `check`, `pr:size`, CI | AFK | T01 | `check` runs tests, which must not touch `data.db` |
+| T02 | Baseline green: TS flags, `check`, `pr:size`, CI | AFK | — | In **Ready** (partial CI landed with T01). |
 | T03 | Prettier format-only pass | AFK | T02 | Needs `check` to include `format:check` |
 | T04 | Zod contracts for LLM output and stored JSON | AFK | T02 | Needs strict baseline |
 | T05 | Zod contracts for API bodies, client fetches, env | AFK | T04 | Builds on the contracts module |
@@ -90,3 +90,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | ID | Ticket | Why |
 |---|---|---|
 | T00 | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2)) | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue. |
+| T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3)) | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules. |
