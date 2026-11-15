@@ -14,14 +14,14 @@ Last updated: 2026-11-15 by coordinator (T10 PR #47 in review).
 
 ## In progress
 
-| ID  | Ticket                                                                                                                            | Why                                |
-| --- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| ID  | Ticket                                                                                                                            | Why                                        |
+| --- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
 | T11 | Playwright tracer bullet with fake AI client and axe ([#13](https://github.com/logandelafosse/french-writing-prompter/issues/13)) | `ticket/t11-playwright`; T05 + T07 merged. |
 
 ## In review
 
-| ID  | Ticket                                                                                     | Why                                                                                              |
-| --- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| ID  | Ticket                                                                                     | Why                                                                                                                           |
+| --- | ------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | T10 | UI primitives ([#12](https://github.com/logandelafosse/french-writing-prompter/issues/12)) | [PR #47](https://github.com/logandelafosse/french-writing-prompter/pull/47); adversarial / test / tooling reviews dispatched. |
 
 ## Blocked
@@ -32,17 +32,17 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 0 — Foundations
 
-| ID  | Ticket                                                              | Type | Blocked by | Why not ready                                       |
-| --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------------------------------- |
-| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                            |
-| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                            |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                            |
-| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44                            |
-| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **Done** — merged PR #46                            |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **Done** — merged PR #45                            |
-| T10 | UI primitives                                                       | AFK  | —          | **In review** — PR #47                            |
-| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | **In progress** — branch `ticket/t11-playwright`    |
-| T12 | Lefthook pre-commit                                                 | AFK  | —          | **Ready** — T08 merged                              |
+| ID  | Ticket                                                              | Type | Blocked by | Why not ready                                    |
+| --- | ------------------------------------------------------------------- | ---- | ---------- | ------------------------------------------------ |
+| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40                         |
+| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                         |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                         |
+| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44                         |
+| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **Done** — merged PR #46                         |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **Done** — merged PR #45                         |
+| T10 | UI primitives                                                       | AFK  | —          | **In review** — PR #47                           |
+| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | **In progress** — branch `ticket/t11-playwright` |
+| T12 | Lefthook pre-commit                                                 | AFK  | —          | **Ready** — T08 merged                           |
 
 ### Phase 1 — Core loop
 
