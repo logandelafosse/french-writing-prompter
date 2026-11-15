@@ -2,9 +2,9 @@
 
 | Phase | Type | Blocked by | Production lines (est.) |
 |---|---|---|---|
-| 1 | HITL (Q8) | T17 | ~330 |
+| 1 | AFK (Q8 answered) | T17 | ~330 |
 
-**Owner question Q8 (swap cost).** Default if accepted: `↻ Une autre consigne` uses one of the three daily slots, exactly like a fresh generate, whether or not the old prompt had a Draft.
+**Swap cost (Q8, answered 2026-11-15):** `↻ Une autre consigne` uses one of the three daily slots, exactly like a fresh generate, whether or not the old prompt had a Draft.
 
 ## User stories
 

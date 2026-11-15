@@ -54,7 +54,7 @@ Tickets that depend on one of these are HITL and stay `Blocked` until it is answ
 | Q5 | ~~Score display~~ **Answered 2026-11-15:** CECR sub-levels per dimension + hover/tap “what it is / pour monter”; holistic tip inside Scores | — | T22 |
 | Q6 | ~~DLF inheritance~~ **Answered 2026-11-15:** DLF-extract publishes a **lexicon artifact** (headwords, glosses, LA examples); Consigne pins a version and injects relevant entries into grader prompts. Not spellings-only; not submodule | — | T24 |
 | Q7 | ~~Resource catalog~~ **Answered 2026-11-15:** general free French grammar + CI starter catalog; Logan edits in PR; LA-specific CI not required for v1 | — | T30 |
-| Q8 | Word target at A1/A2; does swapping a prompt use a daily slot; do Placement writings feed Weakness memory | 250–300 at all levels as a soft nudge; swap uses a slot; Placement feeds memory | T15, T18. The Placement part does not block: T28 builds the default, and a "no" is a one-line filter. |
+| Q8 | ~~Word target / swap / Placement memory~~ **Answered 2026-11-15:** A1 10–20, A2 80–120, B1–C2 250–300 (soft); swap uses a daily slot; Placement Mistakes feed Weakness memory | — | T15, T18, T28 |
 
 ## Models
 

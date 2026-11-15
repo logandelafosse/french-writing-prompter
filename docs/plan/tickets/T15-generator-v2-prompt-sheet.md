@@ -2,9 +2,17 @@
 
 | Phase | Type | Blocked by | Production lines (est.) |
 |---|---|---|---|
-| 1 | HITL (Q8) | T14 | ~320 |
+| 1 | AFK (Q8 answered) | T14 | ~320 |
 
-**Owner question Q8 (word target at A1/A2).** Default if accepted: 250–300 words at every CEFR Level, as a soft nudge that never blocks. The target lives in one constant owned by the server; the model never chooses it.
+**Word targets (Q8, answered 2026-11-15):** soft nudge only, never blocks. Server-owned by CEFR Level (model never chooses):
+
+| Level | Target |
+|---|---|
+| A1 | 10–20 |
+| A2 | 80–120 |
+| B1–C2 | 250–300 |
+
+Lives in `src/config/limits.ts` (or equivalent) as `WORD_TARGET_BY_LEVEL`.
 
 ## User stories
 
@@ -13,7 +21,7 @@
 
 ## What to build
 
-- **Generator v2 (backend §4.3, slice S11 minus Focus/topics/pin)**: the prompt generator calls the AI client through T04's validated `chatCompletionJSON(Schema, params)` with a zod output schema `{ text, genre, tense, tone, registre, topic, topic_tags }`, all in French. `registre` is a required enum: `formel` | `familier` | `mixt`. The Writing Prompt text must state the registre explicitly (e.g. lettre formelle au maire vs billet à un cousin). The server attaches `wordTarget` from the constant and stores the result as `PromptMeta` in `sessions.prompt_meta_json` (generated migration). Validation: `text` 150–1500 characters. Instructions keep the dialect rules from the T06 module and never require the subjonctif, passé simple or futur simple; futur proche is fine. Across prompts, vary `registre` so Logan practises both formel and familier (and mixt when useful); do not lock to familier only because Louisiana French is the dialect.
+- **Generator v2 (backend §4.3, slice S11 minus Focus/topics/pin)**: the prompt generator calls the AI client through T04's validated `chatCompletionJSON(Schema, params)` with a zod output schema `{ text, genre, tense, tone, registre, topic, topic_tags }`, all in French. `registre` is a required enum: `formel` | `familier` | `mixt`. The Writing Prompt text must state the registre explicitly (e.g. lettre formelle au maire vs billet à un cousin). The server attaches `wordTarget: { min, max }` from `WORD_TARGET_BY_LEVEL[currentLevel]` and stores the result as `PromptMeta` in `sessions.prompt_meta_json` (generated migration). Validation: `text` 150–1500 characters (prompt text length, not the learner word target). Instructions keep the dialect rules from the T06 module and never require the subjonctif, passé simple or futur simple; futur proche is fine. Across prompts, vary `registre` so Logan practises both formel and familier (and mixt when useful); do not lock to familier only because Louisiana French is the dialect.
 - `POST /api/prompt` returns `{ session: { id, promptText, promptMeta }, quota }`; `GET /api/today` returns `promptMeta` on `activeSession`. Legacy rows with no meta return `promptMeta: null`.
 - **PromptSheet** (implementation-map §2.3), `writing` mode: label `Consigne d'écriture` (uppercased by CSS), serif 22 px prompt (19 px mobile), then the meta row `récit · passé composé et imparfait · 250–300 mots · familier` (`{genre} · {tense} · {min}–{max} mots · {registre}`, with optional short `tone` if it adds colour beyond registre). Mobile stacks meta and swap. `meta: null` hides the meta line. The swap button generates a new prompt (confirm and quota rules arrive in T18).
 - **GenerateButton**: its own busy flag. While generating, label `Je cherche une consigne…` (ellipsis character), `aria-busy="true"`, disabled, busy colour. Never shares a flag with submit.
@@ -23,9 +31,9 @@
 ## Acceptance criteria
 
 - [ ] [unit] Generator output schema rejects missing fields and `text` outside 150–1500 chars; the fake client's malformed output raises `AiOutputError`, not a raw `SyntaxError`.
-- [ ] [unit] Stored `wordTarget` is the server constant even if the model output contains a word count.
+- [ ] [unit] Stored `wordTarget` is `{ min, max }` from `WORD_TARGET_BY_LEVEL` for the session's CEFR Level (A1 → 10–20, A2 → 80–120, B1+ → 250–300) even if the model output contains a word count.
 - [ ] [unit] Generator system prompt contains the dialect module rules and does not require `subjonctif`, `passé simple` or `futur simple` (prompt-builder test).
-- [ ] [unit] Meta formatter produces `récit · passé composé et imparfait · 250–300 mots · familier` from a fixture with `registre: "familier"`.
+- [ ] [unit] Meta formatter produces `récit · passé composé et imparfait · 250–300 mots · familier` from a B1 fixture with `registre: "familier"`, and `10–20 mots` for an A1 fixture.
 - [ ] [unit] Generator schema rejects a missing or unknown `registre`; fixtures cover `formel`, `familier` and `mixt`.
 - [ ] [unit] Generator instructions tell the model to vary registre across prompts and to state the registre in the prompt text.
 - [ ] [integration] `POST /api/prompt` with `FakeAiClient` persists `prompt_meta_json` and returns it; a legacy row yields `promptMeta: null` without throwing.

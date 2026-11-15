@@ -41,7 +41,7 @@
 
 The generator, the evaluator, the placement test and the History page use this module. The two copied rule strings and every `"louisiana"` literal outside the module are deleted.
 
-**Config.** `src/config/limits.ts` holds `DAILY_PROMPT_QUOTA`, `WORD_TARGET` (250–300), `PLACEMENT_STEPS` and `ADVANCEMENT_STREAK`. `src/config/ai.ts` holds `AI_MODEL`. The literals `3`, `"gpt-4o"` and the copy "You've used your 3 prompts" read from these constants.
+**Config.** `src/config/limits.ts` holds `DAILY_PROMPT_QUOTA`, `WORD_TARGET_BY_LEVEL` (A1 10–20, A2 80–120, B1–C2 250–300 — Q8), `PLACEMENT_STEPS` and `ADVANCEMENT_STREAK`. `src/config/ai.ts` holds `AI_MODEL`. The literals `3`, `"gpt-4o"` and the copy "You've used your 3 prompts" read from these constants.
 
 **Local dates.** `src/lib/dates.ts` provides `localDateKey(date, timeZone?)` and French formatters (e.g. `samedi 14 novembre`, `21 h 42`). The two `toISOString().split("T")[0]` calls in `quota-store.ts` switch to `localDateKey`. The `test` and `test:watch` scripts set `TZ=America/Chicago`.
 

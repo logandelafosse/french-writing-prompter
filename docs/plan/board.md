@@ -48,10 +48,10 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 |---|---|---|---|---|
 | T13 | App header, level menu, local-midnight quota | AFK | T06, T10, T11 | Needs dates module, primitives, e2e. Q3 answered: Consigne · Louisiana Languages. |
 | T14 | Home first run and `/api/today` bootstrap | AFK | T13 | Needs the header |
-| T15 | Generator v2 with structured prompt meta; prompt sheet | HITL (Q8) | T14 | Needs Home phases; word target at A1/A2 |
+| T15 | Generator v2 with structured prompt meta; prompt sheet | AFK | T14 | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300. |
 | T16 | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK | T15 | Needs the prompt sheet |
 | T17 | Session lifecycle and draft autosave | AFK | T16 | Needs the writing surface. Not alongside T20 (both edit the evaluate route and `/api/today`). |
-| T18 | Quota exhausted, swap confirm, session statuses | HITL (Q8) | T17 | Needs sessions with drafts; swap cost. Not alongside T19 (both edit `POST /api/prompt` and Phase B). |
+| T18 | Quota exhausted, swap confirm, session statuses | AFK | T17 | Needs sessions with drafts. Q8: swap uses a daily slot. Not alongside T19 (both edit `POST /api/prompt` and Phase B). |
 | T19 | Error and offline states | AFK | T17 | Needs local draft copy. Builds the shared `withErrors` route wrapper. |
 | T20 | Level service with durable streak and undoable advancement | AFK | T14 | Banner lives on the new Home. Not alongside T17 or T21. |
 | T21 | Evaluator v2: Corrections, quote location, French output | AFK | T06, T17 | Needs dialect module and sessions. Q4 answered: taxonomy §1.1 as-is. ~480 lines: if over, split out the corrections table + stored-evaluation parser first. |
