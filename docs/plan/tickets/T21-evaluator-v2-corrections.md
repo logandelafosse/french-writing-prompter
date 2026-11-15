@@ -2,9 +2,9 @@
 
 | Phase | Type | Blocked by | Production lines (est.) |
 |---|---|---|---|
-| 1 | HITL (Q4) | T06, T17 | ~480 |
+| 1 | AFK (Q4 answered) | T06, T17 | ~480 |
 
-**Owner question Q4 (Mistake category taxonomy).** Default if accepted: the 15 categories plus `autre` in `backend-requirements.md` §1.1, with their French labels and "Louisiana note (never a Mistake)" column fed to the evaluator. IDs are persisted; labels can change later, merging IDs cannot.
+**Mistake taxonomy (Q4, answered 2026-11-15):** use the 15 categories plus `autre` in `backend-requirements.md` §1.1 as-is for v1, with their French labels and "Louisiana note (never a Mistake)" column fed to the evaluator. IDs are persisted; labels can change later, merging IDs cannot. Logan approved this as a starting set.
 
 ## User stories
 

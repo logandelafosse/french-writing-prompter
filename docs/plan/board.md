@@ -54,7 +54,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T18 | Quota exhausted, swap confirm, session statuses | HITL (Q8) | T17 | Needs sessions with drafts; swap cost. Not alongside T19 (both edit `POST /api/prompt` and Phase B). |
 | T19 | Error and offline states | AFK | T17 | Needs local draft copy. Builds the shared `withErrors` route wrapper. |
 | T20 | Level service with durable streak and undoable advancement | AFK | T14 | Banner lives on the new Home. Not alongside T17 or T21. |
-| T21 | Evaluator v2: Corrections, quote location, French output | HITL (Q4) | T06, T17 | Needs dialect module and sessions; taxonomy. ~480 lines: if over, split out the corrections table + stored-evaluation parser first. |
+| T21 | Evaluator v2: Corrections, quote location, French output | AFK | T06, T17 | Needs dialect module and sessions. Q4 answered: taxonomy §1.1 as-is. ~480 lines: if over, split out the corrections table + stored-evaluation parser first. |
 | T22 | Review screen: marked text, Mistake cards, Scores | HITL (Q5) | T16, T21 | Needs Corrections; dimension display. ~500 lines: split into T22a / T22b is pre-approved, see spec. |
 
 ### Phase 2 — Dialect
