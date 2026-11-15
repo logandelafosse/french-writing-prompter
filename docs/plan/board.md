@@ -18,9 +18,9 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                   | Why                                                                                                                                        |
-| --- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| T08 | ESLint hardening and AGENTS.md rules ([#10](https://github.com/logandelafosse/french-writing-prompter/issues/10))        | [PR #46](https://github.com/logandelafosse/french-writing-prompter/pull/46); adversarial / test / tooling reviews dispatched.             |
+| ID  | Ticket                                                                                                                   | Why                                                                                                                                          |
+| --- | ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| T08 | ESLint hardening and AGENTS.md rules ([#10](https://github.com/logandelafosse/french-writing-prompter/issues/10))        | [PR #46](https://github.com/logandelafosse/french-writing-prompter/pull/46); adversarial / test / tooling reviews dispatched.                |
 | T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | [PR #45](https://github.com/logandelafosse/french-writing-prompter/pull/45); desk evidence `b3a8632`; merge when `check` green, no blockers. |
 
 ## Blocked
@@ -37,8 +37,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42                                                                     |
 | T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43                                                                     |
 | T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44                                                                     |
-| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **In review** — PR #46                                                                          |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **In review** — PR #45                                                                          |
+| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **In review** — PR #46                                                                       |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **In review** — PR #45                                                                       |
 | T10 | UI primitives                                                       | AFK  | T09        | Built on tokens. If T06's knip pass deleted `ui/button.tsx` or its deps, T10 recreates them. |
 | T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | In **Ready** — T07 merged.                                                                   |
 | T12 | Lefthook pre-commit                                                 | AFK  | T08        | Hooks run the full lint set                                                                  |
