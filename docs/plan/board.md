@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T13 split: PR #51 T13a; T13b on `ticket/t13b-app-header` after #51 merges).
+Last updated: 2026-11-15 by coordinator (T12 merged PR #49; T13a PR #51 in review).
 
 ## Ready
 
@@ -16,10 +16,9 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                    | Why                                                                                                                                                                                                                                    |
-| --- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                          | [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49); ANSI-safe hook test output; awaiting green `check`.                                                                                                       |
-| T13 | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15)) | [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) **T13a** quota (~231 lines); **T13b** branch ready (~333 vs T13a); [PR #50](https://github.com/logandelafosse/french-writing-prompter/pull/50) superseded. |
+| ID  | Ticket                                                                                                                    | Why                                                                                                                                                                                                                                             |
+| --- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T13 | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15)) | [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) **T13a** quota (~221 lines); **T13b** `ticket/t13b-app-header` after merge; [PR #50](https://github.com/logandelafosse/french-writing-prompter/pull/50) superseded. |
 
 ## Blocked
 
@@ -29,24 +28,24 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 0 — Foundations
 
-| ID  | Ticket                                                              | Type | Blocked by | Why not ready            |
-| --- | ------------------------------------------------------------------- | ---- | ---------- | ------------------------ |
-| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40 |
-| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42 |
-| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43 |
-| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44 |
-| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **Done** — merged PR #46 |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **Done** — merged PR #45 |
-| T10 | UI primitives                                                       | AFK  | —          | **Done** — merged PR #47 |
-| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | **Done** — merged PR #48 |
-| T12 | Lefthook pre-commit                                                 | AFK  | —          | **In review** — PR #49   |
-| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **In review** — PR #50   |
+| ID  | Ticket                                                              | Type | Blocked by | Why not ready               |
+| --- | ------------------------------------------------------------------- | ---- | ---------- | --------------------------- |
+| T03 | Prettier format-only pass                                           | AFK  | —          | **Done** — merged PR #40    |
+| T05 | Zod contracts for API bodies, client fetches, env                   | AFK  | —          | **Done** — merged PR #42    |
+| T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK  | —          | **Done** — merged PR #43    |
+| T07 | ast-grep guardrails                                                 | AFK  | —          | **Done** — merged PR #44    |
+| T08 | ESLint hardening and AGENTS.md engineering rules                    | AFK  | —          | **Done** — merged PR #46    |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata                         | AFK  | —          | **Done** — merged PR #45    |
+| T10 | UI primitives                                                       | AFK  | —          | **Done** — merged PR #47    |
+| T11 | Playwright tracer bullet with fake AI client and axe                | AFK  | —          | **Done** — merged PR #48    |
+| T12 | Lefthook pre-commit                                                 | AFK  | —          | **Done** — merged PR #49    |
+| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **In review** — PR #51 T13a |
 
 ### Phase 1 — Core loop
 
 | ID  | Ticket                                                              | Type | Blocked by | Why not ready                                                                                                                                               |
 | --- | ------------------------------------------------------------------- | ---- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **In review** — PR #50; e2e + evidence pending.                                                                                                             |
+| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **In review** — PR #51 T13a; T13b header after merge.                                                                                                       |
 | T14 | Home first run and `/api/today` bootstrap                           | AFK  | T13        | Needs the header                                                                                                                                            |
 | T15 | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300.                                                                                                  |
 | T16 | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                      |
@@ -100,3 +99,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11))          | Merged [PR #45](https://github.com/logandelafosse/french-writing-prompter/pull/45) 2026-11-15; evidence `docs/evidence/11/`; T10 unblocked.                                      |
 | T10 | UI primitives ([#12](https://github.com/logandelafosse/french-writing-prompter/issues/12))                                        | Merged [PR #47](https://github.com/logandelafosse/french-writing-prompter/pull/47) 2026-11-15; no learner-visible UI; tooling follow-up: UI primitive ast-grep pack.             |
 | T11 | Playwright tracer bullet with fake AI client and axe ([#13](https://github.com/logandelafosse/french-writing-prompter/issues/13)) | Merged [PR #48](https://github.com/logandelafosse/french-writing-prompter/pull/48) 2026-11-15; evidence `docs/evidence/T11/`; T13 unblocked.                                     |
+| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                                  | Merged [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49) 2026-11-15; hook integration tests + `opencode.json` guards.                                  |
