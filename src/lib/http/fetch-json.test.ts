@@ -19,6 +19,23 @@ describe("fetchJson", () => {
     expect(result).toEqual({ ok: false, error: { kind: "network" } });
   });
 
+  it("uses statusText when the error body is not JSON", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(
+          new Response("not json", { status: 500, statusText: "Server Error" }),
+        ),
+      ),
+    );
+
+    const result = await fetchJson("/api/test", TestSchema);
+    expect(result).toEqual({
+      ok: false,
+      error: { kind: "http", status: 500, message: "Server Error" },
+    });
+  });
+
   it("returns http with status and server message on 4xx/5xx", async () => {
     vi.stubGlobal(
       "fetch",
