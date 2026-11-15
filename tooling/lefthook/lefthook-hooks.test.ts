@@ -1,4 +1,4 @@
-import { execSync, spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import {
   copyFile,
@@ -54,7 +54,7 @@ async function createHookClone(): Promise<{
 }> {
   const parent = await mkdtemp(path.join(tmpdir(), "fwp-lefthook-"));
   const dir = path.join(parent, "clone");
-  execSync(`git clone "${root}" "${dir}"`, { cwd: root, stdio: "pipe" });
+  execFileSync("git", ["clone", root, dir], { cwd: root, stdio: "pipe" });
   for (const file of SYNC_FROM_WORKING_TREE) {
     await copyFile(path.join(root, file), path.join(dir, file));
   }
@@ -124,11 +124,14 @@ async function writeScratchFile(
 }
 
 function runHooksInstall(cwd: string): void {
-  execSync("npm ci", {
+  const install = spawnSync("npm", ["ci"], {
     cwd,
     stdio: "pipe",
     env: { ...process.env },
   });
+  if (install.status !== 0) {
+    throw new Error(install.stderr?.toString() || "npm ci failed");
+  }
 }
 
 describe("lefthook git hooks", { timeout: 600_000 }, () => {
@@ -268,7 +271,7 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     const bareParent = await mkdtemp(path.join(tmpdir(), "fwp-bare-"));
     const bare = path.join(bareParent, "remote.git");
     try {
-      execSync(`git init --bare "${bare}"`, { stdio: "pipe" });
+      execFileSync("git", ["init", "--bare", bare], { stdio: "pipe" });
       git(clone!.dir, ["remote", "add", "origin", bare]);
 
       const rel = "src/lib/hooks-push-block.ts";
@@ -277,18 +280,10 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
         rel,
         `export const day = new Date().toISOString().split("T")[0];\n`,
       );
-      git(clone!.dir, ["add", rel]);
-      const seed = spawnSync(
-        "git",
-        [...GIT_IDENTITY, "commit", "--no-verify", "-m", "seed bad file"],
-        { cwd: clone!.dir, encoding: "utf8", env: hookEnv },
-      );
-      expect(seed.status).toBe(0);
 
       const push = tryGitPush(clone!.dir);
       expect(push.ok).toBe(false);
       expect(push.output).toMatch(/> french-writing-prompter@.*\s+check|npm run check/i);
-      git(clone!.dir, ["reset", "--hard", "HEAD~1"]);
     } finally {
       await rm(bareParent, { recursive: true, force: true });
     }
@@ -298,7 +293,12 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
 describe("opencode.json destructive escapes", () => {
   it("denies --no-verify, force push, rm -rf, and sqlite3 data.db", async () => {
     const raw = await readFile(path.join(root, "opencode.json"), "utf8");
-    const OpenCodeConfig = z.object({$schema: z.string(),permission: z.object({bash: z.record(z.string(), z.string())})});
+    const OpenCodeConfig = z.object({
+      $schema: z.string(),
+      permission: z.object({
+        bash: z.record(z.string(), z.string()),
+      }),
+    });
     const parsed = parseJson(OpenCodeConfig, raw);
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
