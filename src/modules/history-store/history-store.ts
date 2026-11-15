@@ -1,5 +1,7 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
+import { localDateKey } from "@/lib/dates";
+import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
 import { Evaluation } from "@/contracts/evaluation";
 import { PromptConstraints } from "@/contracts/prompt";
 import type { SessionView } from "@/contracts/session";
@@ -14,6 +16,8 @@ export interface SessionData {
   evaluationJson: string | null;
   cefrLevel: string;
   id?: number;
+  kind?: string;
+  localDate?: string;
 }
 
 export interface Session {
@@ -48,6 +52,8 @@ export async function saveSession(data: SessionData): Promise<Session> {
     return rowToSession(first(rows, `session id ${data.id} after update`));
   }
 
+  const localDate =
+    data.localDate ?? localDateKey(new Date(now), quotaTimeZone());
   const result = await db.insert(sessions).values({
     promptText: data.promptText,
     promptConstraints: data.promptConstraints,
@@ -55,6 +61,8 @@ export async function saveSession(data: SessionData): Promise<Session> {
     evaluationJson: data.evaluationJson,
     cefrLevel: data.cefrLevel,
     createdAt: now,
+    kind: data.kind ?? "daily",
+    localDate,
   });
 
   return {

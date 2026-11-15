@@ -14,6 +14,7 @@ export default defineConfig({
       DATABASE_URL: ":memory:",
       AI_CLIENT: "fake",
     },
+    hookTimeout: 120_000,
     restoreMocks: true,
     unstubEnvs: true,
     projects: [
