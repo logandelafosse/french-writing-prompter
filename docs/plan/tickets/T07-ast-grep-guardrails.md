@@ -1,8 +1,8 @@
 # T07 — ast-grep guardrails
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T06 | ~40 in `src` (import paths after the legacy move); ~400 YAML rules and config |
+| Phase | Type | Blocked by | Production lines (est.)                                                       |
+| ----- | ---- | ---------- | ----------------------------------------------------------------------------- |
+| 0     | AFK  | T06        | ~40 in `src` (import paths after the legacy move); ~400 YAML rules and config |
 
 ## User stories
 
@@ -23,7 +23,7 @@ The legacy UI moves with `git mv` (so rename detection keeps the diff small) int
 
 P1 rules from §4 (`no-type-assertion`, `no-mocking-own-modules`) are in scope only if `npm run pr:size` stays under budget; otherwise note them on the board card for the coordinator. `no-direct-ai-client` belongs to T11.
 
-**From T02 tooling review (PR #39):** widen `no-utc-date-key` for `indexOf/split("T")` date extraction and `utcDateKey`-named helpers; add `no-skip-undefined-element` (`if ($EL === undefined) continue`); add `no-interpolated-exec` on `execSync(\`...\`)` in `scripts/**` and `tooling/**`.
+**From T02 tooling review (PR #39):** widen `no-utc-date-key` for `indexOf/split("T")` date extraction and `utcDateKey`-named helpers; add `no-skip-undefined-element` (`if ($EL === undefined) continue`); add `no-interpolated-exec` on `execSync(\`...\`)`in`scripts/**`and`tooling/**`.
 
 ## Acceptance criteria
 

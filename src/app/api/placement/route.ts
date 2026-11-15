@@ -40,7 +40,7 @@ export async function POST(request: Request) {
     if (!placementTest) {
       return NextResponse.json(
         { error: "No active placement test." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -62,8 +62,5 @@ export async function POST(request: Request) {
     });
   }
 
-  return NextResponse.json(
-    { error: "Invalid action." },
-    { status: 400 }
-  );
+  return NextResponse.json({ error: "Invalid action." }, { status: 400 });
 }

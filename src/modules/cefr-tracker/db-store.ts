@@ -18,7 +18,7 @@ export async function getCurrentLevel(): Promise<CefrLevel | null> {
 
 export async function setLevel(
   level: CefrLevel,
-  source: "auto" | "manual"
+  source: "auto" | "manual",
 ): Promise<LevelChange> {
   const fromLevel = await getCurrentLevel();
 

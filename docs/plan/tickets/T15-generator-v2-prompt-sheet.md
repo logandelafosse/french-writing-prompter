@@ -1,15 +1,15 @@
 # T15 — Generator v2 with structured prompt meta; prompt sheet
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 1 | AFK (Q8 answered) | T14 | ~320 |
+| Phase | Type              | Blocked by | Production lines (est.) |
+| ----- | ----------------- | ---------- | ----------------------- |
+| 1     | AFK (Q8 answered) | T14        | ~320                    |
 
 **Word targets (Q8, answered 2026-11-15):** soft nudge only, never blocks. Server-owned by CEFR Level (model never chooses):
 
-| Level | Target |
-|---|---|
-| A1 | 10–20 |
-| A2 | 80–120 |
+| Level | Target  |
+| ----- | ------- |
+| A1    | 10–20   |
+| A2    | 80–120  |
 | B1–C2 | 250–300 |
 
 Lives in `src/config/limits.ts` (or equivalent) as `WORD_TARGET_BY_LEVEL`.

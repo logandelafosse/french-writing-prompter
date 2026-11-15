@@ -1,8 +1,8 @@
 # T24 — DLF lexicon, grader context, and attribution
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 2 | AFK (Q6 answered) | T23 | ~250 |
+| Phase | Type              | Blocked by | Production lines (est.) |
+| ----- | ----------------- | ---------- | ----------------------- |
+| 2     | AFK (Q6 answered) | T23        | ~250                    |
 
 **Q6 (answered 2026-11-15):** inherit DLF via a **published lexicon artifact** from `logandelafosse/DLF-extract` (option 1), not a spellings-only index and not a git submodule. Consigne pins a version; graders receive definitions and Louisiana usage examples for relevant words.
 
@@ -25,7 +25,7 @@ Document the contract in this PR (and link an issue/PR on DLF-extract if the pub
 
 Until the publisher exists in DLF-extract, this ticket may land with:
 
-1. The Consigne-side loader, lookup, prompt injection, and badge wiring against a **committed fixture lexicon** (20–50 entries with real glosses/examples), and  
+1. The Consigne-side loader, lookup, prompt injection, and badge wiring against a **committed fixture lexicon** (20–50 entries with real glosses/examples), and
 2. A `npm run dlf:fetch` script that installs/updates the artifact when `DLF_LEXICON_VERSION` is set,
 
 with a follow-up HITL note on the board: “cut first DLF lexicon release.” Do not block the Correction UI on the first Release if the fixture covers e2e.

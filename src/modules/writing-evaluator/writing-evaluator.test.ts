@@ -40,7 +40,7 @@ describe("WritingEvaluator", () => {
     const result = await evaluator.evaluate(
       "Ma ville est belle.",
       prompt,
-      "louisiana"
+      "louisiana",
     );
 
     expect(result).toHaveProperty("dimensions");
@@ -64,10 +64,9 @@ describe("WritingEvaluator", () => {
 
     const callArgs = mockClient.chatCompletionJSON.mock.calls[0]?.[0];
     expect(callArgs).toBeDefined();
-    if (callArgs === undefined) throw new Error("expected chatCompletionJSON call");
-    const systemMsg = callArgs.messages.find(
-      (m: any) => m.role === "system"
-    );
+    if (callArgs === undefined)
+      throw new Error("expected chatCompletionJSON call");
+    const systemMsg = callArgs.messages.find((m: any) => m.role === "system");
 
     expect(systemMsg.content).toContain("Louisiana French");
     expect(systemMsg.content).toContain("chaoui");
@@ -83,12 +82,13 @@ describe("WritingEvaluator", () => {
     await evaluator.evaluate(
       "Mon texte en français.",
       makePrompt("B1"),
-      "louisiana"
+      "louisiana",
     );
 
     const callArgs = mockClient.chatCompletionJSON.mock.calls[0]?.[0];
     expect(callArgs).toBeDefined();
-    if (callArgs === undefined) throw new Error("expected chatCompletionJSON call");
+    if (callArgs === undefined)
+      throw new Error("expected chatCompletionJSON call");
     const userMsg = callArgs.messages.find((m: any) => m.role === "user");
 
     expect(userMsg.content).toContain("Mon texte en français");

@@ -11,10 +11,28 @@ const issueOf = (id) => Number(id.slice(1)) + 2;
 for (const id of process.argv.slice(2)) {
   const file = readdirSync(DIR).find((f) => f.startsWith(`${id}-`));
   const [, ...rest] = readFileSync(`${DIR}/${file}`, "utf8").split("\n");
-  const current = gh("issue", "view", String(issueOf(id)), "--repo", REPO, "--json", "body", "--jq", ".body");
+  const current = gh(
+    "issue",
+    "view",
+    String(issueOf(id)),
+    "--repo",
+    REPO,
+    "--json",
+    "body",
+    "--jq",
+    ".body",
+  );
   const head = current.split("\n> Canonical spec:")[0].trimEnd();
   const body = `${head}\n\n> Canonical spec: [${DIR}/${file}](${BLOB}/${file})\n\n${rest.join("\n").trim()}`;
   writeFileSync(".ticket-issue-body.tmp.md", body);
-  gh("issue", "edit", String(issueOf(id)), "--repo", REPO, "--body-file", ".ticket-issue-body.tmp.md");
+  gh(
+    "issue",
+    "edit",
+    String(issueOf(id)),
+    "--repo",
+    REPO,
+    "--body-file",
+    ".ticket-issue-body.tmp.md",
+  );
   console.log(`synced ${id} -> #${issueOf(id)}`);
 }

@@ -41,9 +41,7 @@ export async function saveSession(data: SessionData): Promise<Session> {
       .where(eq(sessions.id, data.id))
       .limit(1);
 
-    return rowToSession(
-      first(rows, `session id ${data.id} after update`),
-    );
+    return rowToSession(first(rows, `session id ${data.id} after update`));
   }
 
   const result = await db.insert(sessions).values({

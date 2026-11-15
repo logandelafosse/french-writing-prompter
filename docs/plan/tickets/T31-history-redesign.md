@@ -1,8 +1,8 @@
 # T31 — History redesign
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 4 | AFK | T18, T22 | ~420 |
+| ----- | ---- | ---------- | ----------------------- |
+| 4     | AFK  | T18, T22   | ~420                    |
 
 ## User stories
 
@@ -18,7 +18,7 @@ The page moves to `/historique`. `/history` (and `/history/:path*`) redirects pe
 
 Each row is a `HistoryRow` wrapped in its own error boundary:
 
-- **Evaluated**: filled dot, title in weight 600. The title is the Focus labels joined with ` · `. Fallback when there is no Focus snapshot: `{genre} · {date}` from prompt meta, else `Séance du {date}`. Never the prompt text. Meta reads `{Weekday d month} · évaluée · {n} fautes · {level}`, where the Mistake count uses `countsAsMistake`.
+- **Evaluated**: filled dot, title in weight 600. The title is the Focus labels joined with `·`. Fallback when there is no Focus snapshot: `{genre} · {date}` from prompt meta, else `Séance du {date}`. Never the prompt text. Meta reads `{Weekday d month} · évaluée · {n} fautes · {level}`, where the Mistake count uses `countsAsMistake`.
 - **Draft abandoned**: hollow dot, weight 500, title `Brouillon laissé de côté`, meta `{date} · {n} mots · pas évalué`. When expanded it shows the prompt and a draft excerpt, with no Corrections block and no link.
 - **Prompt unused**: short dash, weight 400, title `Consigne pas utilisée`, meta `{date} · rien d'écrit`. Rendered as a `<div>`, not expandable.
 - **Malformed**: meta ends with `· détails incomplets`. The expanded body is the inline Notice `Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.` The row still shows whatever fields did parse.

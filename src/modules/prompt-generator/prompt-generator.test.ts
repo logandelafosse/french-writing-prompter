@@ -11,7 +11,7 @@ function createMockClient(responseText: string) {
 describe("PromptGenerator", () => {
   it("generates a prompt with the correct structure", async () => {
     const mockClient = createMockClient(
-      "Écrivez une lettre à un ami décrivant votre week-end. Utilisez le passé composé. Votre texte doit faire entre 80 et 120 mots. Adoptez un ton familier."
+      "Écrivez une lettre à un ami décrivant votre week-end. Utilisez le passé composé. Votre texte doit faire entre 80 et 120 mots. Adoptez un ton familier.",
     );
 
     const generator = new PromptGenerator(mockClient as any);
@@ -37,7 +37,7 @@ describe("PromptGenerator", () => {
     expect(callArgs).toBeDefined();
     if (callArgs === undefined) throw new Error("expected chatCompletion call");
     const systemMessage = callArgs.messages.find(
-      (m: any) => m.role === "system"
+      (m: any) => m.role === "system",
     );
 
     expect(systemMessage.content).toContain("B1");
@@ -46,7 +46,7 @@ describe("PromptGenerator", () => {
 
   it("includes all required constraint types in the prompt", async () => {
     const mockClient = createMockClient(
-      "Décrivez votre ville idéale en 150-200 mots, au conditionnel, ton descriptif."
+      "Décrivez votre ville idéale en 150-200 mots, au conditionnel, ton descriptif.",
     );
 
     const generator = new PromptGenerator(mockClient as any);

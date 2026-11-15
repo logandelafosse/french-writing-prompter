@@ -1,413 +1,504 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Q5 — Scores CECR + survol · Consigne</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Newsreader:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --desk: #E6EBE6;
-      --sheet: #FCFDFA;
-      --ink: #17211D;
-      --ink-2: #3A4640;
-      --muted: #55625C;
-      --line: #D0D8D1;
-      --primary: #1F5A4A;
-      --primary-tint: #E3EEE8;
-      --mistake: #A8321A;
-      --radius: 6px;
-      --font-ui: "Bricolage Grotesque", "Trebuchet MS", sans-serif;
-      --font-prose: "Newsreader", Georgia, serif;
-      --shadow: 0 18px 40px -28px rgba(23,33,29,0.45);
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: var(--font-ui);
-      color: var(--ink);
-      background:
-        radial-gradient(ellipse 80% 50% at 10% 0%, #F3F6F1 0%, transparent 55%),
-        radial-gradient(circle, rgba(23,33,29,0.07) 1px, transparent 1px),
-        var(--desk);
-      background-size: auto, 5px 5px, auto;
-      padding: 32px 24px 72px;
-    }
-    h1 {
-      font-size: 28px;
-      font-weight: 600;
-      letter-spacing: -0.03em;
-      margin: 0 0 8px;
-    }
-    .lede {
-      color: var(--muted);
-      font-size: 15px;
-      max-width: 640px;
-      margin: 0 0 28px;
-      line-height: 1.45;
-    }
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(280px, 1fr) minmax(320px, 420px);
-      gap: 24px;
-      max-width: 1000px;
-      align-items: start;
-    }
-    @media (max-width: 800px) {
-      .layout { grid-template-columns: 1fr; }
-    }
-    .sheet {
-      background: var(--sheet);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 28px 32px;
-    }
-    .label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-    }
-    .prose {
-      font-family: var(--font-prose);
-      font-size: 17px;
-      line-height: 1.7;
-      color: var(--ink-2);
-    }
-    .mark {
-      background: #F7E1DA;
-      border-bottom: 2px solid var(--mistake);
-      padding: 0 1px;
-    }
-    .corrections-stub {
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 18px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid var(--line);
-    }
-    .corr {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-      font-size: 14px;
-      color: var(--ink);
-    }
-    .pill {
-      width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      background: var(--mistake);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      display: grid;
-      place-items: center;
-      flex: 0 0 auto;
-    }
-    details.scores {
-      border-top: 1px solid var(--line);
-      padding-top: 14px;
-    }
-    details.scores[open] > summary .caret::before { content: "Scores ▾"; }
-    details.scores > summary {
-      list-style: none;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--primary);
-      min-height: 44px;
-      user-select: none;
-    }
-    details.scores > summary::-webkit-details-marker { display: none; }
-    .caret::before { content: "Scores ▸"; }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      height: 28px;
-      padding: 0 12px;
-      border-radius: 22px;
-      background: var(--primary-tint);
-      color: var(--primary);
-      font-size: 13px;
-      font-weight: 600;
-    }
-    .ensemble { font-weight: 500; color: var(--ink-2); font-size: 14px; }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Q5 — Scores CECR + survol · Consigne</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Newsreader:ital,wght@0,400;0,500;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --desk: #e6ebe6;
+        --sheet: #fcfdfa;
+        --ink: #17211d;
+        --ink-2: #3a4640;
+        --muted: #55625c;
+        --line: #d0d8d1;
+        --primary: #1f5a4a;
+        --primary-tint: #e3eee8;
+        --mistake: #a8321a;
+        --radius: 6px;
+        --font-ui: "Bricolage Grotesque", "Trebuchet MS", sans-serif;
+        --font-prose: "Newsreader", Georgia, serif;
+        --shadow: 0 18px 40px -28px rgba(23, 33, 29, 0.45);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-ui);
+        color: var(--ink);
+        background:
+          radial-gradient(
+            ellipse 80% 50% at 10% 0%,
+            #f3f6f1 0%,
+            transparent 55%
+          ),
+          radial-gradient(circle, rgba(23, 33, 29, 0.07) 1px, transparent 1px),
+          var(--desk);
+        background-size:
+          auto,
+          5px 5px,
+          auto;
+        padding: 32px 24px 72px;
+      }
+      h1 {
+        font-size: 28px;
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        margin: 0 0 8px;
+      }
+      .lede {
+        color: var(--muted);
+        font-size: 15px;
+        max-width: 640px;
+        margin: 0 0 28px;
+        line-height: 1.45;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) minmax(320px, 420px);
+        gap: 24px;
+        max-width: 1000px;
+        align-items: start;
+      }
+      @media (max-width: 800px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+      }
+      .sheet {
+        background: var(--sheet);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 28px 32px;
+      }
+      .label {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .prose {
+        font-family: var(--font-prose);
+        font-size: 17px;
+        line-height: 1.7;
+        color: var(--ink-2);
+      }
+      .mark {
+        background: #f7e1da;
+        border-bottom: 2px solid var(--mistake);
+        padding: 0 1px;
+      }
+      .corrections-stub {
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .corr {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--ink);
+      }
+      .pill {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: var(--mistake);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+      }
+      details.scores {
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+      }
+      details.scores[open] > summary .caret::before {
+        content: "Scores ▾";
+      }
+      details.scores > summary {
+        list-style: none;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--primary);
+        min-height: 44px;
+        user-select: none;
+      }
+      details.scores > summary::-webkit-details-marker {
+        display: none;
+      }
+      .caret::before {
+        content: "Scores ▸";
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        height: 28px;
+        padding: 0 12px;
+        border-radius: 22px;
+        background: var(--primary-tint);
+        color: var(--primary);
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .ensemble {
+        font-weight: 500;
+        color: var(--ink-2);
+        font-size: 14px;
+      }
 
-    /* Score rows with hover popover */
-    .score-list {
-      margin: 14px 0 0;
-      padding: 0;
-      list-style: none;
-      display: grid;
-      gap: 4px;
-    }
-    .score-row {
-      position: relative;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 12px;
-      padding: 10px 12px;
-      border-radius: var(--radius);
-      border: 1px solid transparent;
-      min-height: 44px;
-      cursor: help;
-      transition: background 120ms ease, border-color 120ms ease;
-    }
-    .score-row:hover,
-    .score-row:focus-within {
-      background: var(--primary-tint);
-      border-color: #C5D9CF;
-      outline: none;
-    }
-    .dim-name {
-      font-size: 15px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .hint-dot {
-      width: 14px;
-      height: 14px;
-      border-radius: 999px;
-      border: 1.5px solid var(--muted);
-      color: var(--muted);
-      font-size: 10px;
-      font-weight: 700;
-      display: grid;
-      place-items: center;
-      line-height: 1;
-      opacity: 0.7;
-    }
-    .score-row:hover .hint-dot,
-    .score-row:focus-within .hint-dot {
-      border-color: var(--primary);
-      color: var(--primary);
-      opacity: 1;
-    }
-    .dim-score {
-      font-weight: 600;
-      font-size: 16px;
-      color: var(--primary);
-      font-variant-numeric: tabular-nums;
-    }
+      /* Score rows with hover popover */
+      .score-list {
+        margin: 14px 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 4px;
+      }
+      .score-row {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: var(--radius);
+        border: 1px solid transparent;
+        min-height: 44px;
+        cursor: help;
+        transition:
+          background 120ms ease,
+          border-color 120ms ease;
+      }
+      .score-row:hover,
+      .score-row:focus-within {
+        background: var(--primary-tint);
+        border-color: #c5d9cf;
+        outline: none;
+      }
+      .dim-name {
+        font-size: 15px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .hint-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 1.5px solid var(--muted);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+        line-height: 1;
+        opacity: 0.7;
+      }
+      .score-row:hover .hint-dot,
+      .score-row:focus-within .hint-dot {
+        border-color: var(--primary);
+        color: var(--primary);
+        opacity: 1;
+      }
+      .dim-score {
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--primary);
+        font-variant-numeric: tabular-nums;
+      }
 
-    .popover {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: calc(100% + 6px);
-      z-index: 5;
-      background: var(--sheet);
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: 0 12px 32px -12px rgba(23,33,29,0.35);
-      padding: 14px 16px;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(4px);
-      transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
-      pointer-events: none;
-    }
-    .score-row:hover .popover,
-    .score-row:focus-within .popover {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
-    /* Keep open when moving into popover — rows stack so last rows need space */
-    .score-row:last-child .popover {
-      top: auto;
-      bottom: calc(100% + 6px);
-    }
-    .popover .what {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--primary);
-      margin: 0 0 6px;
-    }
-    .popover .desc {
-      margin: 0 0 10px;
-      font-size: 14px;
-      line-height: 1.4;
-      color: var(--ink-2);
-    }
-    .popover .improve {
-      margin: 0;
-      padding-top: 10px;
-      border-top: 1px solid var(--line);
-      font-size: 14px;
-      line-height: 1.4;
-      color: var(--ink);
-    }
-    .popover .improve strong {
-      display: block;
-      font-size: 11px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 4px;
-      font-weight: 700;
-    }
+      .popover {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 6px);
+        z-index: 5;
+        background: var(--sheet);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: 0 12px 32px -12px rgba(23, 33, 29, 0.35);
+        padding: 14px 16px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(4px);
+        transition:
+          opacity 120ms ease,
+          transform 120ms ease,
+          visibility 120ms;
+        pointer-events: none;
+      }
+      .score-row:hover .popover,
+      .score-row:focus-within .popover {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      /* Keep open when moving into popover — rows stack so last rows need space */
+      .score-row:last-child .popover {
+        top: auto;
+        bottom: calc(100% + 6px);
+      }
+      .popover .what {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin: 0 0 6px;
+      }
+      .popover .desc {
+        margin: 0 0 10px;
+        font-size: 14px;
+        line-height: 1.4;
+        color: var(--ink-2);
+      }
+      .popover .improve {
+        margin: 0;
+        padding-top: 10px;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+        line-height: 1.4;
+        color: var(--ink);
+      }
+      .popover .improve strong {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 4px;
+        font-weight: 700;
+      }
 
-    .tip {
-      margin-top: 16px;
-      padding: 12px 14px;
-      background: var(--primary-tint);
-      border-radius: var(--radius);
-      font-size: 14px;
-      line-height: 1.4;
-      color: var(--ink-2);
-    }
-    .tip strong {
-      display: block;
-      font-size: 11px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--primary);
-      margin-bottom: 4px;
-    }
+      .tip {
+        margin-top: 16px;
+        padding: 12px 14px;
+        background: var(--primary-tint);
+        border-radius: var(--radius);
+        font-size: 14px;
+        line-height: 1.4;
+        color: var(--ink-2);
+      }
+      .tip strong {
+        display: block;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin-bottom: 4px;
+      }
 
-    .aside {
-      font-size: 14px;
-      color: var(--ink-2);
-      line-height: 1.45;
-    }
-    .aside h2 {
-      font-size: 16px;
-      font-weight: 600;
-      margin: 0 0 8px;
-    }
-    .aside ul {
-      margin: 0;
-      padding-left: 1.1em;
-    }
-    .aside li { margin-bottom: 6px; }
-    .kbd {
-      display: inline-block;
-      font-size: 12px;
-      background: var(--primary-tint);
-      padding: 1px 6px;
-      border-radius: 4px;
-      color: var(--primary);
-    }
-  </style>
-</head>
-<body>
-  <h1>Q5 — Scores CECR + survol</h1>
-  <p class="lede">
-    Affichage comme le mockup Claude Design (sous-niveaux CECR).
-    Passe la souris (ou Tab) sur une catégorie pour voir <em>ce que c’est</em> et <em>comment monter</em>.
-  </p>
+      .aside {
+        font-size: 14px;
+        color: var(--ink-2);
+        line-height: 1.45;
+      }
+      .aside h2 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 8px;
+      }
+      .aside ul {
+        margin: 0;
+        padding-left: 1.1em;
+      }
+      .aside li {
+        margin-bottom: 6px;
+      }
+      .kbd {
+        display: inline-block;
+        font-size: 12px;
+        background: var(--primary-tint);
+        padding: 1px 6px;
+        border-radius: 4px;
+        color: var(--primary);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Q5 — Scores CECR + survol</h1>
+    <p class="lede">
+      Affichage comme le mockup Claude Design (sous-niveaux CECR). Passe la
+      souris (ou Tab) sur une catégorie pour voir <em>ce que c’est</em> et
+      <em>comment monter</em>.
+    </p>
 
-  <div class="layout">
-    <div class="sheet">
-      <div class="label">Ton texte (extrait)</div>
-      <p class="prose">
-        Chère Tante Odile, asteur que je suis revenu, j’étais
-        <span class="mark">lasse</span>
-        mais content…
-      </p>
+    <div class="layout">
+      <div class="sheet">
+        <div class="label">Ton texte (extrait)</div>
+        <p class="prose">
+          Chère Tante Odile, asteur que je suis revenu, j’étais
+          <span class="mark">lasse</span>
+          mais content…
+        </p>
 
-      <div class="corrections-stub" style="margin-top:20px">
-        <div class="label" style="margin:0">Corrections · 3</div>
-        <div class="corr">
-          <span class="pill">1</span>
-          <div><span style="color:var(--mistake);font-size:11px;font-weight:700;letter-spacing:0.08em">FAUTE</span>
-            <div style="font-family:var(--font-prose)"><s>lasse</s> → las</div>
+        <div class="corrections-stub" style="margin-top: 20px">
+          <div class="label" style="margin: 0">Corrections · 3</div>
+          <div class="corr">
+            <span class="pill">1</span>
+            <div>
+              <span
+                style="
+                  color: var(--mistake);
+                  font-size: 11px;
+                  font-weight: 700;
+                  letter-spacing: 0.08em;
+                "
+                >FAUTE</span
+              >
+              <div style="font-family: var(--font-prose)">
+                <s>lasse</s> → las
+              </div>
+            </div>
           </div>
         </div>
+
+        <details class="scores" open>
+          <summary>
+            <span class="caret" aria-hidden="true"></span>
+            <span class="ensemble"
+              >Ensemble : <span class="chip">B1</span></span
+            >
+          </summary>
+
+          <ul class="score-list" role="list">
+            <li class="score-row" tabindex="0">
+              <span class="dim-name"
+                >Grammaire
+                <span class="hint-dot" aria-hidden="true">?</span></span
+              >
+              <span class="dim-score">A2+</span>
+              <div class="popover" role="tooltip">
+                <p class="what">Grammaire</p>
+                <p class="desc">
+                  Conjugaisons, accords, orthographe de structure, et comment tu
+                  construis tes phrases.
+                </p>
+                <p class="improve">
+                  <strong>Pour monter</strong>
+                  Relis les accords sujet–adjectif (lasse → las) et fixe un
+                  temps dominant par paragraphe avant de mélanger imparfait et
+                  passé composé.
+                </p>
+              </div>
+            </li>
+
+            <li class="score-row" tabindex="0">
+              <span class="dim-name"
+                >Vocabulaire
+                <span class="hint-dot" aria-hidden="true">?</span></span
+              >
+              <span class="dim-score">B1</span>
+              <div class="popover" role="tooltip">
+                <p class="what">Vocabulaire</p>
+                <p class="desc">
+                  Choix des mots, précision, et tournures naturelles — y compris
+                  le français louisianais quand il est juste.
+                </p>
+                <p class="improve">
+                  <strong>Pour monter</strong>
+                  Remplace deux calques anglais par un mot DLF ou une expression
+                  que tu utilises déjà à l’oral (<em>asteur</em>,
+                  <em>icitte</em>).
+                </p>
+              </div>
+            </li>
+
+            <li class="score-row" tabindex="0">
+              <span class="dim-name"
+                >Cohérence
+                <span class="hint-dot" aria-hidden="true">?</span></span
+              >
+              <span class="dim-score">A2</span>
+              <div class="popover" role="tooltip">
+                <p class="what">Cohérence</p>
+                <p class="desc">
+                  Enchaînement des idées, structure des paragraphes, et
+                  connecteurs qui guident le lecteur.
+                </p>
+                <p class="improve">
+                  <strong>Pour monter</strong>
+                  Ajoute une phrase-pont entre le récit du fais do-do et ta
+                  conclusion ; essaie <em>ça fait que</em> ou <em>après ça</em>.
+                </p>
+              </div>
+            </li>
+
+            <li class="score-row" tabindex="0">
+              <span class="dim-name"
+                >Registre et style
+                <span class="hint-dot" aria-hidden="true">?</span></span
+              >
+              <span class="dim-score">B1+</span>
+              <div class="popover" role="tooltip">
+                <p class="what">Registre et style</p>
+                <p class="desc">
+                  Adéquation du ton à la consigne (lettre, récit…), naturel, et
+                  dispositifs rhétoriques sans forcer.
+                </p>
+                <p class="improve">
+                  <strong>Pour monter</strong>
+                  Tu as le ton de lettre familière. Garde-le, et varie un peu la
+                  longueur des phrases pour que la lecture respire.
+                </p>
+              </div>
+            </li>
+          </ul>
+
+          <div class="tip">
+            <strong>Pour atteindre B2</strong>
+            Travaille l’imparfait face au passé composé dans le récit, et lie
+            mieux tes idées avec des connecteurs.
+          </div>
+        </details>
       </div>
 
-      <details class="scores" open>
-        <summary>
-          <span class="caret" aria-hidden="true"></span>
-          <span class="ensemble">Ensemble : <span class="chip">B1</span></span>
-        </summary>
-
-        <ul class="score-list" role="list">
-          <li class="score-row" tabindex="0">
-            <span class="dim-name">Grammaire <span class="hint-dot" aria-hidden="true">?</span></span>
-            <span class="dim-score">A2+</span>
-            <div class="popover" role="tooltip">
-              <p class="what">Grammaire</p>
-              <p class="desc">Conjugaisons, accords, orthographe de structure, et comment tu construis tes phrases.</p>
-              <p class="improve">
-                <strong>Pour monter</strong>
-                Relis les accords sujet–adjectif (lasse → las) et fixe un temps dominant par paragraphe avant de mélanger imparfait et passé composé.
-              </p>
-            </div>
+      <aside class="aside sheet">
+        <h2>Comportement mocké</h2>
+        <ul>
+          <li>
+            Survol ou focus clavier sur la ligne → panneau sous (ou au-dessus
+            pour la dernière).
           </li>
-
-          <li class="score-row" tabindex="0">
-            <span class="dim-name">Vocabulaire <span class="hint-dot" aria-hidden="true">?</span></span>
-            <span class="dim-score">B1</span>
-            <div class="popover" role="tooltip">
-              <p class="what">Vocabulaire</p>
-              <p class="desc">Choix des mots, précision, et tournures naturelles — y compris le français louisianais quand il est juste.</p>
-              <p class="improve">
-                <strong>Pour monter</strong>
-                Remplace deux calques anglais par un mot DLF ou une expression que tu utilises déjà à l’oral (<em>asteur</em>, <em>icitte</em>).
-              </p>
-            </div>
+          <li>
+            Deux blocs : <strong>définition</strong> de la catégorie, puis
+            <strong>pour monter</strong> (conseil de cette Évaluation).
           </li>
-
-          <li class="score-row" tabindex="0">
-            <span class="dim-name">Cohérence <span class="hint-dot" aria-hidden="true">?</span></span>
-            <span class="dim-score">A2</span>
-            <div class="popover" role="tooltip">
-              <p class="what">Cohérence</p>
-              <p class="desc">Enchaînement des idées, structure des paragraphes, et connecteurs qui guident le lecteur.</p>
-              <p class="improve">
-                <strong>Pour monter</strong>
-                Ajoute une phrase-pont entre le récit du fais do-do et ta conclusion ; essaie <em>ça fait que</em> ou <em>après ça</em>.
-              </p>
-            </div>
+          <li>
+            Sur mobile, le même contenu s’ouvrirait au tap (à prévoir en prod).
           </li>
-
-          <li class="score-row" tabindex="0">
-            <span class="dim-name">Registre et style <span class="hint-dot" aria-hidden="true">?</span></span>
-            <span class="dim-score">B1+</span>
-            <div class="popover" role="tooltip">
-              <p class="what">Registre et style</p>
-              <p class="desc">Adéquation du ton à la consigne (lettre, récit…), naturel, et dispositifs rhétoriques sans forcer.</p>
-              <p class="improve">
-                <strong>Pour monter</strong>
-                Tu as le ton de lettre familière. Garde-le, et varie un peu la longueur des phrases pour que la lecture respire.
-              </p>
-            </div>
+          <li>
+            Labels = dimensions de l’app (<span class="kbd"
+              >Registre et style</span
+            >), pas « Consigne suivie ».
+          </li>
+          <li>
+            Le niveau CECR par dimension reste à mapper depuis les notes 1–6 (ou
+            à faire sortir par le modèle).
           </li>
         </ul>
-
-        <div class="tip">
-          <strong>Pour atteindre B2</strong>
-          Travaille l’imparfait face au passé composé dans le récit, et lie mieux tes idées avec des connecteurs.
-        </div>
-      </details>
+      </aside>
     </div>
-
-    <aside class="aside sheet">
-      <h2>Comportement mocké</h2>
-      <ul>
-        <li>Survol ou focus clavier sur la ligne → panneau sous (ou au-dessus pour la dernière).</li>
-        <li>Deux blocs : <strong>définition</strong> de la catégorie, puis <strong>pour monter</strong> (conseil de cette Évaluation).</li>
-        <li>Sur mobile, le même contenu s’ouvrirait au tap (à prévoir en prod).</li>
-        <li>Labels = dimensions de l’app (<span class="kbd">Registre et style</span>), pas « Consigne suivie ».</li>
-        <li>Le niveau CECR par dimension reste à mapper depuis les notes 1–6 (ou à faire sortir par le modèle).</li>
-      </ul>
-    </aside>
-  </div>
-</body>
+  </body>
 </html>

@@ -59,10 +59,9 @@ export class WritingEvaluator {
   async evaluate(
     writing: string,
     prompt: WritingPrompt,
-    dialect: FrenchDialect
+    dialect: FrenchDialect,
   ): Promise<Evaluation> {
-    const dialectRules =
-      dialect === "louisiana" ? LOUISIANA_FRENCH_RULES : "";
+    const dialectRules = dialect === "louisiana" ? LOUISIANA_FRENCH_RULES : "";
 
     const systemPrompt = `You are a French writing evaluator specializing in CEFR-aligned assessment. You evaluate Louisiana French writing.
 

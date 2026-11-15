@@ -3,7 +3,9 @@ import { isProductionPath } from "./classify-path";
 export type AddedLinesByFile = Map<string, number>;
 
 /** Parse `git diff --numstat` lines; only added lines in production paths count. */
-export function parseNumstatAddedLines(numstatOutput: string): AddedLinesByFile {
+export function parseNumstatAddedLines(
+  numstatOutput: string,
+): AddedLinesByFile {
   const byFile = new Map<string, number>();
 
   for (const line of numstatOutput.split("\n")) {

@@ -15,7 +15,9 @@ export function migrationsFolderPath(): string {
 }
 
 export function latestMigrationMillis(): number {
-  const migrations = readMigrationFiles({ migrationsFolder: MIGRATIONS_FOLDER });
+  const migrations = readMigrationFiles({
+    migrationsFolder: MIGRATIONS_FOLDER,
+  });
   if (migrations.length === 0) {
     return 0;
   }
@@ -39,7 +41,9 @@ export async function getLastAppliedMigrationMillis(
   }
 }
 
-export function hasPendingMigrations(lastAppliedMillis: number | null): boolean {
+export function hasPendingMigrations(
+  lastAppliedMillis: number | null,
+): boolean {
   const latest = latestMigrationMillis();
   if (latest === 0) {
     return false;

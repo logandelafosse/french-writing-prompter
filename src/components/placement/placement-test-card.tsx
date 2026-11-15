@@ -82,8 +82,8 @@ export function PlacementTestCard() {
 
   if (flow.phase === "complete") {
     return (
-      <div className="rounded-xl border bg-white p-6 space-y-6">
-        <div className="text-center space-y-2">
+      <div className="space-y-6 rounded-xl border bg-white p-6">
+        <div className="space-y-2 text-center">
           <h2 className="text-lg font-semibold text-zinc-900">
             Placement test complete
           </h2>
@@ -114,7 +114,7 @@ export function PlacementTestCard() {
             setFlow({ phase: "idle" });
             setWriting("");
           }}
-          className="w-full py-3 px-4 rounded-lg bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 transition-colors"
+          className="w-full rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
         >
           Back
         </button>
@@ -124,37 +124,35 @@ export function PlacementTestCard() {
 
   if (flow.phase === "prompt") {
     return (
-      <div className="rounded-xl border bg-white p-6 space-y-4">
+      <div className="space-y-4 rounded-xl border bg-white p-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-wide">
+          <h2 className="text-sm font-medium tracking-wide text-zinc-500 uppercase">
             Placement test
           </h2>
-          <span className="text-xs text-zinc-400">
-            Step {flow.step} / 3
-          </span>
+          <span className="text-xs text-zinc-400">Step {flow.step} / 3</span>
         </div>
 
-        <div className="w-full bg-zinc-200 rounded-full h-1">
+        <div className="h-1 w-full rounded-full bg-zinc-200">
           <div
-            className="bg-zinc-900 h-1 rounded-full transition-all"
+            className="h-1 rounded-full bg-zinc-900 transition-all"
             style={{ width: `${(flow.step / 3) * 100}%` }}
           />
         </div>
 
-        <div className="border border-zinc-200 rounded-lg p-4 bg-zinc-50">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+          <div className="mb-2 flex items-center gap-2">
             <LevelBadge
               level={flow.prompt.constraints.cefrLevel as CefrLevel}
             />
             <span className="text-xs text-zinc-400">Louisiana French</span>
           </div>
-          <p className="text-zinc-800 leading-relaxed whitespace-pre-wrap">
+          <p className="leading-relaxed whitespace-pre-wrap text-zinc-800">
             {flow.prompt.text}
           </p>
         </div>
 
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 rounded-lg p-3">
+          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
             <p>{error}</p>
           </div>
         )}
@@ -168,7 +166,7 @@ export function PlacementTestCard() {
             onChange={(e) => setWriting(e.target.value)}
             placeholder="Write your response here in French..."
             rows={8}
-            className="w-full rounded-lg border border-zinc-300 p-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent resize-y"
+            className="w-full resize-y rounded-lg border border-zinc-300 p-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-transparent focus:ring-2 focus:ring-zinc-900 focus:outline-none"
           />
           <div className="flex gap-3">
             <button
@@ -176,14 +174,14 @@ export function PlacementTestCard() {
                 setFlow({ phase: "idle" });
                 setWriting("");
               }}
-              className="flex-1 py-3 px-4 rounded-lg border border-zinc-300 text-zinc-700 text-sm font-medium hover:bg-zinc-50 transition-colors"
+              className="flex-1 rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading || !writing.trim()}
-              className="flex-1 py-3 px-4 rounded-lg bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? "Evaluating..." : "Submit"}
             </button>
@@ -194,17 +192,18 @@ export function PlacementTestCard() {
   }
 
   return (
-    <div className="rounded-xl border bg-white p-6 space-y-4">
-      <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-wide">
+    <div className="space-y-4 rounded-xl border bg-white p-6">
+      <h2 className="text-sm font-medium tracking-wide text-zinc-500 uppercase">
         Placement test
       </h2>
       <p className="text-sm text-zinc-600">
-        Don't know your level? Take a 3-prompt writing test to determine it automatically.
+        Don't know your level? Take a 3-prompt writing test to determine it
+        automatically.
       </p>
       <button
         onClick={handleStart}
         disabled={loading}
-        className="w-full py-3 px-4 rounded-lg border border-zinc-300 text-zinc-700 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Starting..." : "Start placement test"}
       </button>

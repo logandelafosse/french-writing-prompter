@@ -1,8 +1,8 @@
 # T29 — Focus du jour driving prompts; "Pratiquer ça"
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 3 | AFK | T15, T28 | ~420 (close to the 500 limit) |
+| Phase | Type | Blocked by | Production lines (est.)       |
+| ----- | ---- | ---------- | ----------------------------- |
+| 3     | AFK  | T15, T28   | ~420 (close to the 500 limit) |
 
 ## User stories
 
@@ -20,7 +20,7 @@
 
 **Prompt generation.** Generating a prompt snapshots Focus onto the session (`focus_json`) and consumes the pin. The generator receives the Focus categories with an `elicitHint` each, plus the topics of the last 10 sessions. The prompt asks for a scenario that needs those structures without naming grammar terms, and avoids the recent topics. The evaluator receives the session's Focus labels, and the post-processor sets `isFocus` on Mistakes whose category is in the snapshot. The taxonomy gains `inlineName`, `shortName` and `elicitHint` for each category.
 
-**FocusLine on Home.** The line shows `FOCUS DU JOUR` and the names joined with ` · `.
+**FocusLine on Home.** The line shows `FOCUS DU JOUR` and the names joined with `·`.
 
 - Before a prompt exists it shows the computed Focus. After a prompt exists it shows the session snapshot.
 - Layout by screen:

@@ -12,23 +12,23 @@ This document lists the server, data and LLM changes needed for the redesign, an
 
 ## 0. Findings from the current code (verified)
 
-| # | Defect | Verified where | Notes |
-|---|---|---|---|
-| D1 | Louisiana rules duplicated | `prompt-generator.ts` L22–33, `writing-evaluator.ts` L41–54, `CONTEXT.md` L47 | Three copies that have already drifted ("Minimal subjunctive usage" vs "Minimal or absent"). |
-| D2 | B2 demands subjunctive | `prompt-generator.ts` L39 `"All major tenses including subjunctive"` | Contradicts the dialect rule. C1/C2 "All tenses" implies passé simple / futur simple as well. |
-| D3 | Unvalidated LLM JSON | `openai-client.ts` L48 `JSON.parse(text) as T` | A parse failure throws a raw `SyntaxError`, which becomes a 500. The `catch {}` on L34 also drops the cause (timeout, 429 and 401 all look the same). |
-| D4 | No Corrections | `writing-evaluator.ts` `Evaluation` | Only scores and tips. |
-| D5 | Tracker not initialised; demotion | `evaluate/route.ts` L46–60, `tracker-store.ts` | `initTracker()` has no callers. After a restart the singleton is empty, so the route seeds A2 in memory only. A learner at C1 who gets three B1 Evaluations is "advanced" to B1, which is a demotion. `consecutiveAbove` lives in memory. |
-| D6 | Placement bypasses tracker | `placement/route.ts` L6, L50 | Writes through `db-store.setLevel` with source `"manual"`. |
-| D7 | Placement state in module variable | `placement/route.ts` L8 | Lost on restart or HMR. The three writings and Evaluations are never saved. |
-| D8 | Quota uses the UTC date | `quota-store.ts` L6, L17 | `toISOString().split("T")[0]`. In UTC-6 the quota resets at 18:00 local time. Read-then-write increment is also racy. |
-| D9 | Test wipes the real DB | `history-store.test.ts` L11–13, `vitest.config.ts` (no env), `db/index.ts` (defaults to `file:./data.db`) | Confirmed: the real `data.db` now holds a single row, id 35, `evaluation_json = {"score": 5}`, `prompt_constraints = {}`. That is the residue of this test. `level_changes` and `daily_quota` are empty. |
-| D10 | No body validation | All routes | `evaluate/route.ts` L12 casts the body, L29 `JSON.parse(session.promptConstraints)` is unguarded. `level` PUT accepts any `source`, including `"auto"`, from the client. No route has try/catch, so AI failures become HTML 500s. |
-| D11 | No Drafts; abandoned and unused prompts look the same | `sessions` schema | Both have `writing_text = null`. |
-| D12 (new) | Evaluated level overwrites the prompt level | `evaluate/route.ts` L42 | `cefrLevel: evaluation.overall_cefr` replaces the level the prompt was generated for. |
-| D13 (new) | History crashes on malformed rows | `history-page.tsx` L32–37 | Unguarded `JSON.parse`. The existing row `{"score":5}` would crash `EvaluationCard`. |
-| D14 (new) | `zod` is not a direct dependency | `package.json` | v4.4.3 is only present transitively (via openai and eslint). Add it explicitly. |
-| D15 (new) | Project is not in its own git repo | `git rev-parse` resolves to `~/Personal-Projects`, where this folder is untracked (`??`) | Relevant to the Dialect Note "git history" argument in §6. |
+| #         | Defect                                                | Verified where                                                                                            | Notes                                                                                                                                                                                                                                     |
+| --------- | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1        | Louisiana rules duplicated                            | `prompt-generator.ts` L22–33, `writing-evaluator.ts` L41–54, `CONTEXT.md` L47                             | Three copies that have already drifted ("Minimal subjunctive usage" vs "Minimal or absent").                                                                                                                                              |
+| D2        | B2 demands subjunctive                                | `prompt-generator.ts` L39 `"All major tenses including subjunctive"`                                      | Contradicts the dialect rule. C1/C2 "All tenses" implies passé simple / futur simple as well.                                                                                                                                             |
+| D3        | Unvalidated LLM JSON                                  | `openai-client.ts` L48 `JSON.parse(text) as T`                                                            | A parse failure throws a raw `SyntaxError`, which becomes a 500. The `catch {}` on L34 also drops the cause (timeout, 429 and 401 all look the same).                                                                                     |
+| D4        | No Corrections                                        | `writing-evaluator.ts` `Evaluation`                                                                       | Only scores and tips.                                                                                                                                                                                                                     |
+| D5        | Tracker not initialised; demotion                     | `evaluate/route.ts` L46–60, `tracker-store.ts`                                                            | `initTracker()` has no callers. After a restart the singleton is empty, so the route seeds A2 in memory only. A learner at C1 who gets three B1 Evaluations is "advanced" to B1, which is a demotion. `consecutiveAbove` lives in memory. |
+| D6        | Placement bypasses tracker                            | `placement/route.ts` L6, L50                                                                              | Writes through `db-store.setLevel` with source `"manual"`.                                                                                                                                                                                |
+| D7        | Placement state in module variable                    | `placement/route.ts` L8                                                                                   | Lost on restart or HMR. The three writings and Evaluations are never saved.                                                                                                                                                               |
+| D8        | Quota uses the UTC date                               | `quota-store.ts` L6, L17                                                                                  | `toISOString().split("T")[0]`. In UTC-6 the quota resets at 18:00 local time. Read-then-write increment is also racy.                                                                                                                     |
+| D9        | Test wipes the real DB                                | `history-store.test.ts` L11–13, `vitest.config.ts` (no env), `db/index.ts` (defaults to `file:./data.db`) | Confirmed: the real `data.db` now holds a single row, id 35, `evaluation_json = {"score": 5}`, `prompt_constraints = {}`. That is the residue of this test. `level_changes` and `daily_quota` are empty.                                  |
+| D10       | No body validation                                    | All routes                                                                                                | `evaluate/route.ts` L12 casts the body, L29 `JSON.parse(session.promptConstraints)` is unguarded. `level` PUT accepts any `source`, including `"auto"`, from the client. No route has try/catch, so AI failures become HTML 500s.         |
+| D11       | No Drafts; abandoned and unused prompts look the same | `sessions` schema                                                                                         | Both have `writing_text = null`.                                                                                                                                                                                                          |
+| D12 (new) | Evaluated level overwrites the prompt level           | `evaluate/route.ts` L42                                                                                   | `cefrLevel: evaluation.overall_cefr` replaces the level the prompt was generated for.                                                                                                                                                     |
+| D13 (new) | History crashes on malformed rows                     | `history-page.tsx` L32–37                                                                                 | Unguarded `JSON.parse`. The existing row `{"score":5}` would crash `EvaluationCard`.                                                                                                                                                      |
+| D14 (new) | `zod` is not a direct dependency                      | `package.json`                                                                                            | v4.4.3 is only present transitively (via openai and eslint). Add it explicitly.                                                                                                                                                           |
+| D15 (new) | Project is not in its own git repo                    | `git rev-parse` resolves to `~/Personal-Projects`, where this folder is untracked (`??`)                  | Relevant to the Dialect Note "git history" argument in §6.                                                                                                                                                                                |
 
 ---
 
@@ -49,10 +49,22 @@ export type CefrLevel = z.infer<typeof CefrLevel>;
 
 // src/domain/mistake-category.ts — see §1.1 for the taxonomy
 export const MistakeCategory = z.enum([
-  "conjugaison", "imparfait_pc", "infinitif_participe", "auxiliaire",
-  "genre", "accord", "articles", "prepositions", "pronoms",
-  "negation", "ordre_mots", "orthographe", "accents", "vocabulaire",
-  "connecteurs", "autre",
+  "conjugaison",
+  "imparfait_pc",
+  "infinitif_participe",
+  "auxiliaire",
+  "genre",
+  "accord",
+  "articles",
+  "prepositions",
+  "pronoms",
+  "negation",
+  "ordre_mots",
+  "orthographe",
+  "accents",
+  "vocabulaire",
+  "connecteurs",
+  "autre",
 ]);
 export type MistakeCategory = z.infer<typeof MistakeCategory>;
 
@@ -60,36 +72,38 @@ export type MistakeCategory = z.infer<typeof MistakeCategory>;
 export const CorrectionKind = z.enum(["mistake", "standard", "dialect_check"]);
 
 export const CorrectionStatus = z.enum([
-  "open",               // freshly produced
-  "acknowledged",       // learner pressed "Compris"
-  "confirmed_dialect",  // dialect_check answered "Oui" → Dialect Note created
-  "confirmed_mistake",  // dialect_check answered "Non" → now counts as a Mistake
-  "overturned",         // mistake pushed back → Dialect Note created
+  "open", // freshly produced
+  "acknowledged", // learner pressed "Compris"
+  "confirmed_dialect", // dialect_check answered "Oui" → Dialect Note created
+  "confirmed_mistake", // dialect_check answered "Non" → now counts as a Mistake
+  "overturned", // mistake pushed back → Dialect Note created
 ]);
 
-export const Span = z.object({
-  start: z.number().int().nonnegative(), // UTF-16 offsets into sessions.writing_text
-  end: z.number().int().positive(),
-}).refine((s) => s.end > s.start);
+export const Span = z
+  .object({
+    start: z.number().int().nonnegative(), // UTF-16 offsets into sessions.writing_text
+    end: z.number().int().positive(),
+  })
+  .refine((s) => s.end > s.start);
 
 export const Correction = z.object({
-  id: z.string(),                       // server-assigned (uuid)
+  id: z.string(), // server-assigned (uuid)
   sessionId: z.number().int(),
-  ordinal: z.number().int(),            // text order, 1-based (= marker number)
+  ordinal: z.number().int(), // text order, 1-based (= marker number)
   kind: CorrectionKind,
-  quote: z.string().min(1),             // learner text as quoted by the model
-  span: Span.nullable(),                // null = could not anchor; still listed, no in-text mark
+  quote: z.string().min(1), // learner text as quoted by the model
+  span: Span.nullable(), // null = could not anchor; still listed, no in-text mark
   anchor: z.enum(["exact", "normalized", "none"]),
-  suggestion: z.string(),               // corrected form / Louisiana form / form tutor would propose
-  explanation: z.string(),              // French
-  question: z.string().nullable(),      // dialect_check only, French
+  suggestion: z.string(), // corrected form / Louisiana form / form tutor would propose
+  explanation: z.string(), // French
+  question: z.string().nullable(), // dialect_check only, French
   ruleIfDialect: z.string().nullable(), // model-drafted rule for the Add Dialect Note sheet
   category: MistakeCategory.nullable(), // required for mistake & dialect_check; null for standard
   dlf: z.object({ entryId: z.string(), headword: z.string() }).nullable(), // standard only, server-verified
-  resourceIds: z.array(z.string()),     // mistake only; validated against catalog
+  resourceIds: z.array(z.string()), // mistake only; validated against catalog
   status: CorrectionStatus,
   dialectNoteId: z.number().int().nullable(),
-  isFocus: z.boolean(),                 // category ∈ session focus snapshot (server-computed)
+  isFocus: z.boolean(), // category ∈ session focus snapshot (server-computed)
 });
 export type Correction = z.infer<typeof Correction>;
 
@@ -101,7 +115,12 @@ export const countsAsMistake = (c: Pick<Correction, "kind" | "status">) =>
 
 ```ts
 // src/domain/evaluation.ts
-export const Dimension = z.enum(["grammatical_accuracy", "vocabulary", "coherence", "register_style"]);
+export const Dimension = z.enum([
+  "grammatical_accuracy",
+  "vocabulary",
+  "coherence",
+  "register_style",
+]);
 export const DimensionScore = z.object({
   score: z.number().int().min(1).max(6),
   comment: z.string(),
@@ -111,19 +130,26 @@ export const EvaluationV2 = z.object({
   version: z.literal(2),
   dimensions: z.record(Dimension, DimensionScore),
   overallCefr: CefrLevel,
-  summary: z.string(),        // French, 1–2 sentences ("summary count line" lives in UI)
-  nextLevelTip: z.string(),   // French, framed around next CEFR level
-  model: z.string(),          // e.g. "gpt-4o"
-  promptVersion: z.string(),  // e.g. "evaluator@2"
+  summary: z.string(), // French, 1–2 sentences ("summary count line" lives in UI)
+  nextLevelTip: z.string(), // French, framed around next CEFR level
+  model: z.string(), // e.g. "gpt-4o"
+  promptVersion: z.string(), // e.g. "evaluator@2"
   evaluatedAt: z.string(),
 });
 // Corrections are NOT nested in stored EvaluationV2; they live in the `corrections` table
 // (mutable status). The raw model output is kept verbatim in `evaluation_raw` for audit.
 
-export const EvaluationV1 = z.object({ /* today's shape, kept read-only for legacy rows */
-  dimensions: z.record(Dimension, z.object({ score: z.number(), max: z.number(), comment: z.string() })),
+export const EvaluationV1 = z.object({
+  /* today's shape, kept read-only for legacy rows */
+  dimensions: z.record(
+    Dimension,
+    z.object({ score: z.number(), max: z.number(), comment: z.string() }),
+  ),
   overall_cefr: CefrLevel,
-  tips: z.object({ per_dimension: z.record(Dimension, z.string()), holistic: z.string() }),
+  tips: z.object({
+    per_dimension: z.record(Dimension, z.string()),
+    holistic: z.string(),
+  }),
 });
 
 export type StoredEvaluation =
@@ -140,12 +166,12 @@ export function parseStoredEvaluation(json: string | null): StoredEvaluation; //
 export const WeaknessTrend = z.enum(["actif", "en_progres", "tranquille"]);
 export const Weakness = z.object({
   category: MistakeCategory,
-  label: z.string(),             // French label from taxonomy
-  count: z.number().int(),       // total Mistakes in this category, all time
+  label: z.string(), // French label from taxonomy
+  count: z.number().int(), // total Mistakes in this category, all time
   lastSeenAt: z.string(),
   trend: WeaknessTrend,
   isFocus: z.boolean(),
-  pinned: z.boolean(),           // "Pratiquer ça" pending
+  pinned: z.boolean(), // "Pratiquer ça" pending
   resources: z.array(z.lazy(() => Resource)),
 });
 
@@ -153,12 +179,12 @@ export const Weakness = z.object({
 export const DialectNoteScope = z.enum(["word", "pattern"]); // "ce mot seulement" / "toute la famille"
 export const DialectNote = z.object({
   id: z.number().int(),
-  rule: z.string().min(3).max(500),        // French, learner has final say
+  rule: z.string().min(3).max(500), // French, learner has final say
   example: z.string().max(300).nullable(),
   scope: DialectNoteScope,
-  form: z.string().min(1).max(80),         // normalized key: the word/lemma ("tomber") or pattern label
-  learnerForm: z.string().nullable(),      // "a tombé" (T'as écrit)
-  tutorSuggestion: z.string().nullable(),  // "est tombé" (Le tuteur proposait)
+  form: z.string().min(1).max(80), // normalized key: the word/lemma ("tomber") or pattern label
+  learnerForm: z.string().nullable(), // "a tombé" (T'as écrit)
+  tutorSuggestion: z.string().nullable(), // "est tombé" (Le tuteur proposait)
   sourceSessionId: z.number().int().nullable(),
   sourceCorrectionId: z.string().nullable(),
   createdAt: z.string(),
@@ -169,9 +195,9 @@ export const DialectNote = z.object({
 export const Resource = z.object({
   id: z.string().regex(/^[a-z0-9-]+$/),
   type: z.enum(["grammaire", "input"]),
-  title: z.string(),              // French display label
+  title: z.string(), // French display label
   url: z.string().url(),
-  source: z.string(),             // "Lawless French", "Télé-Louisiane", …
+  source: z.string(), // "Lawless French", "Télé-Louisiane", …
   categories: z.array(MistakeCategory).min(1),
   dialect: z.enum(["louisiana", "standard"]),
 });
@@ -179,19 +205,29 @@ export const Resource = z.object({
 // src/domain/session.ts
 export const SessionKind = z.enum(["daily", "placement"]);
 export const SessionStatus = z.enum(["active", "evaluated", "abandoned"]); // stored
-export const SessionDisplayStatus = z.enum([                               // derived for UI
-  "in_progress", "evaluated", "draft_abandoned", "prompt_unused",
+export const SessionDisplayStatus = z.enum([
+  // derived for UI
+  "in_progress",
+  "evaluated",
+  "draft_abandoned",
+  "prompt_unused",
 ]);
 export const DataIssue = z.enum([
-  "evaluation_unreadable", "evaluation_legacy", "prompt_meta_unreadable", "focus_unreadable",
+  "evaluation_unreadable",
+  "evaluation_legacy",
+  "prompt_meta_unreadable",
+  "focus_unreadable",
 ]);
 
 export const Registre = z.enum(["formel", "familier", "mixt"]);
 export const PromptMeta = z.object({
-  genre: z.string(), tense: z.string(), tone: z.string(),
+  genre: z.string(),
+  tense: z.string(),
+  tone: z.string(),
   registre: Registre, // required: prompt text states it; Evaluation judges Register & Style against it
   wordTarget: z.object({ min: z.number().int(), max: z.number().int() }),
-  topic: z.string(), topicTags: z.array(z.string()).max(3),
+  topic: z.string(),
+  topicTags: z.array(z.string()).max(3),
 });
 
 export const Draft = z.object({
@@ -206,24 +242,24 @@ export const Draft = z.object({
 
 The list is small (15 plus `autre`) and stable. IDs are persisted, and labels can change freely. The labels use the granularity the mockups show ("Infinitif ou participe", "Imparfait ou passé composé", "Genre des noms", "Accents"). The "Louisiana note" column is part of the evaluator instructions (§4.1). It names forms that must never land in that category.
 
-| id | Label (UI) | Covers | Louisiana note (never a Mistake) |
-|---|---|---|---|
-| `conjugaison` | Conjugaison | wrong verb form/person/stem | `je vas`, `ça va` 3pl agreement, `eusse a` |
-| `imparfait_pc` | Imparfait ou passé composé | aspect choice in past narrative | — |
-| `infinitif_participe` | Infinitif ou participe (‑er / ‑é) | `à préparé` vs `à préparer` | — |
-| `auxiliaire` | Choix de l'auxiliaire | avoir/être misuse | `avoir` with movement verbs (`il a tombé`, `j'ai venu`) |
-| `genre` | Genre des noms | noun gender | regionally attested genders (verify against DLF) |
-| `accord` | Accords | adjective/participle/subject–verb agreement | `ça` + 3sg verb for plural subject |
-| `articles` | Articles et déterminants | article choice/omission, contractions | — |
-| `prepositions` | Prépositions | verb/noun + preposition | `à` for possession (`le char à Tom`) |
-| `pronoms` | Pronoms | object/relative/reflexive pronouns | `ça`/`eusse`/`eux-autres`, `vous-autres`, `nous-autres`, `on` |
-| `negation` | Négation | misplaced/missing `pas`, `jamais`… | dropped `ne` |
-| `ordre_mots` | Ordre des mots | word order, question formation | `quoi faire`, `où-ce que`, `ça qui` questions |
-| `orthographe` | Orthographe | misspelling of a word (not accent-only) | DLF-attested spellings (`asteur`, `icitte`) |
-| `accents` | Accents (é / è / ê) | accent-only errors | — |
-| `vocabulaire` | Choix du mot | wrong word, false friend | DLF-attested English borrowings |
-| `connecteurs` | Liaison des idées | connectors and cohesion inside the sentence | `ça fait que`, `mais` as an opener |
-| `autre` | Autre | fallback; never shown as Focus | — |
+| id                    | Label (UI)                        | Covers                                      | Louisiana note (never a Mistake)                              |
+| --------------------- | --------------------------------- | ------------------------------------------- | ------------------------------------------------------------- |
+| `conjugaison`         | Conjugaison                       | wrong verb form/person/stem                 | `je vas`, `ça va` 3pl agreement, `eusse a`                    |
+| `imparfait_pc`        | Imparfait ou passé composé        | aspect choice in past narrative             | —                                                             |
+| `infinitif_participe` | Infinitif ou participe (‑er / ‑é) | `à préparé` vs `à préparer`                 | —                                                             |
+| `auxiliaire`          | Choix de l'auxiliaire             | avoir/être misuse                           | `avoir` with movement verbs (`il a tombé`, `j'ai venu`)       |
+| `genre`               | Genre des noms                    | noun gender                                 | regionally attested genders (verify against DLF)              |
+| `accord`              | Accords                           | adjective/participle/subject–verb agreement | `ça` + 3sg verb for plural subject                            |
+| `articles`            | Articles et déterminants          | article choice/omission, contractions       | —                                                             |
+| `prepositions`        | Prépositions                      | verb/noun + preposition                     | `à` for possession (`le char à Tom`)                          |
+| `pronoms`             | Pronoms                           | object/relative/reflexive pronouns          | `ça`/`eusse`/`eux-autres`, `vous-autres`, `nous-autres`, `on` |
+| `negation`            | Négation                          | misplaced/missing `pas`, `jamais`…          | dropped `ne`                                                  |
+| `ordre_mots`          | Ordre des mots                    | word order, question formation              | `quoi faire`, `où-ce que`, `ça qui` questions                 |
+| `orthographe`         | Orthographe                       | misspelling of a word (not accent-only)     | DLF-attested spellings (`asteur`, `icitte`)                   |
+| `accents`             | Accents (é / è / ê)               | accent-only errors                          | —                                                             |
+| `vocabulaire`         | Choix du mot                      | wrong word, false friend                    | DLF-attested English borrowings                               |
+| `connecteurs`         | Liaison des idées                 | connectors and cohesion inside the sentence | `ça fait que`, `mais` as an opener                            |
+| `autre`               | Autre                             | fallback; never shown as Focus              | —                                                             |
 
 The Louisiana notes column is a starting point written from the existing rules plus DLF lookups. It needs owner review (HITL, §7 S7). An unknown category from the model maps to `autre` and is never rejected.
 
@@ -273,7 +309,8 @@ Mechanics:
   3. Run idempotent TS backfills (§2.3).
 
   Wire it as `predev` and `prestart`. Tests call the same function (§5).
-- **Baseline**: `0000_baseline.sql` is generated from the *current* `schema.ts`, then hand-edited to use `CREATE TABLE IF NOT EXISTS`. That way existing push-created DBs accept it, and the migrator records it in `__drizzle_migrations`. All later migrations are additive (`ALTER TABLE … ADD COLUMN`, new tables), so SQLite never needs a table rebuild for these changes.
+
+- **Baseline**: `0000_baseline.sql` is generated from the _current_ `schema.ts`, then hand-edited to use `CREATE TABLE IF NOT EXISTS`. That way existing push-created DBs accept it, and the migrator records it in `__drizzle_migrations`. All later migrations are additive (`ALTER TABLE … ADD COLUMN`, new tables), so SQLite never needs a table rebuild for these changes.
 - Record the decision as `docs/adr/0001-generated-migrations.md`.
 
 ### 2.2 Drizzle changes
@@ -395,42 +432,42 @@ Conventions:
 - **`withErrors(handler)`**: maps `LlmError` to `502 AI_UNAVAILABLE`, `502 AI_INVALID_OUTPUT` or `504 AI_TIMEOUT`, and anything unknown to `500 INTERNAL`. It logs the cause. Routes never return HTML errors.
 - **Quota-exhausted UI** needs `resetsAt`, the ISO instant of the next local midnight.
 
-| Code | HTTP |
-|---|---|
-| INVALID_JSON | 400 |
-| NO_LEVEL | 400 |
-| NOT_FOUND | 404 |
-| ALREADY_EVALUATED / NOT_ACTIVE / CONFLICT | 409 |
-| DRAFT_WOULD_BE_ABANDONED | 409 |
-| VALIDATION | 422 |
-| QUOTA_EXHAUSTED | 429 |
-| AI_UNAVAILABLE / AI_INVALID_OUTPUT | 502 |
-| AI_TIMEOUT | 504 |
+| Code                                      | HTTP |
+| ----------------------------------------- | ---- |
+| INVALID_JSON                              | 400  |
+| NO_LEVEL                                  | 400  |
+| NOT_FOUND                                 | 404  |
+| ALREADY_EVALUATED / NOT_ACTIVE / CONFLICT | 409  |
+| DRAFT_WOULD_BE_ABANDONED                  | 409  |
+| VALIDATION                                | 422  |
+| QUOTA_EXHAUSTED                           | 429  |
+| AI_UNAVAILABLE / AI_INVALID_OUTPUT        | 502  |
+| AI_TIMEOUT                                | 504  |
 
 ### Home and state
 
-| Route | Request | Response | Errors |
-|---|---|---|---|
-| `GET /api/home` (new) | — | `{ level: CefrLevel \| null, quota: Quota, focus: FocusItem[], activeSession: SessionDetail \| null, banner: { changeId, from, to } \| null, placement: { runId, step } \| null }` | — |
-| `GET /api/quota` (changed) | — | `Quota = { used, remaining, max: 3, resetsAt }` | — |
+| Route                      | Request | Response                                                                                                                                                                           | Errors |
+| -------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| `GET /api/home` (new)      | —       | `{ level: CefrLevel \| null, quota: Quota, focus: FocusItem[], activeSession: SessionDetail \| null, banner: { changeId, from, to } \| null, placement: { runId, step } \| null }` | —      |
+| `GET /api/quota` (changed) | —       | `Quota = { used, remaining, max: 3, resetsAt }`                                                                                                                                    | —      |
 
 `GET /api/home` returns everything the Home page needs in one call. `banner` is the latest `auto` level change if no session has been created since it, which implements "clears on next generate".
 
 ### Prompts and sessions
 
-| Route | Request | Response | Errors |
-|---|---|---|---|
-| `POST /api/prompt` (changed) | `{ replaceSessionId?: number, confirmAbandon?: boolean }` | `201 { session: SessionDetail, quota: Quota }` | NO_LEVEL, QUOTA_EXHAUSTED `{resetsAt}`, DRAFT_WOULD_BE_ABANDONED `{ wordCount }` (active session has text and `confirmAbandon` is not true), AI_* |
-| `PUT /api/sessions/:id/draft` (new) | `{ text: string ≤ 20000 }` | `{ savedAt, wordCount }` | NOT_FOUND, NOT_ACTIVE (evaluated or abandoned) |
-| `POST /api/sessions/:id/evaluate` (replaces `POST /api/evaluate`; keep the old path as a thin alias for one slice) | `{ text: string, 1..20000, trimmed non-empty }` | `{ session: SessionDetail, evaluation: EvaluationV2, corrections: Correction[], advancement: LevelChange \| null }` | NOT_FOUND, ALREADY_EVALUATED, VALIDATION, AI_* |
-| `GET /api/sessions` (changed) | `?limit=20&cursor=<createdAt>` | `{ sessions: SessionSummary[], nextCursor: string \| null, levelLine: string }` | — |
-| `GET /api/sessions/:id` (new) | — | `SessionDetail` | NOT_FOUND |
+| Route                                                                                                              | Request                                                   | Response                                                                                                            | Errors                                                                                                                                            |
+| ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `POST /api/prompt` (changed)                                                                                       | `{ replaceSessionId?: number, confirmAbandon?: boolean }` | `201 { session: SessionDetail, quota: Quota }`                                                                      | NO_LEVEL, QUOTA_EXHAUSTED `{resetsAt}`, DRAFT_WOULD_BE_ABANDONED `{ wordCount }` (active session has text and `confirmAbandon` is not true), AI_* |
+| `PUT /api/sessions/:id/draft` (new)                                                                                | `{ text: string ≤ 20000 }`                                | `{ savedAt, wordCount }`                                                                                            | NOT_FOUND, NOT_ACTIVE (evaluated or abandoned)                                                                                                    |
+| `POST /api/sessions/:id/evaluate` (replaces `POST /api/evaluate`; keep the old path as a thin alias for one slice) | `{ text: string, 1..20000, trimmed non-empty }`           | `{ session: SessionDetail, evaluation: EvaluationV2, corrections: Correction[], advancement: LevelChange \| null }` | NOT_FOUND, ALREADY_EVALUATED, VALIDATION, AI_*                                                                                                    |
+| `GET /api/sessions` (changed)                                                                                      | `?limit=20&cursor=<createdAt>`                            | `{ sessions: SessionSummary[], nextCursor: string \| null, levelLine: string }`                                     | —                                                                                                                                                 |
+| `GET /api/sessions/:id` (new)                                                                                      | —                                                         | `SessionDetail`                                                                                                     | NOT_FOUND                                                                                                                                         |
 
 Notes on these routes:
 
 - `POST /api/prompt` marks the previous active session `abandoned` and generates the new prompt with Focus, recent topics and the pin.
 - `PUT /api/sessions/:id/draft` uses last-write-wins. The client also keeps a localStorage copy for offline use, per the design.
-- `POST /api/sessions/:id/evaluate` is allowed when the quota is exhausted. It saves `writing_text` *before* calling the LLM, so an AI failure never loses text. On success it runs the level service.
+- `POST /api/sessions/:id/evaluate` is allowed when the quota is exhausted. It saves `writing_text` _before_ calling the LLM, so an AI failure never loses text. On success it runs the level service.
 - `levelLine` in `GET /api/sessions` is the quiet line under the History title, e.g. "A2 depuis le 3 octobre, B1 depuis le 28 octobre".
 
 `SessionSummary`:
@@ -445,17 +482,17 @@ Notes on these routes:
 
 `displayStatus` is derived as follows:
 
-| Stored state | displayStatus |
-|---|---|
-| `evaluated` | `evaluated` |
-| `active` and `local_date == today` | `in_progress` |
+| Stored state                                                      | displayStatus     |
+| ----------------------------------------------------------------- | ----------------- |
+| `evaluated`                                                       | `evaluated`       |
+| `active` and `local_date == today`                                | `in_progress`     |
 | `abandoned`, or `active` from an earlier day, with non-empty text | `draft_abandoned` |
-| `abandoned`, or `active` from an earlier day, with empty text | `prompt_unused` |
+| `abandoned`, or `active` from an earlier day, with empty text     | `prompt_unused`   |
 
 ### Corrections
 
-| Route | Request | Response | Errors |
-|---|---|---|---|
+| Route                              | Request                                         | Response                     | Errors                                   |
+| ---------------------------------- | ----------------------------------------------- | ---------------------------- | ---------------------------------------- |
 | `PATCH /api/corrections/:id` (new) | `{ action: "acknowledge" \| "reject_dialect" }` | `{ correction: Correction }` | NOT_FOUND, CONFLICT (invalid transition) |
 
 `reject_dialect` means the learner answered "Non, corrige-le". It turns a `dialect_check` into `confirmed_mistake`.
@@ -470,43 +507,43 @@ Allowed transitions, enforced in `correction-service`:
 
 ### Dialect Notes
 
-| Route | Request | Response | Errors |
-|---|---|---|---|
-| `GET /api/dialect-notes` | — | `{ notes: DialectNote[] }` | — |
-| `POST /api/dialect-notes` | `{ rule, example?, scope, form, learnerForm?, tutorSuggestion?, fromCorrectionId? }` | `201 { note, correction?: Correction }` | VALIDATION, NOT_FOUND (correction), CONFLICT (correction not `mistake` or `dialect_check`, or already resolved) |
-| `PATCH /api/dialect-notes/:id` | `{ rule?, example?, scope?, form? }` | `{ note }` | NOT_FOUND, VALIDATION |
-| `DELETE /api/dialect-notes/:id` | — | `204` | NOT_FOUND |
-| `GET /api/dialect-notes/export` | — | `text/markdown` (same renderer as the `dialect:export` script) | — |
+| Route                           | Request                                                                              | Response                                                       | Errors                                                                                                          |
+| ------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `GET /api/dialect-notes`        | —                                                                                    | `{ notes: DialectNote[] }`                                     | —                                                                                                               |
+| `POST /api/dialect-notes`       | `{ rule, example?, scope, form, learnerForm?, tutorSuggestion?, fromCorrectionId? }` | `201 { note, correction?: Correction }`                        | VALIDATION, NOT_FOUND (correction), CONFLICT (correction not `mistake` or `dialect_check`, or already resolved) |
+| `PATCH /api/dialect-notes/:id`  | `{ rule?, example?, scope?, form? }`                                                 | `{ note }`                                                     | NOT_FOUND, VALIDATION                                                                                           |
+| `DELETE /api/dialect-notes/:id` | —                                                                                    | `204`                                                          | NOT_FOUND                                                                                                       |
+| `GET /api/dialect-notes/export` | —                                                                                    | `text/markdown` (same renderer as the `dialect:export` script) | —                                                                                                               |
 
 When `POST /api/dialect-notes` has a `fromCorrectionId`, the Correction becomes `overturned` (mistake) or `confirmed_dialect` (dialect_check) and `dialectNoteId` is set. `DELETE` is a soft delete.
 
 ### Weaknesses and Carnet
 
-| Route | Request | Response | Errors |
-|---|---|---|---|
-| `GET /api/weaknesses` | — | `{ weaknesses: Weakness[], focus: FocusItem[] }` | — |
-| `POST /api/weaknesses/:category/practice` | — | `{ pinned: true }` | VALIDATION (unknown category) |
-| `DELETE /api/weaknesses/:category/practice` | — | `{ pinned: false }` | — |
+| Route                                       | Request | Response                                         | Errors                        |
+| ------------------------------------------- | ------- | ------------------------------------------------ | ----------------------------- |
+| `GET /api/weaknesses`                       | —       | `{ weaknesses: Weakness[], focus: FocusItem[] }` | —                             |
+| `POST /api/weaknesses/:category/practice`   | —       | `{ pinned: true }`                               | VALIDATION (unknown category) |
+| `DELETE /api/weaknesses/:category/practice` | —       | `{ pinned: false }`                              | —                             |
 
 `GET /api/weaknesses` lists only categories with count ≥ 1, ordered by trend (actif, en_progres, tranquille) and then by `s`. `POST …/practice` keeps at most one pending pin by cancelling the previous one.
 
 ### Level
 
-| Route | Request | Response | Errors |
-|---|---|---|---|
-| `GET /api/level` | — | `{ level, history: LevelChange[], streak: number }` | — |
-| `PUT /api/level` (changed) | `{ level: CefrLevel }` | `{ change }` | VALIDATION |
-| `POST /api/level/undo` (new) | `{ changeId: number }` | `{ change }` | NOT_FOUND, CONFLICT (not the latest change, or not `auto`) |
+| Route                        | Request                | Response                                            | Errors                                                     |
+| ---------------------------- | ---------------------- | --------------------------------------------------- | ---------------------------------------------------------- |
+| `GET /api/level`             | —                      | `{ level, history: LevelChange[], streak: number }` | —                                                          |
+| `PUT /api/level` (changed)   | `{ level: CefrLevel }` | `{ change }`                                        | VALIDATION                                                 |
+| `POST /api/level/undo` (new) | `{ changeId: number }` | `{ change }`                                        | NOT_FOUND, CONFLICT (not the latest change, or not `auto`) |
 
 `PUT /api/level` no longer accepts `source` from the client: it is always `manual`. `POST /api/level/undo` inserts `{ from: to, to: from, source: "undo", revertsChangeId }`. The streak resets implicitly (§5, D5).
 
 ### Placement Test
 
-| Route | Request | Response | Errors |
-|---|---|---|---|
-| `GET /api/placement` (changed) | — | `{ run: null \| { id, status, step, session: SessionDetail, results?: PlacementResult } }` | — |
-| `POST /api/placement/start` (new; replaces `action: "start"`) | — | `201 { run }` | CONFLICT (a level is already set, or a run is in progress, in which case the existing run is returned), AI_* |
-| `POST /api/placement/:runId/submit` (new) | `{ sessionId, text }` | `{ run }` (next step) or `{ run, results: { finalLevel, summary, steps: { level, overallCefr, mistakeCount }[] } }` | NOT_FOUND, CONFLICT (wrong step or session), VALIDATION, AI_* |
+| Route                                                         | Request               | Response                                                                                                            | Errors                                                                                                       |
+| ------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `GET /api/placement` (changed)                                | —                     | `{ run: null \| { id, status, step, session: SessionDetail, results?: PlacementResult } }`                          | —                                                                                                            |
+| `POST /api/placement/start` (new; replaces `action: "start"`) | —                     | `201 { run }`                                                                                                       | CONFLICT (a level is already set, or a run is in progress, in which case the existing run is returned), AI_* |
+| `POST /api/placement/:runId/submit` (new)                     | `{ sessionId, text }` | `{ run }` (next step) or `{ run, results: { finalLevel, summary, steps: { level, overallCefr, mistakeCount }[] } }` | NOT_FOUND, CONFLICT (wrong step or session), VALIDATION, AI_*                                                |
 
 `GET /api/placement` reconstructs the run from the DB. `POST /api/placement/start` creates the run and a `kind = 'placement'` session for step 1. Placement sessions don't count toward quota.
 
@@ -551,24 +588,30 @@ Strict mode requires every property to be required. Use `.nullable()`, never `.o
 ```ts
 export const EvaluatorOutputSchema = z.object({
   dimensions: z.object({
-    grammatical_accuracy: DimensionScore, vocabulary: DimensionScore,
-    coherence: DimensionScore, register_style: DimensionScore,
+    grammatical_accuracy: DimensionScore,
+    vocabulary: DimensionScore,
+    coherence: DimensionScore,
+    register_style: DimensionScore,
   }),
   overall_cefr: CefrLevel,
   summary: z.string(),
   next_level_tip: z.string(),
-  corrections: z.array(z.object({
-    kind: CorrectionKind,
-    quote: z.string(),              // exact copy from learner text, 1–8 words, no ellipsis
-    occurrence: z.number().int(),   // 1-based: which occurrence of `quote` in the text
-    suggestion: z.string(),
-    explanation: z.string(),        // French
-    category: MistakeCategory.nullable(),
-    question: z.string().nullable(),
-    rule_if_dialect: z.string().nullable(), // French, ≤ 160 chars; required for mistake & dialect_check
-    dlf_headword: z.string().nullable(),    // standard only
-    resource_ids: z.array(z.string()),      // enum of catalog IDs injected per request when supported
-  })).max(15),
+  corrections: z
+    .array(
+      z.object({
+        kind: CorrectionKind,
+        quote: z.string(), // exact copy from learner text, 1–8 words, no ellipsis
+        occurrence: z.number().int(), // 1-based: which occurrence of `quote` in the text
+        suggestion: z.string(),
+        explanation: z.string(), // French
+        category: MistakeCategory.nullable(),
+        question: z.string().nullable(),
+        rule_if_dialect: z.string().nullable(), // French, ≤ 160 chars; required for mistake & dialect_check
+        dlf_headword: z.string().nullable(), // standard only
+        resource_ids: z.array(z.string()), // enum of catalog IDs injected per request when supported
+      }),
+    )
+    .max(15),
 });
 ```
 
@@ -580,7 +623,7 @@ export const EvaluatorOutputSchema = z.object({
    - Learner Dialect Notes are listed under "Formes confirmées par l'apprenant — ne les signale JAMAIS". Word-scope notes list the form; pattern-scope notes give the rule text.
    - DLF hints: "Mots du texte attestés dans le Dictionary of Louisiana French : asteur, chevrette, … Ne les traite pas comme des fautes."
 3. **Correction kinds:**
-   - `mistake`: an error in *both* Standard and Louisiana French. Needs a `category` from the enum and `rule_if_dialect`, the sentence that would describe the form if the learner says it's Louisiana.
+   - `mistake`: an error in _both_ Standard and Louisiana French. Needs a `category` from the enum and `rule_if_dialect`, the sentence that would describe the form if the learner says it's Louisiana.
    - `standard`: the learner used correct Standard French where a common Louisiana form exists. Never an error. `suggestion` is the Louisiana form, `explanation` says it's a regional preference, and `dlf_headword` is the dictionary headword you believe attests it. At most 3 per text, choosing the most useful ones.
    - `dialect_check`: you are unsure whether the form is Louisiana French. Ask, don't judge. `question` is in French, `suggestion` is what you'd propose if it's a mistake, and you give `category` and `rule_if_dialect`.
    - "Si tu hésites entre `mistake` et `dialect_check`, choisis `dialect_check`."
@@ -597,12 +640,12 @@ export const EvaluatorOutputSchema = z.object({
 **Server post-processing** (`postProcessEvaluation(raw, ctx)`): a pure function, which is the most-tested unit in this plan.
 
 1. **Span location** (`locateQuote(text, quote, occurrence, cursor)`):
-   - (a) Exact `indexOf`: take the *n*-th occurrence if it exists, otherwise the first match at or after `cursor` (the end of the previous anchored span), otherwise the first match anywhere.
+   - (a) Exact `indexOf`: take the _n_-th occurrence if it exists, otherwise the first match at or after `cursor` (the end of the previous anchored span), otherwise the first match anywhere.
    - (b) Normalized search over a character-index map: NFC, `’`→`'`, NBSP and narrow NBSP → space, collapsed whitespace, case-folded.
    - (c) Retry with leading and trailing punctuation stripped from the quote.
    - (d) Still not found: `span = null`, `anchor = "none"`. The Correction is kept and listed without an in-text mark.
    - A span overlapping an earlier accepted span also gets `span = null`.
-   - Offsets are against `writing_text` exactly as stored. Normalize `\r\n` to `\n` *before* saving and before sending to the model.
+   - Offsets are against `writing_text` exactly as stored. Normalize `\r\n` to `\n` _before_ saving and before sending to the model.
 2. **Dialect Note guard**: drop any `mistake` or `dialect_check` whose normalized quote or suggestion contains an active word-scope note's `form` or `learnerForm`. This makes "the tutor does not flag that form again" a guarantee for word scope. Pattern scope relies on the prompt. Log dropped items for prompt tuning.
 3. **Kind invariants**:
    - `standard` gets `category = null` and `resource_ids = []`.
@@ -669,10 +712,11 @@ The light validation is `text` between 150 and 1500 characters. No retry on topi
    - `missing-field.json`
 
    These are hand-written now and can be refreshed later from real runs.
+
 3. **Test layers:**
    - **Pure unit tests**: `locateQuote`, `postProcessEvaluation`, `computeTrend`, `computeFocus`, `countsAsMistake`, `localDateKey`, `streak`, `parseStoredEvaluation`.
    - **Contract tests**: every fixture goes through `EvaluatorOutputSchema` and `postProcessEvaluation`, with snapshots of the resulting Corrections.
-   - **Prompt-builder tests**: assert the system prompt contains the active notes, Focus labels, catalog IDs and DLF hints, and does *not* contain deleted notes or the word "subjonctif" as a requirement.
+   - **Prompt-builder tests**: assert the system prompt contains the active notes, Focus labels, catalog IDs and DLF hints, and does _not_ contain deleted notes or the word "subjonctif" as a requirement.
    - **Client tests**: `OpenAiLlmClient` with a stubbed `fetch` or SDK covers the error mapping and the one repair retry.
    - **Route tests**: call the handlers directly with `services` overridden by the fake client and a test DB.
 4. **Dev without OpenAI.** With `LLM_FAKE=1`, `services.ts` wires a fixture-backed fake so the UI can be built and screenshotted offline.
@@ -682,22 +726,22 @@ The light validation is `text` between 150 and 1500 characters. No retry on topi
 
 ## 5. Fixes for each known defect
 
-| Defect | Fix | Where | Slice |
-|---|---|---|---|
-| D1 duplicated rules | One structured rules module and two renderers. CONTEXT.md links to the export. | `src/modules/dialect/*`; remove the constants from the generator and evaluator | S3 |
-| D2 B2 subjunctive | Dialect-aware `level-descriptions.ts`. A prompt-builder test asserts the subjunctive is never required. | `src/modules/dialect/level-descriptions.ts` | S3 |
-| D3 unvalidated JSON | `completeJSON(req, schema)` with Structured Outputs, `safeParse`, one repair retry and typed `LlmError`. Delete `chatCompletionJSON<T>`. | `src/modules/llm/*` | S2 |
-| D4 no Corrections | Evaluator v2, the post-processor and the `corrections` table | `writing-evaluator/*`, `correction-store.ts` | S7 |
-| D5 tracker / demotion / streak | Replace `CefrTracker` + `tracker-store` with a stateless `level-service` (below). Delete `initTracker` and the singleton. | `src/modules/cefr-tracker/level-service.ts` | S4 |
-| D6 placement bypass | Placement completion calls `levelService.setLevel(level, "placement")` | `placement-service.ts` | S4, S13 |
-| D7 placement in memory | `placement_runs` table plus `kind = 'placement'` sessions. The `PlacementTest` class becomes pure functions (`nextStepLevel`, `computeLevel`) driven by DB state. | `placement-test/*`, routes | S13 |
-| D8 UTC quota | `localDateKey(now, tz)` via `Intl.DateTimeFormat("en-CA", { timeZone })`, with `tz = process.env.APP_TIME_ZONE ?? Intl.DateTimeFormat().resolvedOptions().timeZone`. This is a single-user app whose server runs on the learner's machine. Quota = `count(sessions where kind='daily' and local_date=today)`, checked and inserted in one `db.transaction`. `resetsAt` = next local midnight. Drop `daily_quota`. | `quota-manager/quota-service.ts` | S5 |
-| D9 test wipes DB | See below. | `src/db/*`, `vitest.config.ts`, tests | **S0 (first)** |
-| D10 no validation | `parseBody` + `withErrors` on every route, request schemas in `src/domain`. `PUT /api/level` drops the client-supplied `source`. | `src/server/http.ts`, all routes | S2 (helpers + existing routes), then each slice |
-| D11 drafts / statuses | `status` column, autosave endpoint, `displayStatus` derivation, abandon-on-swap with confirmation | `history-store`, `/api/sessions/*`, `/api/prompt` | S6 |
-| D12 level overwrite | `prompt_level` column. `cefr_level` holds only the evaluated level. | schema + evaluate service | S6 |
-| D13 History crash | Server returns `dataIssues`. The client never `JSON.parse`s DB strings. | `/api/sessions`, `history-page.tsx` | S6 |
-| D14 zod | `npm i zod` (pin ^4) | `package.json` | S2 |
+| Defect                         | Fix                                                                                                                                                                                                                                                                                                                                                                                                               | Where                                                                          | Slice                                           |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------- |
+| D1 duplicated rules            | One structured rules module and two renderers. CONTEXT.md links to the export.                                                                                                                                                                                                                                                                                                                                    | `src/modules/dialect/*`; remove the constants from the generator and evaluator | S3                                              |
+| D2 B2 subjunctive              | Dialect-aware `level-descriptions.ts`. A prompt-builder test asserts the subjunctive is never required.                                                                                                                                                                                                                                                                                                           | `src/modules/dialect/level-descriptions.ts`                                    | S3                                              |
+| D3 unvalidated JSON            | `completeJSON(req, schema)` with Structured Outputs, `safeParse`, one repair retry and typed `LlmError`. Delete `chatCompletionJSON<T>`.                                                                                                                                                                                                                                                                          | `src/modules/llm/*`                                                            | S2                                              |
+| D4 no Corrections              | Evaluator v2, the post-processor and the `corrections` table                                                                                                                                                                                                                                                                                                                                                      | `writing-evaluator/*`, `correction-store.ts`                                   | S7                                              |
+| D5 tracker / demotion / streak | Replace `CefrTracker` + `tracker-store` with a stateless `level-service` (below). Delete `initTracker` and the singleton.                                                                                                                                                                                                                                                                                         | `src/modules/cefr-tracker/level-service.ts`                                    | S4                                              |
+| D6 placement bypass            | Placement completion calls `levelService.setLevel(level, "placement")`                                                                                                                                                                                                                                                                                                                                            | `placement-service.ts`                                                         | S4, S13                                         |
+| D7 placement in memory         | `placement_runs` table plus `kind = 'placement'` sessions. The `PlacementTest` class becomes pure functions (`nextStepLevel`, `computeLevel`) driven by DB state.                                                                                                                                                                                                                                                 | `placement-test/*`, routes                                                     | S13                                             |
+| D8 UTC quota                   | `localDateKey(now, tz)` via `Intl.DateTimeFormat("en-CA", { timeZone })`, with `tz = process.env.APP_TIME_ZONE ?? Intl.DateTimeFormat().resolvedOptions().timeZone`. This is a single-user app whose server runs on the learner's machine. Quota = `count(sessions where kind='daily' and local_date=today)`, checked and inserted in one `db.transaction`. `resetsAt` = next local midnight. Drop `daily_quota`. | `quota-manager/quota-service.ts`                                               | S5                                              |
+| D9 test wipes DB               | See below.                                                                                                                                                                                                                                                                                                                                                                                                        | `src/db/*`, `vitest.config.ts`, tests                                          | **S0 (first)**                                  |
+| D10 no validation              | `parseBody` + `withErrors` on every route, request schemas in `src/domain`. `PUT /api/level` drops the client-supplied `source`.                                                                                                                                                                                                                                                                                  | `src/server/http.ts`, all routes                                               | S2 (helpers + existing routes), then each slice |
+| D11 drafts / statuses          | `status` column, autosave endpoint, `displayStatus` derivation, abandon-on-swap with confirmation                                                                                                                                                                                                                                                                                                                 | `history-store`, `/api/sessions/*`, `/api/prompt`                              | S6                                              |
+| D12 level overwrite            | `prompt_level` column. `cefr_level` holds only the evaluated level.                                                                                                                                                                                                                                                                                                                                               | schema + evaluate service                                                      | S6                                              |
+| D13 History crash              | Server returns `dataIssues`. The client never `JSON.parse`s DB strings.                                                                                                                                                                                                                                                                                                                                           | `/api/sessions`, `history-page.tsx`                                            | S6                                              |
+| D14 zod                        | `npm i zod` (pin ^4)                                                                                                                                                                                                                                                                                                                                                                                              | `package.json`                                                                 | S2                                              |
 
 **D5: the level service.** `getLevelState()` takes the current level from the latest `level_changes` row. The streak is computed from the DB: count the trailing evaluated `daily` sessions with `evaluated_at` after `since.createdAt` whose `cefr_level` is above the current level, stopping at the first one that isn't. `recordEvaluation()` promotes one level when the streak reaches 3. With no level set it does nothing; the prompt route already refuses to run without a level, so the evaluate route's A2 seed is deleted. Undo and manual changes create a new `level_changes` row, which resets the streak implicitly. Nothing is held in memory, so nothing is lost on restart and a promotion can never move the level down.
 
@@ -744,33 +788,32 @@ If the owner later wants hand-edits in markdown to flow back, add an explicit `d
 
 > **Update (Q6, 2026-11-15):** Consigne does **not** stop at a spellings index. DLF-extract publishes a trimmed **lexicon artifact** (headword, forms, glosses, Louisiana examples + translations). Consigne pins a version and, at Evaluation time, looks up words from the Student Writing / Corrections and injects short definition+example cards into the evaluator prompt. Spelling/`DLF` badges remain positive evidence only. Prefer this over a git submodule (`out/` is gitignored in DLF-extract anyway).
 
-
 Source: `~/Personal-Projects/DLF-extract/out/canonical.jsonl`, 20.6 MB. Numbers come from one-off node scripts run outside the repo.
 
-| Measure | Value |
-|---|---|
-| Entries / JSON parse failures | 16,646 / 0 |
-| `parse_status` | 16,630 `needs_review`, 16 `ok`, so the status is useless as a filter |
-| Unique headwords | 15,224 |
-| Unique normalized spellings (headword + `forms[].spelling`, lowercased, `’`→`'`) | 17,310 |
-| Accent-fold collisions | 287 |
-| Noisy forms (digits, punctuation, >30 chars, e.g. `Ph36`, `2`, `chomandeur,`) | 7 |
-| Capitalized headwords (likely proper nouns or contamination) | 139 |
-| Senses / examples / LF example text | 22,051 / 10,274 / 566 KB |
-| **Index sizes** | |
-| sorted spelling list | 150 KB raw / 52 KB gz |
-| spelling → entry ids | 657 KB / 240 KB gz |
-| spelling → `[entryId, headword, pos]` | 1,017 KB / 303 KB gz; `JSON.parse` + `Map` in about 9 ms |
-| spelling → `[headword, pos, gloss≤40]` | 1,051 KB / 299 KB gz |
-| **Coverage** (tokens of DLF's own LF examples found in the index) | |
-| all 108,362 tokens | 47.7 % |
-| tokens of 6+ letters (27,815) | 54.3 % exact, **67.4 % with naive plural stripping** (`-s`/`-x`, `-aux`→`-al`) |
+| Measure                                                                          | Value                                                                          |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| Entries / JSON parse failures                                                    | 16,646 / 0                                                                     |
+| `parse_status`                                                                   | 16,630 `needs_review`, 16 `ok`, so the status is useless as a filter           |
+| Unique headwords                                                                 | 15,224                                                                         |
+| Unique normalized spellings (headword + `forms[].spelling`, lowercased, `’`→`'`) | 17,310                                                                         |
+| Accent-fold collisions                                                           | 287                                                                            |
+| Noisy forms (digits, punctuation, >30 chars, e.g. `Ph36`, `2`, `chomandeur,`)    | 7                                                                              |
+| Capitalized headwords (likely proper nouns or contamination)                     | 139                                                                            |
+| Senses / examples / LF example text                                              | 22,051 / 10,274 / 566 KB                                                       |
+| **Index sizes**                                                                  |                                                                                |
+| sorted spelling list                                                             | 150 KB raw / 52 KB gz                                                          |
+| spelling → entry ids                                                             | 657 KB / 240 KB gz                                                             |
+| spelling → `[entryId, headword, pos]`                                            | 1,017 KB / 303 KB gz; `JSON.parse` + `Map` in about 9 ms                       |
+| spelling → `[headword, pos, gloss≤40]`                                           | 1,051 KB / 299 KB gz                                                           |
+| **Coverage** (tokens of DLF's own LF examples found in the index)                |                                                                                |
+| all 108,362 tokens                                                               | 47.7 %                                                                         |
+| tokens of 6+ letters (27,815)                                                    | 54.3 % exact, **67.4 % with naive plural stripping** (`-s`/`-x`, `-aux`→`-al`) |
 
 **What it means:**
 
 - The index holds lemmas only. Closed-class words (`il`, `de`, `le`, `ça`, `je`) and inflections (`était`, `avait`, `enfants`) are missing.
 - Some entries were lost to article-boundary parse errors:
-  - `maringouin` only appears *inside* the `attaquer` article.
+  - `maringouin` only appears _inside_ the `attaquer` article.
   - `aller`, `char`, `eusse`, `eux-autres`, `nous-autres`, `vous-autres` and `ouaouaron` are not headwords.
 - Hits include: `asteur`, `icitte`→`ici`, `boucoup`→`beaucoup`, `chaoui`, `cocodrie`, `chevrette`, `lagniappe`, `fais-dodo`, `catin`.
 - The mockup's own example, `ma voiture → mon char`, would get **no** DLF badge from today's extract.
@@ -800,23 +843,23 @@ Source: `~/Personal-Projects/DLF-extract/out/canonical.jsonl`, 20.6 MB. Numbers 
 
 Each slice is thin and end-to-end (DB, service, API, and minimal UI where relevant), with an estimate of under 500 lines of production code, excluding tests and fixtures. **HITL** marks slices that need an owner decision before or during the work.
 
-| Slice | Scope | Est. prod lines | Depends on | HITL? |
-|---|---|---|---|---|
-| **S0** Test DB isolation | vitest env + migrate-in-setup + guard in `db/index.ts`; rewrite history-store test | ~60 | — | no |
-| **S1** Generated migrations | `drizzle/0000_baseline.sql` (IF NOT EXISTS), `scripts/migrate.ts` with backup, npm scripts, ADR | ~120 | S0 | no |
-| **S2** LLM + HTTP boundary | `llm/*` (zod `completeJSON`, Structured Outputs, retry, `LlmError`), `FakeLlmClient`, `parseBody`/`withErrors`, applied to existing routes; add zod dep; delete the A2 seed | ~350 | S0 | no |
-| **S3** Single dialect module | `dialect/louisiana-rules.ts`, renderers, dialect-aware level descriptions; generator/evaluator use it; CONTEXT.md link | ~250 | S2 | **yes**: owner reviews rule wording and level descriptions |
-| **S4** Level service + undo banner | stateless streak, `source` enum + `reverts_change_id` migration, `POST /api/level/undo`, Home banner with "Rester en B1"; placement completion routed through service | ~300 | S1, S2 | no |
-| **S5** Local-midnight quota | `local_date` column + backfill, `quota-service`, `resetsAt`, drop `daily_quota`, quota copy in header | ~200 | S1 | no |
-| **S6** Session lifecycle + History v2 | `status`/`prompt_level`/`writing_saved_at`/`abandoned_at` columns, draft autosave endpoint (+ local copy), swap confirm (409 flow), `GET /api/sessions` with `displayStatus` and `dataIssues`, History rows (three statuses + inline notice) | ~480 | S1, S2, S5 | no |
-| **S7** Evaluator v2 + Corrections (review screen) | output schema, prompt `evaluator@2`, `locateQuote`, post-processor, `corrections` table, `POST /api/sessions/:id/evaluate`, review UI: marked text + Corrections list + collapsed Scores, `Compris` | ~500 (split S7a server / S7b UI if over) | S2, S3, S6 | **yes**: approve the Mistake taxonomy (§1.1) |
-| **S8** Dialect checks, pushback and Dialect Notes | `dialect_notes` table, `PATCH /api/corrections/:id`, `POST/PATCH/DELETE /api/dialect-notes`, Add Dialect Note sheet, Carnet "Mon français louisianais" list, note injection + word-scope guard in evaluator | ~450 | S7 | no |
-| **S9** Weakness memory + Focus | `computeTrend`, `computeFocus`, `GET /api/weaknesses`, Carnet "À travailler", Focus line on Home, `focus_json` snapshot, History titles by Focus, `focus du jour` tag | ~400 | S7 | no |
-| **S10** Resource catalog | `catalog.data.ts` + schema validation test, evaluator injection + ID validation, Resource links on Corrections and Weaknesses | ~200 (excl. data) | S7, S9 | **yes**: owner curates entries and URLs |
-| **S11** Generator v2 | JSON output + `prompt_meta_json`, meta line, Focus + recent topics + "Pratiquer ça" pin (`practice_requests`), 250–300 target | ~300 | S3, S9 | no |
-| **S12** DLF index + attribution | build script, generated index, `dlf/` lookup, pre-call hints, post-call `DLF` badge on `standard` | ~250 | S7 | **yes**: licensing / commit decision (§8 Q1) |
-| **S13** Persistent Placement Test | `placement_runs`, placement sessions, new routes, resume on reload, results screen data | ~400 | S4, S6, S7 | no |
-| **S14** Dialect markdown export | `export-markdown.ts`, `npm run dialect:export`, `GET /api/dialect-notes/export`, first committed `docs/dialect/louisiana-french.md` | ~120 | S3, S8 | no |
+| Slice                                             | Scope                                                                                                                                                                                                                                        | Est. prod lines                          | Depends on | HITL?                                                      |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ---------- | ---------------------------------------------------------- |
+| **S0** Test DB isolation                          | vitest env + migrate-in-setup + guard in `db/index.ts`; rewrite history-store test                                                                                                                                                           | ~60                                      | —          | no                                                         |
+| **S1** Generated migrations                       | `drizzle/0000_baseline.sql` (IF NOT EXISTS), `scripts/migrate.ts` with backup, npm scripts, ADR                                                                                                                                              | ~120                                     | S0         | no                                                         |
+| **S2** LLM + HTTP boundary                        | `llm/*` (zod `completeJSON`, Structured Outputs, retry, `LlmError`), `FakeLlmClient`, `parseBody`/`withErrors`, applied to existing routes; add zod dep; delete the A2 seed                                                                  | ~350                                     | S0         | no                                                         |
+| **S3** Single dialect module                      | `dialect/louisiana-rules.ts`, renderers, dialect-aware level descriptions; generator/evaluator use it; CONTEXT.md link                                                                                                                       | ~250                                     | S2         | **yes**: owner reviews rule wording and level descriptions |
+| **S4** Level service + undo banner                | stateless streak, `source` enum + `reverts_change_id` migration, `POST /api/level/undo`, Home banner with "Rester en B1"; placement completion routed through service                                                                        | ~300                                     | S1, S2     | no                                                         |
+| **S5** Local-midnight quota                       | `local_date` column + backfill, `quota-service`, `resetsAt`, drop `daily_quota`, quota copy in header                                                                                                                                        | ~200                                     | S1         | no                                                         |
+| **S6** Session lifecycle + History v2             | `status`/`prompt_level`/`writing_saved_at`/`abandoned_at` columns, draft autosave endpoint (+ local copy), swap confirm (409 flow), `GET /api/sessions` with `displayStatus` and `dataIssues`, History rows (three statuses + inline notice) | ~480                                     | S1, S2, S5 | no                                                         |
+| **S7** Evaluator v2 + Corrections (review screen) | output schema, prompt `evaluator@2`, `locateQuote`, post-processor, `corrections` table, `POST /api/sessions/:id/evaluate`, review UI: marked text + Corrections list + collapsed Scores, `Compris`                                          | ~500 (split S7a server / S7b UI if over) | S2, S3, S6 | **yes**: approve the Mistake taxonomy (§1.1)               |
+| **S8** Dialect checks, pushback and Dialect Notes | `dialect_notes` table, `PATCH /api/corrections/:id`, `POST/PATCH/DELETE /api/dialect-notes`, Add Dialect Note sheet, Carnet "Mon français louisianais" list, note injection + word-scope guard in evaluator                                  | ~450                                     | S7         | no                                                         |
+| **S9** Weakness memory + Focus                    | `computeTrend`, `computeFocus`, `GET /api/weaknesses`, Carnet "À travailler", Focus line on Home, `focus_json` snapshot, History titles by Focus, `focus du jour` tag                                                                        | ~400                                     | S7         | no                                                         |
+| **S10** Resource catalog                          | `catalog.data.ts` + schema validation test, evaluator injection + ID validation, Resource links on Corrections and Weaknesses                                                                                                                | ~200 (excl. data)                        | S7, S9     | **yes**: owner curates entries and URLs                    |
+| **S11** Generator v2                              | JSON output + `prompt_meta_json`, meta line, Focus + recent topics + "Pratiquer ça" pin (`practice_requests`), 250–300 target                                                                                                                | ~300                                     | S3, S9     | no                                                         |
+| **S12** DLF index + attribution                   | build script, generated index, `dlf/` lookup, pre-call hints, post-call `DLF` badge on `standard`                                                                                                                                            | ~250                                     | S7         | **yes**: licensing / commit decision (§8 Q1)               |
+| **S13** Persistent Placement Test                 | `placement_runs`, placement sessions, new routes, resume on reload, results screen data                                                                                                                                                      | ~400                                     | S4, S6, S7 | no                                                         |
+| **S14** Dialect markdown export                   | `export-markdown.ts`, `npm run dialect:export`, `GET /api/dialect-notes/export`, first committed `docs/dialect/louisiana-french.md`                                                                                                          | ~120                                     | S3, S8     | no                                                         |
 
 Suggested order: S0 → S1 → S2 → (S3, S4, S5 in parallel) → S6 → S7 → (S8, S9, S12 in parallel) → (S10, S11, S13, S14).
 

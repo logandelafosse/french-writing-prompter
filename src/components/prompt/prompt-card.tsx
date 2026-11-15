@@ -101,9 +101,9 @@ export function PromptCard() {
   const canGenerate = quota ? quota.remaining > 0 : true;
 
   return (
-    <div className="rounded-xl border bg-white p-6 space-y-4">
+    <div className="space-y-4 rounded-xl border bg-white p-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-wide">
+        <h2 className="text-sm font-medium tracking-wide text-zinc-500 uppercase">
           Writing Prompt
         </h2>
         {quota && (
@@ -117,12 +117,12 @@ export function PromptCard() {
         <button
           onClick={handleGenerate}
           disabled={loading || !canGenerate}
-          className="w-full py-3 px-4 rounded-lg bg-zinc-900 text-white text-sm font-medium hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full rounded-lg bg-zinc-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
               <svg
-                className="animate-spin h-4 w-4"
+                className="h-4 w-4 animate-spin"
                 fill="none"
                 viewBox="0 0 24 24"
               >
@@ -151,13 +151,13 @@ export function PromptCard() {
       )}
 
       {!canGenerate && !prompt && (
-        <p className="text-sm text-amber-600 bg-amber-50 rounded-lg p-3">
+        <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-600">
           You've used your 3 prompts for today. Come back tomorrow!
         </p>
       )}
 
       {error && (
-        <div className="text-sm text-red-600 bg-red-50 rounded-lg p-3 space-y-2">
+        <div className="space-y-2 rounded-lg bg-red-50 p-3 text-sm text-red-600">
           <p>{error}</p>
           <div className="flex gap-2">
             <button
@@ -180,14 +180,12 @@ export function PromptCard() {
 
       {prompt && !evaluation && (
         <>
-          <div className="border border-zinc-200 rounded-lg p-4 space-y-3 bg-zinc-50">
+          <div className="space-y-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
             <div className="flex items-center gap-2">
-              <LevelBadge
-                level={prompt.constraints.cefrLevel as CefrLevel}
-              />
+              <LevelBadge level={prompt.constraints.cefrLevel as CefrLevel} />
               <span className="text-xs text-zinc-400">Louisiana French</span>
             </div>
-            <p className="text-zinc-800 leading-relaxed whitespace-pre-wrap">
+            <p className="leading-relaxed whitespace-pre-wrap text-zinc-800">
               {prompt.text}
             </p>
           </div>
@@ -201,17 +199,17 @@ export function PromptCard() {
               onChange={(e) => setWriting(e.target.value)}
               placeholder="Write your response here in French..."
               rows={8}
-              className="w-full rounded-lg border border-zinc-300 p-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent resize-y"
+              className="w-full resize-y rounded-lg border border-zinc-300 p-3 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-transparent focus:ring-2 focus:ring-zinc-900 focus:outline-none"
             />
             <button
               onClick={handleSubmit}
               disabled={loading || !writing.trim()}
-              className="w-full py-3 px-4 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full rounded-lg bg-emerald-600 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg
-                    className="animate-spin h-4 w-4"
+                    className="h-4 w-4 animate-spin"
                     fill="none"
                     viewBox="0 0 24 24"
                   >
@@ -240,22 +238,20 @@ export function PromptCard() {
       )}
 
       {advancement && (
-        <div className="bg-emerald-50 border border-emerald-300 rounded-lg p-4 text-center">
-          <p className="text-emerald-800 font-semibold">
+        <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-4 text-center">
+          <p className="font-semibold text-emerald-800">
             You've advanced to level {advancement.toLevel}!
           </p>
         </div>
       )}
 
-      {evaluation && (
-        <EvaluationCard evaluation={evaluation} />
-      )}
+      {evaluation && <EvaluationCard evaluation={evaluation} />}
 
       {evaluation && (
         <button
           onClick={handleGenerate}
           disabled={loading || !canGenerate}
-          className="w-full py-3 px-4 rounded-lg border border-zinc-300 text-zinc-700 text-sm font-medium hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Generate a new prompt
         </button>

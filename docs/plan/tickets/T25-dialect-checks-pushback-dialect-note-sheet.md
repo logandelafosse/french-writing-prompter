@@ -1,8 +1,8 @@
 # T25 — Dialect checks, pushback, Add Dialect Note sheet
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 2 | AFK | T22 | ~480 (close to the 500 limit) |
+| Phase | Type | Blocked by | Production lines (est.)       |
+| ----- | ---- | ---------- | ----------------------------- |
+| 2     | AFK  | T22        | ~480 (close to the 500 limit) |
 
 ## User stories
 

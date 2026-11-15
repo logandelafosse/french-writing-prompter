@@ -1,8 +1,8 @@
 # T33 — Persistent Placement Test (server)
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 4 | AFK | T20, T21 | ~380 |
+| ----- | ---- | ---------- | ----------------------- |
+| 4     | AFK  | T20, T21   | ~380                    |
 
 ## User stories
 

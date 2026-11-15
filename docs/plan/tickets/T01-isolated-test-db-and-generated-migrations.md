@@ -1,8 +1,8 @@
 # T01 — Isolated test DB and generated migrations
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T00 | ~150 |
+| ----- | ---- | ---------- | ----------------------- |
+| 0     | AFK  | T00        | ~150                    |
 
 ## User stories
 
@@ -19,7 +19,7 @@ Today `history-store.test.ts` calls `db.delete(sessions)` against the real `data
 **Generated migrations.** The app moves from `drizzle-kit push` to versioned migrations in `drizzle/`, which are committed:
 
 - `0000_baseline.sql` is generated from the current `schema.ts`, then hand-edited to `CREATE TABLE IF NOT EXISTS` / `CREATE INDEX IF NOT EXISTS`, so the existing push-created `data.db` accepts it without losing rows.
-- `scripts/migrate.ts` copies `data.db` to `data.db.bak-<timestamp>` only when the file exists *and* migrations are pending, then runs the libsql migrator. It runs as `predev` and `prestart`. Tests call the same migrate function.
+- `scripts/migrate.ts` copies `data.db` to `data.db.bak-<timestamp>` only when the file exists _and_ migrations are pending, then runs the libsql migrator. It runs as `predev` and `prestart`. Tests call the same migrate function.
 - Scripts: `db:generate`, `db:migrate`, `db:studio`. `db:push` is removed.
 - `docs/adr/0001-generated-migrations.md` records the decision.
 

@@ -16,7 +16,7 @@ export async function POST() {
   if (!level) {
     return NextResponse.json(
       { error: "No CEFR level set. Please set your level first." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -24,7 +24,7 @@ export async function POST() {
   if (used >= 3) {
     return NextResponse.json(
       { error: "Daily quota exhausted. Try again tomorrow." },
-      { status: 429 }
+      { status: 429 },
     );
   }
 

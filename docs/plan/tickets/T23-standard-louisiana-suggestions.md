@@ -1,8 +1,8 @@
 # T23 — Standard→Louisiana suggestions
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 2 | AFK | T22 | ~150 |
+| ----- | ---- | ---------- | ----------------------- |
+| 2     | AFK  | T22        | ~150                    |
 
 ## User stories
 

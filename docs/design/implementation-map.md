@@ -30,14 +30,14 @@ import { Bricolage_Grotesque, Newsreader } from "next/font/google";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin", "latin-ext"],
-  axes: ["opsz"],          // handoff loads opsz 12..96; weight omitted → variable 200–800
+  axes: ["opsz"], // handoff loads opsz 12..96; weight omitted → variable 200–800
   variable: "--font-bricolage",
   display: "swap",
 });
 
 const newsreader = Newsreader({
   subsets: ["latin", "latin-ext"],
-  axes: ["opsz"],          // handoff loads opsz 6..72, wght 400/500, italic 400
+  axes: ["opsz"], // handoff loads opsz 6..72, wght 400/500, italic 400
   style: ["normal", "italic"],
   variable: "--font-newsreader",
   display: "swap",
@@ -59,7 +59,7 @@ Today:
   --font-heading: var(--font-sans);
 ```
 
-`--font-sans: var(--font-sans)` is a cycle. CSS treats cyclic custom properties as *invalid at computed-value time*, so `font-sans` resolves to the browser default font, not Geist. (Geist was registered as `--font-geist-sans` and never wired up.) The fix is to point the theme font tokens at the `next/font` variables, which have different names:
+`--font-sans: var(--font-sans)` is a cycle. CSS treats cyclic custom properties as _invalid at computed-value time_, so `font-sans` resolves to the browser default font, not Geist. (Geist was registered as `--font-geist-sans` and never wired up.) The fix is to point the theme font tokens at the `next/font` variables, which have different names:
 
 ```css
 @theme inline {
@@ -88,91 +88,125 @@ Consequence: `src/components/ui/button.tsx` uses `bg-primary text-primary-foregr
 @theme {
   /* Reset Tailwind's palette so only design colors exist (white/transparent/current kept) */
   --color-*: initial;
-  --color-white: #FFFFFF;
+  --color-white: #ffffff;
   --color-transparent: transparent;
   --color-current: currentColor;
 
   /* Surfaces */
-  --color-desk: #E6EBE6;            /* page background */
-  --color-desk-highlight: #F3F6F1;  /* soft top-left glow */
-  --color-sheet: #FCFDFA;           /* writing sheet, cards, side panel */
-  --color-notice: #EEF2ED;          /* calm banners: quota, offline, incomplete data */
+  --color-desk: #e6ebe6; /* page background */
+  --color-desk-highlight: #f3f6f1; /* soft top-left glow */
+  --color-sheet: #fcfdfa; /* writing sheet, cards, side panel */
+  --color-notice: #eef2ed; /* calm banners: quota, offline, incomplete data */
 
   /* Text */
-  --color-ink: #17211D;             /* primary text */
-  --color-ink-2: #3A4640;           /* secondary text on sheet; demoted prompt in review */
-  --color-muted: #55625C;           /* labels, meta, captions */
-  --color-disabled-text: #6B7770;   /* disabled controls; "unused prompt" dash glyph */
+  --color-ink: #17211d; /* primary text */
+  --color-ink-2: #3a4640; /* secondary text on sheet; demoted prompt in review */
+  --color-muted: #55625c; /* labels, meta, captions */
+  --color-disabled-text: #6b7770; /* disabled controls; "unused prompt" dash glyph */
 
   /* Lines */
-  --color-line: #D0D8D1;            /* sheet borders, dividers */
-  --color-line-strong: #B9C4BC;     /* control borders, chip, notice border, inactive progress */
-  --color-input-border: #8D9A92;    /* text inputs, secondary buttons in banners */
-  --color-rule: #DCE3DD;            /* textarea ruled lines, meter track */
+  --color-line: #d0d8d1; /* sheet borders, dividers */
+  --color-line-strong: #b9c4bc; /* control borders, chip, notice border, inactive progress */
+  --color-input-border: #8d9a92; /* text inputs, secondary buttons in banners */
+  --color-rule: #dce3dd; /* textarea ruled lines, meter track */
 
   /* Brand / actions */
-  --color-primary: #1F5A4A;         /* primary buttons, links, Focus label, evaluated dot */
-  --color-primary-hover: #123C31;
-  --color-primary-tint: #E3EEE8;    /* selected level, advancement banner */
-  --color-meter-target: #BCD3C8;    /* 250–300 zone on the meter */
-  --color-busy: #2F4A40;            /* loading-state buttons; selected level caption */
+  --color-primary: #1f5a4a; /* primary buttons, links, Focus label, evaluated dot */
+  --color-primary-hover: #123c31;
+  --color-primary-tint: #e3eee8; /* selected level, advancement banner */
+  --color-meter-target: #bcd3c8; /* 250–300 zone on the meter */
+  --color-busy: #2f4a40; /* loading-state buttons; selected level caption */
 
   /* Correction kinds */
-  --color-mistake: #A8321A;         /* also the wordmark full stop */
-  --color-mistake-tint: #F7E1DA;
-  --color-standard: #1F4E8C;        /* never a fill */
-  --color-dialect: #7A5A00;
-  --color-dialect-tint: #F6ECC8;
+  --color-mistake: #a8321a; /* also the wordmark full stop */
+  --color-mistake-tint: #f7e1da;
+  --color-standard: #1f4e8c; /* never a fill */
+  --color-dialect: #7a5a00;
+  --color-dialect-tint: #f6ecc8;
 
   /* Overlays */
   --color-scrim: rgb(23 33 29 / 0.42);
 
   /* Radii */
-  --radius-base: 6px;               /* "6 px everywhere": use `rounded-base` */
-  --radius-chip: 22px;              /* level chip pill, close button */
-  --radius-marker: 9px;             /* in-text <sup> marker pills */
-  --radius-marker-card: 10px;       /* marker pill in card header */
-  --radius-marker-dialect: 3px;     /* squared dialect marker */
-  --radius-meter: 3px;              /* meter track/fill */
-  --radius-progress: 2px;           /* placement progress segments */
+  --radius-base: 6px; /* "6 px everywhere": use `rounded-base` */
+  --radius-chip: 22px; /* level chip pill, close button */
+  --radius-marker: 9px; /* in-text <sup> marker pills */
+  --radius-marker-card: 10px; /* marker pill in card header */
+  --radius-marker-dialect: 3px; /* squared dialect marker */
+  --radius-meter: 3px; /* meter track/fill */
+  --radius-progress: 2px; /* placement progress segments */
 
   /* Shadows */
   --shadow-sheet: 0 18px 40px -28px rgb(23 33 29 / 0.45);
-  --shadow-panel: -24px 0 60px -30px rgb(23 33 29 / 0.6);   /* Dialect Note side panel */
-  --shadow-pop: 0 14px 30px -22px rgb(23 33 29 / 0.5);      /* swap-prompt confirm */
+  --shadow-panel: -24px 0 60px -30px rgb(23 33 29 / 0.6); /* Dialect Note side panel */
+  --shadow-pop: 0 14px 30px -22px rgb(23 33 29 / 0.5); /* swap-prompt confirm */
 
   /* Max widths (use as max-w-prose-col etc.) */
-  --container-home: 760px;          /* Home phases A/B, Placement */
-  --container-list: 860px;          /* Carnet, History */
-  --container-review: 1200px;       /* Home phase C split */
-  --container-panel: 560px;         /* Dialect Note side panel width */
+  --container-home: 760px; /* Home phases A/B, Placement */
+  --container-list: 860px; /* Carnet, History */
+  --container-review: 1200px; /* Home phase C split */
+  --container-panel: 560px; /* Dialect Note side panel width */
 
   /* Spacing: keep Tailwind's 4px base; every design value is a multiple of 2px → use .5 steps (p-5.5 = 22px) */
   --spacing: 0.25rem;
-  --spacing-touch: 44px;            /* min touch target: min-h-touch */
-  --spacing-btn: 48px;              /* primary button height */
-  --spacing-btn-mobile: 54px;       /* full-width primary on mobile */
-  --spacing-row: 68px;              /* History row min height */
+  --spacing-touch: 44px; /* min touch target: min-h-touch */
+  --spacing-btn: 48px; /* primary button height */
+  --spacing-btn-mobile: 54px; /* full-width primary on mobile */
+  --spacing-row: 68px; /* History row min height */
 
   /* Type scale (size / line-height / tracking / weight) */
-  --text-page-title: 46px;  --text-page-title--line-height: 1.05; --text-page-title--letter-spacing: -0.03em; --text-page-title--font-weight: 600;
-  --text-page-title-sm: 38px; --text-page-title-sm--line-height: 1.05; --text-page-title-sm--letter-spacing: -0.03em; --text-page-title-sm--font-weight: 600; /* mobile Home date */
-  --text-step-title: 34px;  --text-step-title--line-height: 1.1;  --text-step-title--letter-spacing: -0.03em; --text-step-title--font-weight: 600;   /* Placement step/done */
-  --text-panel-title: 28px; --text-panel-title--letter-spacing: -0.02em; --text-panel-title--font-weight: 600;   /* Dialect Note sheet */
-  --text-section-title: 24px; --text-section-title--letter-spacing: -0.02em; --text-section-title--font-weight: 600;
-  --text-wordmark: 32px;    --text-wordmark--letter-spacing: -0.03em; --text-wordmark--font-weight: 700;
-  --text-wordmark-sm: 26px; --text-wordmark-sm--letter-spacing: -0.03em; --text-wordmark-sm--font-weight: 700;
-  --text-label: 12px;       --text-label--letter-spacing: 0.12em; --text-label--font-weight: 700;  /* + uppercase */
-  --text-kind: 12px;        --text-kind--letter-spacing: 0.1em;   --text-kind--font-weight: 700;   /* card kind label */
-  --text-marker: 11px;      --text-marker--line-height: 1;        --text-marker--font-weight: 700;
-  --text-dlf: 11px;         --text-dlf--letter-spacing: 0.08em;   --text-dlf--font-weight: 600;
-  --text-prompt: 22px;      --text-prompt--line-height: 1.45;
-  --text-prompt-sm: 19px;   --text-prompt-sm--line-height: 1.45;
-  --text-prompt-review: 17px; --text-prompt-review--line-height: 1.45;  /* 16px on mobile review */
-  --text-writing: 18px;     --text-writing--line-height: 32px;   /* 17px/30px mobile */
-  --text-writing-marked: 18px; --text-writing-marked--line-height: 34px; /* 17px/32px mobile */
-  --text-quote: 19px;       --text-quote--line-height: 1.35;     /* correction card quote */
-  --text-result-level: 96px; --text-result-level--line-height: 0.9; --text-result-level--letter-spacing: -0.04em; --text-result-level--font-weight: 700;
+  --text-page-title: 46px;
+  --text-page-title--line-height: 1.05;
+  --text-page-title--letter-spacing: -0.03em;
+  --text-page-title--font-weight: 600;
+  --text-page-title-sm: 38px;
+  --text-page-title-sm--line-height: 1.05;
+  --text-page-title-sm--letter-spacing: -0.03em;
+  --text-page-title-sm--font-weight: 600; /* mobile Home date */
+  --text-step-title: 34px;
+  --text-step-title--line-height: 1.1;
+  --text-step-title--letter-spacing: -0.03em;
+  --text-step-title--font-weight: 600; /* Placement step/done */
+  --text-panel-title: 28px;
+  --text-panel-title--letter-spacing: -0.02em;
+  --text-panel-title--font-weight: 600; /* Dialect Note sheet */
+  --text-section-title: 24px;
+  --text-section-title--letter-spacing: -0.02em;
+  --text-section-title--font-weight: 600;
+  --text-wordmark: 32px;
+  --text-wordmark--letter-spacing: -0.03em;
+  --text-wordmark--font-weight: 700;
+  --text-wordmark-sm: 26px;
+  --text-wordmark-sm--letter-spacing: -0.03em;
+  --text-wordmark-sm--font-weight: 700;
+  --text-label: 12px;
+  --text-label--letter-spacing: 0.12em;
+  --text-label--font-weight: 700; /* + uppercase */
+  --text-kind: 12px;
+  --text-kind--letter-spacing: 0.1em;
+  --text-kind--font-weight: 700; /* card kind label */
+  --text-marker: 11px;
+  --text-marker--line-height: 1;
+  --text-marker--font-weight: 700;
+  --text-dlf: 11px;
+  --text-dlf--letter-spacing: 0.08em;
+  --text-dlf--font-weight: 600;
+  --text-prompt: 22px;
+  --text-prompt--line-height: 1.45;
+  --text-prompt-sm: 19px;
+  --text-prompt-sm--line-height: 1.45;
+  --text-prompt-review: 17px;
+  --text-prompt-review--line-height: 1.45; /* 16px on mobile review */
+  --text-writing: 18px;
+  --text-writing--line-height: 32px; /* 17px/30px mobile */
+  --text-writing-marked: 18px;
+  --text-writing-marked--line-height: 34px; /* 17px/32px mobile */
+  --text-quote: 19px;
+  --text-quote--line-height: 1.35; /* correction card quote */
+  --text-result-level: 96px;
+  --text-result-level--line-height: 0.9;
+  --text-result-level--letter-spacing: -0.04em;
+  --text-result-level--font-weight: 700;
 }
 ```
 
@@ -186,24 +220,51 @@ Notes:
 
 ```css
 @layer base {
-  html { @apply font-sans text-ink; }
+  html {
+    @apply text-ink font-sans;
+  }
   body {
     background-color: var(--color-desk);
     background-image:
       radial-gradient(rgb(23 33 29 / 0.05) 1px, transparent 1px),
-      radial-gradient(900px 500px at 15% 0%, var(--color-desk-highlight), rgb(243 246 241 / 0));
-    background-size: 5px 5px, auto;
+      radial-gradient(
+        900px 500px at 15% 0%,
+        var(--color-desk-highlight),
+        rgb(243 246 241 / 0)
+      );
+    background-size:
+      5px 5px,
+      auto;
   }
-  @media (max-width: 639px) {   /* mobile frames use a smaller glow */
-    body { background-image:
-      radial-gradient(rgb(23 33 29 / 0.05) 1px, transparent 1px),
-      radial-gradient(500px 300px at 15% 0%, var(--color-desk-highlight), rgb(243 246 241 / 0)); }
+  @media (max-width: 639px) {
+    /* mobile frames use a smaller glow */
+    body {
+      background-image:
+        radial-gradient(rgb(23 33 29 / 0.05) 1px, transparent 1px),
+        radial-gradient(
+          500px 300px at 15% 0%,
+          var(--color-desk-highlight),
+          rgb(243 246 241 / 0)
+        );
+    }
   }
-  a { color: var(--color-primary); }
-  a:hover { color: var(--color-primary-hover); }
-  :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; } /* not drawn; see §6 */
+  a {
+    color: var(--color-primary);
+  }
+  a:hover {
+    color: var(--color-primary-hover);
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  } /* not drawn; see §6 */
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 ```
@@ -224,19 +285,21 @@ Abbreviations for screens: HE=HomeEmpty, M=Main, HR=HomeReview, HQ=HomeQuota, ME
 
 ```ts
 type ButtonVariant =
-  | "primary"          // bg primary, hover primary-hover, white, 17px/600, h48 px26 (CTA in review: 16px, px24)
-  | "secondary"        // bg sheet, 1px line-strong, ink, 14px/500, h44 px16  ("Compris", "Non, corrige-le")
+  | "primary" // bg primary, hover primary-hover, white, 17px/600, h48 px26 (CTA in review: 16px, px24)
+  | "secondary" // bg sheet, 1px line-strong, ink, 14px/500, h44 px16  ("Compris", "Non, corrige-le")
   | "secondary-strong" // bg sheet, 1px input-border, ink, 15px/500, h44 px16–18 ("Réessayer", "Garder celle-là")
-  | "outline-primary"  // bg sheet, 1px primary, primary text, 14px/600, h44 px16 ("Pratiquer ça")
-  | "outline-dialect"  // bg sheet, 1px dialect, dialect text, 14px/600 ("Ajouter une note")
-  | "dialect"          // bg dialect, white, 14px/600 h44 px16; 16px h48 px24 in sheet footer
-  | "text"             // no bg/border, primary text, 14px/500, h44 px4 ("↻ Une autre consigne")
-  | "quiet"            // no bg, muted text, underline, 14px/400, h44 px4 ("C'est du français louisianais", "Supprimer")
-  | "quiet-ink";       // no bg, ink/primary text, underline ("Rester en B1", "Modifier" = primary)
-type ButtonSize = "md" /*44*/ | "lg" /*48*/ | "block-mobile" /*54, full width, 18px*/;
+  | "outline-primary" // bg sheet, 1px primary, primary text, 14px/600, h44 px16 ("Pratiquer ça")
+  | "outline-dialect" // bg sheet, 1px dialect, dialect text, 14px/600 ("Ajouter une note")
+  | "dialect" // bg dialect, white, 14px/600 h44 px16; 16px h48 px24 in sheet footer
+  | "text" // no bg/border, primary text, 14px/500, h44 px4 ("↻ Une autre consigne")
+  | "quiet" // no bg, muted text, underline, 14px/400, h44 px4 ("C'est du français louisianais", "Supprimer")
+  | "quiet-ink"; // no bg, ink/primary text, underline ("Rester en B1", "Modifier" = primary)
+type ButtonSize =
+  "md" /*44*/ | "lg" /*48*/ | "block-mobile" /*54, full width, 18px*/;
 interface ButtonProps extends BaseUIButtonProps {
-  variant?: ButtonVariant; size?: ButtonSize;
-  busy?: boolean;          // → disabled + aria-busy="true" + bg busy (#2F4A40); caller swaps the label
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  busy?: boolean; // → disabled + aria-busy="true" + bg busy (#2F4A40); caller swaps the label
 }
 ```
 
@@ -249,7 +312,11 @@ States: default, hover (primary → `#123C31`), focus-visible, disabled (`color:
 **Field** (`ui/field.tsx`): label + control wiring (`htmlFor`/`id`, `aria-describedby` for hints).
 
 ```ts
-interface FieldProps { label: ReactNode; hint?: ReactNode; children: ReactElement; }
+interface FieldProps {
+  label: ReactNode;
+  hint?: ReactNode;
+  children: ReactElement;
+}
 // Input: h48, px14, 1px input-border, rounded, bg #FFFFFF, Newsreader 18px, lang="fr" when French content
 // Textarea (plain, not ruled): p 12px 14px, h92, resize vertical, Newsreader 18px/1.45
 ```
@@ -271,10 +338,13 @@ Label style in the sheet: 15px/600, with an optional 400/muted trailing clause (
 ```ts
 interface AppHeaderProps {
   variant: "full" | "placement";
-  level: CefrLevel | null;               // null → first run: no chip
+  level: CefrLevel | null; // null → first run: no chip
   quota: QuotaState | null;
-  placementLink?: { href: string; label: "Je connais mon niveau" | "Finir plus tard" } | null; // PS/PT; PD: none
-  current?: "carnet" | "historique";     // aria-current="page"
+  placementLink?: {
+    href: string;
+    label: "Je connais mon niveau" | "Finir plus tard";
+  } | null; // PS/PT; PD: none
+  current?: "carnet" | "historique"; // aria-current="page"
 }
 ```
 
@@ -287,7 +357,11 @@ interface AppHeaderProps {
 **QuotaText** (`shell/quota-text.tsx`)
 
 ```ts
-interface QuotaTextProps { quota: QuotaState; firstRun: boolean; compact?: boolean /* mobile */ }
+interface QuotaTextProps {
+  quota: QuotaState;
+  firstRun: boolean;
+  compact?: boolean; /* mobile */
+}
 ```
 
 Desktop copy: `Reste N consignes sur 3`, exhausted `3 consignes sur 3 prises`, first run `3 consignes aujourd'hui`. Compact copy: `Reste N sur 3` (exhausted compact is not drawn, see §6). Muted, plain text (not live). It updates after generate.
@@ -295,7 +369,10 @@ Desktop copy: `Reste N consignes sur 3`, exhausted `3 consignes sur 3 prises`, f
 **LevelChip** + **LevelMenu** (`shell/level-menu.tsx`): replaces `LevelSelector`/`LevelBadge` in `level/level-components.tsx` and `LevelCard`.
 
 ```ts
-interface LevelChipProps { level: CefrLevel; onChange(level: CefrLevel): Promise<void>; }
+interface LevelChipProps {
+  level: CefrLevel;
+  onChange(level: CefrLevel): Promise<void>;
+}
 ```
 
 - Chip: `<button aria-label="Niveau CECR B1, changer">B1 ▾</button>`, min-h 44, px14, 1px line-strong, radius 22px, bg sheet, 600 (15px mobile).
@@ -308,7 +385,10 @@ interface LevelChipProps { level: CefrLevel; onChange(level: CefrLevel): Promise
 **LevelPicker** (`home/level-picker.tsx`; HE). Also reusable inside LevelMenu.
 
 ```ts
-interface LevelPickerProps { value: CefrLevel | null; onChange(l: CefrLevel): void; }
+interface LevelPickerProps {
+  value: CefrLevel | null;
+  onChange(l: CefrLevel): void;
+}
 ```
 
 `<fieldset>` + `<legend>` (`TON NIVEAU CECR`, legend margin-bottom 12px). Grid `repeat(auto-fit, minmax(min(96px,100%),1fr))`, gap 8px. Each option is `<button aria-pressed>`: min-h 64px, p8, 1px line-strong, bg sheet, column centered, gap 2px; code 18px/600, name 12px muted. Pressed: 2px primary border, bg primary-tint, code 700, name color busy `#2F4A40`. Use the 2px border without shifting layout (inset box-shadow or a transparent 2px base border).
@@ -319,12 +399,12 @@ interface LevelPickerProps { value: CefrLevel | null; onChange(l: CefrLevel): vo
 
 ```ts
 interface FocusLineProps {
-  focus: FocusDuJour | null;              // null/empty → render nothing
+  focus: FocusDuJour | null; // null/empty → render nothing
   variant: "inline" | "stacked" | "hero"; // inline: desktop; stacked: MW; hero: ME (before prompt, mobile)
 }
 ```
 
-- inline: `<p>` flex wrap baseline, gap 4px 14px, 16px; label 12px/700/0.12em primary; names joined ` · `.
+- inline: `<p>` flex wrap baseline, gap 4px 14px, 16px; label 12px/700/0.12em primary; names joined `·`.
 - stacked (MW): column, gap 4px, 15px/1.4, padding 0 8px.
 - hero (ME): column, gap 10px, padding 20px 0, top+bottom 1px line-strong; each Weakness on its own serif 22px/1.35 line (capitalized name); reason 14px/1.45 muted; followed by full-width primary (54px, 18px) and centered link `Changer de focus dans le Carnet`.
 - In HR (desktop review) the FocusLine sits on the title row (flex wrap, baseline, `justify-between`, gap 8px 24px) to the right of the h1.
@@ -334,7 +414,7 @@ interface FocusLineProps {
 ```ts
 interface PromptSheetProps {
   prompt: { text: string; meta: PromptMeta | null };
-  label?: string;                         // default "Consigne d'écriture"; HQ: "Consigne d'écriture · 3 sur 3"
+  label?: string; // default "Consigne d'écriture"; HQ: "Consigne d'écriture · 3 sur 3"
   mode: "writing" | "review" | "placement";
   swap?: { state: "enabled" | "disabled-quota" | "hidden"; onSwap(): void };
 }
@@ -349,12 +429,14 @@ interface PromptSheetProps {
 
 ```ts
 interface RuledTextareaProps {
-  id: string; label: string /* "Ton texte" */;
-  value: string; onChange(v: string): void;
-  onSubmitShortcut?(): void;              // ⌘/Ctrl+Enter
-  density?: "desktop" | "mobile";         // 18/32 vs 17/30
-  minRows?: number;                       // MW uses min-height 720px
-  readOnly?: boolean;                     // while evaluating
+  id: string;
+  label: string /* "Ton texte" */;
+  value: string;
+  onChange(v: string): void;
+  onSubmitShortcut?(): void; // ⌘/Ctrl+Enter
+  density?: "desktop" | "mobile"; // 18/32 vs 17/30
+  minRows?: number; // MW uses min-height 720px
+  readOnly?: boolean; // while evaluating
 }
 ```
 
@@ -368,12 +450,17 @@ interface RuledTextareaProps {
 **WordMeter** (`writing/word-meter.tsx`; M, HQ, MW, PT)
 
 ```ts
-interface WordMeterProps { count: number; target: { min: number; max: number } | null; draftStatus?: ReactNode; layout: "desktop" | "mobile"; }
+interface WordMeterProps {
+  count: number;
+  target: { min: number; max: number } | null;
+  draftStatus?: ReactNode;
+  layout: "desktop" | "mobile";
+}
 ```
 
 - Track: `aria-hidden`, relative, width 240px desktop / 100% mobile, height 6px, radius 3px, bg rule `#DCE3DD` (MW uses `#D3DBD4`, see §6). Target zone: absolute, `left: min/max*100%` (250/300 = 83.3%), right 0, top/bottom −3px (12px tall), radius 3px, bg meter-target. Fill: absolute, left 0, top/bottom 0, `width: min(count/max,1)*100%` (202→67.3%, 52→17.3%, 124→41.3%), radius 3px, primary. Fill is painted above the zone (DOM order: zone, then fill).
 - Text: 14px muted; count in `<strong>` 600 ink; `N / 250–300 mots`. With no target (placement): `N mots`, no track.
-- Desktop: column gap 8px, min-width 240px, followed by ` · ` + DraftStatus on the same line. Mobile: DraftStatus on a new line (`<br>`), 14px/1.4.
+- Desktop: column gap 8px, min-width 240px, followed by `·` + DraftStatus on the same line. Mobile: DraftStatus on a new line (`<br>`), 14px/1.4.
 - Never disables submit. Optional nudge paragraph below the sheet (14px muted). Copy exists only for "under target" (see §5/§6).
 - A11y: the visual track is hidden. The text is the accessible value. Do not make the count a live region (too chatty).
 
@@ -391,10 +478,10 @@ interface WordMeterProps { count: number; target: { min: number; max: number } |
 
 ```ts
 interface MarkedTextProps {
-  text: string;                            // the Student Writing, verbatim
-  corrections: Pick<Correction, "id"|"index"|"kind"|"span"|"status">[];
-  density: "desktop" | "mobile";           // 18/34 vs 17/32
-  onMarkActivate?(id: string): void;       // scroll/focus the matching card
+  text: string; // the Student Writing, verbatim
+  corrections: Pick<Correction, "id" | "index" | "kind" | "span" | "status">[];
+  density: "desktop" | "mobile"; // 18/34 vs 17/32
+  onMarkActivate?(id: string): void; // scroll/focus the matching card
 }
 ```
 
@@ -414,9 +501,13 @@ interface MarkedTextProps {
 
 ```ts
 interface CorrectionsRegionProps {
-  evaluation: EvaluationView; focus: FocusDuJour | null; quota: QuotaState;
-  onAcknowledge(id): void; onPushBack(id): void /* opens DialectNoteSheet */;
-  onConfirmDialect(id): void /* opens sheet */; onRejectDialect(id): void /* → mistake */;
+  evaluation: EvaluationView;
+  focus: FocusDuJour | null;
+  quota: QuotaState;
+  onAcknowledge(id): void;
+  onPushBack(id): void /* opens DialectNoteSheet */;
+  onConfirmDialect(id): void /* opens sheet */;
+  onRejectDialect(id): void /* → mistake */;
   onNextPrompt(): void;
 }
 ```
@@ -429,7 +520,8 @@ interface CorrectionsRegionProps {
 
 ```ts
 type CorrectionCardProps = {
-  correction: Correction; density: "desktop" | "mobile";
+  correction: Correction;
+  density: "desktop" | "mobile";
 } & (
   | { kind: "mistake"; onAcknowledge(): void; onPushBack(): void }
   | { kind: "standard"; onAcknowledge(): void }
@@ -441,8 +533,8 @@ Shared: `<article id="correction-N" aria-labelledby>`, bg sheet, 1px line, radiu
 
 - Header row: flex (wrap for mistake), center, gap 10px, 12px/700/0.1em in the kind color. Marker pill (card version): mistake `padding:2px 8px; radius 10px; bg #A8321A; white`; standard `padding:2px 7px; 1px solid #1F4E8C; radius 10px; bg #FFF`; dialect `padding:2px 7px; radius 3px; bg #7A5A00; white`, text `6 ?`; letter-spacing 0 on the marker. Then the kind label. Mistake only: optional `focus du jour` tag (500, letter-spacing 0, color primary) when `matchesFocus`.
 - Quote line: `<p lang="fr">` Newsreader 19px/1.35.
-  - mistake: `<s>` quote (muted) ` → ` (muted) `<strong>` suggestion (500, ink). Add hidden text for `<s>` ("avant :") since strikethrough is not announced.
-  - standard: quote (not struck, ink) ` → ` `<strong>` Louisiana form (500, standard color) + `DLF` badge (Bricolage 11px/600/0.08em muted). The badge should be an `<abbr title="Dictionary of Louisiana French">` or link to the DLF entry (see §6).
+  - mistake: `<s>` quote (muted) `→` (muted) `<strong>` suggestion (500, ink). Add hidden text for `<s>` ("avant :") since strikethrough is not announced.
+  - standard: quote (not struck, ink) `→` `<strong>` Louisiana form (500, standard color) + `DLF` badge (Bricolage 11px/600/0.08em muted). The badge should be an `<abbr title="Dictionary of Louisiana French">` or link to the DLF entry (see §6).
   - dialect_check: context quote wrapped in a dialect-tint span, `padding:1px 3px` (no underline).
 - Explanation: 15px/1.5, French model output, rendered as plain text (no dialect post-processing).
 - ResourceLinks (mistake only).
@@ -455,7 +547,10 @@ Shared: `<article id="correction-N" aria-labelledby>`, bg sheet, 1px line, radiu
 **ResourceLinks** (`review/resource-links.tsx`; HR, MR, CO, CA)
 
 ```ts
-interface ResourceLinksProps { resources: ResourceLink[]; layout: "row" | "column"; }
+interface ResourceLinksProps {
+  resources: ResourceLink[];
+  layout: "row" | "column";
+}
 ```
 
 `<p>` flex wrap (HR row gap 2px 16px; CA gap 0 18px) or column (CO, MR); 14px; each link inline-flex, min-h 32px (36px mobile). Label `Grammaire · <topic>` / `Input · <source>`. External: `target="_blank" rel="noopener"`, plus visually hidden "(nouvel onglet)".
@@ -463,7 +558,11 @@ interface ResourceLinksProps { resources: ResourceLink[]; layout: "row" | "colum
 **ScoresDisclosure** (`review/scores-disclosure.tsx`; HR, MR). Replaces `EvaluationCard`.
 
 ```ts
-interface ScoresDisclosureProps { overall: CefrLevel; dimensions: { key: DimensionKey; label: string; value: string }[]; defaultOpen?: false; }
+interface ScoresDisclosureProps {
+  overall: CefrLevel;
+  dimensions: { key: DimensionKey; label: string; value: string }[];
+  defaultOpen?: false;
+}
 ```
 
 - Closed: `<button aria-expanded="false" aria-controls>`, flex wrap `justify-between`, gap 4px 16px, min-h 48px, px18, 1px line, radius 6, no bg, 15px, left `Scores ▸` (600), right `Ensemble : B1` (muted).
@@ -475,7 +574,13 @@ interface ScoresDisclosureProps { overall: CefrLevel; dimensions: { key: Dimensi
 **Notice** (`states/notice.tsx`; HQ, ST offline, HI malformed)
 
 ```ts
-interface NoticeProps { tone: "calm" | "advance"; title?: ReactNode; children: ReactNode; action?: ReactNode; role?: "status" | undefined; }
+interface NoticeProps {
+  tone: "calm" | "advance";
+  title?: ReactNode;
+  children: ReactNode;
+  action?: ReactNode;
+  role?: "status" | undefined;
+}
 ```
 
 - calm: 1px line-strong, radius 6, bg notice `#EEF2ED`. Banner layout (ST): flex wrap `justify-between`, gap 10px 20px, padding 14px 18px; text `<p>` `flex: 1 1 320px`, 15px/1.45, lead in `<strong>` 600.
@@ -500,10 +605,21 @@ interface NoticeProps { tone: "calm" | "advance"; title?: ReactNode; children: R
 
 ```ts
 interface DialectNoteSheetProps {
-  open: boolean; onOpenChange(open: boolean): void;
+  open: boolean;
+  onOpenChange(open: boolean): void;
   mode: "from-correction" | "new" | "edit";
-  source?: { written: string; tutorProposed: string; correctionId: string; sessionId: number };
-  initial: { rule: string; example: string; scope: "word" | "pattern"; scopeLabels: { word: string; pattern: string } };
+  source?: {
+    written: string;
+    tutorProposed: string;
+    correctionId: string;
+    sessionId: number;
+  };
+  initial: {
+    rule: string;
+    example: string;
+    scope: "word" | "pattern";
+    scopeLabels: { word: string; pattern: string };
+  };
   onSave(note: DialectNoteInput): Promise<void>;
 }
 ```
@@ -527,18 +643,25 @@ interface DialectNoteSheetProps {
 **CarnetWeaknessRow** (CA)
 
 ```ts
-interface CarnetWeaknessRowProps { weakness: Weakness; onPractice(id: string): Promise<void>; }
+interface CarnetWeaknessRowProps {
+  weakness: Weakness;
+  onPractice(id: string): Promise<void>;
+}
 ```
 
 - Row: flex wrap `justify-between` center, gap 8px 24px, padding 16px 0, top border line; `id="weakness-<id>"` (CTA anchor target).
-- Left (`flex:1 1 380px`, column gap 4px): h3 Newsreader 22px/500 (`tranquille`: color ink-2); meta 15px ink-2 (`tranquille`: muted) `N fois · vu <date> · <trend>`, plus ` · ` and `focus du jour` (600, primary) when focus; ResourceLinks row (absent for `tranquille` in the mockup).
+- Left (`flex:1 1 380px`, column gap 4px): h3 Newsreader 22px/500 (`tranquille`: color ink-2); meta 15px ink-2 (`tranquille`: muted) `N fois · vu <date> · <trend>`, plus `·` and `focus du jour` (600, primary) when focus; ResourceLinks row (absent for `tranquille` in the mockup).
 - Right: `Pratiquer ça`. outline-primary for actif/en progrès, plain secondary (line-strong, ink, 500) for tranquille. After press: the Weakness becomes Focus for the next prompt. The feedback for this is not drawn (§6). It should set `aria-pressed` or show "Prochaine consigne" text.
 - Section header: h2 `À travailler` + 15px muted intro, gap 4px, padding-bottom 16px.
 
 **DialectNoteRow** (CA)
 
 ```ts
-interface DialectNoteRowProps { note: DialectNote; onEdit(): void; onDelete(): Promise<void>; }
+interface DialectNoteRowProps {
+  note: DialectNote;
+  onEdit(): void;
+  onDelete(): Promise<void>;
+}
 ```
 
 - Row: flex wrap `justify-between` center, gap 4px 24px, padding 16px 0, top border. Left column gap 4px: rule `lang="fr"` Newsreader 20px/1.35; example italic 17px ink-2; meta 14px muted `14 novembre · séance d'aujourd'hui · ce mot seulement` + ` · nouvelle` (600, dialect) when new.
@@ -574,7 +697,9 @@ type HistoryRowProps = { item: HistoryItem; defaultExpanded?: boolean };
 **PlacementProgress** (PT)
 
 ```ts
-interface PlacementProgressProps { step: 1 | 2 | 3; }
+interface PlacementProgressProps {
+  step: 1 | 2 | 3;
+}
 ```
 
 `role="progressbar" aria-label="Avancement du test" aria-valuemin=1 aria-valuemax=3 aria-valuenow={step}`, plus `aria-valuetext="Étape 2 sur 3"`. Grid 3 cols, gap 8px; segments 4px tall, radius 2px; done/current primary, upcoming line-strong.
@@ -584,23 +709,26 @@ interface PlacementProgressProps { step: 1 | 2 | 3; }
 **PlacementResult** (PD)
 
 ```ts
-interface PlacementResultProps { result: PlacementResultView; onAccept(): void; }
+interface PlacementResultProps {
+  result: PlacementResultView;
+  onAccept(): void;
+}
 ```
 
 h1 `Test de placement · fini`; Surface `aria-live="polite"` 40px 44px gap 26px; top row flex wrap center gap 12px 28px: level 96px/0.9/700/-0.04em primary; column (`flex:1 1 300px`, gap 6px): label `TON NIVEAU CECR · SEUIL` + serif 22px/1.4 summary. `<dl>` column: rows flex wrap baseline, gap 2px 16px, padding 12px 0, top border (last also bottom); `<dt>` `flex:0 0 110px` 14px muted `Étape N`; `<dd>` level `flex:0 0 48px` 17px/600; `<dd>` summary `flex:1 1 260px` 15px. CTAs: primary `Ma première consigne` (to `/`, Phase A-returning or straight to generate, §6) + TextLink `Choisir un autre niveau` (opens LevelPicker on `/`). Header: wordmark only.
 
 ### 2.10 Replacement summary
 
-| Current | Fate |
-|---|---|
-| `src/app/page.tsx` (h1 + History link + 3 cards) | Becomes a thin wrapper around `HomePage`; header moves to layout |
-| `components/prompt/prompt-card.tsx` | Split into `HomePage` state machine, PromptSheet, RuledTextarea, WordMeter, DraftStatus, Generate/Submit buttons, ErrorAlert, QuotaNotice, AdvancementBanner |
-| `components/prompt/evaluation-card.tsx` | Replaced by CorrectionsRegion + ScoresDisclosure. Its dimension list and `key`s are reused |
-| `components/level/level-card.tsx` | Removed. Level display/change moves to LevelChip/LevelMenu; first-run selection to LevelPicker |
-| `components/level/level-components.tsx` | `CefrLevel` type moves to shared types; `LEVEL_LABELS` becomes French (Découverte…Maîtrise); `LEVEL_COLORS` dropped (no per-level hue in the design) |
-| `components/placement/placement-test-card.tsx` | Replaced by `/placement` route + PlacementStart/Step/Result; its fetch flow is reused |
-| `components/history/history-page.tsx` | Replaced by HistoryPage/HistoryRow; `formatDate` (en-US) becomes a French formatter |
-| `components/ui/button.tsx` | Rewritten with the new variants (§2.1) |
+| Current                                          | Fate                                                                                                                                                         |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/app/page.tsx` (h1 + History link + 3 cards) | Becomes a thin wrapper around `HomePage`; header moves to layout                                                                                             |
+| `components/prompt/prompt-card.tsx`              | Split into `HomePage` state machine, PromptSheet, RuledTextarea, WordMeter, DraftStatus, Generate/Submit buttons, ErrorAlert, QuotaNotice, AdvancementBanner |
+| `components/prompt/evaluation-card.tsx`          | Replaced by CorrectionsRegion + ScoresDisclosure. Its dimension list and `key`s are reused                                                                   |
+| `components/level/level-card.tsx`                | Removed. Level display/change moves to LevelChip/LevelMenu; first-run selection to LevelPicker                                                               |
+| `components/level/level-components.tsx`          | `CefrLevel` type moves to shared types; `LEVEL_LABELS` becomes French (Découverte…Maîtrise); `LEVEL_COLORS` dropped (no per-level hue in the design)         |
+| `components/placement/placement-test-card.tsx`   | Replaced by `/placement` route + PlacementStart/Step/Result; its fetch flow is reused                                                                        |
+| `components/history/history-page.tsx`            | Replaced by HistoryPage/HistoryRow; `formatDate` (en-US) becomes a French formatter                                                                          |
+| `components/ui/button.tsx`                       | Rewritten with the new variants (§2.1)                                                                                                                       |
 
 ---
 
@@ -612,50 +740,57 @@ Routes (French slugs to match the UI; see §6 for the rename decision): `/` (Hom
 
 ```ts
 type HomePhase =
-  | { phase: "A0-first-run"; selectedLevel: CefrLevel | null }       // no CEFR level
-  | { phase: "A-ready" }                                              // level set, no active prompt today (or after review)
-  | { phase: "B-writing"; session: ActiveSession }                    // prompt + draft
+  | { phase: "A0-first-run"; selectedLevel: CefrLevel | null } // no CEFR level
+  | { phase: "A-ready" } // level set, no active prompt today (or after review)
+  | { phase: "B-writing"; session: ActiveSession } // prompt + draft
   | { phase: "C-review"; session: ActiveSession; evaluation: EvaluationView };
 
-interface HomeOverlay {                 // orthogonal to phase
-  generating: boolean;                  // "Je cherche une consigne…"
-  evaluating: boolean;                  // "Je lis ton texte…"
+interface HomeOverlay {
+  // orthogonal to phase
+  generating: boolean; // "Je cherche une consigne…"
+  evaluating: boolean; // "Je lis ton texte…"
   error: null | { kind: "generate" | "evaluate"; retry(): void };
   offline: boolean;
   confirmSwap: boolean;
   advancement: null | LevelAdvancement;
   dialectSheet: null | { correctionId: string };
-  quotaExhausted: boolean;              // derived from quota.remaining === 0
+  quotaExhausted: boolean; // derived from quota.remaining === 0
 }
 ```
 
 On load, a single bootstrap call returns level, quota, focus, the active session (latest session today that is not abandoned), and any pending advancement. It resolves to: no level → A0; active session with evaluation → C; active session without evaluation → B (draft restored, local copy reconciled); else → A-ready.
 
-| Screen | Route | State | Data needed |
-|---|---|---|---|
-| HomeEmpty | `/` | A0-first-run (`level=null`); header without chip; quota text first-run form | learner display name (does not exist; §6), quota |
-| MobileEmpty | `/` @390 | A-ready, FocusLine `hero`, full-width generate | level, quota, Focus du jour (names + reason) |
-| *(desktop A-ready)* | `/` | A-ready. Not drawn: compose date title + FocusLine inline + Surface with generate button (§6) | same |
-| Main | `/` | B-writing, quota > 0, swap enabled | level, quota, focus, active session {prompt text, PromptMeta, draft text, draft savedAt} |
-| MobileWriting | `/` @390 | B-writing, FocusLine `stacked`, footer outside the sheet | same |
-| HomeQuota | `/` | B-writing + quotaExhausted. QuotaNotice above the sheet; label `· 3 SUR 3`; swap disabled `· à minuit`; submit enabled | quota {remaining 0, resetsAt}, active session |
-| HomeReview | `/` | C-review, desktop split, scores closed (open via `scoresOpen`) | session (prompt, meta, writing), EvaluationView {corrections, counts, scores}, focus, quota (CTA `reste N`), weakness link target |
-| MobileReview | `/` @390 | C-review, stacked, no date/Focus | same |
-| Corrections | (component sheet) | CorrectionCard × 3 kinds + MarkedText fragments | Correction objects |
-| DialectNote | `/` overlay (also `/carnet`) | C-review + `dialectSheet` open; backdrop shows MarkedText | Correction {quote, suggestion}, model-drafted rule, example, scope labels |
-| States | (component sheet) | `error.evaluate`, `offline`, `confirmSwap`, `advancement`, busy labels | draft word count (swap copy), advancement {from, to} |
-| Carnet | `/carnet` | list page | Weakness[] (with focus flag, resources), DialectNote[] |
-| History | `/historique` | list page, one row expanded, one malformed | HistoryItem[], level history |
-| PlacementStart | `/placement` | `start` | placement state (exists? resumable?) |
-| PlacementStep | `/placement` | `step` {n, prompt, draft} | current step, prompt text, draft |
-| PlacementDone | `/placement` | `done` | PlacementResultView |
+| Screen              | Route                        | State                                                                                                                  | Data needed                                                                                                                       |
+| ------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| HomeEmpty           | `/`                          | A0-first-run (`level=null`); header without chip; quota text first-run form                                            | learner display name (does not exist; §6), quota                                                                                  |
+| MobileEmpty         | `/` @390                     | A-ready, FocusLine `hero`, full-width generate                                                                         | level, quota, Focus du jour (names + reason)                                                                                      |
+| _(desktop A-ready)_ | `/`                          | A-ready. Not drawn: compose date title + FocusLine inline + Surface with generate button (§6)                          | same                                                                                                                              |
+| Main                | `/`                          | B-writing, quota > 0, swap enabled                                                                                     | level, quota, focus, active session {prompt text, PromptMeta, draft text, draft savedAt}                                          |
+| MobileWriting       | `/` @390                     | B-writing, FocusLine `stacked`, footer outside the sheet                                                               | same                                                                                                                              |
+| HomeQuota           | `/`                          | B-writing + quotaExhausted. QuotaNotice above the sheet; label `· 3 SUR 3`; swap disabled `· à minuit`; submit enabled | quota {remaining 0, resetsAt}, active session                                                                                     |
+| HomeReview          | `/`                          | C-review, desktop split, scores closed (open via `scoresOpen`)                                                         | session (prompt, meta, writing), EvaluationView {corrections, counts, scores}, focus, quota (CTA `reste N`), weakness link target |
+| MobileReview        | `/` @390                     | C-review, stacked, no date/Focus                                                                                       | same                                                                                                                              |
+| Corrections         | (component sheet)            | CorrectionCard × 3 kinds + MarkedText fragments                                                                        | Correction objects                                                                                                                |
+| DialectNote         | `/` overlay (also `/carnet`) | C-review + `dialectSheet` open; backdrop shows MarkedText                                                              | Correction {quote, suggestion}, model-drafted rule, example, scope labels                                                         |
+| States              | (component sheet)            | `error.evaluate`, `offline`, `confirmSwap`, `advancement`, busy labels                                                 | draft word count (swap copy), advancement {from, to}                                                                              |
+| Carnet              | `/carnet`                    | list page                                                                                                              | Weakness[] (with focus flag, resources), DialectNote[]                                                                            |
+| History             | `/historique`                | list page, one row expanded, one malformed                                                                             | HistoryItem[], level history                                                                                                      |
+| PlacementStart      | `/placement`                 | `start`                                                                                                                | placement state (exists? resumable?)                                                                                              |
+| PlacementStep       | `/placement`                 | `step` {n, prompt, draft}                                                                                              | current step, prompt text, draft                                                                                                  |
+| PlacementDone       | `/placement`                 | `done`                                                                                                                 | PlacementResultView                                                                                                               |
 
 ### 3.2 Placement state (`/placement`)
 
 ```ts
 type PlacementPhase =
   | { phase: "start"; resumable: boolean }
-  | { phase: "step"; step: 1 | 2 | 3; prompt: string; draft: Draft; submitting: boolean }
+  | {
+      phase: "step";
+      step: 1 | 2 | 3;
+      prompt: string;
+      draft: Draft;
+      submitting: boolean;
+    }
   | { phase: "done"; result: PlacementResultView };
 ```
 
@@ -687,28 +822,30 @@ type CorrectionKind = "mistake" | "standard" | "dialect_check";
 
 type CorrectionStatus =
   | "open"
-  | "acknowledged"           // "Compris"
-  | "pushed_back"            // mistake → "C'est du français louisianais" → Dialect Note saved
-  | "confirmed_dialect"      // dialect_check → "Oui" → Dialect Note saved
-  | "converted_to_mistake";  // dialect_check → "Non, corrige-le"
+  | "acknowledged" // "Compris"
+  | "pushed_back" // mistake → "C'est du français louisianais" → Dialect Note saved
+  | "confirmed_dialect" // dialect_check → "Oui" → Dialect Note saved
+  | "converted_to_mistake"; // dialect_check → "Non, corrige-le"
 
 interface Correction {
   id: string;
-  index: number;                      // 1-based, text order, shared numbering across kinds
+  index: number; // 1-based, text order, shared numbering across kinds
   kind: CorrectionKind;
   span: { start: number; end: number }; // UTF-16 offsets into the stored writingText
-  quote: string;                      // === writingText.slice(start, end); server validates and drops mismatches
-  contextQuote?: string;              // dialect_check card shows a wider phrase ("mon petit cousin a tombé") than the mark ("a tombé")
-  suggestion: string;                 // mistake: corrected form; standard: Louisiana form; dialect_check: the Standard form the tutor would propose ("est tombé")
-  explanation: string;                // French, model output, shown verbatim
-  category: WeaknessCategoryId | null;// required for mistake & dialect_check; null for standard
+  quote: string; // === writingText.slice(start, end); server validates and drops mismatches
+  contextQuote?: string; // dialect_check card shows a wider phrase ("mon petit cousin a tombé") than the mark ("a tombé")
+  suggestion: string; // mistake: corrected form; standard: Louisiana form; dialect_check: the Standard form the tutor would propose ("est tombé")
+  explanation: string; // French, model output, shown verbatim
+  category: WeaknessCategoryId | null; // required for mistake & dialect_check; null for standard
   dlf?: { entryId: string; headword: string }; // required for standard; spelling authority for Louisiana forms
-  resources: ResourceLink[];          // mistake only: one grammar + one input, picked by category
-  matchesFocus: boolean;              // mistake only
+  resources: ResourceLink[]; // mistake only: one grammar + one input, picked by category
+  matchesFocus: boolean; // mistake only
   status: CorrectionStatus;
-  dialectNoteId?: string;             // set when resolved into a note
-  dialectDraft?: {                    // pre-drafted for the sheet (mistake pushback & dialect_check)
-    rule: string; example: string;
+  dialectNoteId?: string; // set when resolved into a note
+  dialectDraft?: {
+    // pre-drafted for the sheet (mistake pushback & dialect_check)
+    rule: string;
+    example: string;
     scopeLabels: { word: string; pattern: string }; // "Ce mot seulement : « tomber »" / "Toute la famille : « avoir » avec les verbes de mouvement"
   };
 }
@@ -732,8 +869,8 @@ interface EvaluationView {
   overall: CefrLevel;
   dimensions: Record<DimensionKey, { label: string; value: string }>; // DimensionKey = existing four keys
   tips?: { perDimension: Record<DimensionKey, string>; holistic: string }; // existing; placement TBD (§6)
-  focusWeaknessLink?: { weaknessId: string; shortName: string };  // CTA "« ‑er / ‑é » dans le Carnet →"
-  dataIssue?: "corrections_unreadable";                           // malformed stored JSON
+  focusWeaknessLink?: { weaknessId: string; shortName: string }; // CTA "« ‑er / ‑é » dans le Carnet →"
+  dataIssue?: "corrections_unreadable"; // malformed stored JSON
 }
 ```
 
@@ -742,27 +879,28 @@ Correction actions: `POST /api/corrections/:id { action: "acknowledge" | "reject
 ### 4.3 Weakness, Weakness category, Resource
 
 ```ts
-type WeaknessCategoryId = string;   // stable slug from a curated taxonomy, e.g. "infinitive-after-preposition"
+type WeaknessCategoryId = string; // stable slug from a curated taxonomy, e.g. "infinitive-after-preposition"
 
 interface WeaknessCategory {
   id: WeaknessCategoryId;
-  name: string;          // "Infinitif ou participe (‑er / ‑é)": Carnet heading, mobile Focus hero (capitalized)
-  inlineName: string;    // "infinitif ou participe (‑er / ‑é)": Focus line (lowercase)
-  historyName: string;   // "Infinitif ou participe": History row title (parenthetical dropped)
-  shortName: string;     // "‑er / ‑é": review CTA
+  name: string; // "Infinitif ou participe (‑er / ‑é)": Carnet heading, mobile Focus hero (capitalized)
+  inlineName: string; // "infinitif ou participe (‑er / ‑é)": Focus line (lowercase)
+  historyName: string; // "Infinitif ou participe": History row title (parenthetical dropped)
+  shortName: string; // "‑er / ‑é": review CTA
   resources: { grammar: ResourceLink; input: ResourceLink } | null;
 }
 
 interface Weakness extends WeaknessCategory {
-  count: number;                         // Mistakes in this category (excludes standard; includes converted dialect checks; minus pushed-back)
-  lastSeenAt: string;                    // ISO; UI renders "vu aujourd'hui" / "vu le 6 novembre"
-  trend: "actif" | "en_progres" | "tranquille";  // display "actif" / "en progrès" / "tranquille"; rule owned by server
+  count: number; // Mistakes in this category (excludes standard; includes converted dialect checks; minus pushed-back)
+  lastSeenAt: string; // ISO; UI renders "vu aujourd'hui" / "vu le 6 novembre"
+  trend: "actif" | "en_progres" | "tranquille"; // display "actif" / "en progrès" / "tranquille"; rule owned by server
   isFocus: boolean;
 }
 
 interface ResourceLink {
-  id: string; kind: "grammar" | "input";
-  label: string;        // topic for grammar ("l'infinitif après une préposition"), source name for input ("InnerFrench")
+  id: string;
+  kind: "grammar" | "input";
+  label: string; // topic for grammar ("l'infinitif après une préposition"), source name for input ("InnerFrench")
   url: string;
 }
 ```
@@ -774,17 +912,20 @@ Ordering: by trend (actif → en progrès → tranquille), then count desc. `GET
 ```ts
 interface DialectNote {
   id: string;
-  rule: string;                          // learner-edited
+  rule: string; // learner-edited
   example: string;
   scope: "word" | "pattern";
-  scopeLabel: string;                    // Carnet meta: "ce mot seulement" / "toute la famille"
+  scopeLabel: string; // Carnet meta: "ce mot seulement" / "toute la famille"
   match: { lemma?: string; pattern?: string }; // what the tutor must stop flagging (server use; UI doesn't display)
-  written?: string; tutorProposed?: string;    // from-correction notes
+  written?: string;
+  tutorProposed?: string; // from-correction notes
   source: { sessionId: number; sessionDate: string } | null; // meta "séance d'aujourd'hui" / "séance du 9 novembre"; null for manual notes
   createdAt: string;
-  isNew: boolean;                        // "nouvelle" tag; expiry rule TBD (§6)
+  isNew: boolean; // "nouvelle" tag; expiry rule TBD (§6)
 }
-type DialectNoteInput = Pick<DialectNote, "rule" | "example" | "scope"> & { correctionId?: string };
+type DialectNoteInput = Pick<DialectNote, "rule" | "example" | "scope"> & {
+  correctionId?: string;
+};
 ```
 
 `GET /api/dialect-notes`, `POST` (with optional `correctionId` → resolves that Correction and reverses any Weakness increment), `PATCH /:id`, `DELETE /:id`. Notes are passed to the evaluator so the form is not flagged again.
@@ -793,10 +934,13 @@ type DialectNoteInput = Pick<DialectNote, "rule" | "example" | "scope"> & { corr
 
 ```ts
 interface FocusDuJour {
-  date: string;                          // learner-local YYYY-MM-DD
-  weaknesses: Pick<WeaknessCategory, "id" | "name" | "inlineName" | "historyName" | "shortName">[]; // 1–2
-  reason: string;                        // ME copy: "C'est ce qui est revenu le plus dans tes dernières évaluations. La consigne va t'y faire travailler."
-  source: "auto" | "practice";           // practice = chosen via "Pratiquer ça"
+  date: string; // learner-local YYYY-MM-DD
+  weaknesses: Pick<
+    WeaknessCategory,
+    "id" | "name" | "inlineName" | "historyName" | "shortName"
+  >[]; // 1–2
+  reason: string; // ME copy: "C'est ce qui est revenu le plus dans tes dernières évaluations. La consigne va t'y faire travailler."
+  source: "auto" | "practice"; // practice = chosen via "Pratiquer ça"
 }
 ```
 
@@ -808,10 +952,10 @@ Today the prompt generator returns free text plus `{cefrLevel, dialect}`. The me
 
 ```ts
 interface PromptMeta {
-  genre: string;          // "récit", "lettre"
-  tenses: string;         // "passé composé et imparfait", "futur proche"
+  genre: string; // "récit", "lettre"
+  tenses: string; // "passé composé et imparfait", "futur proche"
   wordRange: { min: number; max: number }; // 250–300 in mocks; should vary by CEFR (§6)
-  tone: string;           // "ton chaleureux", "ton amical"
+  tone: string; // "ton chaleureux", "ton amical"
 }
 ```
 
@@ -823,7 +967,7 @@ Display: `${genre} · ${tenses} · ${min}–${max} mots · ${tone}` (en dash in 
 interface Draft {
   sessionId: number;
   text: string;
-  savedAt: string;        // ISO; DraftStatus renders local "21 h 42"
+  savedAt: string; // ISO; DraftStatus renders local "21 h 42"
   origin: "server" | "local";
 }
 ```
@@ -836,24 +980,31 @@ interface Draft {
 ### 4.8 Session status / History
 
 ```ts
-type SessionStatus = "in_progress" | "evaluated" | "abandoned_draft" | "unused_prompt";
+type SessionStatus =
+  "in_progress" | "evaluated" | "abandoned_draft" | "unused_prompt";
 // abandoned_draft: replaced by swap (or day ended) with ≥1 word; unused_prompt: replaced/expired with 0 words
 
 interface HistoryItem {
   id: number;
   createdAt: string;
   status: SessionStatus;
-  focusTitle: string | null;              // historyName(s) joined " · "; null for legacy sessions (§6 fallback)
+  focusTitle: string | null; // historyName(s) joined " · "; null for legacy sessions (§6 fallback)
   wordCount: number;
-  mistakeCount?: number;                  // evaluated
-  cefrLevel?: CefrLevel;                  // evaluated
+  mistakeCount?: number; // evaluated
+  cefrLevel?: CefrLevel; // evaluated
   prompt: { text: string; meta: PromptMeta | null };
-  excerpt?: string;                       // first ~3 sentences
-  correctionsSummary?: { kind: CorrectionKind | "dialect_note"; quote: string; suggestion?: string }[];
+  excerpt?: string; // first ~3 sentences
+  correctionsSummary?: {
+    kind: CorrectionKind | "dialect_note";
+    quote: string;
+    suggestion?: string;
+  }[];
   dataIssue?: "corrections_unreadable";
 }
 
-interface LevelProgression { entries: { level: CefrLevel; since: string }[] } // "Niveau : A2 depuis le 3 octobre, B1 depuis le 28 octobre."
+interface LevelProgression {
+  entries: { level: CefrLevel; since: string }[];
+} // "Niveau : A2 depuis le 3 octobre, B1 depuis le 28 octobre."
 ```
 
 `GET /api/sessions` must parse each row defensively and return a `dataIssue` per row instead of throwing. Today `history-page.tsx` runs `JSON.parse` in render, so one bad row crashes the page. `GET /api/sessions/:id` serves the full read-only review.
@@ -863,7 +1014,13 @@ interface LevelProgression { entries: { level: CefrLevel; since: string }[] } //
 `POST /api/evaluate` already returns `advancement: LevelChange | null`. The UI also needs:
 
 ```ts
-interface LevelAdvancement { changeId: number; fromLevel: CefrLevel; toLevel: CefrLevel; createdAt: string; dismissedAt?: string }
+interface LevelAdvancement {
+  changeId: number;
+  fromLevel: CefrLevel;
+  toLevel: CefrLevel;
+  createdAt: string;
+  dismissedAt?: string;
+}
 ```
 
 - `POST /api/level/undo { changeId }`: restores `fromLevel` (source "manual"), resets the consecutive counter.
@@ -873,7 +1030,13 @@ interface LevelAdvancement { changeId: number; fromLevel: CefrLevel; toLevel: Ce
 ### 4.10 Quota with reset time
 
 ```ts
-interface QuotaState { used: number; remaining: number; max: 3; resetsAt: string /* ISO of next local midnight */; todayIndex?: number /* "3 SUR 3" */ }
+interface QuotaState {
+  used: number;
+  remaining: number;
+  max: 3;
+  resetsAt: string /* ISO of next local midnight */;
+  todayIndex?: number; /* "3 SUR 3" */
+}
 ```
 
 Bug to fix: `quota-store.ts` keys the day with `new Date().toISOString()`, which is UTC midnight, not local midnight. The client must send its IANA time zone (`Intl.DateTimeFormat().resolvedOptions().timeZone`, header or cookie) so the server computes the local date and `resetsAt`. The countdown `dans 1 h 46` is computed client-side from `resetsAt`.
@@ -881,10 +1044,16 @@ Bug to fix: `quota-store.ts` keys the day with `new Date().toISOString()`, which
 ### 4.11 Placement
 
 ```ts
-interface PlacementState { id: string; step: 1 | 2 | 3 | "done"; prompt?: string; draft?: Draft }
+interface PlacementState {
+  id: string;
+  step: 1 | 2 | 3 | "done";
+  prompt?: string;
+  draft?: Draft;
+}
 interface PlacementResultView {
-  finalLevel: CefrLevel; levelName: string;        // "Seuil"
-  summary: string;                                 // French, model
+  finalLevel: CefrLevel;
+  levelName: string; // "Seuil"
+  summary: string; // French, model
   steps: { step: 1 | 2 | 3; level: CefrLevel; summary: string }[]; // one-line French summary per step
 }
 ```
@@ -909,225 +1078,225 @@ Caveat for all rows: the handoff says the Louisiana French in the mockups (UI st
 
 ### AppHeader
 
-| Key | String | Notes |
-|---|---|---|
-| wordmark | `Lâche pas` + `.` (full stop in `#A8321A`) | **P**: app name pending |
-| tagline | `atelier d'écriture · français louisianais` | desktop only |
-| nav.label | `Navigation` | `aria-label` |
-| nav.carnet | `Carnet` | |
-| nav.history | `Historique` | |
-| quota.remaining | `Reste {n} consignes sur 3` | desktop |
-| quota.remaining.one | `Reste 1 consigne sur 3` | **I** singular |
-| quota.exhausted | `3 consignes sur 3 prises` | |
-| quota.firstRun | `3 consignes aujourd'hui` | HE |
-| quota.compact | `Reste {n} sur 3` | mobile |
-| quota.compact.exhausted | `3 sur 3 prises` | **I** |
-| chip | `{level} ▾` | |
-| chip.label | `Niveau CECR {level}, changer` | `aria-label` |
-| placement.start.link | `Je connais mon niveau` | PS header |
-| placement.step.link | `Finir plus tard` | PT header |
+| Key                     | String                                      | Notes                   |
+| ----------------------- | ------------------------------------------- | ----------------------- |
+| wordmark                | `Lâche pas` + `.` (full stop in `#A8321A`)  | **P**: app name pending |
+| tagline                 | `atelier d'écriture · français louisianais` | desktop only            |
+| nav.label               | `Navigation`                                | `aria-label`            |
+| nav.carnet              | `Carnet`                                    |                         |
+| nav.history             | `Historique`                                |                         |
+| quota.remaining         | `Reste {n} consignes sur 3`                 | desktop                 |
+| quota.remaining.one     | `Reste 1 consigne sur 3`                    | **I** singular          |
+| quota.exhausted         | `3 consignes sur 3 prises`                  |                         |
+| quota.firstRun          | `3 consignes aujourd'hui`                   | HE                      |
+| quota.compact           | `Reste {n} sur 3`                           | mobile                  |
+| quota.compact.exhausted | `3 sur 3 prises`                            | **I**                   |
+| chip                    | `{level} ▾`                                 |                         |
+| chip.label              | `Niveau CECR {level}, changer`              | `aria-label`            |
+| placement.start.link    | `Je connais mon niveau`                     | PS header               |
+| placement.step.link     | `Finir plus tard`                           | PT header               |
 
 ### Home / Phase A
 
-| Key | String | Notes |
-|---|---|---|
-| title.date | `Samedi 14 novembre` | `Intl` fr weekday + day + month, first letter capitalized. Mobile: `Samedi` ⏎ `14 novembre` |
-| welcome.lead | `Bienvenue, {name}. Icitte, on écrit un petit texte par jour, en français de la Louisiane.` | name source missing (§6) |
-| welcome.body | `Pour te donner une consigne à ta mesure, il me faut ton niveau. Tu pourras le changer n'importe quand.` | |
-| level.legend | `TON NIVEAU CECR` | |
-| level.A1..C2 | `Découverte`, `Survie`, `Seuil`, `Avancé`, `Autonome`, `Maîtrise` | replaces English `LEVEL_LABELS` |
-| generate | `Donne-moi une consigne` | |
-| generate.busy | `Je cherche une consigne…` | ellipsis character `…` |
-| placement.link | `Pas sûr ? Fais le test de placement (3 consignes)` | narrow no-break space before `?` is French typography; markup uses a normal space |
+| Key            | String                                                                                                   | Notes                                                                                       |
+| -------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| title.date     | `Samedi 14 novembre`                                                                                     | `Intl` fr weekday + day + month, first letter capitalized. Mobile: `Samedi` ⏎ `14 novembre` |
+| welcome.lead   | `Bienvenue, {name}. Icitte, on écrit un petit texte par jour, en français de la Louisiane.`              | name source missing (§6)                                                                    |
+| welcome.body   | `Pour te donner une consigne à ta mesure, il me faut ton niveau. Tu pourras le changer n'importe quand.` |                                                                                             |
+| level.legend   | `TON NIVEAU CECR`                                                                                        |                                                                                             |
+| level.A1..C2   | `Découverte`, `Survie`, `Seuil`, `Avancé`, `Autonome`, `Maîtrise`                                        | replaces English `LEVEL_LABELS`                                                             |
+| generate       | `Donne-moi une consigne`                                                                                 |                                                                                             |
+| generate.busy  | `Je cherche une consigne…`                                                                               | ellipsis character `…`                                                                      |
+| placement.link | `Pas sûr ? Fais le test de placement (3 consignes)`                                                      | narrow no-break space before `?` is French typography; markup uses a normal space           |
 
 ### FocusLine
 
-| Key | String | Notes |
-|---|---|---|
-| focus.label | `FOCUS DU JOUR` | primary color |
-| focus.names | `{inlineName} · {inlineName}` | e.g. `infinitif ou participe (‑er / ‑é) · imparfait ou passé composé`. Uses U+2011 non-breaking hyphen |
-| focus.hero.names | `Infinitif ou participe (‑er / ‑é)` / `Imparfait ou passé composé` | one per line, capitalized (`name`) |
-| focus.reason | `C'est ce qui est revenu le plus dans tes dernières évaluations. La consigne va t'y faire travailler.` | auto source. Practice-source wording **I** missing |
-| focus.change | `Changer de focus dans le Carnet` | ME |
+| Key              | String                                                                                                 | Notes                                                                                                  |
+| ---------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| focus.label      | `FOCUS DU JOUR`                                                                                        | primary color                                                                                          |
+| focus.names      | `{inlineName} · {inlineName}`                                                                          | e.g. `infinitif ou participe (‑er / ‑é) · imparfait ou passé composé`. Uses U+2011 non-breaking hyphen |
+| focus.hero.names | `Infinitif ou participe (‑er / ‑é)` / `Imparfait ou passé composé`                                     | one per line, capitalized (`name`)                                                                     |
+| focus.reason     | `C'est ce qui est revenu le plus dans tes dernières évaluations. La consigne va t'y faire travailler.` | auto source. Practice-source wording **I** missing                                                     |
+| focus.change     | `Changer de focus dans le Carnet`                                                                      | ME                                                                                                     |
 
 ### PromptSheet / writing
 
-| Key | String | Notes |
-|---|---|---|
-| prompt.label | `CONSIGNE D'ÉCRITURE` | |
-| prompt.label.withIndex | `CONSIGNE D'ÉCRITURE · {i} SUR 3` | shown in HQ only (§6) |
-| prompt.text | e.g. `C'est samedi matin chez ta grand-mère…` | **M** |
-| prompt.meta | `{genre} · {tenses} · {min}–{max} mots · {tone}` | e.g. `récit · passé composé et imparfait · 250–300 mots · ton chaleureux` |
-| swap | `↻ Une autre consigne` | |
-| swap.disabled | `↻ Une autre consigne · à minuit` | quota exhausted |
-| text.label | `TON TEXTE` | |
-| meter | `{n} / {min}–{max} mots` | count bold |
-| meter.noTarget | `{n} mots` | Placement |
-| draft.saved | `Brouillon sauvé à {H} h {mm}` | joined to meter with ` · ` on desktop |
-| draft.local | `Brouillon gardé sur cet appareil` | **I** offline variant |
-| kbd | `⌘ ↵` | `Ctrl ↵` on non-Apple, **I** |
-| submit | `Corrige-moi` | |
-| submit.busy | `Je lis ton texte…` | |
-| nudge.under | `Encore une cinquantaine de mots, si le cœur t'en dit. Tu peux envoyer n'importe quand.` | for ~50 short; other distances/over-target **I** missing |
+| Key                    | String                                                                                   | Notes                                                                     |
+| ---------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| prompt.label           | `CONSIGNE D'ÉCRITURE`                                                                    |                                                                           |
+| prompt.label.withIndex | `CONSIGNE D'ÉCRITURE · {i} SUR 3`                                                        | shown in HQ only (§6)                                                     |
+| prompt.text            | e.g. `C'est samedi matin chez ta grand-mère…`                                            | **M**                                                                     |
+| prompt.meta            | `{genre} · {tenses} · {min}–{max} mots · {tone}`                                         | e.g. `récit · passé composé et imparfait · 250–300 mots · ton chaleureux` |
+| swap                   | `↻ Une autre consigne`                                                                   |                                                                           |
+| swap.disabled          | `↻ Une autre consigne · à minuit`                                                        | quota exhausted                                                           |
+| text.label             | `TON TEXTE`                                                                              |                                                                           |
+| meter                  | `{n} / {min}–{max} mots`                                                                 | count bold                                                                |
+| meter.noTarget         | `{n} mots`                                                                               | Placement                                                                 |
+| draft.saved            | `Brouillon sauvé à {H} h {mm}`                                                           | joined to meter with `·` on desktop                                       |
+| draft.local            | `Brouillon gardé sur cet appareil`                                                       | **I** offline variant                                                     |
+| kbd                    | `⌘ ↵`                                                                                    | `Ctrl ↵` on non-Apple, **I**                                              |
+| submit                 | `Corrige-moi`                                                                            |                                                                           |
+| submit.busy            | `Je lis ton texte…`                                                                      |                                                                           |
+| nudge.under            | `Encore une cinquantaine de mots, si le cœur t'en dit. Tu peux envoyer n'importe quand.` | for ~50 short; other distances/over-target **I** missing                  |
 
 ### Quota notice (HQ)
 
-| Key | String | Notes |
-|---|---|---|
-| quota.notice.title | `T'as pris tes trois consignes pour aujourd'hui.` | |
-| quota.notice.body | `La prochaine arrive à minuit, dans {h} h {mm}. Ton brouillon reste icitte : tu peux le finir et l'envoyer quand tu veux.` | without a draft: second sentence omitted **I** |
+| Key                | String                                                                                                                     | Notes                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| quota.notice.title | `T'as pris tes trois consignes pour aujourd'hui.`                                                                          |                                                |
+| quota.notice.body  | `La prochaine arrive à minuit, dans {h} h {mm}. Ton brouillon reste icitte : tu peux le finir et l'envoyer quand tu veux.` | without a draft: second sentence omitted **I** |
 
 ### Review (Phase C)
 
-| Key | String | Notes |
-|---|---|---|
-| review.sheet.label | `Consigne et ton texte` | `aria-label` |
-| review.text.label | `TON TEXTE · {n} MOTS` | |
-| review.region.label | `Évaluation` (desktop) / `Corrections` (mobile) | `aria-label` |
-| review.title | `Évaluation` | h2 desktop / h1 mobile |
-| review.mobile.listLabel | `CORRECTIONS` | MR h2 |
-| review.summary | `{n} fautes · {n} en français standard · {n} à vérifier` | singular `1 faute`; zero parts omitted **I**; zero overall `Aucune correction` **I** |
-| scores.closed | `Scores ▸` | |
-| scores.open | `Scores ▾` | |
-| scores.overall | `Ensemble : {level}` | |
-| scores.dimensions | `Grammaire`, `Vocabulaire`, `Cohérence`, `Consigne suivie` | **P**: use the app's four dimensions. Proposed French: `Grammaire` (grammatical_accuracy), `Vocabulaire` (vocabulary), `Cohérence` (coherence), `Registre et style` (register_style); owner to confirm |
-| cta.next | `Une autre consigne · reste {n}` | at 0: `Une autre consigne · à minuit` **I** (disabled) |
-| cta.carnet | `« {shortName} » dans le Carnet →` | e.g. `« ‑er / ‑é » dans le Carnet →` |
+| Key                     | String                                                     | Notes                                                                                                                                                                                                  |
+| ----------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| review.sheet.label      | `Consigne et ton texte`                                    | `aria-label`                                                                                                                                                                                           |
+| review.text.label       | `TON TEXTE · {n} MOTS`                                     |                                                                                                                                                                                                        |
+| review.region.label     | `Évaluation` (desktop) / `Corrections` (mobile)            | `aria-label`                                                                                                                                                                                           |
+| review.title            | `Évaluation`                                               | h2 desktop / h1 mobile                                                                                                                                                                                 |
+| review.mobile.listLabel | `CORRECTIONS`                                              | MR h2                                                                                                                                                                                                  |
+| review.summary          | `{n} fautes · {n} en français standard · {n} à vérifier`   | singular `1 faute`; zero parts omitted **I**; zero overall `Aucune correction` **I**                                                                                                                   |
+| scores.closed           | `Scores ▸`                                                 |                                                                                                                                                                                                        |
+| scores.open             | `Scores ▾`                                                 |                                                                                                                                                                                                        |
+| scores.overall          | `Ensemble : {level}`                                       |                                                                                                                                                                                                        |
+| scores.dimensions       | `Grammaire`, `Vocabulaire`, `Cohérence`, `Consigne suivie` | **P**: use the app's four dimensions. Proposed French: `Grammaire` (grammatical_accuracy), `Vocabulaire` (vocabulary), `Cohérence` (coherence), `Registre et style` (register_style); owner to confirm |
+| cta.next                | `Une autre consigne · reste {n}`                           | at 0: `Une autre consigne · à minuit` **I** (disabled)                                                                                                                                                 |
+| cta.carnet              | `« {shortName} » dans le Carnet →`                         | e.g. `« ‑er / ‑é » dans le Carnet →`                                                                                                                                                                   |
 
 ### CorrectionCard
 
-| Key | String | Notes |
-|---|---|---|
-| kind.mistake | `FAUTE` | |
-| kind.standard | `FRANÇAIS STANDARD` | |
-| kind.dialect | `ÇA SE DIT COMME ÇA ?` | |
-| tag.focus | `focus du jour` | |
-| marker | `{n}` / `{n} ?` (dialect) | |
-| arrow | `→` | |
-| dlf | `DLF` | |
-| explanation | e.g. `Après une préposition (à, de, pour), le verbe reste à l'infinitif : ‑er, pas ‑é.` | **M** |
-| resource.grammar | `Grammaire · {topic}` | topics **P** |
-| resource.input | `Input · {source}` | `InnerFrench`, `Télé-Louisiane` **P** |
-| action.ack | `Compris` | |
-| action.pushback | `C'est du français louisianais` | |
-| action.confirm | `Oui, c'est à nous-autres` | |
-| action.reject | `Non, corrige-le` | |
-| sr.mark | `faute {n}` / `français standard {n}` / `à vérifier {n}` | **I** visually hidden |
+| Key              | String                                                                                  | Notes                                 |
+| ---------------- | --------------------------------------------------------------------------------------- | ------------------------------------- |
+| kind.mistake     | `FAUTE`                                                                                 |                                       |
+| kind.standard    | `FRANÇAIS STANDARD`                                                                     |                                       |
+| kind.dialect     | `ÇA SE DIT COMME ÇA ?`                                                                  |                                       |
+| tag.focus        | `focus du jour`                                                                         |                                       |
+| marker           | `{n}` / `{n} ?` (dialect)                                                               |                                       |
+| arrow            | `→`                                                                                     |                                       |
+| dlf              | `DLF`                                                                                   |                                       |
+| explanation      | e.g. `Après une préposition (à, de, pour), le verbe reste à l'infinitif : ‑er, pas ‑é.` | **M**                                 |
+| resource.grammar | `Grammaire · {topic}`                                                                   | topics **P**                          |
+| resource.input   | `Input · {source}`                                                                      | `InnerFrench`, `Télé-Louisiane` **P** |
+| action.ack       | `Compris`                                                                               |                                       |
+| action.pushback  | `C'est du français louisianais`                                                         |                                       |
+| action.confirm   | `Oui, c'est à nous-autres`                                                              |                                       |
+| action.reject    | `Non, corrige-le`                                                                       |                                       |
+| sr.mark          | `faute {n}` / `français standard {n}` / `à vérifier {n}`                                | **I** visually hidden                 |
 
 Correction sheet explainers (`Corrections.dc.html`). These are not placed on any screen; usable as a legend/help if wanted:
 
-| Kind | Title | Blurb |
-|---|---|---|
-| mistake | `Faute` | `Une vraie erreur. Elle compte dans tes points faibles.` |
-| standard | `Français standard` | `Pas une faute. Une forme d'icitte t'est proposée ; ça compte pas.` |
-| dialect | `Ça se dit comme ça ?` | `Le tuteur est pas sûr. Oui : ça devient une note de dialecte. Non : c'est une faute.` |
+| Kind     | Title                  | Blurb                                                                                  |
+| -------- | ---------------------- | -------------------------------------------------------------------------------------- |
+| mistake  | `Faute`                | `Une vraie erreur. Elle compte dans tes points faibles.`                               |
+| standard | `Français standard`    | `Pas une faute. Une forme d'icitte t'est proposée ; ça compte pas.`                    |
+| dialect  | `Ça se dit comme ça ?` | `Le tuteur est pas sûr. Oui : ça devient une note de dialecte. Non : c'est une faute.` |
 
 ### States
 
-| Key | String | Notes |
-|---|---|---|
-| error.evaluate.lead | `J'ai pas pu lire ton texte ce coup-ci.` | bold |
-| error.evaluate.body | `Il est toujours là, y a rien de perdu.` | |
-| error.retry | `Essayer encore` | |
-| error.generate | (not drawn) | **I** proposal: `J'ai pas pu trouver de consigne ce coup-ci.` + `Essayer encore` |
-| offline.lead | `Pas de connexion.` | |
-| offline.body | `Ton brouillon est gardé sur cet appareil. Tu peux continuer à écrire.` | |
-| offline.retry | `Réessayer` | |
-| swap.label | `Changer de consigne` | `aria-label` |
-| swap.lead | `Changer de consigne ?` | |
-| swap.body | `Ton brouillon de {n} mots va rester dans l'Historique.` | |
-| swap.keep | `Garder celle-là` | |
-| swap.confirm | `Changer` | |
-| advance.lead | `Te voilà en {to}.` | |
-| advance.body | `Tes dernières évaluations étaient au-dessus de {from}, ça fait que les consignes vont monter d'un cran.` | |
-| advance.undo | `Rester en {from}` | |
+| Key                 | String                                                                                                    | Notes                                                                            |
+| ------------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| error.evaluate.lead | `J'ai pas pu lire ton texte ce coup-ci.`                                                                  | bold                                                                             |
+| error.evaluate.body | `Il est toujours là, y a rien de perdu.`                                                                  |                                                                                  |
+| error.retry         | `Essayer encore`                                                                                          |                                                                                  |
+| error.generate      | (not drawn)                                                                                               | **I** proposal: `J'ai pas pu trouver de consigne ce coup-ci.` + `Essayer encore` |
+| offline.lead        | `Pas de connexion.`                                                                                       |                                                                                  |
+| offline.body        | `Ton brouillon est gardé sur cet appareil. Tu peux continuer à écrire.`                                   |                                                                                  |
+| offline.retry       | `Réessayer`                                                                                               |                                                                                  |
+| swap.label          | `Changer de consigne`                                                                                     | `aria-label`                                                                     |
+| swap.lead           | `Changer de consigne ?`                                                                                   |                                                                                  |
+| swap.body           | `Ton brouillon de {n} mots va rester dans l'Historique.`                                                  |                                                                                  |
+| swap.keep           | `Garder celle-là`                                                                                         |                                                                                  |
+| swap.confirm        | `Changer`                                                                                                 |                                                                                  |
+| advance.lead        | `Te voilà en {to}.`                                                                                       |                                                                                  |
+| advance.body        | `Tes dernières évaluations étaient au-dessus de {from}, ça fait que les consignes vont monter d'un cran.` |                                                                                  |
+| advance.undo        | `Rester en {from}`                                                                                        |                                                                                  |
 
 The uppercase captions in `States.dc.html` (`L'ÉVALUATION A PAS PASSÉ · LE TEXTE RESTE`, `HORS LIGNE · PAS DE SQUELETTE SANS FIN`, `CHANGER DE CONSIGNE AVEC UN BROUILLON`, `PASSAGE DE NIVEAU · S'EFFACE À LA PROCHAINE CONSIGNE`, `CHARGEMENT · DEUX ÉTATS, DEUX LIBELLÉS`) are designer annotations. Do not ship them.
 
 ### DialectNoteSheet
 
-| Key | String | Notes |
-|---|---|---|
-| eyebrow | `MON FRANÇAIS LOUISIANAIS` | |
-| title | `Ajouter une note de dialecte` | edit mode `Modifier la note` **I** |
-| close | `Fermer` | `aria-label` |
-| written | `T'as écrit` | |
-| proposed | `Le tuteur proposait` | |
-| rule.label | `La règle` | |
-| rule.hint | `· proposée par le tuteur, c'est toi qui as le dernier mot` | 400, muted |
-| rule.value | e.g. `Avec « tomber », on prend l'auxiliaire « avoir » : il a tombé.` | **M** draft |
-| example.label | `Un exemple` | |
-| example.value | e.g. `Mon petit cousin a tombé dans la boue.` | **M** draft |
-| scope.legend | `Ça vaut pour` | |
-| scope.word | `Ce mot seulement : « {lemma} »` | **M** lemma |
-| scope.pattern | `Toute la famille : {pattern}` | **M** e.g. `« avoir » avec les verbes de mouvement` |
-| footer.note | `Une fois sauvée, la note va dans ton Carnet et le tuteur te reprendra plus là-dessus.` | |
-| footer.esc | `Échap pour fermer` | |
-| cancel | `Annuler` | |
-| save | `Sauver la note` | |
+| Key           | String                                                                                  | Notes                                               |
+| ------------- | --------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| eyebrow       | `MON FRANÇAIS LOUISIANAIS`                                                              |                                                     |
+| title         | `Ajouter une note de dialecte`                                                          | edit mode `Modifier la note` **I**                  |
+| close         | `Fermer`                                                                                | `aria-label`                                        |
+| written       | `T'as écrit`                                                                            |                                                     |
+| proposed      | `Le tuteur proposait`                                                                   |                                                     |
+| rule.label    | `La règle`                                                                              |                                                     |
+| rule.hint     | `· proposée par le tuteur, c'est toi qui as le dernier mot`                             | 400, muted                                          |
+| rule.value    | e.g. `Avec « tomber », on prend l'auxiliaire « avoir » : il a tombé.`                   | **M** draft                                         |
+| example.label | `Un exemple`                                                                            |                                                     |
+| example.value | e.g. `Mon petit cousin a tombé dans la boue.`                                           | **M** draft                                         |
+| scope.legend  | `Ça vaut pour`                                                                          |                                                     |
+| scope.word    | `Ce mot seulement : « {lemma} »`                                                        | **M** lemma                                         |
+| scope.pattern | `Toute la famille : {pattern}`                                                          | **M** e.g. `« avoir » avec les verbes de mouvement` |
+| footer.note   | `Une fois sauvée, la note va dans ton Carnet et le tuteur te reprendra plus là-dessus.` |                                                     |
+| footer.esc    | `Échap pour fermer`                                                                     |                                                     |
+| cancel        | `Annuler`                                                                               |                                                     |
+| save          | `Sauver la note`                                                                        |                                                     |
 
 ### Carnet
 
-| Key | String | Notes |
-|---|---|---|
-| title | `Carnet` | |
-| weak.title | `À travailler` | |
-| weak.intro | `Les fautes qui reviennent. « Pratiquer ça » oriente ta prochaine consigne.` | |
-| weak.meta | `{n} fois · vu {when} · {trend}` | `when`: `aujourd'hui` / `le 6 novembre`; trend `actif` / `en progrès` / `tranquille`. Singular `1 fois` |
-| weak.meta.focus | ` · focus du jour` | 600 primary |
-| weak.practice | `Pratiquer ça` | |
-| weak.names | `Infinitif ou participe (‑er / ‑é)`, `Imparfait ou passé composé`, `Genre des noms`, `Prépositions après le verbe`, `Accents (é / è / ê)` | **P** taxonomy |
-| notes.title | `Mon français louisianais` | |
-| notes.intro | `Tes notes de dialecte. Le tuteur les suit et te reprend pas là-dessus.` | |
-| notes.add | `Ajouter une note` | |
-| notes.meta | `{date} · {source} · {scope}` | source `séance d'aujourd'hui` / `séance du 9 novembre`; scope `ce mot seulement` / `toute la famille` |
-| notes.meta.new | ` · nouvelle` | 600 dialect |
-| notes.edit | `Modifier` | |
-| notes.delete | `Supprimer` | |
-| empty.weak / empty.notes | (not drawn) | **I** needed |
+| Key                      | String                                                                                                                                    | Notes                                                                                                   |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| title                    | `Carnet`                                                                                                                                  |                                                                                                         |
+| weak.title               | `À travailler`                                                                                                                            |                                                                                                         |
+| weak.intro               | `Les fautes qui reviennent. « Pratiquer ça » oriente ta prochaine consigne.`                                                              |                                                                                                         |
+| weak.meta                | `{n} fois · vu {when} · {trend}`                                                                                                          | `when`: `aujourd'hui` / `le 6 novembre`; trend `actif` / `en progrès` / `tranquille`. Singular `1 fois` |
+| weak.meta.focus          | ` · focus du jour`                                                                                                                        | 600 primary                                                                                             |
+| weak.practice            | `Pratiquer ça`                                                                                                                            |                                                                                                         |
+| weak.names               | `Infinitif ou participe (‑er / ‑é)`, `Imparfait ou passé composé`, `Genre des noms`, `Prépositions après le verbe`, `Accents (é / è / ê)` | **P** taxonomy                                                                                          |
+| notes.title              | `Mon français louisianais`                                                                                                                |                                                                                                         |
+| notes.intro              | `Tes notes de dialecte. Le tuteur les suit et te reprend pas là-dessus.`                                                                  |                                                                                                         |
+| notes.add                | `Ajouter une note`                                                                                                                        |                                                                                                         |
+| notes.meta               | `{date} · {source} · {scope}`                                                                                                             | source `séance d'aujourd'hui` / `séance du 9 novembre`; scope `ce mot seulement` / `toute la famille`   |
+| notes.meta.new           | ` · nouvelle`                                                                                                                             | 600 dialect                                                                                             |
+| notes.edit               | `Modifier`                                                                                                                                |                                                                                                         |
+| notes.delete             | `Supprimer`                                                                                                                               |                                                                                                         |
+| empty.weak / empty.notes | (not drawn)                                                                                                                               | **I** needed                                                                                            |
 
 ### History
 
-| Key | String | Notes |
-|---|---|---|
-| title | `Historique` | |
-| levels | `Niveau : {L1} depuis le {date1}, {L2} depuis le {date2}.` | |
-| list.label | `Séances passées` | `aria-label` |
-| row.title | `{historyName} · {historyName}` | e.g. `Infinitif ou participe · Imparfait ou passé composé` |
-| row.meta.evaluated | `{Weekday d month} · évaluée · {n} fautes · {level}` | |
-| row.meta.malformed | `{Weekday d month} · évaluée · détails incomplets` | |
-| row.abandoned.title | `Brouillon laissé de côté` | |
-| row.abandoned.meta | `{date} · {n} mots · pas évalué` | |
-| row.unused.title | `Consigne pas utilisée` | |
-| row.unused.meta | `{date} · rien d'écrit` | |
-| row.malformed.notice | `Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.` | |
-| expanded.prompt | `CONSIGNE D'ÉCRITURE` | |
-| expanded.text | `TON TEXTE · {n} MOTS` | |
-| expanded.readAll | `Lire tout le texte avec ses marques` | |
-| expanded.corrections | `CORRECTIONS` | |
-| kind.mistake / standard / note | `Faute` / `Français standard` / `Note de dialecte` | sentence case here |
-| note.kept | `{quote}, gardé comme t'as écrit` | |
-| empty | (not drawn) | **I** needed |
+| Key                            | String                                                                                                                                               | Notes                                                      |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| title                          | `Historique`                                                                                                                                         |                                                            |
+| levels                         | `Niveau : {L1} depuis le {date1}, {L2} depuis le {date2}.`                                                                                           |                                                            |
+| list.label                     | `Séances passées`                                                                                                                                    | `aria-label`                                               |
+| row.title                      | `{historyName} · {historyName}`                                                                                                                      | e.g. `Infinitif ou participe · Imparfait ou passé composé` |
+| row.meta.evaluated             | `{Weekday d month} · évaluée · {n} fautes · {level}`                                                                                                 |                                                            |
+| row.meta.malformed             | `{Weekday d month} · évaluée · détails incomplets`                                                                                                   |                                                            |
+| row.abandoned.title            | `Brouillon laissé de côté`                                                                                                                           |                                                            |
+| row.abandoned.meta             | `{date} · {n} mots · pas évalué`                                                                                                                     |                                                            |
+| row.unused.title               | `Consigne pas utilisée`                                                                                                                              |                                                            |
+| row.unused.meta                | `{date} · rien d'écrit`                                                                                                                              |                                                            |
+| row.malformed.notice           | `Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.` |                                                            |
+| expanded.prompt                | `CONSIGNE D'ÉCRITURE`                                                                                                                                |                                                            |
+| expanded.text                  | `TON TEXTE · {n} MOTS`                                                                                                                               |                                                            |
+| expanded.readAll               | `Lire tout le texte avec ses marques`                                                                                                                |                                                            |
+| expanded.corrections           | `CORRECTIONS`                                                                                                                                        |                                                            |
+| kind.mistake / standard / note | `Faute` / `Français standard` / `Note de dialecte`                                                                                                   | sentence case here                                         |
+| note.kept                      | `{quote}, gardé comme t'as écrit`                                                                                                                    |                                                            |
+| empty                          | (not drawn)                                                                                                                                          | **I** needed                                               |
 
 ### Placement
 
-| Key | String | Notes |
-|---|---|---|
-| title | `Test de placement` | |
-| intro | `Trois consignes, une après l'autre. Écris ce que tu peux pour chacune. À la fin, je te donne ton niveau CECR et on commence pour de vrai.` | |
-| step.n | `Étape {n}` | |
-| step.names | `Première consigne`, `Deuxième consigne`, `Troisième consigne` | |
-| caption | `Écris comme tu parles : le français de la Louisiane, c'est ça qui compte icitte. Tes brouillons sont gardés à mesure.` | |
-| start | `Commencer` | |
-| step.title | `Test de placement · étape {n} sur 3` | |
-| progress.label | `Avancement du test` | `aria-label`; `aria-valuetext` `Étape {n} sur 3` **I** |
-| next | `Consigne suivante` | step 3 label **I** (e.g. `Voir mon niveau`); busy label **I** (`Je lis ton texte…` is the natural fit) |
-| done.title | `Test de placement · fini` | |
-| done.label | `TON NIVEAU CECR · {LEVEL NAME}` | e.g. `· SEUIL` |
-| done.summary | e.g. `Tu racontes et tu décris sans misère…` | **M** |
-| done.step.summary | e.g. `Phrases simples, claires, presque pas de fautes.` | **M** |
-| done.cta | `Ma première consigne` | |
-| done.other | `Choisir un autre niveau` | |
+| Key               | String                                                                                                                                      | Notes                                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| title             | `Test de placement`                                                                                                                         |                                                                                                        |
+| intro             | `Trois consignes, une après l'autre. Écris ce que tu peux pour chacune. À la fin, je te donne ton niveau CECR et on commence pour de vrai.` |                                                                                                        |
+| step.n            | `Étape {n}`                                                                                                                                 |                                                                                                        |
+| step.names        | `Première consigne`, `Deuxième consigne`, `Troisième consigne`                                                                              |                                                                                                        |
+| caption           | `Écris comme tu parles : le français de la Louisiane, c'est ça qui compte icitte. Tes brouillons sont gardés à mesure.`                     |                                                                                                        |
+| start             | `Commencer`                                                                                                                                 |                                                                                                        |
+| step.title        | `Test de placement · étape {n} sur 3`                                                                                                       |                                                                                                        |
+| progress.label    | `Avancement du test`                                                                                                                        | `aria-label`; `aria-valuetext` `Étape {n} sur 3` **I**                                                 |
+| next              | `Consigne suivante`                                                                                                                         | step 3 label **I** (e.g. `Voir mon niveau`); busy label **I** (`Je lis ton texte…` is the natural fit) |
+| done.title        | `Test de placement · fini`                                                                                                                  |                                                                                                        |
+| done.label        | `TON NIVEAU CECR · {LEVEL NAME}`                                                                                                            | e.g. `· SEUIL`                                                                                         |
+| done.summary      | e.g. `Tu racontes et tu décris sans misère…`                                                                                                | **M**                                                                                                  |
+| done.step.summary | e.g. `Phrases simples, claires, presque pas de fautes.`                                                                                     | **M**                                                                                                  |
+| done.cta          | `Ma première consigne`                                                                                                                      |                                                                                                        |
+| done.other        | `Choisir un autre niveau`                                                                                                                   |                                                                                                        |
 
 ---
 
@@ -1201,23 +1370,23 @@ Codebase issues surfaced by the mapping (not design gaps, but they block the des
 
 Each slice is end-to-end (UI + the API/data it needs + tests), demoable, and targeted at under 500 lines of production code (tests excluded). Dependencies are listed by slice number.
 
-1. **Foundation: tokens, fonts, primitives.** `globals.css` rewrite (§1, without `--color-*: initial` yet), `layout.tsx` fonts + `lang="fr"`, Button rewrite, ButtonLink, TextLink, Field, Surface, SectionLabel, PageTitle, KbdHint, reduced-motion + focus base styles. Restyle nothing else yet. *Deps: none.* Test: Button variants render with correct roles; `busy` sets `aria-busy` + disabled.
-2. **App header + level menu + local-midnight quota.** AppHeader (full/placement variants, mobile two-row), QuotaText (all forms), LevelChip + LevelMenu (Base UI Menu, `PUT /api/level`), quota keyed by client time zone + `resetsAt` in `/api/quota`. Remove the old header from `page.tsx`/`history-page.tsx`. *Deps: 1.*
-3. **Home Phase A + structured prompt + Phase B shell.** `/api/today` bootstrap (level, quota, active session); HomePage state machine A0/A-ready/B; LevelPicker; FirstRunIntro; PromptSheet with PromptMeta (generator returns `genre/tenses/wordRange/tone`); separate generate busy label; prompt fade-up. Replaces LevelCard + the generate half of PromptCard. *Deps: 2.*
-4. **Writing surface.** RuledTextarea (auto-grow, ruled, `lang="fr"`, spellcheck off, ⌘/Ctrl+Enter), WordMeter, WritingFooter, SubmitButton (`Je lis ton texte…`), minimal Phase C placeholder that still shows the existing scores so nothing regresses. *Deps: 3.*
-5. **Draft persistence.** `PUT /api/sessions/:id/draft`, `draftSavedAt` column, localStorage mirror, reconcile on load, DraftStatus with `21 h 42` formatting, restore into Phase B after reload. *Deps: 4.*
-6. **Quota exhausted + swap with confirm + session statuses.** QuotaNotice with countdown, disabled swap `· à minuit`, ConfirmSwapDialog, `replaceSessionId` on generate marking `abandoned_draft`/`unused_prompt`. *Deps: 5.*
-7. **Errors and offline.** ErrorAlert (evaluate + generate) with retry, OfflineNotice, `navigator.onLine` + fetch-failure handling, draft kept locally, no endless skeletons. *Deps: 5.*
-8. **Corrections v1: Mistakes inline.** Evaluator prompt in French returning `corrections[]` (mistake kind only) with span validation; store in `evaluationJson`; ReviewLayout split/stacked; MarkedText (mistake marks + SR text); CorrectionCard mistake (without the resources/pushback action); EvaluationSummary; aria-live + focus move; ScoresDisclosure replacing EvaluationCard (dimension labels per decision §6.2); CTA `Une autre consigne · reste N`. *Deps: 4 (and decision 2).* Likely the largest slice; if it exceeds 500 lines, split the evaluator/schema change from the UI.
-9. **Standard→Louisiana with DLF.** DLF lookup module over `canonical.jsonl` (headword/forms → entry id), `standard` kind in the evaluator output (dropped unless a DLF form exists), dashed mark + outlined marker, card with `DLF` badge, `Compris` persistence (`POST /api/corrections/:id`). Never counted. *Deps: 8.*
-10. **Dialect check + Dialect Notes (create) + sheet.** `dialect_check` kind with `contextQuote`/`dialectDraft`; wavy mark + squared marker; `Non, corrige-le` → converted mistake; DialectNoteSheet (desktop panel + mobile bottom sheet, focus trap, slide motion); `POST /api/dialect-notes` resolving the Correction; mistake pushback `C'est du français louisianais`; evaluator receives notes and suppresses matches. *Deps: 8.*
-11. **Carnet: Dialect Notes list (read/edit/delete).** `/carnet` page shell, DialectNoteRow, `Ajouter une note` (new mode), `Modifier`, `Supprimer` with confirm/undo, `nouvelle` tag. *Deps: 10.*
-12. **Weakness memory + Carnet "À travailler" + Resources.** Category taxonomy + curated Resource catalog (static module), Weakness aggregation from Corrections (excluding standard, including converted, minus pushed back), trend, CarnetWeaknessRow, ResourceLinks on mistake cards and Carnet rows. *Deps: 8, 11 (page shell); decisions 4–6.*
-13. **Focus du jour.** Focus computation per local day, FocusLine (inline/stacked/hero), Focus fed into the prompt generator, `matchesFocus` + `focus du jour` tag, `Pratiquer ça` (`POST /api/weaknesses/:id/practice`), review CTA `« ‑er / ‑é » dans le Carnet →` with anchor. *Deps: 12, 3.*
-14. **History redesign.** Defensive `/api/sessions` with per-row `dataIssue`, HistoryRow (3 statuses + malformed, error boundary per row), expanded content with corrections summary, LevelProgressionLine, French dates, `/historique` route + redirect. *Deps: 6 (statuses), 8 (corrections summary); can ship before 8 with an evaluated-only summary.*
-15. **Read-only session review.** `/historique/[id]` reusing ReviewLayout/MarkedText/cards without actions. *Deps: 14, 10.*
-16. **Level advancement banner + undo.** Persisted tracker counter, pending advancement in bootstrap, AdvancementBanner, `POST /api/level/undo`, cleared on generate. *Deps: 3.*
-17. **Placement Test redesign.** Persisted placement state, `/placement` route (start/step/done), PlacementProgress, step uses RuledTextarea + WordMeter (no target) + drafts, PlacementResult with per-step summaries (French), first-run-only gating, `Ma première consigne`. Replaces PlacementTestCard. *Deps: 4, 5.*
-18. **Cleanup + motion polish.** Delete the old components, enable `--color-*: initial`, the marks-paint motion, a 390px pass across all pages, and an axe/Testing Library a11y sweep (roles, labels, focus return). *Deps: all UI slices.*
+1. **Foundation: tokens, fonts, primitives.** `globals.css` rewrite (§1, without `--color-*: initial` yet), `layout.tsx` fonts + `lang="fr"`, Button rewrite, ButtonLink, TextLink, Field, Surface, SectionLabel, PageTitle, KbdHint, reduced-motion + focus base styles. Restyle nothing else yet. _Deps: none._ Test: Button variants render with correct roles; `busy` sets `aria-busy` + disabled.
+2. **App header + level menu + local-midnight quota.** AppHeader (full/placement variants, mobile two-row), QuotaText (all forms), LevelChip + LevelMenu (Base UI Menu, `PUT /api/level`), quota keyed by client time zone + `resetsAt` in `/api/quota`. Remove the old header from `page.tsx`/`history-page.tsx`. _Deps: 1._
+3. **Home Phase A + structured prompt + Phase B shell.** `/api/today` bootstrap (level, quota, active session); HomePage state machine A0/A-ready/B; LevelPicker; FirstRunIntro; PromptSheet with PromptMeta (generator returns `genre/tenses/wordRange/tone`); separate generate busy label; prompt fade-up. Replaces LevelCard + the generate half of PromptCard. _Deps: 2._
+4. **Writing surface.** RuledTextarea (auto-grow, ruled, `lang="fr"`, spellcheck off, ⌘/Ctrl+Enter), WordMeter, WritingFooter, SubmitButton (`Je lis ton texte…`), minimal Phase C placeholder that still shows the existing scores so nothing regresses. _Deps: 3._
+5. **Draft persistence.** `PUT /api/sessions/:id/draft`, `draftSavedAt` column, localStorage mirror, reconcile on load, DraftStatus with `21 h 42` formatting, restore into Phase B after reload. _Deps: 4._
+6. **Quota exhausted + swap with confirm + session statuses.** QuotaNotice with countdown, disabled swap `· à minuit`, ConfirmSwapDialog, `replaceSessionId` on generate marking `abandoned_draft`/`unused_prompt`. _Deps: 5._
+7. **Errors and offline.** ErrorAlert (evaluate + generate) with retry, OfflineNotice, `navigator.onLine` + fetch-failure handling, draft kept locally, no endless skeletons. _Deps: 5._
+8. **Corrections v1: Mistakes inline.** Evaluator prompt in French returning `corrections[]` (mistake kind only) with span validation; store in `evaluationJson`; ReviewLayout split/stacked; MarkedText (mistake marks + SR text); CorrectionCard mistake (without the resources/pushback action); EvaluationSummary; aria-live + focus move; ScoresDisclosure replacing EvaluationCard (dimension labels per decision §6.2); CTA `Une autre consigne · reste N`. _Deps: 4 (and decision 2)._ Likely the largest slice; if it exceeds 500 lines, split the evaluator/schema change from the UI.
+9. **Standard→Louisiana with DLF.** DLF lookup module over `canonical.jsonl` (headword/forms → entry id), `standard` kind in the evaluator output (dropped unless a DLF form exists), dashed mark + outlined marker, card with `DLF` badge, `Compris` persistence (`POST /api/corrections/:id`). Never counted. _Deps: 8._
+10. **Dialect check + Dialect Notes (create) + sheet.** `dialect_check` kind with `contextQuote`/`dialectDraft`; wavy mark + squared marker; `Non, corrige-le` → converted mistake; DialectNoteSheet (desktop panel + mobile bottom sheet, focus trap, slide motion); `POST /api/dialect-notes` resolving the Correction; mistake pushback `C'est du français louisianais`; evaluator receives notes and suppresses matches. _Deps: 8._
+11. **Carnet: Dialect Notes list (read/edit/delete).** `/carnet` page shell, DialectNoteRow, `Ajouter une note` (new mode), `Modifier`, `Supprimer` with confirm/undo, `nouvelle` tag. _Deps: 10._
+12. **Weakness memory + Carnet "À travailler" + Resources.** Category taxonomy + curated Resource catalog (static module), Weakness aggregation from Corrections (excluding standard, including converted, minus pushed back), trend, CarnetWeaknessRow, ResourceLinks on mistake cards and Carnet rows. _Deps: 8, 11 (page shell); decisions 4–6._
+13. **Focus du jour.** Focus computation per local day, FocusLine (inline/stacked/hero), Focus fed into the prompt generator, `matchesFocus` + `focus du jour` tag, `Pratiquer ça` (`POST /api/weaknesses/:id/practice`), review CTA `« ‑er / ‑é » dans le Carnet →` with anchor. _Deps: 12, 3._
+14. **History redesign.** Defensive `/api/sessions` with per-row `dataIssue`, HistoryRow (3 statuses + malformed, error boundary per row), expanded content with corrections summary, LevelProgressionLine, French dates, `/historique` route + redirect. _Deps: 6 (statuses), 8 (corrections summary); can ship before 8 with an evaluated-only summary._
+15. **Read-only session review.** `/historique/[id]` reusing ReviewLayout/MarkedText/cards without actions. _Deps: 14, 10._
+16. **Level advancement banner + undo.** Persisted tracker counter, pending advancement in bootstrap, AdvancementBanner, `POST /api/level/undo`, cleared on generate. _Deps: 3._
+17. **Placement Test redesign.** Persisted placement state, `/placement` route (start/step/done), PlacementProgress, step uses RuledTextarea + WordMeter (no target) + drafts, PlacementResult with per-step summaries (French), first-run-only gating, `Ma première consigne`. Replaces PlacementTestCard. _Deps: 4, 5._
+18. **Cleanup + motion polish.** Delete the old components, enable `--color-*: initial`, the marks-paint motion, a 390px pass across all pages, and an axe/Testing Library a11y sweep (roles, labels, focus return). _Deps: all UI slices._
 
 Critical path to the core redesigned loop: 1 → 2 → 3 → 4 → 8. Slices 5–7 make it robust; 9–10 deliver the three-kind Correction model; 11–13 deliver memory (Carnet + Focus); 14–17 are independent after their listed deps.

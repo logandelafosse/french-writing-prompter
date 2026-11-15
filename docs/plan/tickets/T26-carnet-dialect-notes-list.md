@@ -1,8 +1,8 @@
 # T26 — Carnet page with Dialect Notes list
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 2 | AFK | T25 | ~320 |
+| ----- | ---- | ---------- | ----------------------- |
+| 2     | AFK  | T25        | ~320                    |
 
 ## User stories
 

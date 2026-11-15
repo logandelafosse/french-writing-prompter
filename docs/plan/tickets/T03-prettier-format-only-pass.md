@@ -1,8 +1,8 @@
 # T03 — Prettier format-only pass
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T02 | ~20 config (the format commit is exempt via the `size-exempt` label) |
+| Phase | Type | Blocked by | Production lines (est.)                                              |
+| ----- | ---- | ---------- | -------------------------------------------------------------------- |
+| 0     | AFK  | T02        | ~20 config (the format commit is exempt via the `size-exempt` label) |
 
 ## User stories
 

@@ -1,8 +1,8 @@
 # T08 — ESLint hardening and AGENTS.md engineering rules
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T05, T07 | ~150 config + ~150 violation fixes |
+| Phase | Type | Blocked by | Production lines (est.)            |
+| ----- | ---- | ---------- | ---------------------------------- |
+| 0     | AFK  | T05, T07   | ~150 config + ~150 violation fixes |
 
 ## User stories
 

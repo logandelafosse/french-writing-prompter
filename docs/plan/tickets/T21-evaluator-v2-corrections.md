@@ -1,8 +1,8 @@
 # T21 — Evaluator v2: Corrections, quote location, French output
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 1 | AFK (Q4 answered) | T06, T17 | ~480 |
+| Phase | Type              | Blocked by | Production lines (est.) |
+| ----- | ----------------- | ---------- | ----------------------- |
+| 1     | AFK (Q4 answered) | T06, T17   | ~480                    |
 
 **Mistake taxonomy (Q4, answered 2026-11-15):** use the 15 categories plus `autre` in `backend-requirements.md` §1.1 as-is for v1, with their French labels and "Louisiana note (never a Mistake)" column fed to the evaluator. IDs are persisted; labels can change later, merging IDs cannot. Logan approved this as a starting set.
 

@@ -78,7 +78,7 @@ describe("OpenAiClient", () => {
         client.chatCompletion({
           model: "gpt-4o",
           messages: [{ role: "user", content: "test" }],
-        })
+        }),
       ).rejects.toThrow("AI service error");
     });
   });

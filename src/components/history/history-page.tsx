@@ -37,26 +37,26 @@ function SessionRow({ session }: { session: Session }) {
     : null;
 
   return (
-    <div className="border border-zinc-200 rounded-lg overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-zinc-200">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-4 text-left hover:bg-zinc-50 transition-colors"
+        className="flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-zinc-50"
       >
-        <div className="flex items-center gap-3 min-w-0">
-          <span className="text-xs text-zinc-400 shrink-0">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className="shrink-0 text-xs text-zinc-400">
             {formatDate(session.createdAt)}
           </span>
-          <span className="text-sm text-zinc-700 truncate">
+          <span className="truncate text-sm text-zinc-700">
             {session.promptText.slice(0, 60)}
             {session.promptText.length > 60 ? "..." : ""}
           </span>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           {session.cefrLevel && (
             <LevelBadge level={session.cefrLevel as CefrLevel} />
           )}
           <svg
-            className={`w-4 h-4 text-zinc-400 transition-transform ${
+            className={`h-4 w-4 text-zinc-400 transition-transform ${
               expanded ? "rotate-180" : ""
             }`}
             fill="none"
@@ -74,19 +74,17 @@ function SessionRow({ session }: { session: Session }) {
       </button>
 
       {expanded && (
-        <div className="border-t border-zinc-200 p-4 space-y-4 bg-zinc-50/50">
+        <div className="space-y-4 border-t border-zinc-200 bg-zinc-50/50 p-4">
           <div>
-            <h4 className="text-xs font-medium text-zinc-500 uppercase mb-2">
+            <h4 className="mb-2 text-xs font-medium text-zinc-500 uppercase">
               Prompt
             </h4>
-            <p className="text-sm text-zinc-800 whitespace-pre-wrap">
+            <p className="text-sm whitespace-pre-wrap text-zinc-800">
               {session.promptText}
             </p>
             {constraints && (
-              <div className="flex items-center gap-2 mt-2">
-                <LevelBadge
-                  level={constraints.cefrLevel as CefrLevel}
-                />
+              <div className="mt-2 flex items-center gap-2">
+                <LevelBadge level={constraints.cefrLevel as CefrLevel} />
                 <span className="text-xs text-zinc-400">
                   {constraints.dialect === "louisiana"
                     ? "Louisiana French"
@@ -98,10 +96,10 @@ function SessionRow({ session }: { session: Session }) {
 
           {session.writingText && (
             <div>
-              <h4 className="text-xs font-medium text-zinc-500 uppercase mb-2">
+              <h4 className="mb-2 text-xs font-medium text-zinc-500 uppercase">
                 Your text
               </h4>
-              <p className="text-sm text-zinc-800 whitespace-pre-wrap bg-white rounded-lg p-3 border border-zinc-200">
+              <p className="rounded-lg border border-zinc-200 bg-white p-3 text-sm whitespace-pre-wrap text-zinc-800">
                 {session.writingText}
               </p>
             </div>
@@ -109,7 +107,7 @@ function SessionRow({ session }: { session: Session }) {
 
           {evaluation && (
             <div>
-              <h4 className="text-xs font-medium text-zinc-500 uppercase mb-2">
+              <h4 className="mb-2 text-xs font-medium text-zinc-500 uppercase">
                 Evaluation
               </h4>
               <EvaluationCard evaluation={evaluation} />
@@ -155,12 +153,12 @@ export function HistoryPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-col flex-1 bg-zinc-50">
-        <main className="w-full max-w-2xl mx-auto flex flex-col gap-6 p-8">
+      <div className="flex flex-1 flex-col bg-zinc-50">
+        <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
           <div className="animate-pulse space-y-4">
-            <div className="h-6 w-32 bg-zinc-100 rounded" />
-            <div className="h-40 bg-zinc-100 rounded-xl" />
-            <div className="h-40 bg-zinc-100 rounded-xl" />
+            <div className="h-6 w-32 rounded bg-zinc-100" />
+            <div className="h-40 rounded-xl bg-zinc-100" />
+            <div className="h-40 rounded-xl bg-zinc-100" />
           </div>
         </main>
       </div>
@@ -168,15 +166,15 @@ export function HistoryPage() {
   }
 
   return (
-    <div className="flex flex-col flex-1 bg-zinc-50">
-      <main className="w-full max-w-2xl mx-auto flex flex-col gap-6 p-8">
+    <div className="flex flex-1 flex-col bg-zinc-50">
+      <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
             History
           </h1>
           <Link
             href="/"
-            className="text-sm text-zinc-500 hover:text-zinc-700 transition-colors"
+            className="text-sm text-zinc-500 transition-colors hover:text-zinc-700"
           >
             Back
           </Link>
@@ -184,16 +182,13 @@ export function HistoryPage() {
 
         {levelData && levelData.history.length > 0 && (
           <div className="rounded-xl border bg-white p-6">
-            <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-wide mb-3">
+            <h2 className="mb-3 text-sm font-medium tracking-wide text-zinc-500 uppercase">
               Level progression
             </h2>
             <div className="space-y-2">
               {[...levelData.history].reverse().map((change, i: number) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 text-sm"
-                >
-                  <span className="text-xs text-zinc-400 w-32 shrink-0">
+                <div key={i} className="flex items-center gap-3 text-sm">
+                  <span className="w-32 shrink-0 text-xs text-zinc-400">
                     {formatDate(change.createdAt)}
                   </span>
                   {change.fromLevel ? (
@@ -206,7 +201,7 @@ export function HistoryPage() {
                   )}
                   <LevelBadge level={change.toLevel as CefrLevel} />
                   <span
-                    className={`text-xs px-1.5 py-0.5 rounded ${
+                    className={`rounded px-1.5 py-0.5 text-xs ${
                       change.source === "auto"
                         ? "bg-emerald-100 text-emerald-700"
                         : "bg-zinc-100 text-zinc-600"
@@ -221,12 +216,12 @@ export function HistoryPage() {
         )}
 
         <div className="space-y-3">
-          <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-wide">
+          <h2 className="text-sm font-medium tracking-wide text-zinc-500 uppercase">
             Sessions ({sessions.length})
           </h2>
 
           {sessions.length === 0 ? (
-            <p className="text-sm text-zinc-400 text-center py-8">
+            <p className="py-8 text-center text-sm text-zinc-400">
               No sessions yet. Generate a prompt to get started.
             </p>
           ) : (

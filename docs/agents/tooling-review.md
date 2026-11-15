@@ -4,14 +4,14 @@ Date: 2026-11-14. Scope: repo tooling that makes AI agents implementing the rede
 
 Guiding rule: **every known defect gets a machine check, and each check lives in exactly one tool.**
 
-| Kind of check | Tool |
-|---|---|
-| Needs type information | `typescript-eslint` |
-| Import graph and module seams | ESLint `no-restricted-imports` |
-| Syntactic bans with long explanations | ast-grep |
-| Dead code and dependencies | knip |
-| Shape of data at runtime | Zod |
-| Behavior | Vitest and Playwright |
+| Kind of check                         | Tool                           |
+| ------------------------------------- | ------------------------------ |
+| Needs type information                | `typescript-eslint`            |
+| Import graph and module seams         | ESLint `no-restricted-imports` |
+| Syntactic bans with long explanations | ast-grep                       |
+| Dead code and dependencies            | knip                           |
+| Shape of data at runtime              | Zod                            |
+| Behavior                              | Vitest and Playwright          |
 
 Don't encode the same ban in two tools; that is DRY applied to tooling.
 
@@ -21,41 +21,41 @@ Don't encode the same ban in two tools; that is DRY applied to tooling.
 
 ### Tooling inventory
 
-| Area | State |
-|---|---|
-| Git | **The project is not under version control.** `git rev-parse --show-toplevel` resolves to `~/Personal-Projects` (remote `sekaieth/Personal-Projects`). There, `french-writing-prompter/` shows as untracked (`?? french-writing-prompter/`) and has no `.git` of its own. You can't open PRs, hooks would install into the shared parent repo, and `gh issue` would target the wrong repo. |
-| `.gitignore` | Next.js default. **`data.db` is not ignored**, and it holds personal writing. `.env*` is ignored. |
-| Scripts | `dev`, `build`, `start`, `lint` (`eslint`), `test` (`vitest run`), `test:watch`, `db:push`, `db:studio`. No `typecheck`, no `check`, no e2e. |
-| TypeScript | 5.9.3. `strict: true`, `target: ES2017`, `allowJs: true`, `isolatedModules`, `moduleResolution: bundler`. No extra strictness flags. |
-| ESLint | 9, flat config. Only `eslint-config-next` `core-web-vitals` and `typescript`. No type-aware rules. |
-| Vitest | 4.1. `environment: "node"`, `globals: true`, alias `@`. No jsdom project even though Testing Library and jsdom are installed. No setup file. No env isolation: `src/db/index.ts` falls back to `file:./data.db`. |
-| Formatter | None (no Prettier or Biome). |
-| ast-grep / knip / Playwright / lefthook / husky / CI | None. **On this machine `/usr/bin/sg` is shadow-utils, not ast-grep.** Always invoke `ast-grep`, never `sg`. |
-| Drizzle | `drizzle-kit push` only. **No `drizzle/` migrations folder**, so a test DB can't be built from versioned schema. |
-| Zod | 4.4.3 is in `node_modules`, but only transitively (through `eslint-plugin-react-hooks`). It is not a direct dependency. |
-| Agent configs | `.cursor/` and `.claude/` are empty. `CLAUDE.md` contains `@AGENTS.md`. `AGENTS.md` only points at the issue tracker, labels and domain docs. `opencode.json` is `{"permission": "allow"}`, so everything is allowed, including force-push and `--no-verify`. |
-| `docs/plan/tickets/` | Empty. |
+| Area                                                 | State                                                                                                                                                                                                                                                                                                                                                                                      |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Git                                                  | **The project is not under version control.** `git rev-parse --show-toplevel` resolves to `~/Personal-Projects` (remote `sekaieth/Personal-Projects`). There, `french-writing-prompter/` shows as untracked (`?? french-writing-prompter/`) and has no `.git` of its own. You can't open PRs, hooks would install into the shared parent repo, and `gh issue` would target the wrong repo. |
+| `.gitignore`                                         | Next.js default. **`data.db` is not ignored**, and it holds personal writing. `.env*` is ignored.                                                                                                                                                                                                                                                                                          |
+| Scripts                                              | `dev`, `build`, `start`, `lint` (`eslint`), `test` (`vitest run`), `test:watch`, `db:push`, `db:studio`. No `typecheck`, no `check`, no e2e.                                                                                                                                                                                                                                               |
+| TypeScript                                           | 5.9.3. `strict: true`, `target: ES2017`, `allowJs: true`, `isolatedModules`, `moduleResolution: bundler`. No extra strictness flags.                                                                                                                                                                                                                                                       |
+| ESLint                                               | 9, flat config. Only `eslint-config-next` `core-web-vitals` and `typescript`. No type-aware rules.                                                                                                                                                                                                                                                                                         |
+| Vitest                                               | 4.1. `environment: "node"`, `globals: true`, alias `@`. No jsdom project even though Testing Library and jsdom are installed. No setup file. No env isolation: `src/db/index.ts` falls back to `file:./data.db`.                                                                                                                                                                           |
+| Formatter                                            | None (no Prettier or Biome).                                                                                                                                                                                                                                                                                                                                                               |
+| ast-grep / knip / Playwright / lefthook / husky / CI | None. **On this machine `/usr/bin/sg` is shadow-utils, not ast-grep.** Always invoke `ast-grep`, never `sg`.                                                                                                                                                                                                                                                                               |
+| Drizzle                                              | `drizzle-kit push` only. **No `drizzle/` migrations folder**, so a test DB can't be built from versioned schema.                                                                                                                                                                                                                                                                           |
+| Zod                                                  | 4.4.3 is in `node_modules`, but only transitively (through `eslint-plugin-react-hooks`). It is not a direct dependency.                                                                                                                                                                                                                                                                    |
+| Agent configs                                        | `.cursor/` and `.claude/` are empty. `CLAUDE.md` contains `@AGENTS.md`. `AGENTS.md` only points at the issue tracker, labels and domain docs. `opencode.json` is `{"permission": "allow"}`, so everything is allowed, including force-push and `--no-verify`.                                                                                                                              |
+| `docs/plan/tickets/`                                 | Empty.                                                                                                                                                                                                                                                                                                                                                                                     |
 
 ### Baseline results
 
-| Command | Result |
-|---|---|
-| `npx tsc --noEmit` | **Exit 0** with `--incremental false`. The default run failed only because the sandbox couldn't write `tsconfig.tsbuildinfo` (EROFS), which is not a code issue. |
-| `npm run lint` | **Exit 1, 3 errors**, all `react/no-unescaped-entities` on English apostrophes: `placement-test-card.tsx:202`, `prompt-card.tsx:155`, `prompt-card.tsx:245`. The redesign's French copy (`C'est`, `d'écriture`, `Donne-moi`…) would trip this rule constantly; see §3.2. |
-| `npx vitest run` | **Not run on purpose.** `history-store.test.ts` calls `db.delete(sessions)` against the real `data.db`. That makes `npm test` a destructive command today, which is the most urgent broken window. |
+| Command            | Result                                                                                                                                                                                                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `npx tsc --noEmit` | **Exit 0** with `--incremental false`. The default run failed only because the sandbox couldn't write `tsconfig.tsbuildinfo` (EROFS), which is not a code issue.                                                                                                         |
+| `npm run lint`     | **Exit 1, 3 errors**, all `react/no-unescaped-entities` on English apostrophes: `placement-test-card.tsx:202`, `prompt-card.tsx:155`, `prompt-card.tsx:245`. The redesign's French copy (`C'est`, `d'écriture`, `Donne-moi`…) would trip this rule constantly; see §3.2. |
+| `npx vitest run`   | **Not run on purpose.** `history-store.test.ts` calls `db.delete(sessions)` against the real `data.db`. That makes `npm test` a destructive command today, which is the most urgent broken window.                                                                       |
 
 Probes (temporary flags and a `/tmp` ESLint config; no repo files changed):
 
-| Probe | New errors |
-|---|---|
-| `--noUncheckedIndexedAccess` | 24, across `quota-store.ts` (6), `history-store.ts` (3), `placement-test.ts` (3), `cefr-tracker*` (6) and tests (5). Mostly `rows[0].x`, which crashes on empty result sets. |
-| `--exactOptionalPropertyTypes` | 0 |
-| `--noImplicitOverride` | 0 |
-| `--noFallthroughCasesInSwitch` | 0 |
-| `--noImplicitReturns` | 0 |
-| `--verbatimModuleSyntax` | 0 |
-| `--noPropertyAccessFromIndexSignature` | 3, all `process.env.X` |
-| `--erasableSyntaxOnly` | 5 (constructor parameter properties) |
+| Probe                                                                                       | New errors                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--noUncheckedIndexedAccess`                                                                | 24, across `quota-store.ts` (6), `history-store.ts` (3), `placement-test.ts` (3), `cefr-tracker*` (6) and tests (5). Mostly `rows[0].x`, which crashes on empty result sets.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `--exactOptionalPropertyTypes`                                                              | 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `--noImplicitOverride`                                                                      | 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `--noFallthroughCasesInSwitch`                                                              | 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `--noImplicitReturns`                                                                       | 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `--verbatimModuleSyntax`                                                                    | 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `--noPropertyAccessFromIndexSignature`                                                      | 3, all `process.env.X`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `--erasableSyntaxOnly`                                                                      | 5 (constructor parameter properties)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `typescript-eslint` `strictTypeChecked` + `switch-exhaustiveness-check` + `jsx-a11y` strict | **155** in total: `no-unsafe-member-access` 40, `no-unsafe-assignment` 32, `no-unsafe-argument` 25, `no-unnecessary-type-assertion` 14, `no-non-null-assertion` 11, `no-misused-promises` 9, `no-confusing-void-expression` 6, `no-floating-promises` 5, `no-unsafe-call` 3, `restrict-template-expressions` 2, `no-unnecessary-condition` 2, `await-thenable` 1, `require-await` 1, `jsx-a11y/label-has-associated-control` 2, `jsx-a11y/click-events-have-key-events` 1, `jsx-a11y/no-static-element-interactions` 1. **About 100 of the 155 are `no-unsafe-*` hits that trace back to untyped `res.json()` and `request.json()`.** Validating at the boundaries (§5) removes most of them. |
 
 ### Problems found beyond the brief
@@ -75,18 +75,18 @@ These confirm the pattern behind the known list:
 
 ## 2. TypeScript compiler flags
 
-| Flag | Verdict | Prevents | Cost today | Priority |
-|---|---|---|---|---|
-| `noUncheckedIndexedAccess` | **Adopt** | `rows[0].usedCount` / `rows[0].count` crashing on empty results (assertive programming). Forces `first(rows)`, or drizzle's `.get()`, which returns `T \| undefined`. | 24 errors, roughly 40 lines to fix | P0 |
-| `exactOptionalPropertyTypes` | **Adopt now while it's free** | Confusing "absent" with "explicitly undefined" in API payloads and `db.update().set()` partials, where `undefined` silently skips a column. | 0 errors. Later friction: optional React props that receive `undefined`. Fix by typing the prop as `?: T \| undefined` deliberately. | P0 |
-| `noFallthroughCasesInSwitch` | Adopt | Accidental fallthrough in phase and correction-kind switches. | 0 | P0 |
-| `noImplicitReturns` | Adopt | Handlers with a code path that returns nothing. | 0 | P0 |
-| `noImplicitOverride` | Adopt | Little value (few classes), but free. | 0 | P0 (same PR) |
-| `verbatimModuleSyntax` | **Adopt** | Value imports of server modules (`@/db`, stores) leaking into client bundles when only a type was needed. `import type` becomes mandatory and visible in review, which supports decoupling. | 0 errors (the code already uses `import type`) | P0 |
-| `noPropertyAccessFromIndexSignature` | Skip | Its only hits are `process.env`, which §5 moves into a validated `env.ts`. | 3 | n/a |
-| `erasableSyntaxOnly` | Skip | We don't run TS through Node type-stripping, and parameter properties are the existing DI idiom. | 5 | n/a |
-| `allowJs: false`, `target: ES2022` | Adopt | There are no JS sources. ES2022 unlocks `.at()` and `Error` `cause`, so boundary errors can carry their Zod issue as `cause`. | 0 | P0 |
-| `noUnusedLocals` / `noUnusedParameters` | Skip | They would block `tsc` during TDD red/green, and ESLint `no-unused-vars` plus knip already cover this. | | n/a |
+| Flag                                    | Verdict                       | Prevents                                                                                                                                                                                    | Cost today                                                                                                                           | Priority     |
+| --------------------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------ |
+| `noUncheckedIndexedAccess`              | **Adopt**                     | `rows[0].usedCount` / `rows[0].count` crashing on empty results (assertive programming). Forces `first(rows)`, or drizzle's `.get()`, which returns `T \| undefined`.                       | 24 errors, roughly 40 lines to fix                                                                                                   | P0           |
+| `exactOptionalPropertyTypes`            | **Adopt now while it's free** | Confusing "absent" with "explicitly undefined" in API payloads and `db.update().set()` partials, where `undefined` silently skips a column.                                                 | 0 errors. Later friction: optional React props that receive `undefined`. Fix by typing the prop as `?: T \| undefined` deliberately. | P0           |
+| `noFallthroughCasesInSwitch`            | Adopt                         | Accidental fallthrough in phase and correction-kind switches.                                                                                                                               | 0                                                                                                                                    | P0           |
+| `noImplicitReturns`                     | Adopt                         | Handlers with a code path that returns nothing.                                                                                                                                             | 0                                                                                                                                    | P0           |
+| `noImplicitOverride`                    | Adopt                         | Little value (few classes), but free.                                                                                                                                                       | 0                                                                                                                                    | P0 (same PR) |
+| `verbatimModuleSyntax`                  | **Adopt**                     | Value imports of server modules (`@/db`, stores) leaking into client bundles when only a type was needed. `import type` becomes mandatory and visible in review, which supports decoupling. | 0 errors (the code already uses `import type`)                                                                                       | P0           |
+| `noPropertyAccessFromIndexSignature`    | Skip                          | Its only hits are `process.env`, which §5 moves into a validated `env.ts`.                                                                                                                  | 3                                                                                                                                    | n/a          |
+| `erasableSyntaxOnly`                    | Skip                          | We don't run TS through Node type-stripping, and parameter properties are the existing DI idiom.                                                                                            | 5                                                                                                                                    | n/a          |
+| `allowJs: false`, `target: ES2022`      | Adopt                         | There are no JS sources. ES2022 unlocks `.at()` and `Error` `cause`, so boundary errors can carry their Zod issue as `cause`.                                                               | 0                                                                                                                                    | P0           |
+| `noUnusedLocals` / `noUnusedParameters` | Skip                          | They would block `tsc` during TDD red/green, and ESLint `no-unused-vars` plus knip already cover this.                                                                                      |                                                                                                                                      | n/a          |
 
 Proposed `tsconfig.json` delta:
 
@@ -113,23 +113,23 @@ Optional, P2: `typedRoutes: true` in `next.config.ts` (stable in Next 16) so tha
 
 ### 3.1 Rules and plugins
 
-| Addition | Prevents | Noise | Priority |
-|---|---|---|---|
-| `typescript-eslint` `strictTypeChecked` on `src/**` (`projectService: true`) | Unvalidated `res.json()` / `request.json()` through the `no-unsafe-*` rules (the known problem), `!` assertions, needless casts. | 155 today, mostly gone after §5. Turn **off** `no-confusing-void-expression` (style noise with arrow shorthand). Set `restrict-template-expressions` to `{ allowNumber: true }`. | P0, after the Zod tickets |
-| `no-floating-promises`, `no-misused-promises` (included in strict) | `load()` / `refreshQuota()` fired without error handling, and `onClick={async…}` swallowing rejections, which leads to never-cleared UI state. Keep `checksVoidReturn` on: handlers must catch and set an error state, then use `void`. | 14 today | P0 |
-| `@typescript-eslint/switch-exhaustiveness-check` `{ considerDefaultExhaustiveForUnions: false, requireDefaultForNonUnion: true }` | Unhandled correction kinds (`mistake \| standard \| dialect`), History statuses and phase unions. A `default:` must not hide a new union member (design by contract). | Low | P0 |
-| `jsx-a11y` strict rules (the plugin is already registered by Next; spread **only `.rules`** to avoid "Cannot redefine plugin") | Unassociated labels, clickable `div`s. HANDOFF requires real `<button>`, `<label>` and `aria-*`. | 4 today | P0 |
-| `react/no-unescaped-entities: ["error", { forbid: [">", "}"] }]` | Keeps the useful part of the rule, and stops it from fighting French apostrophes. | Fixes all 3 current errors | P0 |
-| `react/jsx-no-leaked-render` `{ validStrategies: ["ternary", "coerce"] }` (plugin already installed) | `{count && <X/>}` rendering `0`. Mistake counts and quota numbers make this likely. | Low | P1 |
-| `@typescript-eslint/no-restricted-imports` with per-directory overrides (seams; see §3.3) | UI importing `@/db` or stores, domain modules importing Next or React, `openai` imported outside its adapter (decoupling, Law of Demeter, orthogonality). `allowTypeImports: true` where types may cross. | 0 today | P0 |
-| `import/no-cycle` (plugin already installed) | Circular module graphs as the component tree grows. | Low on a repo this size | P1 |
-| `@typescript-eslint/no-magic-numbers` on `src/modules`, `src/server`, `src/app/api`, `src/components` (not tests or `src/config`) `{ ignore: [0, 1, -1], ignoreEnums: true, ignoreNumericLiteralTypes: true, ignoreReadonlyClassProperties: true, ignoreTypeIndexes: true }` | Hardcoded quota `3`, `250–300` word targets, `slice(0, 60)` (the known problem). Top-level `const X = 3` is allowed, which pushes literals into named constants. | Medium; worth it | P1 |
-| `@eslint-community/eslint-plugin-eslint-comments`: `require-description`, `no-unlimited-disable`. Plus `linterOptions.reportUnusedDisableDirectives: "error"` | Agents silencing rules. Every disable must carry `-- reason`. | 1 existing file-wide disable (`writing-evaluator.test.ts`) | P0 |
-| `@vitest/eslint-plugin` recommended + `no-focused-tests`, `no-disabled-tests`, `expect-expect`, `no-conditional-expect`, `no-standalone-expect`, `valid-title`, `prefer-called-with` | `.only` and `.skip` sneaking into PRs, tests with no assertions (test ruthlessly). | Low | P0 |
-| `eslint-plugin-testing-library` `flat/react` + `eslint-plugin-jest-dom` recommended, on `*.test.tsx` | `container.querySelector`, `fireEvent` instead of `userEvent`, missing `await` on async events. Role- and label-based queries also double as a11y checks. | 0 today (no component tests yet), so set it before the first one | P0 |
-| `eslint-plugin-playwright` on `e2e/**`: `no-raw-locators`, `prefer-web-first-assertions`, `no-wait-for-timeout`, `no-networkidle`, `no-force-option` | Flaky e2e from CSS selectors and sleeps. | 0 | P1, in the Playwright ticket |
-| `eslint-plugin-unused-imports` | **Skip.** Duplicates `no-unused-vars` and knip. | | n/a |
-| `eslint-plugin-boundaries` | **Skip for now.** `no-restricted-imports` overrides express our 5 seams with zero new deps and clearer messages. Revisit if the number of layers doubles. | | P2 |
+| Addition                                                                                                                                                                                                                                                                     | Prevents                                                                                                                                                                                                                                | Noise                                                                                                                                                                            | Priority                     |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `typescript-eslint` `strictTypeChecked` on `src/**` (`projectService: true`)                                                                                                                                                                                                 | Unvalidated `res.json()` / `request.json()` through the `no-unsafe-*` rules (the known problem), `!` assertions, needless casts.                                                                                                        | 155 today, mostly gone after §5. Turn **off** `no-confusing-void-expression` (style noise with arrow shorthand). Set `restrict-template-expressions` to `{ allowNumber: true }`. | P0, after the Zod tickets    |
+| `no-floating-promises`, `no-misused-promises` (included in strict)                                                                                                                                                                                                           | `load()` / `refreshQuota()` fired without error handling, and `onClick={async…}` swallowing rejections, which leads to never-cleared UI state. Keep `checksVoidReturn` on: handlers must catch and set an error state, then use `void`. | 14 today                                                                                                                                                                         | P0                           |
+| `@typescript-eslint/switch-exhaustiveness-check` `{ considerDefaultExhaustiveForUnions: false, requireDefaultForNonUnion: true }`                                                                                                                                            | Unhandled correction kinds (`mistake \| standard \| dialect`), History statuses and phase unions. A `default:` must not hide a new union member (design by contract).                                                                   | Low                                                                                                                                                                              | P0                           |
+| `jsx-a11y` strict rules (the plugin is already registered by Next; spread **only `.rules`** to avoid "Cannot redefine plugin")                                                                                                                                               | Unassociated labels, clickable `div`s. HANDOFF requires real `<button>`, `<label>` and `aria-*`.                                                                                                                                        | 4 today                                                                                                                                                                          | P0                           |
+| `react/no-unescaped-entities: ["error", { forbid: [">", "}"] }]`                                                                                                                                                                                                             | Keeps the useful part of the rule, and stops it from fighting French apostrophes.                                                                                                                                                       | Fixes all 3 current errors                                                                                                                                                       | P0                           |
+| `react/jsx-no-leaked-render` `{ validStrategies: ["ternary", "coerce"] }` (plugin already installed)                                                                                                                                                                         | `{count && <X/>}` rendering `0`. Mistake counts and quota numbers make this likely.                                                                                                                                                     | Low                                                                                                                                                                              | P1                           |
+| `@typescript-eslint/no-restricted-imports` with per-directory overrides (seams; see §3.3)                                                                                                                                                                                    | UI importing `@/db` or stores, domain modules importing Next or React, `openai` imported outside its adapter (decoupling, Law of Demeter, orthogonality). `allowTypeImports: true` where types may cross.                               | 0 today                                                                                                                                                                          | P0                           |
+| `import/no-cycle` (plugin already installed)                                                                                                                                                                                                                                 | Circular module graphs as the component tree grows.                                                                                                                                                                                     | Low on a repo this size                                                                                                                                                          | P1                           |
+| `@typescript-eslint/no-magic-numbers` on `src/modules`, `src/server`, `src/app/api`, `src/components` (not tests or `src/config`) `{ ignore: [0, 1, -1], ignoreEnums: true, ignoreNumericLiteralTypes: true, ignoreReadonlyClassProperties: true, ignoreTypeIndexes: true }` | Hardcoded quota `3`, `250–300` word targets, `slice(0, 60)` (the known problem). Top-level `const X = 3` is allowed, which pushes literals into named constants.                                                                        | Medium; worth it                                                                                                                                                                 | P1                           |
+| `@eslint-community/eslint-plugin-eslint-comments`: `require-description`, `no-unlimited-disable`. Plus `linterOptions.reportUnusedDisableDirectives: "error"`                                                                                                                | Agents silencing rules. Every disable must carry `-- reason`.                                                                                                                                                                           | 1 existing file-wide disable (`writing-evaluator.test.ts`)                                                                                                                       | P0                           |
+| `@vitest/eslint-plugin` recommended + `no-focused-tests`, `no-disabled-tests`, `expect-expect`, `no-conditional-expect`, `no-standalone-expect`, `valid-title`, `prefer-called-with`                                                                                         | `.only` and `.skip` sneaking into PRs, tests with no assertions (test ruthlessly).                                                                                                                                                      | Low                                                                                                                                                                              | P0                           |
+| `eslint-plugin-testing-library` `flat/react` + `eslint-plugin-jest-dom` recommended, on `*.test.tsx`                                                                                                                                                                         | `container.querySelector`, `fireEvent` instead of `userEvent`, missing `await` on async events. Role- and label-based queries also double as a11y checks.                                                                               | 0 today (no component tests yet), so set it before the first one                                                                                                                 | P0                           |
+| `eslint-plugin-playwright` on `e2e/**`: `no-raw-locators`, `prefer-web-first-assertions`, `no-wait-for-timeout`, `no-networkidle`, `no-force-option`                                                                                                                         | Flaky e2e from CSS selectors and sleeps.                                                                                                                                                                                                | 0                                                                                                                                                                                | P1, in the Playwright ticket |
+| `eslint-plugin-unused-imports`                                                                                                                                                                                                                                               | **Skip.** Duplicates `no-unused-vars` and knip.                                                                                                                                                                                         |                                                                                                                                                                                  | n/a                          |
+| `eslint-plugin-boundaries`                                                                                                                                                                                                                                                   | **Skip for now.** `no-restricted-imports` overrides express our 5 seams with zero new deps and clearer messages. Revisit if the number of layers doubles.                                                                               |                                                                                                                                                                                  | P2                           |
 
 ### 3.2 Proposed `eslint.config.mjs`
 
@@ -158,19 +158,31 @@ export default defineConfig([
     files: ["src/**/*.{ts,tsx}"],
     extends: [tseslint.configs.strictTypeChecked],
     languageOptions: {
-      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     rules: {
       ...jsxA11y.flatConfigs.strict.rules,
       "@eslint-community/eslint-comments/require-description": "error",
       "@typescript-eslint/switch-exhaustiveness-check": [
         "error",
-        { considerDefaultExhaustiveForUnions: false, requireDefaultForNonUnion: true },
+        {
+          considerDefaultExhaustiveForUnions: false,
+          requireDefaultForNonUnion: true,
+        },
       ],
       "@typescript-eslint/no-confusing-void-expression": "off",
-      "@typescript-eslint/restrict-template-expressions": ["error", { allowNumber: true }],
+      "@typescript-eslint/restrict-template-expressions": [
+        "error",
+        { allowNumber: true },
+      ],
       "react/no-unescaped-entities": ["error", { forbid: [">", "}"] }],
-      "react/jsx-no-leaked-render": ["error", { validStrategies: ["ternary", "coerce"] }],
+      "react/jsx-no-leaked-render": [
+        "error",
+        { validStrategies: ["ternary", "coerce"] },
+      ],
       "import/no-cycle": "error",
     },
   },
@@ -192,29 +204,69 @@ export default defineConfig([
   },
   // Seams: see §3.3. Keep file groups disjoint; same-rule overrides replace, not merge.
   {
-    files: ["src/components/**", "src/app/**/page.tsx", "src/app/**/layout.tsx", "src/hooks/**"],
+    files: [
+      "src/components/**",
+      "src/app/**/page.tsx",
+      "src/app/**/layout.tsx",
+      "src/hooks/**",
+    ],
     rules: {
-      "@typescript-eslint/no-restricted-imports": ["error", {
-        patterns: [
-          { group: ["@/db", "@/db/*", "@/server/*", "@/modules/*/*-store", "drizzle-orm*", "@libsql/*", "openai", "openai/*"],
-            message: "Client code reaches the server only through fetchJson() from @/lib/http and schemas from @/contracts." },
-          { group: ["@/modules/*"], allowTypeImports: true,
-            message: "Import domain types from @/contracts; components must not run domain logic directly." },
-        ],
-      }],
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/db",
+                "@/db/*",
+                "@/server/*",
+                "@/modules/*/*-store",
+                "drizzle-orm*",
+                "@libsql/*",
+                "openai",
+                "openai/*",
+              ],
+              message:
+                "Client code reaches the server only through fetchJson() from @/lib/http and schemas from @/contracts.",
+            },
+            {
+              group: ["@/modules/*"],
+              allowTypeImports: true,
+              message:
+                "Import domain types from @/contracts; components must not run domain logic directly.",
+            },
+          ],
+        },
+      ],
     },
   },
   {
     files: ["src/modules/**"],
     ignores: ["src/modules/openai-client/**"],
     rules: {
-      "@typescript-eslint/no-restricted-imports": ["error", {
-        patterns: [
-          { group: ["next", "next/*", "react", "react-dom", "@/components/*", "@/app/*"],
-            message: "Domain modules are framework-free (orthogonality)." },
-          { group: ["openai", "openai/*"], message: "Only src/modules/openai-client talks to the OpenAI SDK." },
-        ],
-      }],
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "next",
+                "next/*",
+                "react",
+                "react-dom",
+                "@/components/*",
+                "@/app/*",
+              ],
+              message: "Domain modules are framework-free (orthogonality).",
+            },
+            {
+              group: ["openai", "openai/*"],
+              message:
+                "Only src/modules/openai-client talks to the OpenAI SDK.",
+            },
+          ],
+        },
+      ],
     },
   },
   {
@@ -233,9 +285,20 @@ export default defineConfig([
   { files: ["src/**/*.test.tsx"], ...jestDom.configs["flat/recommended"] },
   {
     files: LEGACY,
-    rules: { ...Object.fromEntries(Object.keys(jsxA11y.flatConfigs.strict.rules).map((r) => [r, "off"])) },
+    rules: {
+      ...Object.fromEntries(
+        Object.keys(jsxA11y.flatConfigs.strict.rules).map((r) => [r, "off"]),
+      ),
+    },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "playwright-report/**", "test-results/**"]),
+  globalIgnores([
+    ".next/**",
+    "out/**",
+    "build/**",
+    "next-env.d.ts",
+    "playwright-report/**",
+    "test-results/**",
+  ]),
 ]);
 ```
 
@@ -243,13 +306,13 @@ export default defineConfig([
 
 ### 3.3 Module seams
 
-| Layer | May import | Must not import |
-|---|---|---|
-| `src/contracts/**`: Zod schemas and the types derived from them (`CefrLevel`, `Evaluation`, API bodies, draft) | `zod` only | everything else |
-| `src/modules/**`: pure domain (tracker, placement, prompt-generator, evaluator, dialect) | `@/contracts`, `@/config`, `@/lib` | `next`, `react`, `@/db`, `openai` (except the openai-client adapter) |
-| `src/server/**`: repositories (`@/db`), the AI client factory, `env.ts`, route helpers | anything server-side | `@/components` |
-| `src/app/api/**`: thin handlers that call `parseRequestBody` → module → repository | `@/server`, `@/modules`, `@/contracts` | `@/db` directly (P1, once repositories move to `src/server`) |
-| `src/components/**`, pages | `@/contracts`, `@/copy`, `@/lib/http`, `@/components/ui` | `@/db`, `@/server`, stores, `openai` |
+| Layer                                                                                                          | May import                                               | Must not import                                                      |
+| -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------- |
+| `src/contracts/**`: Zod schemas and the types derived from them (`CefrLevel`, `Evaluation`, API bodies, draft) | `zod` only                                               | everything else                                                      |
+| `src/modules/**`: pure domain (tracker, placement, prompt-generator, evaluator, dialect)                       | `@/contracts`, `@/config`, `@/lib`                       | `next`, `react`, `@/db`, `openai` (except the openai-client adapter) |
+| `src/server/**`: repositories (`@/db`), the AI client factory, `env.ts`, route helpers                         | anything server-side                                     | `@/components`                                                       |
+| `src/app/api/**`: thin handlers that call `parseRequestBody` → module → repository                             | `@/server`, `@/modules`, `@/contracts`                   | `@/db` directly (P1, once repositories move to `src/server`)         |
+| `src/components/**`, pages                                                                                     | `@/contracts`, `@/copy`, `@/lib/http`, `@/components/ui` | `@/db`, `@/server`, stores, `openai`                                 |
 
 Moving the `*-store.ts` files into `src/server/repositories/` with an injected `db` is a P1 refactor (decoupling, and it makes tests independent of a global). The P0 test isolation in §6 doesn't depend on it.
 
@@ -266,7 +329,7 @@ ruleDirs:
 testConfigs:
   - testDir: tooling/ast-grep/tests
 languageGlobs:
-  tsx: ["*.ts"]   # parse .ts as TSX so every rule can be `language: Tsx`; <T>x casts are banned anyway
+  tsx: ["*.ts"] # parse .ts as TSX so every rule can be `language: Tsx`; <T>x casts are banned anyway
 ```
 
 This config assumes that legacy UI is moved to `src/components/legacy/` in the ast-grep ticket. UI rules ignore that directory, and the redesign deletes it file by file. That keeps one shared ratchet for ESLint, ast-grep and knip instead of three exception lists.
@@ -346,7 +409,7 @@ rule:
   kind: import_statement
   has:
     field: source
-    regex: "^[\"']@/db[\"']$"
+    regex: '^["'']@/db["'']$'
 files: ["src/**/*.test.ts", "src/**/*.test.tsx", "e2e/**"]
 ```
 
@@ -374,10 +437,10 @@ ignores: ["src/modules/dialect/**", "src/copy/**"]
 id: dialect-id-single-source
 language: Tsx
 severity: error
-message: "Use DEFAULT_DIALECT / the Dialect schema from src/modules/dialect instead of the literal \"louisiana\"."
+message: 'Use DEFAULT_DIALECT / the Dialect schema from src/modules/dialect instead of the literal "louisiana".'
 rule:
   kind: string
-  regex: "^[\"']louisiana[\"']$"
+  regex: '^["'']louisiana["'']$'
 files: ["src/**"]
 ignores: ["src/modules/dialect/**"]
 ```
@@ -473,7 +536,7 @@ id: no-process-env
 language: Tsx
 severity: error
 message: "Read configuration through getEnv() from src/server/env.ts (Zod-validated, fails fast)."
-note: "`process.env.OPENAI_API_KEY ?? \"sk-placeholder\"` hid a missing key until the first AI call."
+note: '`process.env.OPENAI_API_KEY ?? "sk-placeholder"` hid a missing key until the first AI call.'
 rule:
   pattern: process.env
 files: ["src/**"]
@@ -576,15 +639,15 @@ Magic numbers are left to ESLint `no-magic-numbers` (§3.1) rather than ast-grep
 
 The rule is **schemas are the single source of truth; types are `z.infer`'d from them, never hand-written in parallel.**
 
-| Boundary | Helper | Known problem it fixes |
-|---|---|---|
-| LLM output | `chatCompletionJSON(Schema, params)` → `safeParse` → throws `AiOutputError` (with `cause` = Zod error), which the route maps to a 502 the UI can retry. Better: pass `zodResponseFormat(EvaluationSchema, "evaluation")` so the **hand-written JSON shape in the system prompt is deleted**, making the schema the single description shared by TS, runtime and the model. | `JSON.parse(text) as T`, plus the evaluation shape duplicated in the prompt |
-| API request bodies | `parseRequestBody(request, Schema): Promise<Result<T, Response>>`. On failure it returns a ready-made `400` with `z.prettifyError`. | `request.json()` used directly |
-| Client fetches | `fetchJson(url, Schema, init?): Promise<Result<T, FetchError>>`, where `FetchError = { kind: "network" } \| { kind: "http"; status; message } \| { kind: "invalid" }`. Maps directly to HANDOFF states (offline notice, `role="alert"`, retry). | `await res.json()` assigned straight into state |
-| DB JSON columns (`evaluation_json`, `prompt_constraints`) | Repositories parse on read and return `SessionView = { ok: true; …parsed } \| { ok: false; id; createdAt; reason }`. History renders the `ok: false` branch as an inline notice. | History crashes on malformed JSON (HANDOFF: "the list must never blank or crash") |
-| DB enum-ish text columns (`to_level`, `source`, `cefr_level`) | `CefrLevel.parse(row.toLevel)` in the repository. Drizzle `text({ enum: CEFR_LEVELS })` narrows the TS type but doesn't validate legacy rows. | `as CefrLevel` / `as "auto" \| "manual"` casts |
-| Environment | `getEnv()` memoized, `z.object({ OPENAI_API_KEY: …, DATABASE_URL: …, AI_CLIENT: z.enum(["openai","fake"]).default("openai") })` with a refinement that the key is required unless `AI_CLIENT=fake`. Lazy (not at import) so `next build` doesn't need secrets. | `"sk-placeholder"` fallback |
-| localStorage draft (new in HANDOFF autosave) | `DraftSchema.safeParse` on load. Discard and notice on failure. | The next malformed-JSON crash before it happens |
+| Boundary                                                      | Helper                                                                                                                                                                                                                                                                                                                                                                     | Known problem it fixes                                                            |
+| ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| LLM output                                                    | `chatCompletionJSON(Schema, params)` → `safeParse` → throws `AiOutputError` (with `cause` = Zod error), which the route maps to a 502 the UI can retry. Better: pass `zodResponseFormat(EvaluationSchema, "evaluation")` so the **hand-written JSON shape in the system prompt is deleted**, making the schema the single description shared by TS, runtime and the model. | `JSON.parse(text) as T`, plus the evaluation shape duplicated in the prompt       |
+| API request bodies                                            | `parseRequestBody(request, Schema): Promise<Result<T, Response>>`. On failure it returns a ready-made `400` with `z.prettifyError`.                                                                                                                                                                                                                                        | `request.json()` used directly                                                    |
+| Client fetches                                                | `fetchJson(url, Schema, init?): Promise<Result<T, FetchError>>`, where `FetchError = { kind: "network" } \| { kind: "http"; status; message } \| { kind: "invalid" }`. Maps directly to HANDOFF states (offline notice, `role="alert"`, retry).                                                                                                                            | `await res.json()` assigned straight into state                                   |
+| DB JSON columns (`evaluation_json`, `prompt_constraints`)     | Repositories parse on read and return `SessionView = { ok: true; …parsed } \| { ok: false; id; createdAt; reason }`. History renders the `ok: false` branch as an inline notice.                                                                                                                                                                                           | History crashes on malformed JSON (HANDOFF: "the list must never blank or crash") |
+| DB enum-ish text columns (`to_level`, `source`, `cefr_level`) | `CefrLevel.parse(row.toLevel)` in the repository. Drizzle `text({ enum: CEFR_LEVELS })` narrows the TS type but doesn't validate legacy rows.                                                                                                                                                                                                                              | `as CefrLevel` / `as "auto" \| "manual"` casts                                    |
+| Environment                                                   | `getEnv()` memoized, `z.object({ OPENAI_API_KEY: …, DATABASE_URL: …, AI_CLIENT: z.enum(["openai","fake"]).default("openai") })` with a refinement that the key is required unless `AI_CLIENT=fake`. Lazy (not at import) so `next build` doesn't need secrets.                                                                                                             | `"sk-placeholder"` fallback                                                       |
+| localStorage draft (new in HANDOFF autosave)                  | `DraftSchema.safeParse` on load. Discard and notice on failure.                                                                                                                                                                                                                                                                                                            | The next malformed-JSON crash before it happens                                   |
 
 Single-source examples for `src/contracts`:
 
@@ -715,6 +778,7 @@ Hooks are a convenience; CI is the gate. In the agent configuration, deny `--no-
   3. WCAG contrast is ≥ 4.5:1 for every text pair HANDOFF uses: ink, ink-2, muted, primary, mistake, standard and dialect on sheet; mistake on mistake-tint; dialect on dialect-tint; sheet on primary; sheet on busy.
 
   Design by contract on the design system: if someone tweaks a color, the test tells them whether it's still accessible.
+
 - After the last legacy component is deleted, add `--color-*: initial;` at the top of `@theme`. Default palette classes then stop existing, and the ast-grep palette rule catches any that still appear in source. Also remove the shadcn `oklch` variables then.
 - Also in this ticket: `metadata` with the real title (`Lâche pas.` placeholder per HANDOFF), `<html lang="fr">`, and Geist removed (`no-scaffold-leftovers` keeps it out).
 
@@ -747,23 +811,23 @@ Hooks are a convenience; CI is the gate. In the agent configuration, deny `--no-
 
 ## 11. Priority summary
 
-| # | Recommendation | Prevents | Cost / noise | Priority | Own ticket? |
-|---|---|---|---|---|---|
-| 1 | Own git repo, `*.db` in `.gitignore` | No PRs possible, personal data committed | Trivial | P0 | Yes (TOOL-0) |
-| 2 | Test DB isolation + Vitest guard + migrations | Tests wiping `data.db` | ~120 lines | P0 | Yes (TOOL-1) |
-| 3 | TS flags + `check` script + CI + lint baseline green | Index crashes, client/server import leaks, broken windows | ~60 lines of fixes | P0 | Yes (TOOL-2) |
-| 4 | Prettier format-only pass | Diff churn in every agent PR | Mechanical | P0 | Yes (TOOL-3) |
-| 5 | Zod contracts: LLM + DB JSON + `CefrLevel` single source | `JSON.parse as T`, History crash, duplicated unions | ~300 lines | P0 | Yes (TOOL-4) |
-| 6 | Zod: API bodies, `fetchJson`, `env.ts` | Unvalidated bodies, `sk-placeholder`, `no-unsafe-*` | ~300 lines | P0 | Yes (TOOL-5) |
-| 7 | Dialect module, `src/config`, `src/lib/dates`, knip + deletions | Dialect copy-paste, magic numbers, UTC date, dead code | ~250 lines (net negative) | P0 | Yes (TOOL-6) |
-| 8 | ast-grep rules + legacy dir move | Recurrence of all of the above | ~350 lines YAML | P0 | Yes (TOOL-7) |
-| 9 | ESLint strict-type-checked, seams, a11y, vitest/testing-library, eslint-comments | Floating promises, non-exhaustive switches, a11y, bad tests, silent disables | ~150 config + fixes | P0 | Yes (TOOL-8) |
-| 10 | Design tokens + fonts + metadata + contract test | Raw hex, self-referential font var, boilerplate metadata, contrast regressions | ~200 lines | P0 | Yes (TOOL-9) |
-| 11 | Playwright + fake AI client + axe | Untested end-to-end flows, a11y regressions | ~300 lines | P1 | Yes (TOOL-10) |
-| 12 | Lefthook | Slow feedback | ~30 lines | P1 | Yes (TOOL-11) |
-| 13 | `no-magic-numbers`, `no-type-assertion`, `no-mocking-own-modules`, `jsx-no-leaked-render`, `import/no-cycle` | Casts, magic numbers, brittle tests | Medium noise | P1 | Fold into TOOL-8 / TOOL-7 if under budget, else TOOL-12 |
-| 14 | Repositories under `src/server` with injected `db`; placement state persisted | Global-DB coupling, lost placement test | ~250 lines | P1 | Yes |
-| 15 | `typedRoutes`, after-edit hooks, `eslint-plugin-boundaries`, Stryker mutation testing on `src/modules` | Extra rigor | Varies | P2 | Later |
+| #   | Recommendation                                                                                               | Prevents                                                                       | Cost / noise              | Priority | Own ticket?                                             |
+| --- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------- | -------- | ------------------------------------------------------- |
+| 1   | Own git repo, `*.db` in `.gitignore`                                                                         | No PRs possible, personal data committed                                       | Trivial                   | P0       | Yes (TOOL-0)                                            |
+| 2   | Test DB isolation + Vitest guard + migrations                                                                | Tests wiping `data.db`                                                         | ~120 lines                | P0       | Yes (TOOL-1)                                            |
+| 3   | TS flags + `check` script + CI + lint baseline green                                                         | Index crashes, client/server import leaks, broken windows                      | ~60 lines of fixes        | P0       | Yes (TOOL-2)                                            |
+| 4   | Prettier format-only pass                                                                                    | Diff churn in every agent PR                                                   | Mechanical                | P0       | Yes (TOOL-3)                                            |
+| 5   | Zod contracts: LLM + DB JSON + `CefrLevel` single source                                                     | `JSON.parse as T`, History crash, duplicated unions                            | ~300 lines                | P0       | Yes (TOOL-4)                                            |
+| 6   | Zod: API bodies, `fetchJson`, `env.ts`                                                                       | Unvalidated bodies, `sk-placeholder`, `no-unsafe-*`                            | ~300 lines                | P0       | Yes (TOOL-5)                                            |
+| 7   | Dialect module, `src/config`, `src/lib/dates`, knip + deletions                                              | Dialect copy-paste, magic numbers, UTC date, dead code                         | ~250 lines (net negative) | P0       | Yes (TOOL-6)                                            |
+| 8   | ast-grep rules + legacy dir move                                                                             | Recurrence of all of the above                                                 | ~350 lines YAML           | P0       | Yes (TOOL-7)                                            |
+| 9   | ESLint strict-type-checked, seams, a11y, vitest/testing-library, eslint-comments                             | Floating promises, non-exhaustive switches, a11y, bad tests, silent disables   | ~150 config + fixes       | P0       | Yes (TOOL-8)                                            |
+| 10  | Design tokens + fonts + metadata + contract test                                                             | Raw hex, self-referential font var, boilerplate metadata, contrast regressions | ~200 lines                | P0       | Yes (TOOL-9)                                            |
+| 11  | Playwright + fake AI client + axe                                                                            | Untested end-to-end flows, a11y regressions                                    | ~300 lines                | P1       | Yes (TOOL-10)                                           |
+| 12  | Lefthook                                                                                                     | Slow feedback                                                                  | ~30 lines                 | P1       | Yes (TOOL-11)                                           |
+| 13  | `no-magic-numbers`, `no-type-assertion`, `no-mocking-own-modules`, `jsx-no-leaked-render`, `import/no-cycle` | Casts, magic numbers, brittle tests                                            | Medium noise              | P1       | Fold into TOOL-8 / TOOL-7 if under budget, else TOOL-12 |
+| 14  | Repositories under `src/server` with injected `db`; placement state persisted                                | Global-DB coupling, lost placement test                                        | ~250 lines                | P1       | Yes                                                     |
+| 15  | `typedRoutes`, after-edit hooks, `eslint-plugin-boundaries`, Stryker mutation testing on `src/modules`       | Extra rigor                                                                    | Varies                    | P2       | Later                                                   |
 
 ---
 
@@ -775,23 +839,23 @@ Each ticket stays under ~500 lines of production/config code (tests excluded) an
    - `git init` in `french-writing-prompter/`, create the GitHub repo, and push.
    - Add `*.db`, `.e2e/`, `playwright-report/`, `test-results/` to `.gitignore`.
    - Decide whether `~/Personal-Projects` should ignore the folder or keep it as a submodule.
-   - *Acceptance:* `git rev-parse --show-toplevel` is the app directory; `git ls-files | grep '\.db$'` is empty; `gh repo view` resolves to the new repo; `docs/agents/issue-tracker.md` still holds.
+   - _Acceptance:_ `git rev-parse --show-toplevel` is the app directory; `git ls-files | grep '\.db$'` is empty; `gh repo view` resolves to the new repo; `docs/agents/issue-tracker.md` still holds.
 
 2. **TOOL-1: Isolated test database.**
    - Add `drizzle/` migrations, `db:generate`/`db:migrate`, `src/test/db.ts`, and the Vitest `projects` (node + jsdom) with setup files.
    - Add the guard that throws under Vitest for non-memory URLs.
    - Migrate `history-store.test.ts` to `createTestDb()`.
-   - *Acceptance:* `sha256sum data.db` is unchanged across `npm test`; a test proves that opening a `file:` URL under Vitest throws; a trivial `.test.tsx` renders in jsdom with jest-dom matchers.
+   - _Acceptance:_ `sha256sum data.db` is unchanged across `npm test`; a test proves that opening a `file:` URL under Vitest throws; a trivial `.test.tsx` renders in jsdom with jest-dom matchers.
 
 3. **TOOL-2: Baseline green + `check` + CI.**
    - Apply the tsconfig delta from §2 and fix the 24 `noUncheckedIndexedAccess` errors (use drizzle `.get()` or a `first()` helper that throws with context).
    - Set `react/no-unescaped-entities` `forbid: [">", "}"]`.
    - Add the `typecheck`, `check` and `pr:size` scripts and the GitHub Actions workflow.
-   - *Acceptance:* `npm run check` exits 0 locally and in CI on a PR; `pr:size` prints a number.
+   - _Acceptance:_ `npm run check` exits 0 locally and in CI on a PR; `pr:size` prints a number.
 
 4. **TOOL-3: Prettier.**
    - Add the config and Tailwind plugin, run one format-only commit, and add `.git-blame-ignore-revs`.
-   - *Acceptance:* `format:check` is in `check` and passes; the PR contains no semantic changes (reviewer diffs with `-w`).
+   - _Acceptance:_ `format:check` is in `check` and passes; the PR contains no semantic changes (reviewer diffs with `-w`).
 
 5. **TOOL-4: Contracts for LLM output and stored JSON.**
    - Add `zod` as a direct dependency and `src/contracts/{cefr,evaluation,prompt,session}.ts`.
@@ -799,39 +863,39 @@ Each ticket stays under ~500 lines of production/config code (tests excluded) an
    - Delete the prose JSON shape from the evaluator prompt.
    - Make the repositories return `SessionView`, and have the History page render the `ok: false` notice.
    - Delete both hand-written `CefrLevel` unions.
-   - *Acceptance:* a test feeds malformed model output and gets `AiOutputError`, which the route maps to 502; a test seeds a row with `evaluation_json = "{oops"` and the History list renders it with a notice instead of throwing; `rg "type CefrLevel ="` matches only `src/contracts`.
+   - _Acceptance:_ a test feeds malformed model output and gets `AiOutputError`, which the route maps to 502; a test seeds a row with `evaluation_json = "{oops"` and the History list renders it with a notice instead of throwing; `rg "type CefrLevel ="` matches only `src/contracts`.
 
 6. **TOOL-5: Contracts for HTTP and env.**
    - Add `parseRequestBody`, `fetchJson` with the `FetchError` union, and `src/server/env.ts` with `getEnv()`.
    - Convert all 6 routes and all client fetches.
-   - *Acceptance:* each POST/PUT route has a test asserting 400 with a readable message for a bad body; a missing `OPENAI_API_KEY` throws a named error at first `getEnv()` (not "AI service error"); the `no-unsafe-*` count from the strict probe is ≤ 10.
+   - _Acceptance:_ each POST/PUT route has a test asserting 400 with a readable message for a bad body; a missing `OPENAI_API_KEY` throws a named error at first `getEnv()` (not "AI service error"); the `no-unsafe-*` count from the strict probe is ≤ 10.
 
 7. **TOOL-6: Single sources + dead code.**
    - Add `src/modules/dialect/louisiana.ts` (rules text, `DEFAULT_DIALECT`, `Dialect` schema), imported by the generator and evaluator. CONTEXT.md's Louisiana French entry keeps the glossary definition and names this file as the canonical rule list.
    - Add `src/config/{limits,ai}.ts` (`DAILY_PROMPT_QUOTA`, `WORD_TARGET`, `PLACEMENT_STEPS`, `ADVANCEMENT_STREAK`, `AI_MODEL`).
    - Add `src/lib/dates.ts` (`localDateKey`, French formatters) with TZ-pinned tests.
    - Add knip, delete everything it flags, and add `knip` to `check`.
-   - *Acceptance:* the dialect rule text appears once in `src/`; the evaluator and generator tests assert `toContain(LOUISIANA_RULES)`; the 21:30 Chicago test passes; `npm run knip` exits 0.
+   - _Acceptance:_ the dialect rule text appears once in `src/`; the evaluator and generator tests assert `toContain(LOUISIANA_RULES)`; the 21:30 Chicago test passes; `npm run knip` exits 0.
 
 8. **TOOL-7: ast-grep.**
    - Add `@ast-grep/cli` as a devDependency (so it's never confused with `/usr/bin/sg`), `sgconfig.yml`, all P0 rules from §4 with tests, and `git mv` the legacy UI into `src/components/legacy/`.
-   - *Acceptance:* `npm run lint:ast` passes; each rule has a test with ≥ 1 valid and ≥ 1 invalid case; reintroducing `JSON.parse(x) as T` or `toISOString().split` in a scratch branch fails `check`.
+   - _Acceptance:_ `npm run lint:ast` passes; each rule has a test with ≥ 1 valid and ≥ 1 invalid case; reintroducing `JSON.parse(x) as T` or `toISOString().split` in a scratch branch fails `check`.
 
 9. **TOOL-8: ESLint hardening.**
    - Apply the §3.2 config: strict-type-checked, exhaustiveness, seams, jsx-a11y strict, eslint-comments, vitest, testing-library, jest-dom. Fix the remaining violations outside `legacy/`.
-   - *Acceptance:* `lint` passes with `--max-warnings=0`; a scratch import of `@/db` from a component fails with the seam message; an `eslint-disable` without `-- reason` fails.
+   - _Acceptance:_ `lint` passes with `--max-warnings=0`; a scratch import of `@/db` from a component fails with the seam message; an `eslint-disable` without `-- reason` fails.
 
 10. **TOOL-9: Design tokens.**
     - Add `tokens.css` with the HANDOFF tokens, next/font Bricolage Grotesque + Newsreader, `lang="fr"`, real metadata, the token contract test (presence, no self-reference, contrast), and `no-scaffold-leftovers`.
-    - *Acceptance:* the contract test passes; `bg-sheet text-ink font-ui` render the right computed styles in a jsdom smoke test or a Playwright check; the raw-color rules pass outside `legacy/`.
+    - _Acceptance:_ the contract test passes; `bg-sheet text-ink font-ui` render the right computed styles in a jsdom smoke test or a Playwright check; the raw-color rules pass outside `legacy/`.
 
 11. **TOOL-10: Playwright tracer bullet.**
     - Add the config, `getAiClient()` + `FakeAiClient` + scenario header, the e2e DB lifecycle, `eslint-plugin-playwright`, axe, a CI job, and a `home.spec.ts` that runs the current flow end to end on desktop and mobile.
-    - *Acceptance:* `npm run test:e2e` passes in CI with no network access to OpenAI; the `malformed` scenario shows the retry alert; axe reports 0 violations on the screens touched.
+    - _Acceptance:_ `npm run test:e2e` passes in CI with no network access to OpenAI; the `malformed` scenario shows the retry alert; axe reports 0 violations on the screens touched.
 
 12. **TOOL-11: Lefthook** (after TOOL-0).
     - Add `lefthook.yml` from §7, plus a `prepare` script running `lefthook install`.
-    - *Acceptance:* committing a file with `toISOString().split` is rejected locally; `git push` runs `check`.
+    - _Acceptance:_ committing a file with `toISOString().split` is rejected locally; `git push` runs `check`.
 
 TOOL-1 through TOOL-9 should land before redesign ticket #1. TOOL-10 must land before the first Home-phase ticket is accepted.
 
@@ -845,6 +909,7 @@ Paste under a `## Engineering rules` heading. Keep each one short; tooling enfor
 ## Engineering rules
 
 ### Workflow
+
 - Run `npm run check` before every commit. Never use `--no-verify`. CI runs the same command.
 - One ticket = one PR. `npm run pr:size` must stay under 500 production lines (tests/fixtures excluded).
 - TDD, tracer-bullet first: the first failing test hits the outermost seam that exists for the behavior (route handler, component, or e2e spec), not an inner helper. Then go inward.
@@ -852,34 +917,41 @@ Paste under a `## Engineering rules` heading. Keep each one short; tooling enfor
 - Delete the code you replace in the same PR. No commented-out code. `knip` must pass.
 
 ### Single source of truth
+
 - Domain words come from `CONTEXT.md`; UI strings come from the HANDOFF copy table and live in `src/copy/fr.ts`. Never use the "Avoid" words.
 - Types for anything crossing a boundary are `z.infer` of a schema in `src/contracts`. Never declare a parallel interface or union.
 - Louisiana French rules: only `src/modules/dialect`. Limits/model names: only `src/config`. Colors/fonts/radii: only `src/styles/tokens.css`. Before adding a constant, `rg` for an existing one.
 
 ### Boundaries (crash early, in one place)
+
 - Every value entering the process is parsed: request bodies (`parseRequestBody`), fetch responses (`fetchJson`), LLM output (`chatCompletionJSON(Schema)`), DB JSON/text enums (repositories), env (`getEnv()`), localStorage drafts.
 - No `as` (except `as const`), no `!`, no `any` in production code. Narrow or parse instead.
 - A parse failure in a list item renders an inline notice for that item; it never blanks the page.
 
 ### Time
+
 - Calendar days are local: `localDateKey()` from `src/lib/dates.ts`. Never slice `toISOString()`.
 - Code that depends on "now" takes a `now: () => Date` parameter so tests control it.
 
 ### UI state
+
 - Each async surface has one discriminated-union state (`idle | generating | evaluating | error`). No shared `loading` booleans. Each action has its own label.
 - Every error/banner state has a test proving it clears on the next relevant action.
 
 ### Accessibility (HANDOFF is the contract)
+
 - Use `src/components/ui` primitives; never raw `<button>/<input>/<textarea>/<select>` elsewhere.
 - Every control has an associated `<label>` or `aria-label`. Results arrive in an `aria-live="polite"` region and receive focus. Errors use `role="alert"`. `lang="fr"` on French text.
 
 ### Tests
+
 - Never touch `data.db`. Unit/integration tests use `createTestDb()`; e2e uses its own DB file.
 - Inject fakes through constructors/factories (`OpenAiClientLike`, `getAiClient()`); don't `vi.mock` our own modules.
 - Query by role/label (Testing Library, Playwright). No snapshot tests. No `.only`/`.skip` in commits.
 - AI fixtures live in `src/test/fixtures/ai/` and are validated by the same schemas as production.
 
 ### Module seams
+
 - Components → `@/contracts`, `@/copy`, `@/lib/http`, `@/components/ui` only. Never `@/db`, `@/server`, stores, or `openai`.
 - `src/modules` is framework-free (no `next`, `react`, `@/db`). Only `src/modules/openai-client` imports `openai`.
 - Route handlers stay thin: parse → call module → persist via repository → respond.

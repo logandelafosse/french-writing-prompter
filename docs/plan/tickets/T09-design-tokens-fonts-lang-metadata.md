@@ -1,8 +1,8 @@
 # T09 — Design tokens, fonts, `lang="fr"`, metadata
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T02 | ~200 (mostly `tokens.css`) |
+| Phase | Type | Blocked by | Production lines (est.)    |
+| ----- | ---- | ---------- | -------------------------- |
+| 0     | AFK  | T02        | ~200 (mostly `tokens.css`) |
 
 ## User stories
 

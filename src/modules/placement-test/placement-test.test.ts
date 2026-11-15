@@ -53,7 +53,7 @@ describe("PlacementTest", () => {
     return new PlacementTest(
       mockPromptGenerator as any,
       mockEvaluator as any,
-      "louisiana"
+      "louisiana",
     );
   }
 
@@ -80,7 +80,8 @@ describe("PlacementTest", () => {
       await test.start();
 
       const result = await test.submitWriting("My writing 1");
-      if (result.type !== "next_prompt") throw new Error("expected next_prompt");
+      if (result.type !== "next_prompt")
+        throw new Error("expected next_prompt");
       expect(result.prompt.text).toBe("Prompt for B1");
       expect(test.getCurrentStep()).toBe(2);
       expect(test.getState()).toBe("waiting_for_writing");
@@ -92,7 +93,8 @@ describe("PlacementTest", () => {
       await test.submitWriting("w1");
 
       const result = await test.submitWriting("w2");
-      if (result.type !== "next_prompt") throw new Error("expected next_prompt");
+      if (result.type !== "next_prompt")
+        throw new Error("expected next_prompt");
       expect(result.prompt.text).toBe("Prompt for B2");
       expect(test.getCurrentStep()).toBe(3);
     });
@@ -114,14 +116,14 @@ describe("PlacementTest", () => {
       const test = createPlacementTest();
       await test.start();
       await expect(test.submitWriting("")).rejects.toThrow(
-        "Writing text is required"
+        "Writing text is required",
       );
     });
 
     it("throws if called in idle state", async () => {
       const test = createPlacementTest();
       await expect(test.submitWriting("test")).rejects.toThrow(
-        "Test not in progress"
+        "Test not in progress",
       );
     });
   });

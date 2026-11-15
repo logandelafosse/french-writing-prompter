@@ -1,8 +1,8 @@
 # T16 — Writing surface: ruled textarea, word meter, shortcuts, busy labels
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 1 | AFK | T15 | ~330 |
+| ----- | ---- | ---------- | ----------------------- |
+| 1     | AFK  | T15        | ~330                    |
 
 ## User stories
 
