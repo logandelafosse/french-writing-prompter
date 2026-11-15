@@ -59,26 +59,20 @@ export const PlacementPostBody = z.discriminatedUnion("action", [
   z.strictObject({ action: z.literal("submit"), writing: z.string() }),
 ]);
 
-const placementPrompt = z.strictObject({
-  type: z.literal("prompt"),
-  prompt: WritingPromptDto,
-  step: z.number(),
-});
-
-const placementNext = z.strictObject({
-  type: z.literal("next_prompt"),
-  prompt: WritingPromptDto,
-  step: z.number(),
-});
-
-const placementComplete = z.strictObject({
-  type: z.literal("complete"),
-  finalLevel: CefrLevel,
-  evaluations: z.array(Evaluation),
-});
-
 export const PlacementPostResponse = z.union([
-  placementPrompt,
-  placementNext,
-  placementComplete,
+  z.strictObject({
+    type: z.literal("prompt"),
+    prompt: WritingPromptDto,
+    step: z.number(),
+  }),
+  z.strictObject({
+    type: z.literal("next_prompt"),
+    prompt: WritingPromptDto,
+    step: z.number(),
+  }),
+  z.strictObject({
+    type: z.literal("complete"),
+    finalLevel: CefrLevel,
+    evaluations: z.array(Evaluation),
+  }),
 ]);
