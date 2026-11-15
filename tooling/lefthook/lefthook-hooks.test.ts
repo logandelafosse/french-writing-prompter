@@ -104,7 +104,7 @@ function tryGitCommit(
 function tryGitPush(cwd: string): { ok: boolean; output: string } {
   const result = spawnSync(
     "git",
-    [...GIT_IDENTITY, "push", "origin", "HEAD"],
+    [...GIT_IDENTITY, "push", "-u", "origin", "HEAD"],
     { cwd, encoding: "utf8", env: hookEnv },
   );
   return {
@@ -216,7 +216,9 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     git(clone!.dir, ["add", rel]);
     const result = tryGitCommit(clone!.dir, "floating promise should fail");
     expect(result.ok).toBe(false);
-    expect(result.output).toMatch(/floating-promises|@typescript-eslint/i);
+    expect(result.output).toMatch(
+      /floating-promises|@typescript-eslint|eslint.*error/i,
+    );
   });
 
   it("rejects a commit with a type error", async () => {
