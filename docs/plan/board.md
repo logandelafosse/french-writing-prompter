@@ -16,9 +16,9 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                    | Why                                                                                                         |
-| --- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                          | [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49); ANSI-safe hook test output; awaiting green `check`. |
+| ID  | Ticket                                                                                                                    | Why                                                                                                                                                                                                                                    |
+| --- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T12 | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                          | [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49); ANSI-safe hook test output; awaiting green `check`.                                                                                                       |
 | T13 | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15)) | [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) **T13a** quota (~231 lines); **T13b** branch ready (~333 vs T13a); [PR #50](https://github.com/logandelafosse/french-writing-prompter/pull/50) superseded. |
 
 ## Blocked
