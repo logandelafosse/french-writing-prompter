@@ -20,9 +20,9 @@ Last updated: 2026-11-15 by coordinator (T10 merged PR #47).
 
 ## In review
 
-| ID  | Ticket                                                                                                                            | Why                                                                                      |
-| --- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| T11 | Playwright tracer bullet with fake AI client and axe ([#13](https://github.com/logandelafosse/french-writing-prompter/issues/13)) | [PR #48](https://github.com/logandelafosse/french-writing-prompter/pull/48); T10 merged. |
+| ID  | Ticket                                                                                                                            | Why                                                                                                                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| T11 | Playwright tracer bullet with fake AI client and axe ([#13](https://github.com/logandelafosse/french-writing-prompter/issues/13)) | [PR #48](https://github.com/logandelafosse/french-writing-prompter/pull/48); reviews dispatched; `check`+`e2e` green. |
 
 ## Blocked
 
