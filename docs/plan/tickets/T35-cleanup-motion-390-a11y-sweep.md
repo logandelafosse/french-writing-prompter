@@ -56,7 +56,7 @@
 
 - New features or copy beyond what earlier tickets defined. Missing copy found during the sweep becomes a Backlog ticket.
 - Owner review of Louisiana copy correctness (gap #7). That is a separate owner task.
-- Renaming the app (Q3).
+- App naming (Q3 answered: Consigne · Louisiana Languages).
 
 ## References
 

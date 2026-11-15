@@ -2,9 +2,9 @@
 
 | Phase | Type | Blocked by | Production lines (est.) |
 |---|---|---|---|
-| 1 | HITL (Q3) | T06, T10, T11 | ~420 |
+| 1 | AFK (Q3 answered) | T06, T10, T11 | ~420 |
 
-**Owner question Q3 (app name).** Default if accepted: keep the placeholder wordmark «Lâche pas.» (rust full stop) and `metadata.title = "Lâche pas."`. The name must live in one constant so a later rename is a one-line change.
+**App name (Q3, answered 2026-11-15):** this writing tutor is **Consigne**, a practice mode under the product **Louisiana Languages** (`../LouisianaFrench`). Wordmark: `Consigne`. Browser tab / metadata title: `Consigne · Louisiana Languages`. Tagline under the wordmark: `atelier d'écriture · français louisianais` (or `Louisiana Languages · français louisianais` if that fits the header better — keep the first unless the layout needs the product name in the tagline). Name and product attribution live in one constant module so a rename is a one-line change.
 
 ## User stories
 

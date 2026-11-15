@@ -20,7 +20,7 @@ Fonts come from `next/font/google`, as in §1.1. Bricolage Grotesque is exposed 
 
 Token names follow `implementation-map.md` (`--radius-base`, `font-sans`/`font-serif`). Where `tooling-review.md` §9 says `--radius-DEFAULT`, `font-ui` or `font-prose`, the map wins, because T10 builds against these names.
 
-`layout.tsx` drops Geist and sets `<html lang="fr">`. `metadata` uses the title `Lâche pas.` and the description `atelier d'écriture · français louisianais` (placeholder pending Q3). The base layer sets `html { font-sans; text-ink }` and the desk background. Focus ring and reduced-motion base styles belong to T10.
+`layout.tsx` drops Geist and sets `<html lang="fr">`. `metadata` uses the title `Consigne · Louisiana Languages` and the description `atelier d'écriture · français louisianais` (Q3 answered: feature name Consigne under product Louisiana Languages). The base layer sets `html { font-sans; text-ink }` and the desk background. Focus ring and reduced-motion base styles belong to T10.
 
 The raw-colour ast-grep rules apply everywhere outside `legacy/`. Whichever of T07 and T09 merges second adds `no-scaffold-leftovers`.
 
@@ -30,7 +30,7 @@ The raw-colour ast-grep rules apply everywhere outside `legacy/`. Whichever of T
 - [ ] `[unit]` No custom property in `tokens.css` or `globals.css` is defined as `var()` of itself, directly or through a chain.
 - [ ] `[unit]` Every one of these text pairs is ≥ 4.5:1: ink, ink-2, muted, disabled-text, primary, mistake, standard and dialect on sheet; muted and primary on desk; muted and ink-2 on notice; primary and busy on primary-tint; white on primary, busy, mistake and dialect; standard on white; ink and mistake on mistake-tint; ink and dialect on dialect-tint.
 - [ ] `[unit]` Compiling `globals.css` with Tailwind's Node API for `bg-sheet text-ink font-sans font-serif rounded-base shadow-sheet max-w-home text-prompt` emits declarations that resolve to the token values (no default-palette fallback).
-- [ ] `[check]` `npm run build && npm start` serves `/` with `<html lang="fr"`, `<title>Lâche pas.</title>`, and the description meta; the `<html>` class list includes both next/font variable classes; no `Geist` string remains in `src/`.
+- [ ] `[check]` `npm run build && npm start` serves `/` with `<html lang="fr"`, `<title>Consigne · Louisiana Languages</title>`, and the description meta; the `<html>` class list includes both next/font variable classes; no `Geist` string remains in `src/`.
 - [ ] `[check]` `rg -n '#[0-9a-fA-F]{3,8}\b|oklch\(|rgba?\(' src --glob '*.css'` matches only `src/styles/tokens.css`; if T07 has merged, `npm run lint:ast` passes.
 - [ ] `[check]` `npm run check` is green; the legacy Home and History still render (manual `npm run dev`).
 
@@ -45,7 +45,7 @@ The raw-colour ast-grep rules apply everywhere outside `legacy/`. Whichever of T
 - `--color-*: initial` and removing the default palette (T35).
 - Focus ring, reduced-motion base, any component or primitive (T10).
 - Restyling any screen (T13 onward).
-- Final app name (Q3, T13).
+- Header wordmark wiring beyond metadata (T13).
 
 ## References
 

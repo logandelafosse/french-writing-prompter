@@ -48,7 +48,7 @@ Tickets that depend on one of these are HITL and stay `Blocked` until it is answ
 |---|---|---|---|
 | Q1 | ~~Repo name, visibility, submodule or ignore~~ **Answered 2026-11-15:** private `logandelafosse/french-writing-prompter`; parent ignores the folder | — | T00 (done) |
 | Q2 | ~~Louisiana base rules and CEFR level descriptions~~ **Answered 2026-11-15:** 12 rules, DLF spelling (`-autres`), DLF-sourced vocabulary, subjunctive accepted but never required; full list in the T06 spec | — | T06 |
-| Q3 | App name (wordmark "Lâche pas." is a placeholder) | Keep "Lâche pas." | T13 |
+| Q3 | ~~App name~~ **Answered 2026-11-15:** feature **Consigne** under product **Louisiana Languages**; tab title `Consigne · Louisiana Languages` | — | T13 |
 | Q4 | Mistake category taxonomy (15 categories) | `backend-requirements.md` §1.1 | T21 |
 | Q5 | Score dimensions: keep 1–6, or show CEFR sub-levels like the mockup's "Grammaire A2+"; French labels; where the old `tips` go | 1–6 with French labels; holistic tip as one line inside Scores | T22 |
 | Q6 | Is the DLF-derived index committed or generated locally (licensing, repo visibility) | Gitignored, generated locally from `DLF-extract` | T24 |

@@ -46,7 +46,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 | ID | Ticket | Type | Blocked by | Why not ready |
 |---|---|---|---|---|
-| T13 | App header, level menu, local-midnight quota | HITL (Q3) | T06, T10, T11 | Needs dates module, primitives, e2e; app name |
+| T13 | App header, level menu, local-midnight quota | AFK | T06, T10, T11 | Needs dates module, primitives, e2e. Q3 answered: Consigne · Louisiana Languages. |
 | T14 | Home first run and `/api/today` bootstrap | AFK | T13 | Needs the header |
 | T15 | Generator v2 with structured prompt meta; prompt sheet | HITL (Q8) | T14 | Needs Home phases; word target at A1/A2 |
 | T16 | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK | T15 | Needs the prompt sheet |
