@@ -13,16 +13,13 @@ export async function POST(request: Request) {
 
   const session = await getSession(body.sessionId);
   if (!session) {
-    return NextResponse.json(
-      { error: "Session not found." },
-      { status: 404 }
-    );
+    return NextResponse.json({ error: "Session not found." }, { status: 404 });
   }
 
   if (session.evaluationJson) {
     return NextResponse.json(
       { error: "This prompt has already been evaluated." },
-      { status: 409 }
+      { status: 409 },
     );
   }
 
@@ -31,7 +28,7 @@ export async function POST(request: Request) {
   const evaluation = await evaluator.evaluate(
     body.writing,
     { text: session.promptText, constraints: promptConstraints },
-    "louisiana"
+    "louisiana",
   );
 
   await saveSession({
@@ -53,9 +50,8 @@ export async function POST(request: Request) {
   });
 
   if (advancement) {
-    const { setTrackerLevel } = await import(
-      "@/modules/cefr-tracker/tracker-store"
-    );
+    const { setTrackerLevel } =
+      await import("@/modules/cefr-tracker/tracker-store");
     await setTrackerLevel(advancement.toLevel, "auto");
   }
 

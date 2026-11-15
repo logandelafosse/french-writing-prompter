@@ -1,8 +1,8 @@
 # T14 — Home first run and `/api/today` bootstrap
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 1 | AFK | T13 | ~380 |
+| ----- | ---- | ---------- | ----------------------- |
+| 1     | AFK  | T13        | ~380                    |
 
 ## User stories
 

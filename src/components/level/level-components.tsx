@@ -27,7 +27,7 @@ export function LevelBadge({ level }: { level: CefrLevel | null }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold border ${LEVEL_COLORS[level]}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-semibold ${LEVEL_COLORS[level]}`}
     >
       {level}
       <span className="text-xs opacity-70">— {LEVEL_LABELS[level]}</span>
@@ -50,7 +50,7 @@ export function LevelSelector({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border bg-white hover:bg-zinc-50 transition-colors"
+        className="flex items-center gap-2 rounded-lg border bg-white px-4 py-2 text-sm font-medium transition-colors hover:bg-zinc-50"
       >
         {currentLevel ? (
           <LevelBadge level={currentLevel} />
@@ -58,7 +58,7 @@ export function LevelSelector({
           <span className="text-zinc-500">Select your level</span>
         )}
         <svg
-          className="w-4 h-4 text-zinc-400"
+          className="h-4 w-4 text-zinc-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -78,7 +78,7 @@ export function LevelSelector({
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute z-20 mt-1 w-64 bg-white rounded-lg border shadow-lg py-1">
+          <div className="absolute z-20 mt-1 w-64 rounded-lg border bg-white py-1 shadow-lg">
             {ALL_LEVELS.map((level) => (
               <button
                 key={level}
@@ -86,12 +86,12 @@ export function LevelSelector({
                   onSelect(level);
                   setIsOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-zinc-50 transition-colors ${
+                className={`flex w-full items-center gap-3 px-4 py-2.5 text-sm transition-colors hover:bg-zinc-50 ${
                   level === currentLevel ? "bg-zinc-50" : ""
                 }`}
               >
                 <span
-                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${LEVEL_COLORS[level]}`}
+                  className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${LEVEL_COLORS[level]}`}
                 >
                   {level}
                 </span>

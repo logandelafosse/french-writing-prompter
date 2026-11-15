@@ -1,8 +1,8 @@
 # T04 — Zod contracts for LLM output and stored JSON
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T02 | ~300 |
+| ----- | ---- | ---------- | ----------------------- |
+| 0     | AFK  | T02        | ~300                    |
 
 ## User stories
 
@@ -27,13 +27,19 @@ Add `zod` (^4) as a direct dependency and create `src/contracts/`, which imports
 
 ```ts
 type SessionView = {
-  id: number; createdAt: string; promptText: string; writingText: string | null;
-  promptLevel: CefrLevel | null;                       // null when prompt_constraints is unreadable
-  evaluation: null | { ok: true; value: Evaluation } | { ok: false; reason: "unreadable" };
+  id: number;
+  createdAt: string;
+  promptText: string;
+  writingText: string | null;
+  promptLevel: CefrLevel | null; // null when prompt_constraints is unreadable
+  evaluation:
+    | null
+    | { ok: true; value: Evaluation }
+    | { ok: false; reason: "unreadable" };
 };
 ```
 
-The History page stops parsing strings. A row with `evaluation.ok === false` still shows its Writing Prompt and Student Writing, plus the inline notice from the copy table (`row.malformed.notice`): *Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.* `POST /api/evaluate` reads stored constraints through `parseJson` too. When they are unreadable, it falls back to the session's `cefr_level`.
+The History page stops parsing strings. A row with `evaluation.ok === false` still shows its Writing Prompt and Student Writing, plus the inline notice from the copy table (`row.malformed.notice`): _Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude._ `POST /api/evaluate` reads stored constraints through `parseJson` too. When they are unreadable, it falls back to the session's `cefr_level`.
 
 ## Acceptance criteria
 

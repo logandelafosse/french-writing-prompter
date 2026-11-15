@@ -1,28 +1,25 @@
-import type { WritingPrompt, FrenchDialect } from "@/modules/prompt-generator/prompt-generator";
+import type {
+  WritingPrompt,
+  FrenchDialect,
+} from "@/modules/prompt-generator/prompt-generator";
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
 import type { CefrLevel } from "@/modules/cefr-tracker/cefr-tracker";
 
-export type PlacementTestState =
-  | "idle"
-  | "waiting_for_writing"
-  | "complete";
+export type PlacementTestState = "idle" | "waiting_for_writing" | "complete";
 
 export type SubmitResult =
   | { type: "next_prompt"; prompt: WritingPrompt; step: number }
   | { type: "complete"; finalLevel: CefrLevel; evaluations: Evaluation[] };
 
 interface PromptGeneratorLike {
-  generate(
-    level: CefrLevel,
-    dialect: FrenchDialect
-  ): Promise<WritingPrompt>;
+  generate(level: CefrLevel, dialect: FrenchDialect): Promise<WritingPrompt>;
 }
 
 interface EvaluatorLike {
   evaluate(
     writing: string,
     prompt: WritingPrompt,
-    dialect: FrenchDialect
+    dialect: FrenchDialect,
   ): Promise<Evaluation>;
 }
 
@@ -46,7 +43,7 @@ export class PlacementTest {
   constructor(
     private promptGenerator: PromptGeneratorLike,
     private evaluator: EvaluatorLike,
-    private dialect: FrenchDialect = "louisiana"
+    private dialect: FrenchDialect = "louisiana",
   ) {}
 
   getState(): PlacementTestState {
@@ -94,7 +91,7 @@ export class PlacementTest {
     const evaluation = await this.evaluator.evaluate(
       writing,
       this.currentPrompt,
-      this.dialect
+      this.dialect,
     );
 
     this.evaluations.push(evaluation);
@@ -102,7 +99,7 @@ export class PlacementTest {
     if (this.currentStep >= 3) {
       this.state = "complete";
       const finalLevel = PlacementTest.computeLevel(
-        this.evaluations.map((e) => e.overall_cefr)
+        this.evaluations.map((e) => e.overall_cefr),
       );
       return {
         type: "complete",
@@ -114,9 +111,14 @@ export class PlacementTest {
     this.currentStep++;
     const level = STARTING_LEVELS[this.currentStep - 1];
     if (level === undefined) {
-      throw new Error(`No starting level for placement step ${this.currentStep}`);
+      throw new Error(
+        `No starting level for placement step ${this.currentStep}`,
+      );
     }
-    this.currentPrompt = await this.promptGenerator.generate(level, this.dialect);
+    this.currentPrompt = await this.promptGenerator.generate(
+      level,
+      this.dialect,
+    );
 
     return {
       type: "next_prompt",
@@ -127,7 +129,7 @@ export class PlacementTest {
 
   static computeLevel(cefrLevels: CefrLevel[]): CefrLevel {
     const sorted = [...cefrLevels].sort(
-      (a, b) => CEFR_ORDER[a] - CEFR_ORDER[b]
+      (a, b) => CEFR_ORDER[a] - CEFR_ORDER[b],
     );
     const median = sorted[1];
     if (median === undefined) {

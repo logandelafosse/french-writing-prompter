@@ -1,8 +1,8 @@
 # T17 — Session lifecycle and draft autosave
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 1 | AFK | T16 | ~400 |
+| ----- | ---- | ---------- | ----------------------- |
+| 1     | AFK  | T16        | ~400                    |
 
 ## User stories
 
@@ -18,7 +18,7 @@
 - `POST /api/prompt` stores `prompt_level` = the CEFR Level the prompt was generated for.
 - **Defect D12**: evaluation writes the evaluated level to `cefr_level` only; `prompt_level` is never overwritten.
 - `PUT /api/sessions/:id/draft` `{ text ≤ 20000 }` → `{ savedAt, wordCount }`; last write wins; `404 NOT_FOUND`, `409 NOT_ACTIVE` for evaluated or abandoned sessions. `\r\n` is normalised to `\n` before saving.
-- Evaluate saves `writing_text` *before* calling the LLM (so an AI failure never loses text), then sets `status = evaluated`, `evaluated_at`. A second evaluate on the same session returns `409 ALREADY_EVALUATED`.
+- Evaluate saves `writing_text` _before_ calling the LLM (so an AI failure never loses text), then sets `status = evaluated`, `evaluated_at`. A second evaluate on the same session returns `409 ALREADY_EVALUATED`.
 - `GET /api/today` `activeSession` now means the `active` daily session for today, and includes `draft: { text, savedAt } | null`.
 
 **Client.**
@@ -26,7 +26,7 @@
 - Autosave: debounced (~1.5 s) `PUT` on input, plus a flush on `visibilitychange` (hidden) and `pagehide` (`keepalive`/`sendBeacon`).
 - localStorage mirror `draft:<sessionId>` = `{ text, savedAt }` on every change (throttled).
 - Reconcile on load (implementation-map §4.7): newest `savedAt` wins; if local is newer, restore it and push it to the server. Local entries for sessions that are no longer active are removed.
-- **DraftStatus**: `Brouillon sauvé à 21 h 42` (`{H} h {mm}`, local time), joined to the meter with ` · ` on desktop and on its own line on mobile. Keeps the last timestamp while saving. Not a live region. Offline/local copy is T19.
+- **DraftStatus**: `Brouillon sauvé à 21 h 42` (`{H} h {mm}`, local time), joined to the meter with `·` on desktop and on its own line on mobile. Keeps the last timestamp while saving. Not a live region. Offline/local copy is T19.
 
 ## Acceptance criteria
 

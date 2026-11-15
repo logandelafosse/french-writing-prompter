@@ -1,8 +1,8 @@
 # T06 — Single sources: dialect module, limits, local dates, knip, glossary
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK (Q2 answered) | T04 | ~250 added (net negative after deletions) |
+| Phase | Type              | Blocked by | Production lines (est.)                   |
+| ----- | ----------------- | ---------- | ----------------------------------------- |
+| 0     | AFK (Q2 answered) | T04        | ~250 added (net negative after deletions) |
 
 ## User stories
 

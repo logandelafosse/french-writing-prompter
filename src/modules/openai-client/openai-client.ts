@@ -24,7 +24,8 @@ export class OpenAiClient {
     try {
       const response = await this.openai.chat.completions.create({
         model: params.model,
-        messages: params.messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
+        messages:
+          params.messages as OpenAI.Chat.Completions.ChatCompletionMessageParam[],
         ...(params.response_format && {
           response_format: params.response_format,
         }),
@@ -37,7 +38,7 @@ export class OpenAiClient {
   }
 
   async chatCompletionJSON<T = Record<string, unknown>>(
-    params: Omit<ChatCompletionParams, "response_format">
+    params: Omit<ChatCompletionParams, "response_format">,
   ): Promise<T> {
     const text = await this.chatCompletion({
       ...params,

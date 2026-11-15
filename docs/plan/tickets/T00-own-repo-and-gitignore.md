@@ -1,8 +1,8 @@
 # T00 — Own repo and gitignore
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | HITL (Q1) | None | ~15 |
+| Phase | Type      | Blocked by | Production lines (est.) |
+| ----- | --------- | ---------- | ----------------------- |
+| 0     | HITL (Q1) | None       | ~15                     |
 
 ## User stories
 

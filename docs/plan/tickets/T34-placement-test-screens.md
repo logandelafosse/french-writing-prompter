@@ -1,8 +1,8 @@
 # T34 — Placement Test screens
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 4 | AFK | T16, T33 | ~400 |
+| ----- | ---- | ---------- | ----------------------- |
+| 4     | AFK  | T16, T33   | ~400                    |
 
 ## User stories
 
@@ -56,6 +56,7 @@ Drafts autosave through T17 (server plus `localStorage`). An AI failure shows th
 - `placement.spec › first run start to result at 1280 and 390`
 - `placement.spec › reload resumes step and draft`
 - `placement.spec › redirects when a level exists`
+
 ## Out of scope
 
 - The server state, routes and results data: T33.

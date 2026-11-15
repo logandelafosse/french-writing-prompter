@@ -1,8 +1,8 @@
 # T19 — Error and offline states
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 1 | AFK | T17 | ~340 |
+| ----- | ---- | ---------- | ----------------------- |
+| 1     | AFK  | T17        | ~340                    |
 
 ## User stories
 

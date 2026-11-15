@@ -15,8 +15,8 @@
 - [ ] **No learner-visible UI:** state explicitly why (e.g. foundations, CI, schema only).
 
 | Step | Evidence |
-| --- | --- |
-| | |
+| ---- | -------- |
+|      |          |
 
 ## Ticket
 

@@ -1,8 +1,8 @@
 # T10 — UI primitives
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T09 | ~350 |
+| ----- | ---- | ---------- | ----------------------- |
+| 0     | AFK  | T09        | ~350                    |
 
 ## User stories
 

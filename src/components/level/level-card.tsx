@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  LevelBadge,
-  LevelSelector,
-  type CefrLevel,
-} from "./level-components";
+import { LevelBadge, LevelSelector, type CefrLevel } from "./level-components";
 
 interface LevelData {
   level: CefrLevel | null;
@@ -56,16 +52,16 @@ export function LevelCard() {
 
   if (loading) {
     return (
-      <div className="rounded-xl border bg-white p-6 animate-pulse">
-        <div className="h-5 w-24 bg-zinc-100 rounded" />
-        <div className="mt-3 h-8 w-48 bg-zinc-100 rounded" />
+      <div className="animate-pulse rounded-xl border bg-white p-6">
+        <div className="h-5 w-24 rounded bg-zinc-100" />
+        <div className="mt-3 h-8 w-48 rounded bg-zinc-100" />
       </div>
     );
   }
 
   return (
     <div className="rounded-xl border bg-white p-6">
-      <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-wide">
+      <h2 className="text-sm font-medium tracking-wide text-zinc-500 uppercase">
         CEFR Level
       </h2>
 
@@ -83,10 +79,7 @@ export function LevelCard() {
             <p className="text-sm text-zinc-600">
               What is your French level? You can change it at any time.
             </p>
-            <LevelSelector
-              currentLevel={null}
-              onSelect={handleSelectLevel}
-            />
+            <LevelSelector currentLevel={null} onSelect={handleSelectLevel} />
             <p className="text-xs text-zinc-400">
               You can also{" "}
               <span className="font-medium text-zinc-600">

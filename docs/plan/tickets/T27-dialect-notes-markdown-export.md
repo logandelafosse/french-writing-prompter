@@ -1,8 +1,8 @@
 # T27 — Dialect Notes markdown export
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 2 | AFK | T26 | ~120 |
+| ----- | ---- | ---------- | ----------------------- |
+| 2     | AFK  | T26        | ~120                    |
 
 ## User stories
 

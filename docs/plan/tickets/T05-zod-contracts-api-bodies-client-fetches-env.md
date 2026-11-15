@@ -1,8 +1,8 @@
 # T05 — Zod contracts for API bodies, client fetches, env
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T04 | ~300 |
+| ----- | ---- | ---------- | ----------------------- |
+| 0     | AFK  | T04        | ~300                    |
 
 ## User stories
 
@@ -17,7 +17,10 @@
 **Client fetches.** `fetchJson(url, Schema, init?)` returns `Result<T, FetchError>`, where:
 
 ```ts
-type FetchError = { kind: "network" } | { kind: "http"; status: number; message: string } | { kind: "invalid" };
+type FetchError =
+  | { kind: "network" }
+  | { kind: "http"; status: number; message: string }
+  | { kind: "invalid" };
 ```
 
 Response schemas for all six routes live in `src/contracts`. Every client fetch in `level-card`, `prompt-card`, `placement-test-card` and `history-page` goes through `fetchJson`. Each failure kind leaves the component in a visible error state; no promise rejection escapes. The existing UI copy is kept; the redesigned error states come later.

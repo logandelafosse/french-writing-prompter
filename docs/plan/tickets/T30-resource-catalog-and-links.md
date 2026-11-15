@@ -1,8 +1,8 @@
 # T30 — Resource catalog and links
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 3 | AFK (Q7 answered) | T28 | ~200 (excluding catalog data) |
+| Phase | Type              | Blocked by | Production lines (est.)       |
+| ----- | ----------------- | ---------- | ----------------------------- |
+| 3     | AFK (Q7 answered) | T28        | ~200 (excluding catalog data) |
 
 **Resource catalog (Q7, answered 2026-11-15):** implementer drafts a starter catalog of well-known **general** free French grammar + comprehensible-input sources; Logan edits in the PR. Louisiana-specific CI is not required for v1 (not easily accessible). Prefer `dialect: "standard"` entries that still help with shared Romance grammar; add Louisiana sources later when available.
 

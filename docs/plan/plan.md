@@ -4,13 +4,13 @@ Turn the CEFR grading demo into the Louisiana French writing tutor designed in `
 
 ## Inputs
 
-| Doc | What it decides |
-|---|---|
-| `docs/design/handoff/HANDOFF.md` + `screens/` | The target UI: tokens, components, copy, states, a11y |
-| `docs/design/implementation-map.md` | Screen → component → route/state mapping, copy table, 50 design gaps with assumed defaults |
-| `docs/plan/backend-requirements.md` | Domain model, schema + migrations, API contracts, LLM prompts, DLF measurements |
-| `docs/agents/tooling-review.md` | Compiler, ESLint, ast-grep, Zod, Playwright, and pre-commit setup |
-| `CONTEXT.md` | Domain glossary (extended in T06 with the tutor vocabulary) |
+| Doc                                           | What it decides                                                                            |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `docs/design/handoff/HANDOFF.md` + `screens/` | The target UI: tokens, components, copy, states, a11y                                      |
+| `docs/design/implementation-map.md`           | Screen → component → route/state mapping, copy table, 50 design gaps with assumed defaults |
+| `docs/plan/backend-requirements.md`           | Domain model, schema + migrations, API contracts, LLM prompts, DLF measurements            |
+| `docs/agents/tooling-review.md`               | Compiler, ESLint, ast-grep, Zod, Playwright, and pre-commit setup                          |
+| `CONTEXT.md`                                  | Domain glossary (extended in T06 with the tutor vocabulary)                                |
 
 ## Product decisions already made
 
@@ -25,13 +25,13 @@ Turn the CEFR grading demo into the Louisiana French writing tutor designed in `
 
 ## Phases
 
-| Phase | Tickets | Outcome |
-|---|---|---|
-| 0. Foundations | T00–T12 | Own repo, safe test DB, migrations, Zod at every boundary, single sources, ast-grep + ESLint guardrails, design tokens and primitives, Playwright with a fake AI client |
-| 1. Core loop | T13–T22 | Header with local-midnight quota, new Home (first run, writing, review), drafts, swap and error states, durable level tracking with undo, Evaluator v2 with Mistakes marked in text |
-| 2. Dialect | T23–T27 | Standard→Louisiana suggestions with DLF attribution, Dialect checks, Add Dialect Note sheet, Carnet notes list, markdown export |
-| 3. Memory | T28–T30 | Weaknesses with trend, Focus du jour driving prompts, Resources |
-| 4. Archive and polish | T31–T35 | History redesign, read-only past reviews, persistent Placement Test, cleanup and motion |
+| Phase                 | Tickets | Outcome                                                                                                                                                                             |
+| --------------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0. Foundations        | T00–T12 | Own repo, safe test DB, migrations, Zod at every boundary, single sources, ast-grep + ESLint guardrails, design tokens and primitives, Playwright with a fake AI client             |
+| 1. Core loop          | T13–T22 | Header with local-midnight quota, new Home (first run, writing, review), drafts, swap and error states, durable level tracking with undo, Evaluator v2 with Mistakes marked in text |
+| 2. Dialect            | T23–T27 | Standard→Louisiana suggestions with DLF attribution, Dialect checks, Add Dialect Note sheet, Carnet notes list, markdown export                                                     |
+| 3. Memory             | T28–T30 | Weaknesses with trend, Focus du jour driving prompts, Resources                                                                                                                     |
+| 4. Archive and polish | T31–T35 | History redesign, read-only past reviews, persistent Placement Test, cleanup and motion                                                                                             |
 
 The first ticket where it feels like a tutor is T22 (Mistakes marked in the text). Dialect awareness lands with T25, and memory with T29.
 
@@ -45,16 +45,16 @@ Parallel lanes once their blockers are done: T03/T07/T08/T12 (tooling), T18–T2
 
 Tickets that depend on one of these are HITL and stay `Blocked` until it is answered. Each has a default so work can proceed if Logan accepts it.
 
-| ID | Question | Default if accepted | Blocks |
-|---|---|---|---|
-| Q1 | ~~Repo name, visibility, submodule or ignore~~ **Answered 2026-11-15:** private `logandelafosse/french-writing-prompter`; parent ignores the folder | — | T00 (done) |
-| Q2 | ~~Louisiana base rules and CEFR level descriptions~~ **Answered 2026-11-15:** 12 rules, DLF spelling (`-autres`), DLF-sourced vocabulary, subjunctive accepted but never required; full list in the T06 spec | — | T06 |
-| Q3 | ~~App name~~ **Answered 2026-11-15:** feature **Consigne** under product **Louisiana Languages**; tab title `Consigne · Louisiana Languages` | — | T13 |
-| Q4 | ~~Mistake category taxonomy~~ **Answered 2026-11-15:** §1.1 as-is for v1 (15 + `autre`) | — | T21 |
-| Q5 | ~~Score display~~ **Answered 2026-11-15:** CECR sub-levels per dimension + hover/tap “what it is / pour monter”; holistic tip inside Scores | — | T22 |
-| Q6 | ~~DLF inheritance~~ **Answered 2026-11-15:** DLF-extract publishes a **lexicon artifact** (headwords, glosses, LA examples); Consigne pins a version and injects relevant entries into grader prompts. Not spellings-only; not submodule | — | T24 |
-| Q7 | ~~Resource catalog~~ **Answered 2026-11-15:** general free French grammar + CI starter catalog; Logan edits in PR; LA-specific CI not required for v1 | — | T30 |
-| Q8 | ~~Word target / swap / Placement memory~~ **Answered 2026-11-15:** A1 10–20, A2 80–120, B1–C2 250–300 (soft); swap uses a daily slot; Placement Mistakes feed Weakness memory | — | T15, T18, T28 |
+| ID  | Question                                                                                                                                                                                                                                 | Default if accepted | Blocks        |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------- |
+| Q1  | ~~Repo name, visibility, submodule or ignore~~ **Answered 2026-11-15:** private `logandelafosse/french-writing-prompter`; parent ignores the folder                                                                                      | —                   | T00 (done)    |
+| Q2  | ~~Louisiana base rules and CEFR level descriptions~~ **Answered 2026-11-15:** 12 rules, DLF spelling (`-autres`), DLF-sourced vocabulary, subjunctive accepted but never required; full list in the T06 spec                             | —                   | T06           |
+| Q3  | ~~App name~~ **Answered 2026-11-15:** feature **Consigne** under product **Louisiana Languages**; tab title `Consigne · Louisiana Languages`                                                                                             | —                   | T13           |
+| Q4  | ~~Mistake category taxonomy~~ **Answered 2026-11-15:** §1.1 as-is for v1 (15 + `autre`)                                                                                                                                                  | —                   | T21           |
+| Q5  | ~~Score display~~ **Answered 2026-11-15:** CECR sub-levels per dimension + hover/tap “what it is / pour monter”; holistic tip inside Scores                                                                                              | —                   | T22           |
+| Q6  | ~~DLF inheritance~~ **Answered 2026-11-15:** DLF-extract publishes a **lexicon artifact** (headwords, glosses, LA examples); Consigne pins a version and injects relevant entries into grader prompts. Not spellings-only; not submodule | —                   | T24           |
+| Q7  | ~~Resource catalog~~ **Answered 2026-11-15:** general free French grammar + CI starter catalog; Logan edits in PR; LA-specific CI not required for v1                                                                                    | —                   | T30           |
+| Q8  | ~~Word target / swap / Placement memory~~ **Answered 2026-11-15:** A1 10–20, A2 80–120, B1–C2 250–300 (soft); swap uses a daily slot; Placement Mistakes feed Weakness memory                                                            | —                   | T15, T18, T28 |
 
 ## Models
 

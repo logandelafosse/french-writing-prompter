@@ -8,9 +8,7 @@ import { migrateWithBackup } from "@/db/migrate-run";
 function listBackups(dbPath: string): string[] {
   const dir = path.dirname(dbPath);
   const base = path.basename(dbPath);
-  return fs
-    .readdirSync(dir)
-    .filter((name) => name.startsWith(`${base}.bak-`));
+  return fs.readdirSync(dir).filter((name) => name.startsWith(`${base}.bak-`));
 }
 
 describe("migrateWithBackup", () => {

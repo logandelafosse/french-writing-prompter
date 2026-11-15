@@ -1,8 +1,8 @@
 # T12 — Lefthook pre-commit
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T08 | ~30 config |
+| ----- | ---- | ---------- | ----------------------- |
+| 0     | AFK  | T08        | ~30 config              |
 
 ## User stories
 

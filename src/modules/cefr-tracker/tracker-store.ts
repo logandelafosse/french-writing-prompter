@@ -25,7 +25,7 @@ export async function initTracker(): Promise<CefrTracker> {
 
 export async function setTrackerLevel(
   level: CefrLevel,
-  source: "auto" | "manual"
+  source: "auto" | "manual",
 ): Promise<LevelChange> {
   const change = await dbSetLevel(level, source);
   getTracker().setLevel(level, source);

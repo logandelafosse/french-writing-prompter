@@ -46,10 +46,9 @@ export class PromptGenerator {
 
   async generate(
     level: CefrLevel,
-    dialect: FrenchDialect
+    dialect: FrenchDialect,
   ): Promise<WritingPrompt> {
-    const dialectRules =
-      dialect === "louisiana" ? LOUISIANA_FRENCH_RULES : "";
+    const dialectRules = dialect === "louisiana" ? LOUISIANA_FRENCH_RULES : "";
 
     const systemPrompt = `You are a French writing tutor. Generate writing prompts for French learners at CEFR level ${level}. The learner uses Louisiana French (dialect rules below).
 

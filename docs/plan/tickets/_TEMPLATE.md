@@ -1,8 +1,8 @@
 # T00 — Title in domain vocabulary
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK / HITL (Qn) | T00, T00 or None | ~000 |
+| Phase | Type            | Blocked by       | Production lines (est.) |
+| ----- | --------------- | ---------------- | ----------------------- |
+| 0     | AFK / HITL (Qn) | T00, T00 or None | ~000                    |
 
 ## User stories
 

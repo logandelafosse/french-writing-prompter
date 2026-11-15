@@ -1,8 +1,8 @@
 # T32 — Read-only past review
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 4 | AFK | T25, T31 | ~250 |
+| ----- | ---- | ---------- | ----------------------- |
+| 4     | AFK  | T25, T31   | ~250                    |
 
 ## User stories
 

@@ -1,8 +1,8 @@
 # T22 — Review screen: marked text, Mistake cards, Scores
 
-| Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 1 | AFK (Q5 answered) | T16, T21 | ~500 (at the limit; see split note in Out of scope) |
+| Phase | Type              | Blocked by | Production lines (est.)                             |
+| ----- | ----------------- | ---------- | --------------------------------------------------- |
+| 1     | AFK (Q5 answered) | T16, T21   | ~500 (at the limit; see split note in Out of scope) |
 
 **Score display (Q5, answered 2026-11-15):** Claude Design style — each dimension shows a CECR sub-level (`A2+`, `B1`, …), not `N / 6`. French labels: `Grammaire`, `Vocabulaire`, `Cohérence`, `Registre et style`. Scores collapsed by default (`Scores ▸` + `Ensemble : {level}`). Hover (desktop) / tap (mobile) on a dimension row opens a popover with (1) what the category measures and (2) a short **Pour monter** tip for this Evaluation. Holistic `next_level_tip` remains one line inside the open Scores. Mapping: evaluator may keep internal 1–6; UI maps to CECR sub-levels via a documented table, or the model emits per-dimension CECR — pick one approach in the PR and test both ends. Mockup: `docs/design/mockups/q5-scores.html`.
 

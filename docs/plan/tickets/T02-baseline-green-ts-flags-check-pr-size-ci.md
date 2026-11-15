@@ -1,8 +1,8 @@
 # T02 — Baseline green: TS flags, `check`, `pr:size`, CI
 
 | Phase | Type | Blocked by | Production lines (est.) |
-|---|---|---|---|
-| 0 | AFK | T01 | ~120 |
+| ----- | ---- | ---------- | ----------------------- |
+| 0     | AFK  | T01        | ~120                    |
 
 ## User stories
 

@@ -6,7 +6,11 @@ import { describe, expect, it } from "vitest";
 import { runPrSize } from "./run-pr-size";
 
 function runInRepo(repoDir: string, cmd: string): string {
-  return execSync(cmd, { cwd: repoDir, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"] });
+  return execSync(cmd, {
+    cwd: repoDir,
+    encoding: "utf8",
+    stdio: ["pipe", "pipe", "pipe"],
+  });
 }
 
 function initRepo(repoDir: string): void {
