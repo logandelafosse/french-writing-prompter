@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@ast-grep/cli": "^0.51.2",
+    "@tailwindcss/node": "^4.3.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

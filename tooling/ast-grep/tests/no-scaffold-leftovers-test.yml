@@ -1,0 +1,5 @@
+id: no-scaffold-leftovers
+valid:
+  - 'export const metadata = { title: "Consigne · Louisiana Languages" };'
+invalid:
+  - 'import { Geist } from "next/font/google";'
