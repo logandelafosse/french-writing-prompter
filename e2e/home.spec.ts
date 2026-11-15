@@ -15,8 +15,6 @@ async function selectLevel(page: import("@playwright/test").Page) {
   await expect(page.getByText(/Elementary/).first()).toBeVisible();
 }
 
-test.describe.configure({ mode: "serial" });
-
 test("learner generates a prompt, writes, and sees the Evaluation and the History entry", async ({
   page,
   scenario,
@@ -67,7 +65,10 @@ test("malformed AI output shows an error and retry recovers", async ({
   await scenario("malformed");
   await page.getByRole("button", { name: "Submit for evaluation" }).click();
   await expect(page.getByText("AI output was invalid.")).toBeVisible();
-  await expect(page.getByText("Next.js", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("Unhandled Runtime Error")).toHaveCount(0);
+  await expect(
+    page.getByText(/Application error: a client-side exception has occurred/i),
+  ).toHaveCount(0);
 
   await scenario("happy");
   await page.getByRole("button", { name: "Retry evaluation" }).click();
