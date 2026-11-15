@@ -153,7 +153,7 @@ export function HistoryPage() {
 
   if (loading) {
     return (
-      <div className="flex flex-1 flex-col bg-zinc-50">
+      <div className="flex flex-1 flex-col">
         <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
           <div className="animate-pulse space-y-4">
             <div className="h-6 w-32 rounded bg-zinc-100" />
@@ -167,7 +167,7 @@ export function HistoryPage() {
 
   if (error) {
     return (
-      <div className="flex flex-1 flex-col bg-zinc-50">
+      <div className="flex flex-1 flex-col">
         <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
           <p className="text-sm text-red-600">{error}</p>
         </main>
@@ -176,7 +176,7 @@ export function HistoryPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col bg-zinc-50">
+    <div className="flex flex-1 flex-col">
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">

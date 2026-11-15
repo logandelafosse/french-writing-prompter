@@ -27,9 +27,11 @@ describe("globals.css theme compilation", () => {
     expect(utilities).toMatch(/background-color:\s*var\(--color-sheet\)/);
     expect(utilities).toMatch(/color:\s*var\(--color-ink\)/);
     expect(utilities).toMatch(
-      /--font-bricolage[\s\S]*Trebuchet MS[\s\S]*sans-serif/,
+      /\.font-sans\s*\{[^}]*font-family:[^}]*var\(--font-bricolage\)/,
     );
-    expect(utilities).toMatch(/--font-newsreader[\s\S]*Georgia[\s\S]*serif/);
+    expect(utilities).toMatch(
+      /\.font-serif\s*\{[^}]*font-family:[^}]*var\(--font-newsreader\)/,
+    );
     expect(utilities).toMatch(/border-radius:\s*var\(--radius-base\)/);
     expect(utilities).toMatch(/\.shadow-sheet\s*\{[\s\S]*0 18px 40px -28px/);
     expect(utilities).toMatch(/max-width:\s*var\(--container-home\)/);
