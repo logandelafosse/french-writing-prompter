@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  {
+    rules: {
+      // French UI copy uses apostrophes (C'est, l'écriture); forbid only JSX-problematic chars.
+      "react/no-unescaped-entities": ["error", { forbid: [">", "}"] }],
+    },
+  },
 ]);
 
 export default eslintConfig;

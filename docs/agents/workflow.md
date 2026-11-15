@@ -42,7 +42,7 @@ The coordinator keeps at most three tickets `In progress` at once, and never two
 6. **PR.** One PR per ticket, linking the ticket file. Card moves to `In review`.
 7. **Review.** Coordinator launches the three reviewers (below) in parallel.
 8. **Fix loop.** Blocking findings go back to the same implementer. Re-run the gates, then re-run only the reviewers that raised blocking findings. Non-blocking findings become new Backlog tickets, linked on the card.
-9. **Done.** All gates green and no blocking findings. Coordinator merges, moves the card, records the PR and spawned follow-ups, and re-checks which Backlog tickets became `Ready`.
+9. **Done.** All gates green and no blocking findings. Coordinator merges once the GitHub Actions **`check`** workflow is green on the PR (`lint`, `typecheck`, `test`, `build` via `npm run ci`). If the repo has no CI, add `.github/workflows/check.yml` before merging. Then move the card, record the PR and spawned follow-ups, and re-check which Backlog tickets became `Ready`.
 
 ## Reviewer briefs
 
