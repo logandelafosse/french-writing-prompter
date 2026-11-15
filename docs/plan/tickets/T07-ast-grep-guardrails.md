@@ -23,7 +23,9 @@ The legacy UI moves with `git mv` (so rename detection keeps the diff small) int
 
 P1 rules from §4 (`no-type-assertion`, `no-mocking-own-modules`) are in scope only if `npm run pr:size` stays under budget; otherwise note them on the board card for the coordinator. `no-direct-ai-client` belongs to T11.
 
-**From T02 tooling review (PR #39):** widen `no-utc-date-key` for `indexOf/split("T")` date extraction and `utcDateKey`-named helpers; add `no-skip-undefined-element` (`if ($EL === undefined) continue`); add `no-interpolated-exec` on `execSync(\`...\`)`in`scripts/**`and`tooling/**`.
+**From T02 tooling review (PR #39):** widen `no-utc-date-key` for `indexOf/split("T")` date extraction and `utcDateKey`-named helpers; add `no-skip-undefined-element` (`if ($EL === undefined) continue`); add `no-interpolated-exec` on `execSync(\`...\`)` in `scripts/**` and `tooling/**`.
+
+**From T04 tooling review (PR #41):** widen `no-json-parse` (optional chaining, `JSON["parse"]`, destructuring, `globalThis`, `eval`/`Function`); add `no-permissive-boundary-schema` (`z.any`, `z.json`, etc.); widen `no-raw-json-body` (`request["json"]()`, destructuring); switch fixture tests from raw `JSON.parse` to `parseJson`.
 
 ## Acceptance criteria
 
