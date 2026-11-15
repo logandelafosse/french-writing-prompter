@@ -10,7 +10,7 @@ import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import playwright from "eslint-plugin-playwright";
 
 const LEGACY = ["src/components/legacy/**"];
-const TESTS = ["src/**/*.test.{ts,tsx}"];
+const TESTS = ["src/**/*.test.{ts,tsx}", "tooling/**/*.test.ts"];
 const LINT_FIXTURES = ["src/test/lint-fixtures/**"];
 
 const strictTypeCheckedRules = Object.assign(

@@ -1,0 +1,21 @@
+pre-commit:
+  parallel: true
+  commands:
+    prettier:
+      glob: "*.{ts,tsx,css,md,json,yml,yaml}"
+      run: npx prettier --write {staged_files}
+      stage_fixed: true
+    eslint:
+      glob: "*.{ts,tsx}"
+      run: npx eslint --max-warnings=0 {staged_files}
+    ast-grep:
+      glob: "*.{ts,tsx,css}"
+      run: npx ast-grep scan {staged_files}
+    typecheck:
+      glob: "*.{ts,tsx}"
+      run: npx tsc --noEmit --incremental false
+
+pre-push:
+  commands:
+    check:
+      run: npm run check
