@@ -4,17 +4,17 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T01 merged; CI live).
+Last updated: 2026-11-15 by coordinator (goal: full ticket delivery; T02 dispatch).
 
 ## Ready
 
-| ID | Ticket | Why |
-|---|---|---|
-| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | T01 merged ([PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38)). Partial overlap: `check.yml` + lint apostrophe rule already on `main`; remaining work in ticket spec. |
+_None._
 
 ## In progress
 
-_None._
+| ID | Ticket | Why |
+|---|---|---|
+| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | Implementer Composer `inherit`, branch `ticket/t02-baseline-green`, started 2026-11-15. Partial CI already on main from T01. |
 
 ## In review
 
