@@ -4,21 +4,24 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (goal: full ticket delivery; T02 dispatch).
+Last updated: 2026-11-15 by coordinator (T02 merged; T03 dispatch).
 
 ## Ready
 
-_None._
+| ID | Ticket | Why |
+|---|---|---|
+| T04 | Zod contracts for LLM output and stored JSON ([#6](https://github.com/logandelafosse/french-writing-prompter/issues/6)) | T02 merged. |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata ([#11](https://github.com/logandelafosse/french-writing-prompter/issues/11)) | T02 merged. Not alongside T07 seam (scaffold-leftovers rule). |
 
 ## In progress
 
-_None._
+| ID | Ticket | Why |
+|---|---|---|
+| T03 | Prettier format-only pass ([#5](https://github.com/logandelafosse/french-writing-prompter/issues/5)) | Implementer `inherit`, branch `ticket/t03-prettier`, started 2026-11-15. |
 
 ## In review
 
-| ID | Ticket | Why |
-|---|---|---|
-| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39); CI green; Grok 4.7 reviewers dispatched. |
+_None._
 
 ## Blocked
 
@@ -30,14 +33,13 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 | ID | Ticket | Type | Blocked by | Why not ready |
 |---|---|---|---|---|
-| T02 | Baseline green: TS flags, `check`, `pr:size`, CI | AFK | — | In **Ready** (partial CI landed with T01). |
-| T03 | Prettier format-only pass | AFK | T02 | Needs `check` to include `format:check` |
-| T04 | Zod contracts for LLM output and stored JSON | AFK | T02 | Needs strict baseline |
+| T03 | Prettier format-only pass | AFK | — | **In progress** |
+| T04 | Zod contracts for LLM output and stored JSON | AFK | — | In **Ready** |
 | T05 | Zod contracts for API bodies, client fetches, env | AFK | T04 | Builds on the contracts module |
 | T06 | Single sources: dialect module, limits, local dates, knip, glossary | AFK | T04 | Needs contracts. Q2 answered 2026-11-15; approved rules are in the spec. |
 | T07 | ast-grep guardrails | AFK | T06 | Rules reference the single-source modules |
 | T08 | ESLint hardening and AGENTS.md engineering rules | AFK | T05, T07 | Needs boundaries typed so `no-unsafe-*` is quiet |
-| T09 | Design tokens, fonts, `lang="fr"`, metadata | AFK | T02 | Needs `check`. Either order with T07: whichever merges second adds the scaffold-leftovers rule (see both specs). |
+| T09 | Design tokens, fonts, `lang="fr"`, metadata | AFK | — | In **Ready**. Either order with T07: whichever merges second adds the scaffold-leftovers rule (see both specs). |
 | T10 | UI primitives | AFK | T09 | Built on tokens. If T06's knip pass deleted `ui/button.tsx` or its deps, T10 recreates them. |
 | T11 | Playwright tracer bullet with fake AI client and axe | AFK | T05 | Fake client is validated by the contracts. Its ast-grep seam rule is added only if T07 has merged. |
 | T12 | Lefthook pre-commit | AFK | T08 | Hooks run the full lint set |
@@ -91,3 +93,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 |---|---|---|
 | T00 | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2)) | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue. |
 | T01 | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3)) | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules. |
+| T02 | Baseline green: TS flags, `check`, `pr:size`, CI ([#4](https://github.com/logandelafosse/french-writing-prompter/issues/4)) | Merged [PR #39](https://github.com/logandelafosse/french-writing-prompter/pull/39) 2026-11-15. Adversarial blocking fix: root-level `fixtures/` in `pr:size`. |
