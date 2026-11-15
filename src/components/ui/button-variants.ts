@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 
 export const buttonVariants = cva(
-  "inline-flex cursor-pointer items-center justify-center font-sans transition-colors focus-visible:outline-none disabled:cursor-not-allowed",
+  "inline-flex cursor-pointer items-center justify-center font-sans transition-colors disabled:cursor-not-allowed",
   {
     variants: {
       variant: {

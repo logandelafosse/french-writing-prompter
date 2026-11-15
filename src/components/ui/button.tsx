@@ -7,7 +7,7 @@ import { buttonVariants, type ButtonVariantProps } from "./button-variants";
 
 export type ButtonProps = Omit<
   ComponentProps<typeof BaseUIButton>,
-  "className"
+  "className" | "aria-busy"
 > &
   ButtonVariantProps & {
     className?: string | undefined;
@@ -27,6 +27,7 @@ export function Button({
 
   return (
     <BaseUIButton
+      {...props}
       type={type}
       disabled={isDisabled}
       aria-busy={busy ? true : undefined}
@@ -35,7 +36,6 @@ export function Button({
         busy && "bg-busy disabled:bg-busy text-white disabled:text-white",
         className,
       )}
-      {...props}
     />
   );
 }

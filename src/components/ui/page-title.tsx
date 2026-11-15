@@ -14,7 +14,7 @@ export function PageTitle({
   return (
     <h1
       className={cn(
-        "text-ink font-semibold tracking-[-0.03em]",
+        "text-ink",
         size === "step" ? "text-step-title" : "text-page-title",
         className,
       )}

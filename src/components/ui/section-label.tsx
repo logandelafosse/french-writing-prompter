@@ -26,11 +26,7 @@ export function SectionLabel<T extends SectionLabelElement = "span">({
   const Component = (as ?? "span") as ElementType;
   return (
     <Component
-      className={cn(
-        "text-label font-bold tracking-[0.12em] uppercase",
-        toneClass[tone],
-        className,
-      )}
+      className={cn("text-label uppercase", toneClass[tone], className)}
       {...props}
     />
   );
