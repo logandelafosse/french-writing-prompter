@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { CefrLevel } from "@/contracts/cefr";
 import { CEFR_LEVELS } from "@/contracts/cefr";
+import { CEFR_UI_LABELS } from "@/config/cefr-labels";
 
 export type { CefrLevel };
 
@@ -15,14 +16,7 @@ const LEVEL_COLORS: Record<CefrLevel, string> = {
   C2: "bg-rose-100 text-rose-800 border-rose-300",
 };
 
-const LEVEL_LABELS: Record<CefrLevel, string> = {
-  A1: "Beginner",
-  A2: "Elementary",
-  B1: "Intermediate",
-  B2: "Upper Intermediate",
-  C1: "Advanced",
-  C2: "Mastery",
-};
+const LEVEL_LABELS = CEFR_UI_LABELS;
 
 export function LevelBadge({ level }: { level: CefrLevel | null }) {
   if (!level) return null;

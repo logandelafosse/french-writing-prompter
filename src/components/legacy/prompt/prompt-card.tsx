@@ -12,6 +12,7 @@ import {
 } from "@/contracts/api";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { DAILY_PROMPT_QUOTA } from "@/config/limits";
+import { useHeaderShell } from "@/components/shell/header-shell";
 
 const LOAD_ERROR = "An error occurred. Please try again.";
 const EVAL_ERROR = "An error occurred during evaluation.";
@@ -30,7 +31,9 @@ export function PromptCard() {
     used: number;
     remaining: number;
     max: number;
+    resetsAt: string;
   } | null>(null);
+  const { refreshQuota: refreshHeaderQuota } = useHeaderShell();
 
   async function refreshQuota() {
     const result = await fetchJson("/api/quota", QuotaGetResponse);
@@ -74,6 +77,7 @@ export function PromptCard() {
       setPrompt(result.value.prompt);
       setSessionId(result.value.sessionId);
       await refreshQuota();
+      await refreshHeaderQuota();
     }
 
     setLoading(false);

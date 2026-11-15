@@ -6,6 +6,14 @@ const fontLoaderOptions = vi.hoisted(() => ({
   newsreader: undefined as Record<string, unknown> | undefined,
 }));
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/",
+}));
+
+vi.mock("@/components/shell/header-shell", () => ({
+  HeaderShell: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 vi.mock("next/font/google", () => ({
   Bricolage_Grotesque: (options: Record<string, unknown>) => {
     fontLoaderOptions.bricolage = options;

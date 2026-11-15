@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Newsreader } from "next/font/google";
+import { APP_DOCUMENT_TITLE, APP_TAGLINE } from "@/config/app-brand";
+import { HeaderShell } from "@/components/shell/header-shell";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -18,8 +20,8 @@ const newsreader = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Consigne · Louisiana Languages",
-  description: "atelier d'écriture · français louisianais",
+  title: APP_DOCUMENT_TITLE,
+  description: APP_TAGLINE,
 };
 
 export default function RootLayout({
@@ -32,7 +34,9 @@ export default function RootLayout({
       lang="fr"
       className={`${bricolage.variable} ${newsreader.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="bg-desk text-ink flex min-h-full flex-col">
+        <HeaderShell>{children}</HeaderShell>
+      </body>
     </html>
   );
 }
