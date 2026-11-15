@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { QuotaText, quotaMessage } from "./header-shell";
-import type { QuotaState } from "@/modules/quota-manager/quota-db-store";
+import type { QuotaState } from "@/modules/quota-manager/quota-store";
 
 const baseQuota = (remaining: number): QuotaState => ({
   used: 3 - remaining,

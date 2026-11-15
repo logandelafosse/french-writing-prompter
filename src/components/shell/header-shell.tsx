@@ -25,7 +25,7 @@ import {
 } from "@/contracts/api";
 import { fetchJson } from "@/lib/http";
 import { cn } from "@/lib/utils";
-import type { QuotaState } from "@/modules/quota-manager/quota-db-store";
+import type { QuotaState } from "@/modules/quota-manager/quota-store";
 
 export function quotaMessage(
   quota: QuotaState,

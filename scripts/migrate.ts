@@ -1,6 +1,8 @@
 import { createClient } from "@libsql/client";
-import { migrateWithBackup } from "../src/db/migrate-run";
-import { backfillSessionsLocalDate } from "../src/db/backfills/sessions-local-date";
+import {
+  backfillSessionsLocalDate,
+  migrateWithBackup,
+} from "../src/db/migrate-run";
 
 async function main() {
   const databaseUrl = process.env.DATABASE_URL ?? "file:./data.db";

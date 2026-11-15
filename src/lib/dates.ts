@@ -33,17 +33,12 @@ export function nextLocalMidnightIso(
   const tz = resolvedTimeZone(timeZone);
   const today = localDateKey(from, tz);
   let lo = from.getTime();
-  let hi = lo + 36 * 60 * 60 * 1000;
-  while (localDateKey(new Date(hi), tz) === today) {
-    hi += 60 * 60 * 1000;
-  }
+  let hi = lo + 86_400_000;
+  while (localDateKey(new Date(hi), tz) === today) hi += 3_600_000;
   while (hi - lo > 1) {
-    const mid = Math.floor((lo + hi) / 2);
-    if (localDateKey(new Date(mid), tz) === today) {
-      lo = mid;
-    } else {
-      hi = mid;
-    }
+    const mid = (lo + hi) >> 1;
+    if (localDateKey(new Date(mid), tz) === today) lo = mid;
+    else hi = mid;
   }
   return new Date(hi).toISOString();
 }

@@ -7,10 +7,10 @@ import {
   assertQuotaAvailable,
   countDailySessions,
   getQuotaState,
-} from "./quota-db-store";
+} from "./quota-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
-describe("quota-db-store local date", () => {
+describe("quota-store local date", () => {
   beforeEach(async () => {
     await db.delete(sessions).execute();
   });
