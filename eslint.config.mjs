@@ -100,6 +100,24 @@ export default defineConfig([
   },
   {
     files: ["src/modules/**"],
+    ignores: ["src/modules/openai-client/**"],
+    rules: {
+      "@typescript-eslint/no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["openai", "openai/*"],
+              message:
+                "Only src/modules/openai-client talks to the OpenAI SDK.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/modules/**"],
     ignores: [
       "src/modules/openai-client/**",
       "src/modules/**/*-store.ts",
@@ -126,19 +144,6 @@ export default defineConfig([
               ],
               message: "Domain modules are framework-free (orthogonality).",
             },
-          ],
-        },
-      ],
-    },
-  },
-  {
-    files: ["src/modules/**"],
-    ignores: ["src/modules/openai-client/**"],
-    rules: {
-      "@typescript-eslint/no-restricted-imports": [
-        "error",
-        {
-          patterns: [
             {
               group: ["openai", "openai/*"],
               message:
