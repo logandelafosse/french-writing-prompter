@@ -6,11 +6,11 @@ How the UI redesign (and later work) gets built by agents. The board is `docs/pl
 
 | Role | Model | Owns |
 |---|---|---|
-| Coordinator | Opus | The board. Picks the next ticket, dispatches implementers and reviewers, records every status change and why. Never writes production code. |
-| Implementer | Grok 4.6 fast (`cursor-grok-4.6-high-fast`) | One ticket on one branch. TDD, Playwright validation, PR. |
-| Adversarial reviewer | Opus | Spec adherence and bug hunting on the PR diff. |
-| Test reviewer | Opus | Test quality: duplication, terseness, usefulness, slop. |
-| Tooling reviewer | Opus | Where a lint rule, ast-grep rule, type, or script would have prevented a finding. |
+| Coordinator | Grok 4.7 high (`grok-4.7-high-fast`) | The board. Picks the next ticket, dispatches implementers and reviewers, records every status change and why. Never writes production code. |
+| Implementer | Composer 2.5 when available; else Grok 4.6 (`cursor-grok-4.6-high-fast`) | One ticket on one branch. TDD, Playwright validation, PR. Prefer Composer 2.5; if the Task model allowlist has no Composer slug, use Grok 4.6 (medium preferred when offered; otherwise the listed high-fast slug). |
+| Adversarial reviewer | Grok 4.7 high (`grok-4.7-high-fast`) | Spec adherence and bug hunting on the PR diff. (Opus paused — no utilization left.) |
+| Test reviewer | Grok 4.7 high (`grok-4.7-high-fast`) | Test quality: duplication, terseness, usefulness, slop. |
+| Tooling reviewer | Grok 4.7 high (`grok-4.7-high-fast`) | Where a lint rule, ast-grep rule, type, or script would have prevented a finding. |
 
 The three reviewers run in parallel on the same PR and never see each other's output.
 

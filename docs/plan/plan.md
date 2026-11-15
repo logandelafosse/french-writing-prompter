@@ -58,4 +58,4 @@ Tickets that depend on one of these are HITL and stay `Blocked` until it is answ
 
 ## Models
 
-Coordinator and all three reviewers: Opus 5.5. Implementer: Grok 4.6 fast (`cursor-grok-4.6-high-fast`), chosen by Logan; a different model family from the reviewers keeps the adversarial review independent.
+(2026-11-15 — Opus utilization exhausted.) Coordinator and all three reviewers: Grok 4.7 high (`grok-4.7-high-fast`). Implementer: Composer 2.5 when available; otherwise Grok 4.6 (`cursor-grok-4.6-high-fast` — medium preferred if offered).
