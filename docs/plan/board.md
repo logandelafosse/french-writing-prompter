@@ -4,19 +4,19 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T16 dispatched).
+Last updated: 2026-11-15 by coordinator (T16 + T13g dispatched).
 
 ## Ready
 
 | ID   | Ticket                                                                                                                                  | Why                                     |
 | ---- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| T13g | Wordmark 44px touch ([#59](https://github.com/logandelafosse/french-writing-prompter/issues/59))                                        | HANDOFF regression from PR #57.         |
 | T20  | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22)) | T14 merged; advancement banner on Home. |
 
 ## In progress
 
 | ID  | Ticket                                                                                                                              | Why                                                         |
 | --- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| T13g | Wordmark 44px touch ([#59](https://github.com/logandelafosse/french-writing-prompter/issues/59))                                   | Branch `ticket/t13g-wordmark-touch`.                        |
 | T16 | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | Branch `ticket/t16-writing-surface`; critical path Phase 1. |
 
 ## In review
