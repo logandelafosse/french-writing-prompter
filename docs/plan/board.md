@@ -4,13 +4,14 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T13c merged #54; T14 ready).
+Last updated: 2026-11-15 by coordinator (T13e #56 ready; T14 ready).
 
 ## Ready
 
-| ID  | Ticket                                                                                                                 | Why                     |
-| --- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| T14 | Home first run and `/api/today` bootstrap ([#16](https://github.com/logandelafosse/french-writing-prompter/issues/16)) | T13c merged 2026-11-15. |
+| ID   | Ticket                                                                                                                 | Why                                    |
+| ---- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| T13e | Mobile header rows + level card sync ([#56](https://github.com/logandelafosse/french-writing-prompter/issues/56))      | Adversarial blockers on merged PR #54. |
+| T14  | Home first run and `/api/today` bootstrap ([#16](https://github.com/logandelafosse/french-writing-prompter/issues/16)) | May parallel T13e (different seams).   |
 
 ## In progress
 
@@ -48,6 +49,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T13  | App header, level menu, local-midnight quota                        | AFK  | —          | **Done** — [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) + [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52) 2026-11-15. |
 | T13c | Header PR #52 review fixes                                          | AFK  | T13        | **Done** — merged [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) 2026-11-15.                                                                        |
 | T13d | T13c e2e acceptance hardening                                       | AFK  | T13c       | **Backlog** — [#55](https://github.com/logandelafosse/french-writing-prompter/issues/55); PR #54 test gaps; does not block T14.                                                  |
+| T13e | Mobile header rows + level card sync                                | AFK  | T13c       | **Ready** — [#56](https://github.com/logandelafosse/french-writing-prompter/issues/56); adversarial blockers PR #54.                                                             |
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **Ready** — T13c done.                                                                                                                                                           |
 | T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300.                                                                                                                       |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                                           |
@@ -109,4 +111,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T11  | Playwright tracer bullet with fake AI client and axe ([#13](https://github.com/logandelafosse/french-writing-prompter/issues/13)) | Merged [PR #48](https://github.com/logandelafosse/french-writing-prompter/pull/48) 2026-11-15; evidence `docs/evidence/T11/`; T13 unblocked.                                                                                                                               |
 | T12  | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                                  | Merged [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49) 2026-11-15; hook integration tests + `opencode.json` guards.                                                                                                                            |
 | T13  | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15))         | Merged [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) + [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52); follow-up [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) (T13c). T14 ready. |
-| T13c | Header PR #52 review fixes ([#53](https://github.com/logandelafosse/french-writing-prompter/issues/53))                           | Merged [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) 2026-11-15; evidence `docs/evidence/53/`; spawned T13d #55.                                                                                                                             |
+| T13c | Header PR #52 review fixes ([#53](https://github.com/logandelafosse/french-writing-prompter/issues/53))                           | Merged [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) 2026-11-15; spawned T13d #55, T13e #56 (adversarial blockers).                                                                                                                          |
