@@ -1218,3 +1218,48 @@ export function countsAsMistake(c: Pick<Correction, "kind" | "status">): boolean
 ```
 
 **Already enforced / positive:** `parseJson` in `parseStoredEvaluation`; `EVALUATION_SCORE_MAX`; `MISTAKE_CATEGORY_IDS` + `z.enum`; omitted-nullable parse test; malformed → unreadable in History.
+
+### PR #71 (T21b — evaluator runtime)
+
+Non-blocking for T21b merge. **TOOL-PR70-1/2/3/5 partially landed in product** (not full ratchets). Land **TOOL-PR71-1**, **71-2**, **71-3**, and remaining **70-7/8/10** before **T22**.
+
+**TOOL-PR70 status on T21b**
+
+| ID   | Status   | Notes                                                                                       |
+| ---- | -------- | ------------------------------------------------------------------------------------------- |
+| 70-1 | Partial  | `z.strictObject` on evaluator output; `Correction` still `z.object`; no ast-grep ratchet      |
+| 70-2 | Partial  | `EVALUATOR_CORRECTIONS_MAX`; contracts `no-magic-numbers` still off                           |
+| 70-3 | Landed   | `DIMENSION_IDS` + `Dimension` on output; legacy v1 lists still manual                         |
+| 70-4 | Open     | `DimensionScore` still legacy `{max}`; dodged via `toPlaceholderEvaluation`                 |
+| 70-5 | Partial  | LLM `MistakeCategory.nullable()`; fixture draft schema still accepts loose `category`       |
+| 70-6 | Open     | `countsAsMistake` boolean-or; History `if/else if` on parse status                          |
+| 70-7 | Open     | `"tips" in` / `"version" in` on Home submit + Placement                                     |
+| 70-8 | Open     | Inline kind enums; prompt copies string literals                                            |
+| 70-9 | Open     | Unbounded `.int()` on occurrence/ordinal/sessionId                                          |
+| 70-10| Open     | `saveCorrections` raw `text()` columns; parse-on-read in T22                                |
+
+| ID (draft)   | Rule / change                                    | Notes                                                                 |
+| ------------ | ------------------------------------------------ | --------------------------------------------------------------------- |
+| TOOL-PR71-1  | `no-parallel-llm-schema`                         | `EvaluatorOutputDraft` / fixture schema bypasses strict LLM envelope    |
+| TOOL-PR71-2  | `chatCompletionJSON` returns `{ value, text }`   | `evaluation_raw` from re-stringified parse, not model text              |
+| TOOL-PR71-3  | `no-cloned-request-in-routes`                    | Session route `new Request` into evaluate alias; fold TOOL-PR67-2       |
+| TOOL-PR71-4  | Prompt constants + kind IDs (fold 70-8)          | Limits/prompt version in config; interpolate `CorrectionKind.options`   |
+| TOOL-PR71-5  | `no-fs-in-modules` for prompt load               | `fs.readFileSync` for evaluator prompt body                           |
+| TOOL-PR71-6  | `LocatedQuote` uses `CorrectionAnchor`           | Local `"exact" \| "normalized"` union                                 |
+| TOOL-PR71-7  | `ai-fixture-schema-ratchet` (fold TOOL-PR63-8) | v2 fixtures vs v1 `Evaluation` ratchet mismatch                       |
+| TOOL-PR71-8  | `OpenAiClientLike` single-source                 | Duplicated in prompt-generator + writing-evaluator                    |
+| TOOL-PR71-9  | Evaluate errors + `now`                          | Mixed error shapes; `new Date()` in handler; fold TOOL-PR68/69/66   |
+
+**Proposed snippet (71-3)**
+
+```yaml
+id: no-cloned-request-in-routes
+language: Tsx
+severity: error
+message: "Routes call a module; do not new Request() another handler."
+rule:
+  pattern: new Request($URL, $INIT)
+files: ["src/app/api/**"]
+```
+
+**Already enforced / positive:** `chatCompletionJSON` + `parseJson`; `Correction.parse` in post-process; `EvaluatePostResponse` `z.strictObject`; injected `now` / `createId`; fake client `parseJson`.
