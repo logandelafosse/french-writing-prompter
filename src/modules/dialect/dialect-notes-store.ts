@@ -1,4 +1,4 @@
-import { eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { corrections, dialectNotes } from "@/db/schema";
 import { DIALECT_NOTE_RULE_MAX, DIALECT_NOTE_RULE_MIN } from "@/config/limits";
@@ -40,6 +40,24 @@ export async function listActiveNotes(): Promise<LearnerDialectNote[]> {
   }));
 }
 
+class DialectNoteConflictError extends Error {
+  constructor() {
+    super("CONFLICT");
+    this.name = "DialectNoteConflictError";
+  }
+}
+
+let createChain = Promise.resolve();
+
+function withCreateLock<T>(fn: () => Promise<T>): Promise<T> {
+  const run = createChain.then(fn, fn);
+  createChain = run.then(
+    () => undefined,
+    () => undefined,
+  );
+  return run;
+}
+
 export async function createDialectNote(
   input: DialectNoteCreateBody,
   now: () => Date,
@@ -55,58 +73,69 @@ export async function createDialectNote(
     return { ok: false, code: "VALIDATION" };
   }
 
-  let current: Correction | null = null;
-  let nextStatus: "overturned" | "confirmed_dialect" | null = null;
-  if (input.fromCorrectionId !== undefined) {
-    current = await getCorrection(input.fromCorrectionId);
-    if (current === null) return { ok: false, code: "NOT_FOUND" };
-    const next = statusAfterDialectNote(current);
-    if (!next.ok) return { ok: false, code: "CONFLICT" };
-    nextStatus = next.status;
-  }
-
   const createdAt = now().toISOString();
-  let noteId = 0;
-  await db.run(sql.raw("BEGIN IMMEDIATE"));
-  try {
-    const inserted = await db.insert(dialectNotes).values({
-      rule,
-      example: input.example ?? null,
-      scope: input.scope,
-      form: input.form,
-      learnerForm: input.learnerForm ?? null,
-      tutorSuggestion: input.tutorSuggestion ?? null,
-      sourceSessionId: current?.sessionId ?? null,
-      sourceCorrectionId: input.fromCorrectionId ?? null,
-      createdAt,
-      updatedAt: createdAt,
-      deletedAt: null,
-    });
-    noteId = Number(inserted.lastInsertRowid);
-    if (current !== null && nextStatus !== null) {
-      await db
-        .update(corrections)
-        .set({
-          status: nextStatus,
-          dialectNoteId: noteId,
-          resolvedAt: createdAt,
-        })
-        .where(eq(corrections.id, current.id));
-    }
-    await db.run(sql.raw("COMMIT"));
-  } catch (error) {
-    await db.run(sql.raw("ROLLBACK"));
-    throw error;
-  }
+  return withCreateLock(async () => {
+    try {
+      return await db.transaction(async (tx) => {
+        let current: Correction | null = null;
+        let nextStatus: "overturned" | "confirmed_dialect" | null = null;
+        if (input.fromCorrectionId !== undefined) {
+          current = await getCorrection(input.fromCorrectionId, tx);
+          if (current === null) return { ok: false, code: "NOT_FOUND" };
+          const next = statusAfterDialectNote(current);
+          if (!next.ok) return { ok: false, code: "CONFLICT" };
+          nextStatus = next.status;
+        }
 
-  const rows = await db
-    .select()
-    .from(dialectNotes)
-    .where(eq(dialectNotes.id, noteId))
-    .limit(1);
-  const note = noteFromRow(first(rows, `dialect note ${noteId}`));
-  if (current === null) return { ok: true, note };
-  const correction = await getCorrection(current.id);
-  if (correction === null) return { ok: true, note };
-  return { ok: true, note, correction };
+        const inserted = await tx.insert(dialectNotes).values({
+          rule,
+          example: input.example ?? null,
+          scope: input.scope,
+          form: input.form,
+          learnerForm: input.learnerForm ?? null,
+          tutorSuggestion: input.tutorSuggestion ?? null,
+          sourceSessionId: current?.sessionId ?? null,
+          sourceCorrectionId: input.fromCorrectionId ?? null,
+          createdAt,
+          updatedAt: createdAt,
+          deletedAt: null,
+        });
+        const noteId = Number(inserted.lastInsertRowid);
+        if (current !== null && nextStatus !== null) {
+          const updated = await tx
+            .update(corrections)
+            .set({
+              status: nextStatus,
+              dialectNoteId: noteId,
+              resolvedAt: createdAt,
+            })
+            .where(
+              and(
+                eq(corrections.id, current.id),
+                eq(corrections.status, current.status),
+              ),
+            );
+          if (updated.rowsAffected === 0) {
+            throw new DialectNoteConflictError();
+          }
+        }
+
+        const rows = await tx
+          .select()
+          .from(dialectNotes)
+          .where(eq(dialectNotes.id, noteId))
+          .limit(1);
+        const note = noteFromRow(first(rows, `dialect note ${noteId}`));
+        if (current === null) return { ok: true, note };
+        const correction = await getCorrection(current.id, tx);
+        if (correction === null) return { ok: true, note };
+        return { ok: true, note, correction };
+      });
+    } catch (error) {
+      if (error instanceof DialectNoteConflictError) {
+        return { ok: false, code: "CONFLICT" };
+      }
+      throw error;
+    }
+  });
 }

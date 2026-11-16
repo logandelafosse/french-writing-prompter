@@ -293,6 +293,34 @@ describe("postProcessEvaluation", () => {
     expect(result.corrections.map((c) => c.quote)).toEqual(["Les enfant"]);
   });
 
+  it("drops a mistake whose quote matches the note form when learnerForm differs", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "mistake",
+          quote: "a tombé",
+          suggestion: "est tombé",
+        }),
+      ]),
+      {
+        text: "Il a tombé hier.",
+        sessionId: 1,
+        now,
+        createId: ids(),
+        dialectNotes: [
+          {
+            scope: "word",
+            form: "a tombé",
+            learnerForm: "tomber",
+            rule: "On dit a tombé.",
+            deletedAt: null,
+          },
+        ],
+      },
+    );
+    expect(result.corrections).toHaveLength(0);
+  });
+
   it("keeps the mistake when the matching word-scope note is soft-deleted", () => {
     const result = postProcessEvaluation(
       baseOutput([

@@ -1,6 +1,8 @@
 import { z } from "zod";
+import type { LibSQLDatabase } from "drizzle-orm/libsql";
 import { db } from "@/db";
 import { corrections, sessions } from "@/db/schema";
+import type * as schema from "@/db/schema";
 import { localDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
@@ -242,8 +244,13 @@ function correctionFromRow(
   return parsed.success ? parsed.data : null;
 }
 
-export async function getCorrection(id: string): Promise<Correction | null> {
-  const rows = await db
+type CorrectionReader = Pick<LibSQLDatabase<typeof schema>, "select">;
+
+export async function getCorrection(
+  id: string,
+  database: CorrectionReader = db,
+): Promise<Correction | null> {
+  const rows = await database
     .select()
     .from(corrections)
     .where(eq(corrections.id, id))

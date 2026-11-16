@@ -170,16 +170,16 @@ describe("WritingEvaluator", () => {
 
   it("lists active notes and omits deleted notes", () => {
     const built = buildEvaluatorPrompt({
-      writing: "Il a tombé.",
+      writing: "On a pris une barbotte.",
       promptText: "Consigne.",
       registre: "familier",
       dialect: DEFAULT_DIALECT,
       dialectNotes: [
         {
           scope: "word",
-          form: "a tombé",
-          learnerForm: "a tombé",
-          rule: "On dit a tombé.",
+          form: "barbotte",
+          learnerForm: "barbotte",
+          rule: "On dit barbotte.",
           deletedAt: null,
         },
         {
@@ -201,7 +201,7 @@ describe("WritingEvaluator", () => {
     expect(built.system).toContain(
       "Formes confirmées par l'apprenant — ne les signale JAMAIS",
     );
-    expect(built.system).toContain("a tombé");
+    expect(built.system).toContain("barbotte");
     expect(built.system).toContain("Avoir avec les verbes de mouvement.");
     expect(built.system).not.toContain("icitte");
   });

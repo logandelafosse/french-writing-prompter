@@ -141,6 +141,33 @@ describe("POST /api/dialect-notes", () => {
     expect(notes).toHaveLength(1);
   });
 
+  it("rejects a second concurrent create for the same correction", async () => {
+    const session = await seedSession();
+    await saveCorrections(
+      [correction(session.id, { id: "c-check", kind: "dialect_check" })],
+      () => new Date(),
+    );
+
+    const [first, second] = await Promise.all([
+      post({ ...noteBody, fromCorrectionId: "c-check" }),
+      post({ ...noteBody, fromCorrectionId: "c-check" }),
+    ]);
+
+    const statuses = [first.status, second.status].sort((a, b) => a - b);
+    expect(statuses).toEqual([201, 409]);
+    const conflict =
+      first.status === 409
+        ? await readResponseJson(first, ErrorEnvelope)
+        : await readResponseJson(second, ErrorEnvelope);
+    expect(conflict.error.code).toBe("CONFLICT");
+
+    const notes = await db.select().from(dialectNotes);
+    expect(notes).toHaveLength(1);
+    const stored = await getCorrection("c-check");
+    expect(stored?.status).toBe("confirmed_dialect");
+    expect(stored?.dialectNoteId).toBe(notes[0]?.id);
+  });
+
   it("returns 404 for an unknown correction id and 422 for a short rule", async () => {
     const missing = await post({ ...noteBody, fromCorrectionId: "missing" });
     expect(missing.status).toBe(404);
