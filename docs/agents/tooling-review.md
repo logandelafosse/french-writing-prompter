@@ -1061,3 +1061,7 @@ Non-blocking for T18 merge. Prioritize TOOL-PR67-3 before T19. Full proposals: [
 | TOOL-PR67-3 | `prompt-post-body-single-source`, `no-unparsed-error-code`, fetch error codes | `PromptPostBody` / `DraftWouldBeAbandonedResponse` duplicated on Home |
 | TOOL-PR67-4 | `countdown-tick-single-source`, `no-silent-invalid-countdown`                 | `60_000` copied in notice, formatter, tests                           |
 | —           | Folds TOOL-PR62-2, TOOL-PR63-15, TOOL-PR62-1, TOOL-PR54-5, TOOL-PR66-5/7      | Quota literals, bracket radii, e2e viewports, autosave `saveNow`      |
+
+**Test review** (no blockers): [T18 test review PR #67](542b8902-0471-49f6-816b-2f8021a78221). Non-blocking: empty-swap quota `used + 1` in integration + e2e; 390 overflow asserts long copy before geometry; exhausted spec asserts label absent before prompt 3; evaluate-at-zero parses `EvaluatePostResponse` or re-reads `evaluated`.
+
+**Adversarial** (blockers fixed pre-merge): [T18 adversarial PR #67](664a59c5-cd45-47df-b9b6-e409c6d2098e). Non-blocking product: `saveNow` on failed PUT (TOOL-PR66-7 / T19); transaction rollback vs quota lock; multi-`active` `replaceSessionId` semantics.
