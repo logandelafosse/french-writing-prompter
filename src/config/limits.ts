@@ -13,6 +13,9 @@ export const PLACEMENT_STEPS = 3;
 
 export const ADVANCEMENT_STREAK = 3;
 
+/** Per-dimension Evaluation score range (1–max). */
+export const EVALUATION_SCORE_MAX = 6;
+
 export const WORD_TARGET_BY_LEVEL: Record<
   CefrLevel,
   { min: number; max: number }

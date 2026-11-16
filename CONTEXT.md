@@ -106,7 +106,7 @@ _Avoid_: dialectal French, Creole (it's a dialect of French, not a creole); inli
 **Domain expert:** It's saved alongside its Evaluation and the Writing Prompt that inspired it, so the learner can review their history. One prompt = one Evaluation; you can't re-submit to the same prompt.
 
 **Dev:** What does the AI return for an Evaluation?
-**Domain expert:** A structured JSON blob: per-dimension scores, overall CEFR Level, and free-text suggestions. The suggestions riff off the scores to produce cohesive, readable feedback.
+**Domain expert:** A structured JSON blob: per-dimension scores, overall CEFR Level, a French summary and next-level tip, and **Corrections** (Mistake, Standard→Louisiana suggestion, or Dialect check) tied to quoted spans. Standard French never lowers a score or the overall CEFR Level.
 
 **Dev:** How does the Placement Test work?
 **Domain expert:** Three prompts back-to-back in one session. At the end, the assigned CEFR Level is shown alongside the full Evaluations for each of the three writings.
