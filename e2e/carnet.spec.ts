@@ -131,9 +131,93 @@ test("empty Carnet shows the empty-state line and has no axe violations", async 
   const main = mainContent(page);
   await expect(
     main.getByText(
+      "Rien à travailler pour l'instant. Les fautes qui reviennent vont apparaître icitte.",
+    ),
+  ).toBeVisible();
+  await expect(
+    main.getByText(
       "Pas encore de notes. Quand le tuteur te demande « Ça se dit comme ça ? », ta réponse vient icitte.",
     ),
   ).toBeVisible();
+  await expect(
+    main.getByRole("button", { name: "Essayer encore" }),
+  ).toHaveCount(0);
   await captureEvidence(page, testInfo, "empty");
   await expectNoAxeViolations(page);
+});
+
+const weaknessWriting =
+  "Maintenant je vois le table. Il a ete ici. Les enfant jouent.";
+
+async function evaluateWriting(
+  page: import("@playwright/test").Page,
+  text: string,
+) {
+  const main = mainContent(page);
+  await main.getByLabel("Ton texte").fill(text);
+  await main.getByRole("button", { name: "Corrige-moi" }).click();
+  await expectEvaluationWithScores(page);
+}
+
+async function pushBackAccents(page: import("@playwright/test").Page) {
+  const card = page.getByRole("article").filter({ hasText: "ete" });
+  await card
+    .getByRole("button", { name: "C'est du français louisianais" })
+    .click();
+  const dialog = page.getByRole("dialog", {
+    name: "Ajouter une note de dialecte",
+  });
+  await dialog.getByRole("button", { name: "Sauver la note" }).click();
+  await expect(page.getByText("Note de dialecte sauvée")).toBeVisible();
+}
+
+test("two genre Mistakes show under À travailler and a pushed-back category does not", async ({
+  page,
+  scenario,
+}, testInfo) => {
+  await scenario("weakness");
+  await generateFirstPrompt(page);
+  await evaluateWriting(page, weaknessWriting);
+  await pushBackAccents(page);
+
+  const main = mainContent(page);
+  await main
+    .getByRole("button", { name: /Une autre consigne · reste/ })
+    .click();
+  await expect(main.getByLabel("Ton texte", { exact: true })).toBeEditable();
+  await evaluateWriting(page, weaknessWriting);
+
+  await page.goto("/carnet");
+  const carnet = mainContent(page);
+  await expect(
+    carnet.getByRole("heading", { name: "À travailler" }),
+  ).toBeVisible();
+  const row = carnet.getByRole("article").filter({ hasText: "Genre des noms" });
+  await expect(row).toHaveAttribute("id", "weakness-genre");
+  await expect(row.getByText("2 fois · vu aujourd'hui · actif")).toBeVisible();
+  await expect(
+    carnet.getByRole("heading", { name: "Accents (é / è / ê)" }),
+  ).toHaveCount(0);
+  await captureEvidence(page, testInfo, "weaknesses");
+});
+
+test("Non, corrige-le adds the dialect-check category to À travailler", async ({
+  page,
+  scenario,
+}) => {
+  await scenario("dialect");
+  await generateFirstPrompt(page);
+  await evaluateWriting(
+    page,
+    "Mon petit cousin a tombé dans la boue. Les enfant jouent.",
+  );
+  await page.getByRole("button", { name: "Non, corrige-le" }).click();
+  await expect(page.getByText("2 fautes")).toBeVisible();
+  await page.goto("/carnet");
+  const carnet = mainContent(page);
+  const row = carnet
+    .getByRole("article")
+    .filter({ hasText: "Choix de l'auxiliaire" });
+  await expect(row).toHaveAttribute("id", "weakness-auxiliaire");
+  await expect(row.getByText(/1 fois · vu aujourd'hui · actif/)).toBeVisible();
 });

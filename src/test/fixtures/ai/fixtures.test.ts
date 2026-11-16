@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
-import { Evaluation } from "@/contracts/evaluation";
+import { Evaluation, EvaluatorOutputSchema } from "@/contracts/evaluation";
 import { GeneratorModelOutput } from "@/contracts/prompt-meta";
 import { parseJson } from "@/lib/json";
 
@@ -47,6 +47,20 @@ describe("AI fixtures", () => {
       throw new Error(String(parsed.cause));
     }
     expect(parsed.ok).toBe(true);
+  });
+
+  it("evaluation.weakness fixtures parse with EvaluatorOutputSchema", () => {
+    for (const file of [
+      "evaluation.weakness.json",
+      "evaluation.weakness-repeat.json",
+    ]) {
+      const text = fs.readFileSync(path.join(FIXTURES_DIR, file), "utf8");
+      const parsed = parseJson(EvaluatorOutputSchema, text);
+      if (!parsed.ok) {
+        throw new Error(`${file}: ${String(parsed.cause)}`);
+      }
+      expect(parsed.ok).toBe(true);
+    }
   });
 
   it("prompt-generator.invalid.json fails GeneratorModelOutput schema", () => {

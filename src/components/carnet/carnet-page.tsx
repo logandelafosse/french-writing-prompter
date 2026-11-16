@@ -6,12 +6,15 @@ import {
   DialectNoteCreateResponse,
   DialectNoteListResponse,
   DialectNotePatchResponse,
+  WeaknessesGetResponse,
 } from "@/contracts/api";
 import type { DialectNote } from "@/contracts/dialect-note";
+import type { Weakness } from "@/contracts/weakness";
 import {
   carnetCopy,
   dialectNoteIsNew,
   formatDialectNoteMeta,
+  formatWeaknessMeta,
 } from "@/copy/carnet";
 import { homeCopy } from "@/copy/fr";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
@@ -25,7 +28,7 @@ import {
 } from "@/components/dialect-note/dialect-note-sheet";
 
 // prettier-ignore
-type LoadUi = { status: "loading" } | { status: "ready"; notes: DialectNote[] } | { status: "error" };
+type LoadUi = { status: "loading" } | { status: "ready"; notes: DialectNote[]; weaknesses: Weakness[] } | { status: "error" };
 // prettier-ignore
 type SheetUi = { status: "closed" } | { status: "new" } | { status: "edit"; note: DialectNote };
 // prettier-ignore
@@ -38,8 +41,15 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
   const addRef = useRef<HTMLButtonElement>(null);
   // prettier-ignore
   const load = useCallback(async () => {
-    const result = await fetchJson("/api/dialect-notes", DialectNoteListResponse);
-    setLoadUi(result.ok ? { status: "ready", notes: result.value.notes } : { status: "error" });
+    const [notesResult, weakResult] = await Promise.all([
+      fetchJson("/api/dialect-notes", DialectNoteListResponse),
+      fetchJson("/api/weaknesses", WeaknessesGetResponse),
+    ]);
+    setLoadUi(
+      notesResult.ok && weakResult.ok
+        ? { status: "ready", notes: notesResult.value.notes, weaknesses: weakResult.value.weaknesses }
+        : { status: "error" },
+    );
   }, []);
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial carnet load
@@ -65,6 +75,7 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
   };
 
   const notes = loadUi.status === "ready" ? loadUi.notes : [];
+  const weaknesses = loadUi.status === "ready" ? loadUi.weaknesses : [];
   const editNote = sheet.status === "edit" ? sheet.note : null;
   // prettier-ignore
   const draft = editNote
@@ -76,6 +87,20 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
     <main className="max-w-list mx-auto flex w-full flex-col gap-7 px-6 py-5 pb-20">
       <PageTitle>{carnetCopy.title}</PageTitle>
       {loadUi.status === "error" ? <ErrorAlert lead={homeCopy.loadError} onRetry={() => void load()} /> : null}
+      <Surface padding="list" className="flex flex-col max-sm:p-[22px_18px]">
+        <div className="flex flex-col gap-1 pb-4">
+          <h2 className="text-section-title m-0">{carnetCopy.weakTitle}</h2>
+          <p className="text-muted m-0 text-[15px]">{carnetCopy.weakIntro}</p>
+        </div>
+        <div aria-live="polite">
+          {loadUi.status === "ready" && weaknesses.length === 0 ? (
+            <p className="border-line text-muted m-0 border-t py-4 text-[15px]">{carnetCopy.weakEmpty}</p>
+          ) : null}
+          {weaknesses.map((weakness) => (
+            <CarnetWeaknessRow key={weakness.category} weakness={weakness} now={now} />
+          ))}
+        </div>
+      </Surface>
       <Surface padding="list-notes" className="flex flex-col max-sm:p-[22px_18px]">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pb-4">
           <div className="flex flex-col gap-1">
@@ -191,6 +216,25 @@ function DialectNoteRow({
       <div className="flex gap-4">
         <Button variant="quiet-ink" className="px-0 text-sm" onClick={onEdit}>{carnetCopy.notesEdit}</Button>
         <Button variant="quiet" className="px-0 text-sm" onClick={onAskDelete}>{carnetCopy.notesDelete}</Button>
+      </div>
+    </article>
+  );
+}
+
+function CarnetWeaknessRow({
+  weakness,
+  now,
+}: {
+  weakness: Weakness;
+  now: () => Date;
+}) {
+  const quiet = weakness.trend === "tranquille";
+  // prettier-ignore
+  return (
+    <article id={`weakness-${weakness.category}`} className="border-line flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t py-4">
+      <div className="flex min-w-0 flex-1 basis-[380px] flex-col gap-1">
+        <h3 lang="fr" className={`m-0 font-serif text-[22px] font-medium ${quiet ? "text-ink-2" : ""}`}>{weakness.label}</h3>
+        <p lang="fr" className={`m-0 text-[15px] ${quiet ? "text-muted" : "text-ink-2"}`}>{formatWeaknessMeta(weakness, now)}</p>
       </div>
     </article>
   );

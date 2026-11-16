@@ -1,0 +1,41 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": {
+      "score": 4,
+      "comment": "Quelques accords à revoir."
+    },
+    "vocabulary": {
+      "score": 3,
+      "comment": "Vocabulaire suffisant."
+    },
+    "coherence": {
+      "score": 4,
+      "comment": "Le récit se suit."
+    },
+    "register_style": {
+      "score": 3,
+      "comment": "Registre familier respecté."
+    }
+  },
+  "overall_cefr": "B1",
+  "summary": "Le genre du nom revient.",
+  "next_level_tip": "Pour atteindre B2, varie tes connecteurs.",
+  "corrections": [
+    {
+      "kind": "mistake",
+      "quote": "le table",
+      "occurrence": 1,
+      "suggestion": "la table",
+      "explanation": "Table est féminin.",
+      "category": "genre",
+      "question": null,
+      "rule_if_dialect": null,
+      "dlf_headword": null,
+      "resource_ids": [],
+      "context_quote": null,
+      "dialect_example": null,
+      "dialect_lemma": null,
+      "dialect_pattern": null
+    }
+  ]
+}

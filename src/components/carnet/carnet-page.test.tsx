@@ -3,6 +3,7 @@ import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { carnetCopy } from "@/copy/carnet";
 import type { DialectNote } from "@/contracts/dialect-note";
+import type { Weakness } from "@/contracts/weakness";
 import { CarnetPage } from "./carnet-page";
 
 const now = () => new Date("2026-11-14T18:00:00-06:00");
@@ -21,10 +22,44 @@ const sessionNote: DialectNote = {
   updatedAt: "2026-11-14T16:00:00-06:00",
 };
 
+const genreWeakness: Weakness = {
+  category: "genre",
+  label: "Genre des noms",
+  count: 2,
+  lastSeenAt: "2026-11-14T16:00:00-06:00",
+  trend: "actif",
+};
+
+const accentsQuiet: Weakness = {
+  category: "accents",
+  label: "Accents (é / è / ê)",
+  count: 1,
+  lastSeenAt: "2026-11-06T16:00:00-06:00",
+  trend: "tranquille",
+};
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: { "Content-Type": "application/json" },
+  });
+}
+
+function fetchUrl(input: RequestInfo | URL): string {
+  if (typeof input === "string") return input;
+  if (input instanceof URL) return input.href;
+  return input.url;
+}
+
+function mockCarnet(
+  notes: DialectNote[] = [],
+  weaknesses: Weakness[] = [],
+): void {
+  vi.mocked(globalThis.fetch).mockImplementation((input) => {
+    if (fetchUrl(input).includes("/api/weaknesses")) {
+      return Promise.resolve(jsonResponse({ weaknesses }));
+    }
+    return Promise.resolve(jsonResponse({ notes }));
   });
 }
 
@@ -41,15 +76,14 @@ describe("CarnetPage", () => {
   });
 
   it("shows the empty-state line when there are no notes", async () => {
-    vi.mocked(globalThis.fetch).mockResolvedValue(jsonResponse({ notes: [] }));
+    mockCarnet();
     render(<CarnetPage now={now} />);
     expect(await screen.findByText(carnetCopy.notesEmpty)).toBeVisible();
+    expect(screen.getByText(carnetCopy.weakEmpty)).toBeVisible();
   });
 
   it("lists a session note with its rule, example and nouvelle", async () => {
-    vi.mocked(globalThis.fetch).mockResolvedValue(
-      jsonResponse({ notes: [sessionNote] }),
-    );
+    mockCarnet([sessionNote]);
     render(<CarnetPage now={now} />);
     expect(await screen.findByText(sessionNote.rule)).toBeVisible();
     expect(screen.getByText(sessionNote.example ?? "")).toBeVisible();
@@ -60,10 +94,12 @@ describe("CarnetPage", () => {
   it("clears a load error on retry", async () => {
     const user = userEvent.setup();
     const fetchMock = vi.mocked(globalThis.fetch);
-    fetchMock.mockResolvedValueOnce(
-      new Response("fail", { status: 500, statusText: "Server Error" }),
-    );
-    fetchMock.mockResolvedValueOnce(jsonResponse({ notes: [] }));
+    const fail = new Response("fail", {
+      status: 500,
+      statusText: "Server Error",
+    });
+    mockCarnet();
+    fetchMock.mockResolvedValueOnce(fail).mockResolvedValueOnce(fail);
     render(<CarnetPage now={now} />);
     expect(
       await screen.findByText("Une erreur s'est produite. Réessaie."),
@@ -79,7 +115,7 @@ describe("CarnetPage", () => {
 
   it("Ajouter une note opens the sheet without T'as écrit", async () => {
     const user = userEvent.setup();
-    vi.mocked(globalThis.fetch).mockResolvedValue(jsonResponse({ notes: [] }));
+    mockCarnet();
     render(<CarnetPage now={now} />);
     await screen.findByText(carnetCopy.notesEmpty);
     await user.click(screen.getByRole("button", { name: carnetCopy.notesAdd }));
@@ -91,9 +127,7 @@ describe("CarnetPage", () => {
 
   it("Modifier opens Modifier la note pre-filled", async () => {
     const user = userEvent.setup();
-    vi.mocked(globalThis.fetch).mockResolvedValue(
-      jsonResponse({ notes: [sessionNote] }),
-    );
+    mockCarnet([sessionNote]);
     render(<CarnetPage now={now} />);
     await screen.findByText(sessionNote.rule);
     await user.click(
@@ -115,6 +149,9 @@ describe("CarnetPage", () => {
       if ((init?.method ?? "GET") === "DELETE") {
         deleted = true;
         return Promise.resolve(new Response(null, { status: 204 }));
+      }
+      if (fetchUrl(input).includes("/api/weaknesses")) {
+        return Promise.resolve(jsonResponse({ weaknesses: [] }));
       }
       return Promise.resolve(
         jsonResponse({ notes: deleted ? [] : [sessionNote] }),
@@ -144,5 +181,28 @@ describe("CarnetPage", () => {
     await waitFor(() => {
       expect(screen.queryByText(sessionNote.rule)).not.toBeInTheDocument();
     });
+  });
+
+  it("lists a Weakness with id, label, and today meta above the notes", async () => {
+    mockCarnet([], [genreWeakness]);
+    render(<CarnetPage now={now} />);
+    await screen.findByRole("heading", { name: "Genre des noms" });
+    expect(screen.getByRole("article")).toHaveAttribute("id", "weakness-genre");
+    expect(screen.getByText("2 fois · vu aujourd'hui · actif")).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: carnetCopy.weakTitle }),
+    ).toBeVisible();
+  });
+
+  it("mutes a tranquille Weakness title and meta", async () => {
+    mockCarnet([], [accentsQuiet]);
+    render(<CarnetPage now={now} />);
+    const title = await screen.findByRole("heading", {
+      name: "Accents (é / è / ê)",
+    });
+    expect(title).toHaveClass("text-ink-2");
+    expect(screen.getByText(/vu le 6 novembre · tranquille/)).toHaveClass(
+      "text-muted",
+    );
   });
 });

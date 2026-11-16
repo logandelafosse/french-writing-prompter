@@ -3,6 +3,7 @@ import { CefrLevel, LevelSource } from "./cefr";
 import { Evaluation, EvaluationV2 } from "./evaluation";
 import { Correction } from "./correction";
 import { DialectNote, DialectNoteScope } from "./dialect-note";
+import { Weakness } from "./weakness";
 import {
   DIALECT_NOTE_EXAMPLE_MAX,
   DIALECT_NOTE_FORM_MAX,
@@ -118,6 +119,11 @@ export const DialectNotePatchResponse = z.strictObject({
   note: DialectNote,
 });
 export type DialectNotePatchResponse = z.infer<typeof DialectNotePatchResponse>;
+
+export const WeaknessesGetResponse = z.strictObject({
+  weaknesses: z.array(Weakness),
+});
+export type WeaknessesGetResponse = z.infer<typeof WeaknessesGetResponse>;
 
 export const QuotaGetResponse = z.strictObject({
   used: z.number(),
