@@ -1175,18 +1175,18 @@ ignores: ["src/lib/dates.ts", "src/config/**"]
 
 Non-blocking for T21a merge. Land **TOOL-PR70-1**, **TOOL-PR70-2**, **TOOL-PR70-3**, and **TOOL-PR70-5** before **T21b** (`chatCompletionJSON` + persist).
 
-| ID (draft)   | Rule / change                                              | Notes                                                                                                    |
-| ------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| TOOL-PR70-1  | `output-schema-strict-nullable`                            | `EvaluatorOutputSchema` / `EvaluationV2` use `z.object`; AC omits `additionalProperties: false` ratchet    |
-| TOOL-PR70-2  | `EVALUATOR_CORRECTIONS_MAX` + contracts `no-magic-numbers` | `.max(15)` in `evaluation.ts`; folds TOOL-PR63-9                                                         |
-| TOOL-PR70-3  | `Dimension` enum single-source                             | Four dimension keys repeated; backend §1 `Dimension`                                                     |
-| TOOL-PR70-4  | Export v2 `DimensionScore` shape                           | `DimensionScore` alias still legacy `{max}`; T21b import trap                                            |
-| TOOL-PR70-5  | LLM `category` → `MistakeCategory.nullable()`              | `z.string().nullable()` allows invented IDs at Structured Outputs boundary                               |
-| TOOL-PR70-6  | `countsAsMistake` exhaustive `switch`                       | Boolean-or; History `if/else if` on parse status misses future variants                                    |
-| TOOL-PR70-7  | `no-in-operator-schema-narrowing`                          | `toPlaceholderEvaluation` uses `"tips" in` / `"version" in`                                              |
-| TOOL-PR70-8  | Kind/status/anchor `as const` IDs                          | Inline `z.enum([...])`; T21b prompt will copy strings                                                     |
-| TOOL-PR70-9  | 1-based ints `.positive()`                                 | `occurrence`, `ordinal`, `sessionId` unbounded `.int()`                                                  |
-| TOOL-PR70-10 | DB text enums + JSON columns parse on read                 | `corrections` raw `text()` columns; land with T21b persist                                               |
+| ID (draft)   | Rule / change                                              | Notes                                                                                                   |
+| ------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| TOOL-PR70-1  | `output-schema-strict-nullable`                            | `EvaluatorOutputSchema` / `EvaluationV2` use `z.object`; AC omits `additionalProperties: false` ratchet |
+| TOOL-PR70-2  | `EVALUATOR_CORRECTIONS_MAX` + contracts `no-magic-numbers` | `.max(15)` in `evaluation.ts`; folds TOOL-PR63-9                                                        |
+| TOOL-PR70-3  | `Dimension` enum single-source                             | Four dimension keys repeated; backend §1 `Dimension`                                                    |
+| TOOL-PR70-4  | Export v2 `DimensionScore` shape                           | `DimensionScore` alias still legacy `{max}`; T21b import trap                                           |
+| TOOL-PR70-5  | LLM `category` → `MistakeCategory.nullable()`              | `z.string().nullable()` allows invented IDs at Structured Outputs boundary                              |
+| TOOL-PR70-6  | `countsAsMistake` exhaustive `switch`                      | Boolean-or; History `if/else if` on parse status misses future variants                                 |
+| TOOL-PR70-7  | `no-in-operator-schema-narrowing`                          | `toPlaceholderEvaluation` uses `"tips" in` / `"version" in`                                             |
+| TOOL-PR70-8  | Kind/status/anchor `as const` IDs                          | Inline `z.enum([...])`; T21b prompt will copy strings                                                   |
+| TOOL-PR70-9  | 1-based ints `.positive()`                                 | `occurrence`, `ordinal`, `sessionId` unbounded `.int()`                                                 |
+| TOOL-PR70-10 | DB text enums + JSON columns parse on read                 | `corrections` raw `text()` columns; land with T21b persist                                              |
 
 **Proposed snippets (not in repo yet)**
 
@@ -1205,7 +1205,9 @@ files: ["src/contracts/evaluation.ts", "src/contracts/**/*output*"]
 `countsAsMistake` exhaustive switch (reference for TOOL-PR70-6):
 
 ```ts
-export function countsAsMistake(c: Pick<Correction, "kind" | "status">): boolean {
+export function countsAsMistake(
+  c: Pick<Correction, "kind" | "status">,
+): boolean {
   switch (c.kind) {
     case "mistake":
       return c.status !== "overturned";
@@ -1225,30 +1227,30 @@ Non-blocking for T21b merge. **TOOL-PR70-1/2/3/5 partially landed in product** (
 
 **TOOL-PR70 status on T21b**
 
-| ID   | Status   | Notes                                                                                       |
-| ---- | -------- | ------------------------------------------------------------------------------------------- |
-| 70-1 | Partial  | `z.strictObject` on evaluator output; `Correction` still `z.object`; no ast-grep ratchet      |
-| 70-2 | Partial  | `EVALUATOR_CORRECTIONS_MAX`; contracts `no-magic-numbers` still off                           |
-| 70-3 | Landed   | `DIMENSION_IDS` + `Dimension` on output; legacy v1 lists still manual                         |
-| 70-4 | Open     | `DimensionScore` still legacy `{max}`; dodged via `toPlaceholderEvaluation`                 |
-| 70-5 | Partial  | LLM `MistakeCategory.nullable()`; fixture draft schema still accepts loose `category`       |
-| 70-6 | Open     | `countsAsMistake` boolean-or; History `if/else if` on parse status                          |
-| 70-7 | Open     | `"tips" in` / `"version" in` on Home submit + Placement                                     |
-| 70-8 | Open     | Inline kind enums; prompt copies string literals                                            |
-| 70-9 | Open     | Unbounded `.int()` on occurrence/ordinal/sessionId                                          |
-| 70-10| Open     | `saveCorrections` raw `text()` columns; parse-on-read in T22                                |
+| ID    | Status  | Notes                                                                                    |
+| ----- | ------- | ---------------------------------------------------------------------------------------- |
+| 70-1  | Partial | `z.strictObject` on evaluator output; `Correction` still `z.object`; no ast-grep ratchet |
+| 70-2  | Partial | `EVALUATOR_CORRECTIONS_MAX`; contracts `no-magic-numbers` still off                      |
+| 70-3  | Landed  | `DIMENSION_IDS` + `Dimension` on output; legacy v1 lists still manual                    |
+| 70-4  | Open    | `DimensionScore` still legacy `{max}`; dodged via `toPlaceholderEvaluation`              |
+| 70-5  | Partial | LLM `MistakeCategory.nullable()`; fixture draft schema still accepts loose `category`    |
+| 70-6  | Open    | `countsAsMistake` boolean-or; History `if/else if` on parse status                       |
+| 70-7  | Open    | `"tips" in` / `"version" in` on Home submit + Placement                                  |
+| 70-8  | Open    | Inline kind enums; prompt copies string literals                                         |
+| 70-9  | Open    | Unbounded `.int()` on occurrence/ordinal/sessionId                                       |
+| 70-10 | Open    | `saveCorrections` raw `text()` columns; parse-on-read in T22                             |
 
-| ID (draft)   | Rule / change                                    | Notes                                                                 |
-| ------------ | ------------------------------------------------ | --------------------------------------------------------------------- |
-| TOOL-PR71-1  | `no-parallel-llm-schema`                         | `EvaluatorOutputDraft` / fixture schema bypasses strict LLM envelope    |
-| TOOL-PR71-2  | `chatCompletionJSON` returns `{ value, text }`   | `evaluation_raw` from re-stringified parse, not model text              |
-| TOOL-PR71-3  | `no-cloned-request-in-routes`                    | Session route `new Request` into evaluate alias; fold TOOL-PR67-2       |
-| TOOL-PR71-4  | Prompt constants + kind IDs (fold 70-8)          | Limits/prompt version in config; interpolate `CorrectionKind.options`   |
-| TOOL-PR71-5  | `no-fs-in-modules` for prompt load               | `fs.readFileSync` for evaluator prompt body                           |
-| TOOL-PR71-6  | `LocatedQuote` uses `CorrectionAnchor`           | Local `"exact" \| "normalized"` union                                 |
-| TOOL-PR71-7  | `ai-fixture-schema-ratchet` (fold TOOL-PR63-8) | v2 fixtures vs v1 `Evaluation` ratchet mismatch                       |
-| TOOL-PR71-8  | `OpenAiClientLike` single-source                 | Duplicated in prompt-generator + writing-evaluator                    |
-| TOOL-PR71-9  | Evaluate errors + `now`                          | Mixed error shapes; `new Date()` in handler; fold TOOL-PR68/69/66   |
+| ID (draft)  | Rule / change                                  | Notes                                                                 |
+| ----------- | ---------------------------------------------- | --------------------------------------------------------------------- |
+| TOOL-PR71-1 | `no-parallel-llm-schema`                       | `EvaluatorOutputDraft` / fixture schema bypasses strict LLM envelope  |
+| TOOL-PR71-2 | `chatCompletionJSON` returns `{ value, text }` | `evaluation_raw` from re-stringified parse, not model text            |
+| TOOL-PR71-3 | `no-cloned-request-in-routes`                  | Session route `new Request` into evaluate alias; fold TOOL-PR67-2     |
+| TOOL-PR71-4 | Prompt constants + kind IDs (fold 70-8)        | Limits/prompt version in config; interpolate `CorrectionKind.options` |
+| TOOL-PR71-5 | `no-fs-in-modules` for prompt load             | `fs.readFileSync` for evaluator prompt body                           |
+| TOOL-PR71-6 | `LocatedQuote` uses `CorrectionAnchor`         | Local `"exact" \| "normalized"` union                                 |
+| TOOL-PR71-7 | `ai-fixture-schema-ratchet` (fold TOOL-PR63-8) | v2 fixtures vs v1 `Evaluation` ratchet mismatch                       |
+| TOOL-PR71-8 | `OpenAiClientLike` single-source               | Duplicated in prompt-generator + writing-evaluator                    |
+| TOOL-PR71-9 | Evaluate errors + `now`                        | Mixed error shapes; `new Date()` in handler; fold TOOL-PR68/69/66     |
 
 **Proposed snippet (71-3)**
 
