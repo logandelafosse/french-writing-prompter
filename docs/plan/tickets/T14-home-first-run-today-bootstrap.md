@@ -42,6 +42,10 @@
 - `first-run generate sets the level then creates a prompt` (component test with mocked fetch)
 - e2e `home-first-run.spec.ts`, `home-returning.spec.ts` at 1280 and 390 px
 
+## Split note (2026-11-15)
+
+[PR #60](https://github.com/logandelafosse/french-writing-prompter/pull/60) exceeded 500 prod lines. Deliver as **[PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61) T14a** (API) then **T14b** (Home UI).
+
 ## Out of scope
 
 - PromptSheet, meta line, generate busy label, fade-up (T15).
