@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "@/db";
-import { levelChanges, sessions } from "@/db/schema";
+import { corrections, levelChanges, sessions } from "@/db/schema";
 import { clearEnvCache } from "@/server/env";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
@@ -39,6 +39,7 @@ describe("evaluate session lifecycle", () => {
     vi.stubEnv("OPENAI_API_KEY", "");
     clearEnvCache();
     vi.setSystemTime(new Date("2026-11-16T18:00:00.000Z"));
+    await db.delete(corrections).execute();
     await db.delete(sessions).execute();
     await db.delete(levelChanges).execute();
   });

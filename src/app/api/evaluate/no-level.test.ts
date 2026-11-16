@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/db";
-import { levelChanges, sessions } from "@/db/schema";
+import { corrections, levelChanges, sessions } from "@/db/schema";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { ErrorEnvelope } from "@/contracts/errors";
@@ -14,6 +14,7 @@ const constraints = JSON.stringify({
 describe("evaluate without a level", () => {
   beforeEach(async () => {
     vi.stubEnv("AI_CLIENT", "fake");
+    await db.delete(corrections).execute();
     await db.delete(sessions).execute();
     await db.delete(levelChanges).execute();
   });

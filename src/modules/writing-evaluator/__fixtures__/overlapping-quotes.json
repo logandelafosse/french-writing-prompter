@@ -1,0 +1,37 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": { "score": 4, "comment": "ok" },
+    "vocabulary": { "score": 3, "comment": "ok" },
+    "coherence": { "score": 4, "comment": "ok" },
+    "register_style": { "score": 3, "comment": "ok" }
+  },
+  "overall_cefr": "B1",
+  "summary": "Citations qui se chevauchent.",
+  "next_level_tip": "Pour atteindre B2, raccourcis tes citations.",
+  "corrections": [
+    {
+      "kind": "mistake",
+      "quote": "Les enfant jouent",
+      "occurrence": 1,
+      "suggestion": "Les enfants jouent",
+      "explanation": "Premier empan.",
+      "category": "accord",
+      "question": null,
+      "rule_if_dialect": "n/a",
+      "dlf_headword": null,
+      "resource_ids": []
+    },
+    {
+      "kind": "mistake",
+      "quote": "enfant jouent",
+      "occurrence": 1,
+      "suggestion": "enfants jouent",
+      "explanation": "Deuxième empan chevauchant.",
+      "category": "accord",
+      "question": null,
+      "rule_if_dialect": "n/a",
+      "dlf_headword": null,
+      "resource_ids": []
+    }
+  ]
+}

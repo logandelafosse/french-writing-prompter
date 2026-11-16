@@ -5,6 +5,7 @@ import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator"
 import { PlacementTest } from "@/modules/placement-test/placement-test";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { PlacementPostBody } from "@/contracts/api";
+import { toPlaceholderEvaluation } from "@/contracts/evaluation";
 import { parseRequestBody } from "@/lib/http";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 
@@ -59,7 +60,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       type: "complete",
       finalLevel: result.finalLevel,
-      evaluations: result.evaluations,
+      evaluations: result.evaluations.map(toPlaceholderEvaluation),
     });
   }
 

@@ -317,22 +317,34 @@ const todayWriting = {
 };
 
 const evaluationOk = {
+  version: 2 as const,
   dimensions: {
-    grammatical_accuracy: { score: 4, max: 6, comment: "Good grammar" },
-    vocabulary: { score: 3, max: 6, comment: "Decent vocab" },
-    coherence: { score: 4, max: 6, comment: "Well structured" },
-    register_style: { score: 3, max: 6, comment: "Ok register" },
+    grammatical_accuracy: { score: 4, comment: "Good grammar" },
+    vocabulary: { score: 3, comment: "Decent vocab" },
+    coherence: { score: 4, comment: "Well structured" },
+    register_style: { score: 3, comment: "Ok register" },
   },
-  overall_cefr: "B1",
-  tips: {
-    per_dimension: {
-      grammatical_accuracy: "Work on conjugations",
-      vocabulary: "Expand your word choice",
-      coherence: "Use more connectors",
-      register_style: "Vary your register",
-    },
-    holistic: "To reach B2, focus on more complex sentence structures.",
+  overallCefr: "B1" as const,
+  summary: "Texte clair.",
+  nextLevelTip: "Pour atteindre B2, travaille les structures.",
+  model: "test-model",
+  promptVersion: "evaluator@2",
+  evaluatedAt: "2026-11-16T18:00:00.000Z",
+};
+
+const evaluateOkResponse = {
+  session: {
+    id: 9,
+    createdAt: "2026-11-14T18:00:00.000Z",
+    promptText: "Lafayette",
+    writingText: "Le bayou est calme ce matin.",
+    promptLevel: "B1" as const,
+    status: "evaluated" as const,
+    cefrLevel: "B1" as const,
   },
+  evaluation: evaluationOk,
+  corrections: [],
+  advancement: null,
 };
 
 describe("HomePage evaluation error", () => {
@@ -381,9 +393,7 @@ describe("HomePage evaluation error", () => {
             ),
           );
         }
-        return Promise.resolve(
-          jsonResponse({ evaluation: evaluationOk, advancement: null }),
-        );
+        return Promise.resolve(jsonResponse(evaluateOkResponse));
       }
       if (url.includes("/api/quota")) {
         return Promise.resolve(

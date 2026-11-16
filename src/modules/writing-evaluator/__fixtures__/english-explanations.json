@@ -1,0 +1,25 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": { "score": 4, "comment": "ok" },
+    "vocabulary": { "score": 3, "comment": "ok" },
+    "coherence": { "score": 4, "comment": "ok" },
+    "register_style": { "score": 3, "comment": "ok" }
+  },
+  "overall_cefr": "B1",
+  "summary": "Explanations slipped into English.",
+  "next_level_tip": "To reach B2, write in French.",
+  "corrections": [
+    {
+      "kind": "mistake",
+      "quote": "Les enfant",
+      "occurrence": 1,
+      "suggestion": "Les enfants",
+      "explanation": "Missing plural -s on the noun.",
+      "category": "accord",
+      "question": null,
+      "rule_if_dialect": "If Louisiana, they might drop the s.",
+      "dlf_headword": null,
+      "resource_ids": []
+    }
+  ]
+}

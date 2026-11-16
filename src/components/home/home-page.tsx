@@ -30,7 +30,10 @@ import { removeInactiveDrafts } from "@/lib/draft-storage";
 import { useDraftAutosave } from "@/components/writing/use-draft-autosave";
 import { shouldShowWordNudge } from "@/lib/word-meter-math";
 import { cn } from "@/lib/utils";
-import type { Evaluation } from "@/contracts/evaluation";
+import {
+  toPlaceholderEvaluation,
+  type Evaluation,
+} from "@/contracts/evaluation";
 import { ConfirmSwapDialog } from "@/components/states/confirm-swap-dialog";
 import { ErrorAlert } from "@/components/states/error-alert";
 import { QuotaNotice } from "@/components/states/notice";
@@ -459,7 +462,7 @@ function WritingInterim({
       return;
     }
     setSubmitUi("review");
-    setEvaluation(result.value.evaluation);
+    setEvaluation(toPlaceholderEvaluation(result.value.evaluation));
     onAfterEvaluate(result.value.advancement);
   };
 

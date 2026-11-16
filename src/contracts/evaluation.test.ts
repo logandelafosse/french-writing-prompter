@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { AI_MODEL } from "@/config/ai";
+import { EVALUATOR_CORRECTIONS_MAX } from "@/config/limits";
 import {
+  DIMENSION_IDS,
+  Dimension,
   EvaluationV2,
   EvaluatorOutputSchema,
   parseStoredEvaluation,
@@ -103,5 +106,69 @@ describe("EvaluatorOutputSchema", () => {
       corrections: [],
     });
     expect(missingOverall.success).toBe(false);
+  });
+
+  it("rejects extra keys, invented categories, and too many corrections", () => {
+    const base = {
+      dimensions,
+      overall_cefr: "B1" as const,
+      summary: "s",
+      next_level_tip: "t",
+      corrections: [] as unknown[],
+    };
+    expect(
+      EvaluatorOutputSchema.safeParse({ ...base, extra: true }).success,
+    ).toBe(false);
+
+    const invented = EvaluatorOutputSchema.safeParse({
+      ...base,
+      corrections: [
+        {
+          kind: "mistake",
+          quote: "bayou",
+          occurrence: 1,
+          suggestion: "bayou",
+          explanation: "x",
+          category: "not_a_real_category",
+          question: null,
+          rule_if_dialect: null,
+          dlf_headword: null,
+          resource_ids: [],
+        },
+      ],
+    });
+    expect(invented.success).toBe(false);
+
+    const tooMany = EvaluatorOutputSchema.safeParse({
+      ...base,
+      corrections: Array.from(
+        { length: EVALUATOR_CORRECTIONS_MAX + 1 },
+        () => ({
+          kind: "mistake",
+          quote: "x",
+          occurrence: 1,
+          suggestion: "y",
+          explanation: "e",
+          category: "autre",
+          question: null,
+          rule_if_dialect: null,
+          dlf_headword: null,
+          resource_ids: [],
+        }),
+      ),
+    });
+    expect(tooMany.success).toBe(false);
+  });
+});
+
+describe("Dimension", () => {
+  it("is the single source for the four dimension keys", () => {
+    expect(Dimension.options).toEqual(DIMENSION_IDS);
+    expect([...Dimension.options]).toEqual([
+      "grammatical_accuracy",
+      "vocabulary",
+      "coherence",
+      "register_style",
+    ]);
   });
 });

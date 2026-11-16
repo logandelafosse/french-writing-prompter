@@ -16,6 +16,9 @@ export const ADVANCEMENT_STREAK = 3;
 /** Per-dimension Evaluation score range (1–max). */
 export const EVALUATION_SCORE_MAX = 6;
 
+/** Max Corrections the evaluator may return per Evaluation. */
+export const EVALUATOR_CORRECTIONS_MAX = 15;
+
 export const WORD_TARGET_BY_LEVEL: Record<
   CefrLevel,
   { min: number; max: number }

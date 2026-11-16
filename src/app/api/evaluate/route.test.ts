@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { clearEnvCache } from "@/server/env";
 import type { z } from "zod";
 import { db } from "@/db";
-import { sessions } from "@/db/schema";
+import { corrections, sessions } from "@/db/schema";
 import { parseJson } from "@/lib/json";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
@@ -20,6 +20,7 @@ vi.mock("@/modules/openai-client/openai-client", () => ({
 }));
 
 async function clearSessions() {
+  await db.delete(corrections).execute();
   await db.delete(sessions).execute();
 }
 

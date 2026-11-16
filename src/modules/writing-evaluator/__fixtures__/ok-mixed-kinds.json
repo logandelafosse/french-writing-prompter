@@ -1,0 +1,52 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": {
+      "score": 4,
+      "comment": "Quelques accords à revoir."
+    },
+    "vocabulary": { "score": 3, "comment": "Vocabulaire suffisant." },
+    "coherence": { "score": 4, "comment": "Le récit se suit." },
+    "register_style": { "score": 3, "comment": "Registre familier respecté." }
+  },
+  "overall_cefr": "B1",
+  "summary": "Texte clair, avec un accord et une forme louisianaise à discuter.",
+  "next_level_tip": "Pour atteindre B2, varie tes connecteurs.",
+  "corrections": [
+    {
+      "kind": "standard",
+      "quote": "Maintenant",
+      "occurrence": 1,
+      "suggestion": "Asteur",
+      "explanation": "Préférence louisianaise, pas une faute.",
+      "category": null,
+      "question": null,
+      "rule_if_dialect": null,
+      "dlf_headword": "asteur",
+      "resource_ids": []
+    },
+    {
+      "kind": "dialect_check",
+      "quote": "je vas",
+      "occurrence": 1,
+      "suggestion": "je vais",
+      "explanation": "Je te demande si c'est voulu.",
+      "category": "conjugaison",
+      "question": "Ça se dit comme ça chez toi, « je vas » ?",
+      "rule_if_dialect": "je vas pour je vais.",
+      "dlf_headword": null,
+      "resource_ids": []
+    },
+    {
+      "kind": "mistake",
+      "quote": "Les enfant",
+      "occurrence": 1,
+      "suggestion": "Les enfants",
+      "explanation": "L'accord du nom au pluriel manque.",
+      "category": "accord",
+      "question": null,
+      "rule_if_dialect": "Si c'est louisianais, on garderait enfant au pluriel sans s.",
+      "dlf_headword": null,
+      "resource_ids": ["grammaire-accord"]
+    }
+  ]
+}

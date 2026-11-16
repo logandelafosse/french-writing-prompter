@@ -2,7 +2,7 @@ import type {
   WritingPrompt,
   FrenchDialect,
 } from "@/modules/prompt-generator/prompt-generator";
-import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
+import type { EvaluatorOutput } from "@/contracts/evaluation";
 import { CEFR_ORDER, type CefrLevel } from "@/contracts/cefr";
 import { PLACEMENT_STEPS } from "@/config/limits";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
@@ -11,7 +11,7 @@ export type PlacementTestState = "idle" | "waiting_for_writing" | "complete";
 
 export type SubmitResult =
   | { type: "next_prompt"; prompt: WritingPrompt; step: number }
-  | { type: "complete"; finalLevel: CefrLevel; evaluations: Evaluation[] };
+  | { type: "complete"; finalLevel: CefrLevel; evaluations: EvaluatorOutput[] };
 
 export interface PromptGeneratorLike {
   generate(level: CefrLevel, dialect: FrenchDialect): Promise<WritingPrompt>;
@@ -22,7 +22,7 @@ export interface EvaluatorLike {
     writing: string,
     prompt: WritingPrompt,
     dialect: FrenchDialect,
-  ): Promise<Evaluation>;
+  ): Promise<EvaluatorOutput>;
 }
 
 const STARTING_LEVELS: CefrLevel[] = ["A2", "B1", "B2"];
@@ -30,7 +30,7 @@ const STARTING_LEVELS: CefrLevel[] = ["A2", "B1", "B2"];
 export class PlacementTest {
   private state: PlacementTestState = "idle";
   private currentStep = 0;
-  private evaluations: Evaluation[] = [];
+  private evaluations: EvaluatorOutput[] = [];
   private currentPrompt: WritingPrompt | null = null;
 
   constructor(

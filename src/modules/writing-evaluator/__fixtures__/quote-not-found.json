@@ -1,0 +1,25 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": { "score": 4, "comment": "ok" },
+    "vocabulary": { "score": 3, "comment": "ok" },
+    "coherence": { "score": 4, "comment": "ok" },
+    "register_style": { "score": 3, "comment": "ok" }
+  },
+  "overall_cefr": "B1",
+  "summary": "Une citation introuvable.",
+  "next_level_tip": "Pour atteindre B2, relis tes accords.",
+  "corrections": [
+    {
+      "kind": "mistake",
+      "quote": "xyzzy-not-in-text",
+      "occurrence": 1,
+      "suggestion": "quelque chose",
+      "explanation": "Citation absente du texte.",
+      "category": "orthographe",
+      "question": null,
+      "rule_if_dialect": "forme louisianaise hypothétique",
+      "dlf_headword": null,
+      "resource_ids": []
+    }
+  ]
+}

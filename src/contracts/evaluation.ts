@@ -1,8 +1,31 @@
 import { z } from "zod";
-import { EVALUATION_SCORE_MAX } from "@/config/limits";
+import {
+  EVALUATION_SCORE_MAX,
+  EVALUATOR_CORRECTIONS_MAX,
+} from "@/config/limits";
 import { CefrLevel } from "./cefr";
 import { CorrectionKind } from "./correction";
+import { MistakeCategory } from "./mistake-category";
 import { parseJson } from "@/lib/json";
+
+export const DIMENSION_IDS = [
+  "grammatical_accuracy",
+  "vocabulary",
+  "coherence",
+  "register_style",
+] as const;
+
+export const Dimension = z.enum(DIMENSION_IDS);
+export type Dimension = z.infer<typeof Dimension>;
+
+function requiredDimensions<T extends z.ZodType>(value: T) {
+  return z.strictObject({
+    grammatical_accuracy: value,
+    vocabulary: value,
+    coherence: value,
+    register_style: value,
+  } satisfies Record<Dimension, T>);
+}
 
 const LegacyDimensionScore = z.object({
   score: z.number(),
@@ -10,20 +33,10 @@ const LegacyDimensionScore = z.object({
   comment: z.string(),
 });
 
-const EvaluationDimensions = z.object({
-  grammatical_accuracy: LegacyDimensionScore,
-  vocabulary: LegacyDimensionScore,
-  coherence: LegacyDimensionScore,
-  register_style: LegacyDimensionScore,
-});
+const EvaluationDimensions = requiredDimensions(LegacyDimensionScore);
 
 const EvaluationTips = z.object({
-  per_dimension: z.object({
-    grammatical_accuracy: z.string(),
-    vocabulary: z.string(),
-    coherence: z.string(),
-    register_style: z.string(),
-  }),
+  per_dimension: requiredDimensions(z.string()),
   holistic: z.string(),
 });
 
@@ -38,41 +51,59 @@ export type DimensionScore = z.infer<typeof LegacyDimensionScore>;
 export type EvaluationDimensions = z.infer<typeof EvaluationDimensions>;
 export type EvaluationTips = z.infer<typeof EvaluationTips>;
 
-const OutputDimensionScore = z.object({
+const OutputDimensionScore = z.strictObject({
   score: z.number().int().min(1).max(EVALUATION_SCORE_MAX),
   comment: z.string(),
 });
 
-const OutputDimensions = z.object({
-  grammatical_accuracy: OutputDimensionScore,
-  vocabulary: OutputDimensionScore,
-  coherence: OutputDimensionScore,
-  register_style: OutputDimensionScore,
-});
+const OutputDimensions = requiredDimensions(OutputDimensionScore);
 
-const EvaluatorOutputCorrectionSchema = z.object({
+const evaluatorCorrectionFields = {
   kind: CorrectionKind,
   quote: z.string(),
   occurrence: z.number().int(),
   suggestion: z.string(),
   explanation: z.string(),
-  category: z.string().nullable(),
   question: z.string().nullable(),
   rule_if_dialect: z.string().nullable(),
   dlf_headword: z.string().nullable(),
   resource_ids: z.array(z.string()),
+};
+
+/** Defensive post-process input: category may be an invented ID. */
+export const EvaluatorOutputCorrectionDraftSchema = z.strictObject({
+  ...evaluatorCorrectionFields,
+  category: z.string().nullable(),
 });
 
-export const EvaluatorOutputSchema = z.object({
+export const EvaluatorOutputCorrectionSchema = z.strictObject({
+  ...evaluatorCorrectionFields,
+  category: MistakeCategory.nullable(),
+});
+
+export const EvaluatorOutputDraftSchema = z.strictObject({
   dimensions: OutputDimensions,
   overall_cefr: CefrLevel,
   summary: z.string(),
   next_level_tip: z.string(),
-  corrections: z.array(EvaluatorOutputCorrectionSchema).max(15),
+  corrections: z
+    .array(EvaluatorOutputCorrectionDraftSchema)
+    .max(EVALUATOR_CORRECTIONS_MAX),
+});
+export type EvaluatorOutputDraft = z.infer<typeof EvaluatorOutputDraftSchema>;
+
+export const EvaluatorOutputSchema = z.strictObject({
+  dimensions: OutputDimensions,
+  overall_cefr: CefrLevel,
+  summary: z.string(),
+  next_level_tip: z.string(),
+  corrections: z
+    .array(EvaluatorOutputCorrectionSchema)
+    .max(EVALUATOR_CORRECTIONS_MAX),
 });
 export type EvaluatorOutput = z.infer<typeof EvaluatorOutputSchema>;
 
-export const EvaluationV2 = z.object({
+export const EvaluationV2 = z.strictObject({
   version: z.literal(2),
   dimensions: OutputDimensions,
   overallCefr: CefrLevel,
@@ -147,4 +178,12 @@ export function toPlaceholderEvaluation(
     value.overall_cefr,
     value.next_level_tip,
   );
+}
+
+export function parseCorrectionCategory(
+  raw: string | null,
+): MistakeCategory | null {
+  if (raw === null) return null;
+  const parsed = MistakeCategory.safeParse(raw);
+  return parsed.success ? parsed.data : null;
 }
