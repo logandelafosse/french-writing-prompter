@@ -5,12 +5,39 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { runPrSize } from "./run-pr-size";
 
+const HOOK_GIT_KEYS = [
+  "GIT_DIR",
+  "GIT_WORK_TREE",
+  "GIT_INDEX_FILE",
+  "GIT_PREFIX",
+] as const;
+
+function withoutHookGitEnv<T>(fn: () => T): T {
+  const saved = Object.fromEntries(
+    HOOK_GIT_KEYS.map((key) => [key, process.env[key]]),
+  );
+  for (const key of HOOK_GIT_KEYS) delete process.env[key];
+  process.env.LEFTHOOK = "0";
+  try {
+    return fn();
+  } finally {
+    for (const key of HOOK_GIT_KEYS) {
+      const value = saved[key];
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
+  }
+}
+
 function runInRepo(repoDir: string, cmd: string): string {
-  return execSync(cmd, {
-    cwd: repoDir,
-    encoding: "utf8",
-    stdio: ["pipe", "pipe", "pipe"],
-  });
+  return withoutHookGitEnv(() =>
+    execSync(cmd, {
+      cwd: repoDir,
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"],
+      env: process.env,
+    }),
+  );
 }
 
 function initRepo(repoDir: string): void {
@@ -46,7 +73,9 @@ describe("runPrSize integration", () => {
       scaffoldMainWithFeature(repoDir);
       writeLines(path.join(repoDir, "src", "bulk-499.ts"), 499);
       commitAll(repoDir, "499 prod lines");
-      const result = runPrSize({ cwd: repoDir, baseRef: "main" });
+      const result = withoutHookGitEnv(() =>
+        runPrSize({ cwd: repoDir, baseRef: "main" }),
+      );
       expect(result.total).toBe(499);
       expect(result.exitCode).toBe(0);
     } finally {
@@ -61,7 +90,9 @@ describe("runPrSize integration", () => {
       writeLines(path.join(repoDir, "src", "bulk-500.ts"), 500);
       writeLines(path.join(repoDir, "src", "tests-only.test.ts"), 1000);
       commitAll(repoDir, "500 prod + test");
-      const result = runPrSize({ cwd: repoDir, baseRef: "main" });
+      const result = withoutHookGitEnv(() =>
+        runPrSize({ cwd: repoDir, baseRef: "main" }),
+      );
       expect(result.total).toBe(500);
       expect(result.exitCode).toBe(1);
     } finally {
