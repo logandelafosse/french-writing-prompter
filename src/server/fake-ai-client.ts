@@ -55,9 +55,12 @@ export class FakeAiClient {
           ? "evaluation.invalid.json"
           : this.scenario === "advance"
             ? "evaluation.b2.json"
-            : "ok-mixed-kinds.json";
+            : this.scenario === "standard"
+              ? "ok-standard-louisiana.json"
+              : "ok-mixed-kinds.json";
     const dir =
-      fixtureName === "ok-mixed-kinds.json"
+      fixtureName === "ok-mixed-kinds.json" ||
+      fixtureName === "ok-standard-louisiana.json"
         ? EVALUATOR_FIXTURES_DIR
         : FIXTURES_DIR;
     const text = fs.readFileSync(path.join(dir, fixtureName), "utf8");

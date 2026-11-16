@@ -9,10 +9,20 @@ export const reviewCopy = {
   mobileListLabel: "Corrections",
   none: "Aucune correction",
   kindMistake: "Faute",
+  kindStandard: "Français standard",
   arrow: "→",
   avant: "avant :",
   actionAck: "Compris",
-  srMark: (n: number) => `faute ${n}`,
+  srMark: (kind: Correction["kind"], n: number) => {
+    switch (kind) {
+      case "standard":
+        return `français standard ${n}`;
+      case "dialect_check":
+        return `à vérifier ${n}`;
+      case "mistake":
+        return `faute ${n}`;
+    }
+  },
   scoresClosed: "Scores ▸",
   scoresOpen: "Scores ▾",
   scoresOverall: (level: string) => `Ensemble : ${level}`,

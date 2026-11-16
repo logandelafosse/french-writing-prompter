@@ -2,12 +2,18 @@ import { getEnv } from "@/server/env";
 import { OpenAiClient } from "@/modules/openai-client/openai-client";
 import { FakeAiClient } from "./fake-ai-client";
 
-export type E2eScenario = "happy" | "malformed" | "failure" | "advance";
+export type E2eScenario =
+  "happy" | "malformed" | "failure" | "advance" | "standard";
 
 const SCENARIO_HEADER = "x-e2e-scenario";
 
 export function parseE2eScenario(raw: string | null): E2eScenario {
-  if (raw === "malformed" || raw === "failure" || raw === "advance") {
+  if (
+    raw === "malformed" ||
+    raw === "failure" ||
+    raw === "advance" ||
+    raw === "standard"
+  ) {
     return raw;
   }
   return "happy";

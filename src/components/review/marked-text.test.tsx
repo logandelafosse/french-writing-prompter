@@ -33,12 +33,7 @@ describe("MarkedText", () => {
             },
           }),
           correction({ id: "u1", ordinal: 2, kind: "mistake" }),
-          correction({
-            id: "s1",
-            ordinal: 3,
-            kind: "standard",
-            span: { start: 0, end: 7 },
-          }),
+          correction({ id: "s1", ordinal: 3, kind: "standard" }),
           correction({
             id: "d1",
             ordinal: 4,
@@ -65,5 +60,38 @@ describe("MarkedText", () => {
     const link = screen.getByRole("link", { name: "faute 1" });
     expect(link).toHaveAttribute("href", "#correction-1");
     expect(screen.getAllByRole("link", { name: /faute/ })).toHaveLength(1);
+  });
+
+  it("standard span gets a dashed mark and outlined marker", () => {
+    const quote = "ma voiture";
+    const writing = `J'arrive avec ${quote}.`;
+    const start = writing.indexOf(quote);
+    const { container } = render(
+      <MarkedText
+        text={writing}
+        corrections={[
+          correction({
+            id: "s1",
+            ordinal: 1,
+            kind: "standard",
+            span: { start, end: start + quote.length },
+          }),
+          correction({ id: "u1", ordinal: 2, kind: "standard" }),
+        ]}
+      />,
+    );
+
+    const marked = screen.getByText(quote);
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; dashed/outlined styles are the kind contract */
+    expect(marked.closest("mark")).toHaveClass("border-dashed");
+    expect(container.querySelectorAll("mark")).toHaveLength(1);
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark DOM asserts */
+
+    const hidden = screen.getByText("(français standard 1)");
+    expect(hidden).toHaveClass("sr-only");
+
+    const link = screen.getByRole("link", { name: "français standard 1" });
+    expect(link).toHaveAttribute("href", "#correction-1");
+    expect(link).toHaveClass("border-standard", "bg-white");
   });
 });

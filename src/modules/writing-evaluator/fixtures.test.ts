@@ -58,6 +58,45 @@ function processFixture(name: string) {
 }
 
 describe("evaluator fixtures", () => {
+  it("ok-standard-louisiana produces ma voiture as standard", () => {
+    const louisianaWriting = "J'arrive avec ma voiture. Les enfant jouent.";
+    const raw = throughChatCompletionJSON(load("ok-standard-louisiana.json"));
+    const corrections = postProcessEvaluation(raw, {
+      text: louisianaWriting,
+      sessionId: 7,
+      now: () => new Date("2026-11-16T18:00:00.000Z"),
+      createId: (() => {
+        let n = 0;
+        return () => `fix-${++n}`;
+      })(),
+    }).corrections.map((c) => ({
+      kind: c.kind,
+      quote: c.quote,
+      suggestion: c.suggestion,
+      span: c.span,
+    }));
+    expect(corrections).toEqual([
+      {
+        kind: "standard",
+        quote: "ma voiture",
+        suggestion: "mon char",
+        span: {
+          start: louisianaWriting.indexOf("ma voiture"),
+          end: louisianaWriting.indexOf("ma voiture") + "ma voiture".length,
+        },
+      },
+      {
+        kind: "mistake",
+        quote: "Les enfant",
+        suggestion: "Les enfants",
+        span: {
+          start: louisianaWriting.indexOf("Les enfant"),
+          end: louisianaWriting.indexOf("Les enfant") + "Les enfant".length,
+        },
+      },
+    ]);
+  });
+
   it("ok-mixed-kinds produces stable corrections", () => {
     expect(processFixture("ok-mixed-kinds.json")).toEqual([
       {
