@@ -116,6 +116,36 @@ describe("aggregateWeaknesses", () => {
     ]);
   });
 
+  it("orders same-trend rows by s desc even when that row has the lower count", () => {
+    const weaknesses = aggregateWeaknesses([
+      session("2026-11-16T18:00:00.000Z", [
+        correction({ kind: "mistake", status: "open", category: "genre" }),
+        correction({ kind: "mistake", status: "open", category: "genre" }),
+        correction({ kind: "mistake", status: "open", category: "genre" }),
+      ]),
+      session("2026-11-15T18:00:00.000Z", [
+        correction({
+          kind: "mistake",
+          status: "open",
+          category: "prepositions",
+        }),
+      ]),
+      session("2026-11-14T18:00:00.000Z", [
+        correction({
+          kind: "mistake",
+          status: "open",
+          category: "prepositions",
+        }),
+      ]),
+    ]);
+    expect(weaknesses.map((row) => row.category)).toEqual([
+      "prepositions",
+      "genre",
+    ]);
+    expect(weaknesses.map((row) => row.trend)).toEqual(["actif", "actif"]);
+    expect(weaknesses.map((row) => row.count)).toEqual([2, 3]);
+  });
+
   it("includes placement sessions when the named filter is on", () => {
     const weaknesses = aggregateWeaknesses([
       session(
