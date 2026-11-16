@@ -1265,3 +1265,26 @@ files: ["src/app/api/**"]
 ```
 
 **Already enforced / positive:** `chatCompletionJSON` + `parseJson`; `Correction.parse` in post-process; `EvaluatePostResponse` `z.strictObject`; injected `now` / `createId`; fake client `parseJson`.
+
+### PR #73 (T22a — Phase C marked text + Mistake cards)
+
+Non-blocking for T22a merge. Priority **TOOL-PR73-1** / **73-2** before **T22b** (restore, Compris persist).
+
+**Hook isolation (`c71bb5f`, `f7e7e313`):** pre-push `GIT_DIR` made nested `git init` in `pr-size.integration.test.ts` hit this repo. The PR wraps those tests in `withoutHookGitEnv` and strips `GIT_*` in `lefthook.yml` — same four keys in two places; `lefthook-hooks.test.ts` still inherits hook env.
+
+| ID (draft)  | Rule / change                                      | Notes                                                                                                                            |
+| ----------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| TOOL-PR73-1 | `hook-git-env-isolation`                           | Vitest setup unsets `GIT_DIR` / `GIT_WORK_TREE` / `GIT_INDEX_FILE` / `GIT_PREFIX`; share key list with lefthook                  |
+| TOOL-PR73-2 | `no-boolean-loading-state` (fold TOOL-PR69-7)      | `home-page.tsx` parallel `useState(false)` beside `submitUi` union; land before T22b restore                                     |
+| TOOL-PR73-3 | `surface-padding-single-source`                    | `correction-card.tsx` `p-[16px_18px]`; `review-screen.tsx` `max-sm:p-[22px_18px_26px]` — use Surface `card` / `mobile-review`    |
+| TOOL-PR73-4 | `no-arbitrary-tailwind-bracket` (fold TOOL-PR62-1) | `marked-text.tsx` / `correction-card.tsx` / `prompt-sheet.tsx`; extend `theme.test.ts` for `max-w-review`, `text-writing-marked` |
+| TOOL-PR73-5 | `sm-breakpoint-single-source`                      | Literal `min-width: 640px` in `review-screen.tsx`, `ruled-textarea.tsx`, `setup-dom.ts`                                          |
+| TOOL-PR73-6 | `review-copy-single-source` (fold TOOL-PR62-3)     | Inline `"1 faute"` / `"en français standard"` in copy + e2e                                                                      |
+| TOOL-PR73-7 | Kind → summary counts (fold TOOL-PR70-6)           | Exhaustive kind switch; `countsAsMistake` for fautes in `copy/review.ts`                                                         |
+| TOOL-PR73-8 | `no-getelementbyid-in-components`                  | Compris focus via `document.getElementById` in `review-screen.tsx`                                                               |
+
+**Folds:** e2e `boundingBox` (TOOL-PR57-1); viewport `test.use` (TOOL-PR54-5 / 62-7).
+
+**70-10 partial:** `EvaluatePostResponse.corrections` is `z.array(Correction)`; DB parse-on-read and `/api/today` restore remain **T22b**.
+
+**Already good:** `reviewCopy`; `Button` for Compris; tokens `--container-review`, `--text-prompt-review`, `--text-writing-marked`, `--radius-marker`; `submitUi` union; UI evidence in PR body.
