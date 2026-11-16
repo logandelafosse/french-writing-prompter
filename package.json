@@ -23,6 +23,7 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:studio": "drizzle-kit studio",
     "pr:size": "tsx scripts/pr-size.ts",
+    "dialect:export": "TZ=America/Chicago AI_CLIENT=fake tsx scripts/dialect-export.ts",
     "dlf:fetch": "tsx scripts/dlf-fetch.ts",
     "prepare": "lefthook install"
   },
