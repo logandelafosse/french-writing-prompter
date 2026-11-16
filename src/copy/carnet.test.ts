@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatDialectNoteMeta } from "./carnet";
+import { formatDialectNoteMeta, formatWeaknessMeta } from "./carnet";
 
 const today = () => new Date("2026-11-14T18:00:00-06:00");
 
@@ -43,5 +43,33 @@ describe("formatDialectNoteMeta", () => {
     expect(
       formatDialectNoteMeta(note, () => new Date("2026-11-14T20:00:00-06:00")),
     ).toBe("13 novembre · toute la famille");
+  });
+});
+
+describe("formatWeaknessMeta", () => {
+  it("renders the singular today form", () => {
+    expect(
+      formatWeaknessMeta(
+        {
+          count: 1,
+          lastSeenAt: "2026-11-16T18:00:00-06:00",
+          trend: "actif",
+        },
+        () => new Date("2026-11-16T20:00:00-06:00"),
+      ),
+    ).toBe("1 fois · vu aujourd'hui · actif");
+  });
+
+  it("renders the dated en progrès form", () => {
+    expect(
+      formatWeaknessMeta(
+        {
+          count: 3,
+          lastSeenAt: "2026-11-06T18:00:00-06:00",
+          trend: "en_progres",
+        },
+        () => new Date("2026-11-16T18:00:00-06:00"),
+      ),
+    ).toBe("3 fois · vu le 6 novembre · en progrès");
   });
 });

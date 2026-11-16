@@ -5,7 +5,7 @@ import type { z } from "zod";
 import { parseJson } from "@/lib/json";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import type { ChatCompletionParams } from "@/modules/openai-client/openai-client";
-import { isNull } from "drizzle-orm";
+import { eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { dialectNotes, sessions } from "@/db/schema";
 import type { E2eScenario } from "./ai-client";
@@ -49,6 +49,16 @@ export class FakeAiClient {
             : "prompt-generator.swap.json"
         : null;
 
+    const weaknessEvaluated =
+      this.scenario === "weakness" && generatorFixture === null
+        ? (
+            await db
+              .select({ id: sessions.id })
+              .from(sessions)
+              .where(eq(sessions.status, "evaluated"))
+          ).length
+        : -1;
+
     const dialectFixture =
       this.scenario === "dialect" && generatorFixture === null
         ? (
@@ -71,9 +81,13 @@ export class FakeAiClient {
             ? "evaluation.b2.json"
             : this.scenario === "standard"
               ? "ok-standard-louisiana.json"
-              : dialectFixture !== null
-                ? dialectFixture
-                : "ok-mixed-kinds.json";
+              : this.scenario === "weakness"
+                ? weaknessEvaluated === 0
+                  ? "evaluation.weakness.json"
+                  : "evaluation.weakness-repeat.json"
+                : dialectFixture !== null
+                  ? dialectFixture
+                  : "ok-mixed-kinds.json";
     const dir = fixtureName.startsWith("ok-")
       ? EVALUATOR_FIXTURES_DIR
       : FIXTURES_DIR;

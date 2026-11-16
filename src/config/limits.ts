@@ -11,6 +11,9 @@ export const FETCH_TIMEOUT_MS = 10_000;
 
 export const PLACEMENT_STEPS = 3;
 
+/** Q8: Placement Mistakes feed Weakness memory. Flip to false to exclude them. */
+export const PLACEMENT_FEEDS_WEAKNESS_MEMORY = true;
+
 export const ADVANCEMENT_STREAK = 3;
 
 /** Per-dimension Evaluation score range (1–max). */
