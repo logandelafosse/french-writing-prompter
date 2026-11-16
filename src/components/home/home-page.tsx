@@ -369,6 +369,7 @@ function WritingInterim({
               target={wordTarget}
               layout="desktop"
               submitBusy={evaluating}
+              submitRetry={submitUi === "error"}
               onSubmit={() => void submit()}
             />
           </div>
@@ -379,6 +380,7 @@ function WritingInterim({
             target={wordTarget}
             layout="mobile"
             submitBusy={evaluating}
+            submitRetry={submitUi === "error"}
             onSubmit={() => void submit()}
           />
         </div>

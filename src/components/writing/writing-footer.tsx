@@ -8,12 +8,14 @@ export function WritingFooter({
   target,
   layout,
   submitBusy,
+  submitRetry,
   onSubmit,
 }: {
   text: string;
   target: { min: number; max: number } | null;
   layout: "desktop" | "mobile";
   submitBusy: boolean;
+  submitRetry?: boolean | undefined;
   onSubmit: () => void;
 }) {
   const disabled = isSubmitDisabled(text, submitBusy);
@@ -28,6 +30,7 @@ export function WritingFooter({
             <SubmitButton
               busy={submitBusy}
               disabled={disabled}
+              retry={submitRetry}
               onClick={onSubmit}
             />
           }
@@ -46,6 +49,7 @@ export function WritingFooter({
         <SubmitButton
           busy={submitBusy}
           disabled={disabled}
+          retry={submitRetry}
           onClick={onSubmit}
         />
       </div>

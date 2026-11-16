@@ -24,4 +24,11 @@ describe("SubmitButton", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: homeCopy.submit })).toBeEnabled();
   });
+
+  it("shows Réessayer after an evaluation error", () => {
+    render(<SubmitButton busy={false} retry onClick={() => undefined} />);
+    expect(
+      screen.getByRole("button", { name: homeCopy.retry }),
+    ).toBeInTheDocument();
+  });
 });

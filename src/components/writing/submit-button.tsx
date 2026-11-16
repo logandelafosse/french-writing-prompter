@@ -5,11 +5,18 @@ export function SubmitButton({
   busy,
   disabled,
   onClick,
+  retry = false,
 }: {
   busy: boolean;
   disabled?: boolean | undefined;
   onClick: () => void;
+  retry?: boolean | undefined;
 }) {
+  const label = busy
+    ? homeCopy.submitBusy
+    : retry
+      ? homeCopy.retry
+      : homeCopy.submit;
   return (
     <Button
       size="lg"
@@ -19,7 +26,7 @@ export function SubmitButton({
       aria-keyshortcuts="Meta+Enter Control+Enter"
       onClick={onClick}
     >
-      {busy ? homeCopy.submitBusy : homeCopy.submit}
+      {label}
     </Button>
   );
 }
