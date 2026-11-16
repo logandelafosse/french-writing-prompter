@@ -1288,3 +1288,113 @@ Non-blocking for T22a merge. Priority **TOOL-PR73-1** / **73-2** before **T22b**
 **70-10 partial:** `EvaluatePostResponse.corrections` is `z.array(Correction)`; DB parse-on-read and `/api/today` restore remain **T22b**.
 
 **Already good:** `reviewCopy`; `Button` for Compris; tokens `--container-review`, `--text-prompt-review`, `--text-writing-marked`, `--radius-marker`; `submitUi` union; UI evidence in PR body.
+
+### PR #74 (T22b — CECR scores, Compris persist, Phase C restore)
+
+Non-blocking for T22b merge. Land **TOOL-PR74-1** before T23/T25 (more `PATCH /api/corrections`). Land remaining **73-2** with the next Home state ticket.
+
+**TOOL-PR73 status on T22b**
+
+| ID    | Status  | Notes                                                                                                                                                          |
+| ----- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 73-1  | Open    | Not in this PR.                                                                                                                                                |
+| 73-2  | Partial | `inReview = reviewing \|\| phase?.kind === "C-review"`; `useState(false)` `reviewing` still sits beside `submitUi`. Fold TOOL-PR69-7.                          |
+| 73-3  | Open    | Unchanged Surface paddings.                                                                                                                                    |
+| 73-4  | Open    | Worse: `scores-disclosure.tsx` `px-[18px]`, `text-[15px]`, `text-[11px]`, `p-[14px_16px]`, `tracking-[0.08em]`, `calc(100%+6px)`. Fold TOOL-PR62-1 / 63-4.     |
+| 73-5  | Open    | `matchMedia("(min-width: 640px)")` unchanged.                                                                                                                  |
+| 73-6  | Partial | Score labels live in `reviewCopy`; e2e still hardcodes `Scores ▸` / `Ensemble : B1` / `Grammaire` / `A2+` / `Pour monter`. Summary French still inline.        |
+| 73-7  | Open    | `formatEvaluationSummary` `else` still counts unknown kinds as dialect.                                                                                        |
+| 73-8  | Open    | Compris still focuses via `document.getElementById`.                                                                                                           |
+| 70-10 | Partial | `correctionFromRow` + `Correction.safeParse`; failed rows dropped; `resourceIds` parse fail → `[]`; `isFocus: false` reconstructed; DB columns still `text()`. |
+
+| ID (draft)  | Rule / change                                                 | Notes                                                                                                       |
+| ----------- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| TOOL-PR74-1 | `no-void-fetchjson` (fold TOOL-PR66-7)                        | `void fetchJson` on Compris; optimistic `ackedIds` survives a failed PATCH until reload                     |
+| TOOL-PR74-2 | `CefrSubLevel` + `SCORE_TO_CECR_SUBLEVEL` ratchet             | Mapping returns `string`; keys 1–6 not tied to `EVALUATION_SCORE_MAX`; no `A2+` / `B1+` enum                |
+| TOOL-PR74-3 | `no-silent-safeparse-drop` (finish TOOL-PR70-10)              | `listCorrectionsForSession` skips bad rows; `resourceIdsJson` fail → `[]`; AGENTS.md wants an inline notice |
+| TOOL-PR74-4 | `CORRECTION_ERRORS` map (fold TOOL-PR69-3 / 69-4)             | French `NOT_FOUND` / `CONFLICT` inline in `corrections/[id]/route.ts` like undo, unlike `DRAFT_ERRORS`      |
+| TOOL-PR74-5 | `TodayReviewSession` / `ReviewScreen.evaluation` required     | Nested `z.object`; `evaluation` nullable + `evaluation = null` default hides Scores                         |
+| TOOL-PR74-6 | `no-zero-arg-date-in-routes` (fold TOOL-PR66-5 / TOOL-PR71-9) | `setCorrectionStatus(id, next.status, () => new Date())`                                                    |
+| TOOL-PR74-7 | `collapsible-trigger-uses-button` (extend TOOL-PR65-1)        | `Collapsible.Trigger` is a native `<button>`; `no-raw-interactive-element` only matches the `button` tag    |
+| —           | Fold TOOL-PR73-2/4/6/8, TOOL-PR57-1, TOOL-PR54-5              | Dual `reviewing` flag; new bracket tokens; e2e copy; `getElementById`; `boundingBox`; `test.use` viewports  |
+
+**Proposed snippets (not in repo yet)**
+
+`no-void-fetchjson` — ESLint on `src/components/**`:
+
+```js
+"no-restricted-syntax": [
+  "error",
+  {
+    selector:
+      "UnaryExpression[operator='void'] > CallExpression[callee.name='fetchJson']",
+    message:
+      "Handle FetchJsonResult (ok / error). Do not void fetchJson — Compris and autosave must not look saved when PATCH/PUT failed.",
+  },
+],
+```
+
+`CefrSubLevel` ratchet — `src/contracts/cefr.ts` + `src/config/limits.contract.test.ts`:
+
+```ts
+export const CEFR_SUB_LEVELS = ["A1", "A2", "A2+", "B1", "B1+", "B2"] as const;
+export const CefrSubLevel = z.enum(CEFR_SUB_LEVELS);
+export type CefrSubLevel = z.infer<typeof CefrSubLevel>;
+
+export const SCORE_TO_CECR_SUBLEVEL = {
+  1: "A1",
+  2: "A2",
+  3: "A2+",
+  4: "B1",
+  5: "B1+",
+  6: "B2",
+} as const satisfies Record<1 | 2 | 3 | 4 | 5 | 6, CefrSubLevel>;
+
+// test: Object.keys(SCORE_TO_CECR_SUBLEVEL).length === EVALUATION_SCORE_MAX
+// and cefrSubLevelFromScore returns CefrSubLevel | null
+```
+
+`no-silent-safeparse-drop` — ast-grep on stores:
+
+```yaml
+id: no-silent-safeparse-drop
+language: Tsx
+severity: error
+message: "A failed safeParse in a list must surface an inline notice (AGENTS.md); do not skip the row or default the field."
+rule:
+  any:
+    - pattern: $PARSED.success ? $PARSED.data : null
+    - pattern: resourceIds.ok ? resourceIds.value : []
+files: ["src/modules/**", "src/server/**"]
+```
+
+`no-zero-arg-date-in-routes`:
+
+```yaml
+id: no-zero-arg-date-in-routes
+language: Tsx
+severity: error
+message: "Inject now: () => Date from the handler seam; do not call new Date() in src/app/api."
+rule:
+  pattern: new Date()
+files: ["src/app/api/**"]
+```
+
+`collapsible-trigger-uses-button`:
+
+```yaml
+id: collapsible-trigger-uses-button
+language: Tsx
+severity: error
+message: "Collapsible.Trigger must render the Button primitive (render={Button} or equivalent)."
+rule:
+  pattern: <Collapsible.Trigger $$$>
+  not:
+    has:
+      kind: jsx_attribute
+      regex: "render"
+files: ["src/components/**"]
+ignores: ["src/components/ui/**"]
+```
+
+**Already enforced / positive:** `CorrectionPatchBody` / `CorrectionPatchResponse` `z.strictObject`; `parseRequestBody` + `withErrors`; `DIMENSION_IDS` drives score rows; `reviewCopy` for Q5 labels / `Pour monter`; `parseStoredEvaluation` on `/api/today` restore; `Correction.safeParse` on read; `acknowledgeCorrection` kind/status gate; UI evidence blob URLs on the PR branch.
