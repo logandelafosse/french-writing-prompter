@@ -69,7 +69,7 @@ export const EvaluatorOutputCorrectionSchema = z.strictObject({
   occurrence: z.number().int(),
   suggestion: z.string(),
   explanation: z.string(),
-  category: MistakeCategory.nullable(),
+  category: z.string().nullable(),
   question: z.string().nullable(),
   rule_if_dialect: z.string().nullable(),
   dlf_headword: z.string().nullable(),
@@ -86,13 +86,7 @@ export const EvaluatorOutputSchema = z.strictObject({
     .max(EVALUATOR_CORRECTIONS_MAX),
 });
 export type EvaluatorOutput = z.infer<typeof EvaluatorOutputSchema>;
-export type EvaluatorOutputDraft = Omit<EvaluatorOutput, "corrections"> & {
-  corrections: Array<
-    Omit<EvaluatorOutput["corrections"][number], "category"> & {
-      category: string | null;
-    }
-  >;
-};
+export type EvaluatorOutputDraft = EvaluatorOutput;
 
 export const EvaluationV2 = z.strictObject({
   version: z.literal(2),

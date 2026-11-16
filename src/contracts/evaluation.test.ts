@@ -108,7 +108,7 @@ describe("EvaluatorOutputSchema", () => {
     expect(missingOverall.success).toBe(false);
   });
 
-  it("rejects extra keys, invented categories, and too many corrections", () => {
+  it("rejects extra keys and too many corrections; accepts unknown category strings", () => {
     const base = {
       dimensions,
       overall_cefr: "B1" as const,
@@ -137,7 +137,7 @@ describe("EvaluatorOutputSchema", () => {
         },
       ],
     });
-    expect(invented.success).toBe(false);
+    expect(invented.success).toBe(true);
 
     const tooMany = EvaluatorOutputSchema.safeParse({
       ...base,

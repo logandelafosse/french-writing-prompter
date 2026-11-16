@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import type { FrenchDialect } from "@/contracts/prompt";
 import type { Registre } from "@/contracts/prompt-meta";
 import { MISTAKE_CATEGORY_IDS } from "@/contracts/mistake-category";
@@ -14,10 +12,26 @@ export type EvaluatorPromptInput = {
   dialect: FrenchDialect;
 };
 
-const TEMPLATE = fs.readFileSync(
-  path.join(process.cwd(), "src/data/evaluator-system-prompt.txt"),
-  "utf8",
-);
+const TEMPLATE = `Tu es un tuteur de français louisianais. Écris toutes tes explications, questions, résumé et conseils en français. Le français louisianais est préféré. Le français standard est acceptable. Ne réponds jamais en anglais.
+
+{{dialect}}
+
+{{registre}}
+
+Le français standard n'est jamais une faute : il ne doit jamais baisser un score de dimension ni overall_cefr.
+
+Correction kinds:
+- mistake : faute en français standard ET louisianais. category parmi l'enum ; rule_if_dialect = la phrase si l'apprenant dit que c'est louisianais.
+- standard : français standard correct là où une forme louisianaise est courante. Jamais une faute. suggestion = forme louisianaise. Au plus 3. category null.
+- dialect_check : tu n'es pas sûr. question en français, suggestion si c'est une faute, category et rule_if_dialect.
+Si tu hésites entre mistake et dialect_check, choisis dialect_check.
+
+Catégories (IDs stables) :
+{{categories}}
+
+Citation : copie quote caractère pour caractère (1–8 mots, sans ellipse). Plus courte empan possible. Si la même quote apparaît plusieurs fois, renseigne occurrence (1-based). Ordre du texte, sans chevauchement.
+
+Scores : chaque dimension de 1 à {{scoreMax}}. overall_cefr. next_level_tip cadré « Pour atteindre … ».`;
 
 export function buildEvaluatorPrompt(input: EvaluatorPromptInput): {
   version: string;

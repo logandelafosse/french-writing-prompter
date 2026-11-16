@@ -3,9 +3,6 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { parseJson } from "@/lib/json";
-import { z } from "zod";
-import { EVALUATOR_CORRECTIONS_MAX } from "@/config/limits";
-import { CorrectionKind } from "@/contracts/correction";
 import {
   EvaluatorOutputSchema,
   type EvaluatorOutputDraft,
@@ -20,30 +17,9 @@ function load(name: string): string {
   return fs.readFileSync(path.join(DIR, name), "utf8");
 }
 
-const FixtureOutputSchema = EvaluatorOutputSchema.extend({
-  corrections: z
-    .array(
-      z.strictObject({
-        kind: CorrectionKind,
-        quote: z.string(),
-        occurrence: z.number().int(),
-        suggestion: z.string(),
-        explanation: z.string(),
-        category: z.string().nullable(),
-        question: z.string().nullable(),
-        rule_if_dialect: z.string().nullable(),
-        dlf_headword: z.string().nullable(),
-        resource_ids: z.array(z.string()),
-      }),
-    )
-    .max(EVALUATOR_CORRECTIONS_MAX),
-});
-
 function throughChatCompletionJSON(text: string): EvaluatorOutputDraft {
   const strict = parseJson(EvaluatorOutputSchema, text);
   if (strict.ok) return strict.value;
-  const fixture = parseJson(FixtureOutputSchema, text);
-  if (fixture.ok) return fixture.value;
   if (strict.reason === "invalid_json") {
     throw new AiOutputError(
       "invalid_json",
@@ -206,9 +182,10 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("unknown-category maps to autre after the LLM schema rejects the invented ID", () => {
-    const text = load("unknown-category.json");
-    expect(parseJson(EvaluatorOutputSchema, text).ok).toBe(false);
+  it("unknown-category maps to autre after post-process", () => {
+    expect(
+      parseJson(EvaluatorOutputSchema, load("unknown-category.json")).ok,
+    ).toBe(true);
     expect(processFixture("unknown-category.json")).toEqual([
       {
         id: "fix-1",
