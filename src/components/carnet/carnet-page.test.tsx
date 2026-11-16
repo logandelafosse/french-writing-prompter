@@ -42,6 +42,16 @@ const accentsQuiet: Weakness = {
   pinned: false,
 };
 
+const autreWeakness: Weakness = {
+  category: "autre",
+  label: "Autre",
+  count: 1,
+  lastSeenAt: "2026-11-14T16:00:00-06:00",
+  trend: "actif",
+  isFocus: false,
+  pinned: false,
+};
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -265,5 +275,58 @@ describe("CarnetPage", () => {
     render(<CarnetPage now={now} />);
     await screen.findByRole("heading", { name: "Genre des noms" });
     expect(screen.getByText(carnetCopy.weakMetaFocus)).toBeVisible();
+  });
+
+  it("does not show Pratiquer ça on Autre", async () => {
+    mockCarnet([], [genreWeakness, autreWeakness]);
+    render(<CarnetPage now={now} />);
+    expect(await screen.findByRole("heading", { name: "Autre" })).toBeVisible();
+    expect(
+      screen.getAllByRole("button", { name: carnetCopy.weakPractice }),
+    ).toHaveLength(1);
+  });
+
+  it("disables every Pratiquer ça button while a pin is saving", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.mocked(globalThis.fetch);
+    let releaseHeld = (): void => undefined;
+    const held = new Promise<void>((resolve) => {
+      releaseHeld = () => {
+        resolve();
+      };
+    });
+    fetchMock.mockImplementation(async (input) => {
+      const url = fetchUrl(input);
+      if (url.includes("/practice")) {
+        await held;
+        return jsonResponse({ pinned: true });
+      }
+      if (url.includes("/api/weaknesses")) {
+        return jsonResponse({
+          weaknesses: [genreWeakness, accentsQuiet],
+          focus: [],
+        });
+      }
+      return jsonResponse({ notes: [] });
+    });
+    render(<CarnetPage now={now} />);
+    const buttons = await screen.findAllByRole("button", {
+      name: carnetCopy.weakPractice,
+    });
+    const first = buttons[0];
+    const second = buttons[1];
+    expect(buttons).toHaveLength(2);
+    if (first === undefined || second === undefined) return;
+    await user.click(first);
+    await waitFor(() => {
+      expect(first).toBeDisabled();
+      expect(second).toBeDisabled();
+    });
+    releaseHeld();
+    await waitFor(() => {
+      expect(
+        screen.getAllByRole("button", { name: carnetCopy.weakPractice })[0],
+      ).toBeEnabled();
+    });
   });
 });

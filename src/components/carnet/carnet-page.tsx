@@ -129,6 +129,7 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
               key={weakness.category}
               weakness={weakness}
               now={now}
+              practiceDisabled={practiceUi.status === "saving"}
               onPractice={pinCategory}
             />
           ))}
@@ -257,10 +258,12 @@ function DialectNoteRow({
 function CarnetWeaknessRow({
   weakness,
   now,
+  practiceDisabled,
   onPractice,
 }: {
   weakness: Weakness;
   now: () => Date;
+  practiceDisabled: boolean;
   onPractice: (
     category: MistakeCategory,
     pinned: boolean,
@@ -272,6 +275,7 @@ function CarnetWeaknessRow({
     : weakness.isFocus
       ? carnetCopy.weakMetaFocus
       : null;
+  const showPractice = weakness.category !== "autre";
   // prettier-ignore
   return (
     <article id={`weakness-${weakness.category}`} className="border-line flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t py-4">
@@ -287,15 +291,18 @@ function CarnetWeaknessRow({
           ) : null}
         </p>
       </div>
-      <Button
-        variant={quiet ? "secondary" : "outline-primary"}
-        aria-pressed={weakness.pinned}
-        onClick={() => {
-          void onPractice(weakness.category, weakness.pinned);
-        }}
-      >
-        {carnetCopy.weakPractice}
-      </Button>
+      {showPractice ? (
+        <Button
+          variant={quiet ? "secondary" : "outline-primary"}
+          aria-pressed={weakness.pinned}
+          disabled={practiceDisabled}
+          onClick={() => {
+            void onPractice(weakness.category, weakness.pinned);
+          }}
+        >
+          {carnetCopy.weakPractice}
+        </Button>
+      ) : null}
     </article>
   );
 }

@@ -16,7 +16,8 @@ function unknownCategory() {
 
 async function parseCategory(params: Promise<{ category: string }>) {
   const parsed = MistakeCategory.safeParse((await params).category);
-  return parsed.success ? parsed.data : null;
+  if (!parsed.success || parsed.data === "autre") return null;
+  return parsed.data;
 }
 
 export const POST = withErrors(async function postPractice(

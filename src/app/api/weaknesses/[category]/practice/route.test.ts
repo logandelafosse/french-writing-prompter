@@ -123,6 +123,20 @@ describe(
       expect(body.error.code).toBe("VALIDATION");
     });
 
+    it("rejects autre with 422", async () => {
+      const posted = await practiceRequest("POST", "autre");
+      expect(posted.status).toBe(422);
+      expect((await readResponseJson(posted, ErrorEnvelope)).error.code).toBe(
+        "VALIDATION",
+      );
+
+      const deleted = await practiceRequest("DELETE", "autre");
+      expect(deleted.status).toBe(422);
+      expect((await readResponseJson(deleted, ErrorEnvelope)).error.code).toBe(
+        "VALIDATION",
+      );
+    });
+
     it("pins first in Focus, cancels the earlier pin, and prompt consumes it", async () => {
       await seedEvaluated("2026-11-13T18:00:00.000Z", [
         "infinitif_participe",
