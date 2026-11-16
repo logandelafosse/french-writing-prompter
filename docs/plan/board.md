@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T17 dispatched).
+Last updated: 2026-11-16 by coordinator (T17 PR #66 in review).
 
 ## Ready
 
@@ -14,13 +14,13 @@ Last updated: 2026-11-16 by coordinator (T17 dispatched).
 
 ## In progress
 
-| ID  | Ticket                                                                                                            | Why                                                                                      |
-| --- | ----------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| T17 | Session lifecycle and draft autosave ([#19](https://github.com/logandelafosse/french-writing-prompter/issues/19)) | Branch `ticket/t17-session-drafts`; [implementer](57b0dbd7-ea55-43ad-a009-5cef171ce8e2). |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                                            | Why                                                                                                                                              |
+| --- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T17 | Session lifecycle and draft autosave ([#19](https://github.com/logandelafosse/french-writing-prompter/issues/19)) | [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66); adversarial + test + tooling reviews; evidence `docs/evidence/19/`. |
 
 ## Blocked
 
@@ -58,7 +58,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T14b | Home phases UI + placement                                          | AFK  | T14a       | **Done** — merged [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62).                                                                                    |
 | T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | **Done** — merged [PR #63](https://github.com/logandelafosse/french-writing-prompter/pull/63).                                                                                    |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | **Done** — merged [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65) 2026-11-16; TOOL-PR65-* backlog.                                                    |
-| T17  | Session lifecycle and draft autosave                                | AFK  | T16        | **In progress** — `ticket/t17-session-drafts`.                                                                                                                                    |
+| T17  | Session lifecycle and draft autosave                                | AFK  | T16        | **In review** — [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66).                                                                                      |
 | T18  | Quota exhausted, swap confirm, session statuses                     | AFK  | T17        | Needs sessions with drafts. Q8: swap uses a daily slot. Not alongside T19 (both edit `POST /api/prompt` and Phase B).                                                             |
 | T19  | Error and offline states                                            | AFK  | T17        | Needs local draft copy. Builds the shared `withErrors` route wrapper.                                                                                                             |
 | T20  | Level service with durable streak and undoable advancement          | AFK  | T14        | **Ready** — see Ready column. Not alongside T17 or T21.                                                                                                                           |
