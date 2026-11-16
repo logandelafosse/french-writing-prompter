@@ -157,8 +157,10 @@ export function AppHeader({
           href="/"
           className="text-wordmark-sm sm:text-wordmark text-ink font-bold tracking-[-0.03em] no-underline"
         >
-          {APP_WORDMARK}
-          <span className="text-mistake">.</span>
+          <h1 className="font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
+            {APP_WORDMARK}
+            <span className="text-mistake">.</span>
+          </h1>
         </Link>
         {placementLink ? (
           <TextLink href={placementLink.href} compact>
@@ -186,10 +188,10 @@ export function AppHeader({
           href="/"
           className="text-wordmark-sm sm:text-wordmark min-h-touch text-ink inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-bold tracking-[-0.03em] no-underline"
         >
-          <span>
+          <h1 className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
             {APP_WORDMARK}
             <span className="text-mistake">.</span>
-          </span>
+          </h1>
           <span className="text-muted hidden text-[13px] font-normal sm:inline">
             {APP_TAGLINE}
           </span>

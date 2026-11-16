@@ -32,11 +32,5 @@ test("level chip menu works with keyboard and passes axe", async ({
   ).toBeFocused();
   await captureEvidence(page, testInfo, "level-menu");
 
-  await expectNoAxeViolations(page, [
-    ...LEGACY_AXE_DISABLED,
-    {
-      id: "page-has-heading-one",
-      reason: "Legacy home uses h2 for CEFR until T14 replaces the shell.",
-    },
-  ]);
+  await expectNoAxeViolations(page, LEGACY_AXE_DISABLED);
 });
