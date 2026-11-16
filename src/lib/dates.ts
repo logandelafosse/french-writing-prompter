@@ -6,6 +6,10 @@ function resolvedTimeZone(timeZone?: string): string {
   return "UTC";
 }
 
+export function appTimeZone(): string {
+  return resolvedTimeZone();
+}
+
 /** Local calendar date key (YYYY-MM-DD) for quota and sessions. */
 export function localDateKey(date: Date, timeZone?: string): string {
   const tz = resolvedTimeZone(timeZone);
@@ -19,6 +23,29 @@ export function localDateKey(date: Date, timeZone?: string): string {
 
 export function todayLocalDateKey(timeZone?: string): string {
   return localDateKey(new Date(), timeZone);
+}
+
+/** ISO instant of the next local midnight after `from` in `timeZone`. */
+export function nextLocalMidnightIso(
+  from: Date = new Date(),
+  timeZone?: string,
+): string {
+  const tz = resolvedTimeZone(timeZone);
+  const today = localDateKey(from, tz);
+  let lo = from.getTime();
+  let hi = lo + 36 * 60 * 60 * 1000;
+  while (localDateKey(new Date(hi), tz) === today) {
+    hi += 60 * 60 * 1000;
+  }
+  while (hi - lo > 1) {
+    const mid = Math.floor((lo + hi) / 2);
+    if (localDateKey(new Date(mid), tz) === today) {
+      lo = mid;
+    } else {
+      hi = mid;
+    }
+  }
+  return new Date(hi).toISOString();
 }
 
 /** e.g. « samedi 14 novembre » (lowercase weekday and month). */

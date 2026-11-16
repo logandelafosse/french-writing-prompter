@@ -6,6 +6,7 @@ const EnvSchema = z
     DATABASE_URL: z.string().default("file:./data.db"),
     AI_CLIENT: z.enum(["openai", "fake"]).default("openai"),
     VITEST: z.string().optional(),
+    APP_TIME_ZONE: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (
@@ -42,6 +43,7 @@ export function getEnv(): AppEnv {
     DATABASE_URL: process.env.DATABASE_URL,
     AI_CLIENT: process.env.AI_CLIENT,
     VITEST: process.env.VITEST,
+    APP_TIME_ZONE: process.env.APP_TIME_ZONE,
   });
 
   if (!parsed.success) {

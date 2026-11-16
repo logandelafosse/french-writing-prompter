@@ -1,13 +1,7 @@
 import { NextResponse } from "next/server";
-import { getTodayQuota } from "@/modules/quota-manager/quota-store";
-import { DAILY_PROMPT_QUOTA } from "@/config/limits";
+import { getQuotaState } from "@/modules/quota-manager/quota-store";
 
 export async function GET() {
-  const used = await getTodayQuota();
-  const remaining = Math.max(0, DAILY_PROMPT_QUOTA - used);
-  return NextResponse.json({
-    used,
-    remaining,
-    max: DAILY_PROMPT_QUOTA,
-  });
+  const quota = await getQuotaState();
+  return NextResponse.json(quota);
 }

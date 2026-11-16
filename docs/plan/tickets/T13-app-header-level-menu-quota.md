@@ -49,6 +49,10 @@ One `AppHeader` rendered from the root layout, replacing the ad-hoc `<h1>French 
 - `level menu selects a level with the keyboard and restores focus on Escape` (Testing Library)
 - e2e `header-quota.spec.ts`, `level-menu.spec.ts` at 1280 and 390 px
 
+## Split note
+
+If `npm run pr:size` exceeds 500 after implementation, split into **T13a** (sessions/quota migration, `quota-store`, prompt quota lock, `GET /api/quota`) and **T13b** (AppHeader shell, level menu, e2e evidence). Merge **T13a** first so Phase 1 can wire header against real quota.
+
 ## Out of scope
 
 - New Home phases and the `/api/today` bootstrap (T14).

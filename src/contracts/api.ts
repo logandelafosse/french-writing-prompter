@@ -48,6 +48,7 @@ export const QuotaGetResponse = z.strictObject({
   used: z.number(),
   remaining: z.number(),
   max: z.number(),
+  resetsAt: z.string(),
 });
 
 export const SessionsGetResponse = z.strictObject({
