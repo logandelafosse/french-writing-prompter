@@ -956,3 +956,17 @@ Paste under a `## Engineering rules` heading. Keep each one short; tooling enfor
 - `src/modules` is framework-free (no `next`, `react`, `@/db`). Only `src/modules/openai-client` imports `openai`.
 - Route handlers stay thin: parse → call module → persist via repository → respond.
 ```
+
+---
+
+## 14. Backlog from PR #52 tooling review (2026-11-15)
+
+Not in T13c scope; file as separate tooling tickets when convenient.
+
+| ID (draft)  | Rule / change                                                                                 | Notes                                                            |
+| ----------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| TOOL-PR52-1 | `quota-state-single-source` (ast-grep) + tighten ESLint `@/modules/*-store` type-import allow | `QuotaState` = `z.infer<typeof QuotaGetResponse>`                |
+| TOOL-PR52-2 | `@typescript-eslint/no-unsafe-type-assertion`                                                 | 7 known hits including `LevelMenu` `as CefrLevel`                |
+| TOOL-PR52-3 | `no-hardcoded-daily-quota`, `no-new-date-in-components`, `no-window-event-bus`                | Header quota copy and `HEADER_SHELL_REFRESH_EVENT`               |
+| TOOL-PR52-4 | `no-arbitrary-token-length`, `no-e2e-viewport-override`                                       | Tokens vs `rounded-[22px]`; viewport in `playwright.config` only |
+| TOOL-PR52-5 | `no-mocking-own-modules`                                                                      | `layout.test.tsx` mocks `HeaderShell`                            |
