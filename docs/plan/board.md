@@ -4,11 +4,13 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T22b PR #74 in review).
+Last updated: 2026-11-16 by coordinator (T22/T22b done; T23 ready).
 
 ## Ready
 
-_None._
+| ID  | Ticket                         | Why                                                                                                                                             |
+| --- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| T23 | Standard→Louisiana suggestions | T22 merged [PR #74](https://github.com/logandelafosse/french-writing-prompter/pull/74) `90b084a`; spec `T23-standard-louisiana-suggestions.md`. |
 
 ## In progress
 
@@ -16,9 +18,7 @@ _None._
 
 ## In review
 
-| ID   | Ticket                                                                                                             | Why                                                                                                               |
-| ---- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
-| T22b | Scores, Compris, today Phase C (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24)) | [PR #74](https://github.com/logandelafosse/french-writing-prompter/pull/74) `4928bd0`; `pr:size` 394; Closes #24. |
+_None._
 
 ## Blocked
 
@@ -63,17 +63,17 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T21  | Evaluator v2: Corrections, quote location, French output            | AFK  | T06, T17   | **Done** — T21a + T21b merged; closed #23.                                                                                                                                        |
 | T21a | Corrections table, EvaluationV2 contracts, parser                   | AFK  | T06, T17   | **Done** — [PR #70](https://github.com/logandelafosse/french-writing-prompter/pull/70) `b075e4e`.                                                                                 |
 | T21b | Evaluator v2 runtime                                                | AFK  | T21a       | **Done** — [PR #71](https://github.com/logandelafosse/french-writing-prompter/pull/71) `525c748`.                                                                                 |
-| T22  | Review screen: marked text, Mistake cards, Scores                   | AFK  | T16, T21   | **In review** — T22b [PR #74](https://github.com/logandelafosse/french-writing-prompter/pull/74); closes #24 on merge.                                                            |
+| T22  | Review screen: marked text, Mistake cards, Scores                   | AFK  | T16, T21   | **Done** — [PR #73](https://github.com/logandelafosse/french-writing-prompter/pull/73) + [PR #74](https://github.com/logandelafosse/french-writing-prompter/pull/74); closed #24. |
 
 ### Phase 2 — Dialect
 
-| ID  | Ticket                                           | Type | Blocked by | Why not ready                                                                                                                                                                      |
-| --- | ------------------------------------------------ | ---- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T23 | Standard→Louisiana suggestions                   | AFK  | T22        | Needs the review screen                                                                                                                                                            |
-| T24 | DLF lexicon, grader context, and attribution     | AFK  | T23        | Needs `standard` kind. Q6: versioned lexicon artifact from DLF-extract (definitions + examples).                                                                                   |
-| T25 | Dialect checks, pushback, Add Dialect Note sheet | AFK  | T22        | Needs the review screen. Run after T23, not alongside it: both edit `CorrectionCard` and `MarkedText`. ~480 lines: split into T25a (server) / T25b (UI) is pre-approved, see spec. |
-| T26 | Carnet page with Dialect Notes list              | AFK  | T25        | Needs notes to exist                                                                                                                                                               |
-| T27 | Dialect Notes markdown export                    | AFK  | T26        | Needs note CRUD                                                                                                                                                                    |
+| ID  | Ticket                                           | Type | Blocked by | Why not ready                                                                                                                                             |
+| --- | ------------------------------------------------ | ---- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T23 | Standard→Louisiana suggestions                   | AFK  | T22        | **Ready** — on board Ready column; T22 `90b084a`.                                                                                                         |
+| T24 | DLF lexicon, grader context, and attribution     | AFK  | T23        | Needs `standard` kind. Q6: versioned lexicon artifact from DLF-extract (definitions + examples).                                                          |
+| T25 | Dialect checks, pushback, Add Dialect Note sheet | AFK  | T22        | Run after T23, not alongside it: both edit `CorrectionCard` and `MarkedText`. ~480 lines: split into T25a (server) / T25b (UI) is pre-approved, see spec. |
+| T26 | Carnet page with Dialect Notes list              | AFK  | T25        | Needs notes to exist                                                                                                                                      |
+| T27 | Dialect Notes markdown export                    | AFK  | T26        | Needs note CRUD                                                                                                                                           |
 
 ### Phase 3 — Memory
 
@@ -129,4 +129,6 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T20  | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22))          | Merged [PR #69](https://github.com/logandelafosse/french-writing-prompter/pull/69) `acc40f8` 2026-11-16; evidence `docs/evidence/22/`; post-review evaluate bootstrap + `pr:size` trim; TOOL-PR69-* backlog. T21 ready.                                                    |
 | T21a | Corrections table, EvaluationV2 contracts, parser (parent [#23](https://github.com/logandelafosse/french-writing-prompter/issues/23))            | Merged [PR #70](https://github.com/logandelafosse/french-writing-prompter/pull/70) `b075e4e` 2026-11-16; server-only; three reviews clear; TOOL-PR70-* backlog. T21b ready.                                                                                                |
 | T21b | Evaluator v2 runtime ([#23](https://github.com/logandelafosse/french-writing-prompter/issues/23))                                                | Merged [PR #71](https://github.com/logandelafosse/french-writing-prompter/pull/71) `525c748` 2026-11-16; `pr:size` 494; placeholder Evaluation card; review fixes `d6b6697`; TOOL-PR71-* backlog. Closed #23. T22 ready.                                                   |
-| T22a | Phase C marked text + Mistake cards (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24))                          | Merged [PR #73](https://github.com/logandelafosse/french-writing-prompter/pull/73) `394cf0e` 2026-11-16; evidence `docs/evidence/24/`; `pr:size` 405; review fixes `99f51a8` + `3a77cf4`; TOOL-PR73-* backlog. T22b ready. Does not close #24.                             |
+| T22a | Phase C marked text + Mistake cards (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24))                          | Merged [PR #73](https://github.com/logandelafosse/french-writing-prompter/pull/73) `394cf0e` 2026-11-16; evidence `docs/evidence/24/`; `pr:size` 405; review fixes `99f51a8` + `3a77cf4`; TOOL-PR73-* backlog. Does not close #24.                                         |
+| T22b | Scores, Compris, today Phase C (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24))                               | Merged [PR #74](https://github.com/logandelafosse/french-writing-prompter/pull/74) `90b084a` 2026-11-16; `pr:size` 394; adversarial fixes `aaf39c5`; TOOL-PR74-* backlog. Closed #24. T23 ready.                                                                           |
+| T22  | Review screen: marked text, Mistake cards, Scores (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24))            | Parent done via T22a + T22b; closed #24 2026-11-16.                                                                                                                                                                                                                        |
