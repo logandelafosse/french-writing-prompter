@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CorrectionPatchResponse } from "@/contracts/api";
+import {
+  CorrectionPatchResponse,
+  DialectNoteCreateResponse,
+} from "@/contracts/api";
 import type { Correction } from "@/contracts/correction";
 import type { EvaluationV2 } from "@/contracts/evaluation";
 import type { PromptMeta } from "@/contracts/prompt-meta";
@@ -12,15 +15,14 @@ import { fetchJson } from "@/lib/http";
 import { Surface } from "@/components/ui/surface";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { GenerateButton } from "@/components/writing/generate-button";
+import { DialectNoteSheet } from "@/components/dialect-note/dialect-note-sheet";
+import { dialectSheetDraft } from "@/components/dialect-note/sheet-draft";
 import { CorrectionCard } from "./correction-card";
 import { MarkedText } from "./marked-text";
 import { ScoresDisclosure } from "./scores-disclosure";
 
 function isOpenCard(item: Correction) {
-  return (
-    (item.kind === "mistake" || item.kind === "standard") &&
-    item.status === "open"
-  );
+  return item.status === "open";
 }
 
 function nextOpenCard(items: Correction[], fromOrdinal: number) {
@@ -51,16 +53,15 @@ export function ReviewScreen({
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mobileTitleRef = useRef<HTMLHeadingElement>(null);
-  const [ackedIds, setAckedIds] = useState<string[]>([]);
+  const [resolved, setResolved] = useState<Record<string, Correction>>({});
+  const [sheetFor, setSheetFor] = useState<Correction | null>(null);
   const [ackUi, setAckUi] = useState<
     { status: "idle" } | { status: "saving" } | { status: "error" }
   >({ status: "idle" });
   const [desktop, setDesktop] = useState(true);
-  const items = corrections.map((item) =>
-    ackedIds.includes(item.id)
-      ? { ...item, status: "acknowledged" as const }
-      : item,
-  );
+  const items = corrections.map((item) => resolved[item.id] ?? item);
+  const sheetDraft =
+    sheetFor === null ? null : dialectSheetDraft(sheetFor, writingText);
 
   useEffect(() => {
     (desktop ? headingRef : mobileTitleRef).current?.focus();
@@ -75,7 +76,18 @@ export function ReviewScreen({
     return () => media.removeEventListener("change", sync);
   }, []);
 
-  const acknowledge = async (target: Correction) => {
+  const applyResolved = (updated: Correction) => {
+    const nextResolved = { ...resolved, [updated.id]: updated };
+    setResolved(nextResolved);
+    const nextItems = corrections.map((item) => nextResolved[item.id] ?? item);
+    const next = nextOpenCard(nextItems, updated.ordinal);
+    document.getElementById(`correction-${(next ?? updated).ordinal}`)?.focus();
+  };
+
+  const patchCorrection = async (
+    target: Correction,
+    action: "acknowledge" | "reject_dialect",
+  ) => {
     if (ackUi.status === "saving") return;
     setAckUi({ status: "saving" });
     const result = await fetchJson(
@@ -84,7 +96,7 @@ export function ReviewScreen({
       {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "acknowledge" }),
+        body: JSON.stringify({ action }),
       },
     );
     if (!result.ok) {
@@ -92,18 +104,46 @@ export function ReviewScreen({
       return;
     }
     setAckUi({ status: "idle" });
-    const nextIds = ackedIds.includes(target.id)
-      ? ackedIds
-      : [...ackedIds, target.id];
-    setAckedIds(nextIds);
-    const nextItems = corrections.map((item) =>
-      nextIds.includes(item.id)
-        ? { ...item, status: "acknowledged" as const }
-        : item,
+    applyResolved(
+      action === "acknowledge"
+        ? { ...target, status: "acknowledged" }
+        : result.value.correction,
     );
-    const next = nextOpenCard(nextItems, target.ordinal);
-    const focusId = `correction-${(next ?? target).ordinal}`;
-    document.getElementById(focusId)?.focus();
+  };
+
+  const saveNote = async (note: {
+    rule: string;
+    example: string;
+    scope: "word" | "pattern";
+  }): Promise<boolean> => {
+    if (sheetFor === null) return false;
+    const draft = dialectSheetDraft(sheetFor, writingText);
+    setAckUi({ status: "saving" });
+    const result = await fetchJson(
+      "/api/dialect-notes",
+      DialectNoteCreateResponse,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rule: note.rule,
+          example: note.example,
+          scope: note.scope,
+          form: draft.lemma,
+          learnerForm: sheetFor.quote,
+          tutorSuggestion: sheetFor.suggestion,
+          fromCorrectionId: sheetFor.id,
+        }),
+      },
+    );
+    if (!result.ok || result.value.correction === undefined) {
+      setAckUi({ status: "error" });
+      return false;
+    }
+    setAckUi({ status: "idle" });
+    setSheetFor(null);
+    applyResolved(result.value.correction);
+    return true;
   };
 
   return (
@@ -169,11 +209,29 @@ export function ReviewScreen({
               key={item.id}
               correction={item}
               onAcknowledge={() => {
-                void acknowledge(item);
+                void patchCorrection(item, "acknowledge");
+              }}
+              onPushBack={() => setSheetFor(item)}
+              onConfirm={() => setSheetFor(item)}
+              onReject={() => {
+                void patchCorrection(item, "reject_dialect");
               }}
             />
           ))}
           {evaluation ? <ScoresDisclosure evaluation={evaluation} /> : null}
+          {sheetFor !== null && sheetDraft !== null ? (
+            <DialectNoteSheet
+              key={sheetFor.id}
+              open
+              onOpenChange={(open) => {
+                if (!open) setSheetFor(null);
+              }}
+              written={sheetFor.quote}
+              tutorProposed={sheetFor.suggestion}
+              draft={sheetDraft}
+              onSave={saveNote}
+            />
+          ) : null}
           <div className="flex flex-wrap items-center gap-2 gap-x-[22px] pt-2.5">
             <GenerateButton
               busy={generating}

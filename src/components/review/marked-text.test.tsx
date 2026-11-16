@@ -34,12 +34,6 @@ describe("MarkedText", () => {
           }),
           correction({ id: "u1", ordinal: 2, kind: "mistake" }),
           correction({ id: "s1", ordinal: 3, kind: "standard" }),
-          correction({
-            id: "d1",
-            ordinal: 4,
-            kind: "dialect_check",
-            span: { start: 0, end: 7 },
-          }),
         ]}
       />,
     );
@@ -93,5 +87,46 @@ describe("MarkedText", () => {
     const link = screen.getByRole("link", { name: "français standard 1" });
     expect(link).toHaveAttribute("href", "#correction-1");
     expect(link).toHaveClass("border-standard", "bg-white");
+  });
+
+  it("dialect span gets a wavy mark, squared marker, and clears when saved", () => {
+    const quote = "a tombé";
+    const writing = `Mon petit cousin ${quote} dans la boue.`;
+    const start = writing.indexOf(quote);
+    const span = { start, end: start + quote.length };
+    const open = correction({
+      id: "d1",
+      ordinal: 6,
+      kind: "dialect_check",
+      span,
+    });
+
+    const { container, rerender } = render(
+      <MarkedText text={writing} corrections={[open]} />,
+    );
+
+    const marked = screen.getByText(quote);
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; wavy/squared styles are the dialect contract */
+    expect(marked.closest("mark")).toHaveClass("decoration-wavy");
+    expect(container.querySelectorAll("mark")).toHaveLength(1);
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark DOM asserts */
+
+    const hidden = screen.getByText("(à vérifier 6)");
+    expect(hidden).toHaveClass("sr-only");
+    const link = screen.getByRole("link", { name: "à vérifier 6" });
+    expect(link).toHaveAttribute("href", "#correction-6");
+    expect(link).toHaveTextContent("6 ?");
+    expect(link).toHaveClass("rounded-marker-dialect");
+
+    rerender(
+      <MarkedText
+        text={writing}
+        corrections={[{ ...open, status: "confirmed_dialect" }]}
+      />,
+    );
+    expect(
+      screen.queryByRole("link", { name: "à vérifier 6" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText(writing)).toBeVisible();
   });
 });

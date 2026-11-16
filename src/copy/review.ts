@@ -1,4 +1,4 @@
-import type { Correction } from "@/contracts/correction";
+import { countsAsMistake, type Correction } from "@/contracts/correction";
 
 export const reviewCopy = {
   sheetLabel: "Consigne et ton texte",
@@ -10,11 +10,33 @@ export const reviewCopy = {
   none: "Aucune correction",
   kindMistake: "Faute",
   kindStandard: "Français standard",
+  kindDialect: "Ça se dit comme ça ?",
   arrow: "→",
   avant: "avant :",
   dlf: "DLF",
   dlfTitle: "Dictionary of Louisiana French",
   actionAck: "Compris",
+  actionPushback: "C'est du français louisianais",
+  actionConfirm: "Oui, c'est à nous-autres",
+  actionReject: "Non, corrige-le",
+  savedNote: "Note de dialecte sauvée",
+  savedNoteLink: "Voir le Carnet",
+  sheetEyebrow: "Mon français louisianais",
+  sheetTitle: "Ajouter une note de dialecte",
+  sheetClose: "Fermer",
+  sheetWritten: "T'as écrit",
+  sheetProposed: "Le tuteur proposait",
+  sheetRule: "La règle",
+  sheetRuleHint: "proposée par le tuteur, c'est toi qui as le dernier mot",
+  sheetExample: "Un exemple",
+  sheetScope: "Ça vaut pour",
+  sheetScopeWord: (lemma: string) => `Ce mot seulement : « ${lemma} »`,
+  sheetScopePattern: (pattern: string) => `Toute la famille : ${pattern}`,
+  sheetFooter:
+    "Une fois sauvée, la note va dans ton Carnet et le tuteur te reprendra plus là-dessus.",
+  sheetEsc: "Échap pour fermer",
+  sheetCancel: "Annuler",
+  sheetSave: "Sauver la note",
   srMark: (kind: Correction["kind"], n: number) => {
     switch (kind) {
       case "standard":
@@ -48,15 +70,17 @@ export const reviewCopy = {
 } as const;
 
 export function formatEvaluationSummary(
-  corrections: Pick<Correction, "kind">[],
+  corrections: Pick<Correction, "kind" | "status">[],
 ): string {
   let mistake = 0;
   let standard = 0;
   let dialectCheck = 0;
   for (const item of corrections) {
-    if (item.kind === "mistake") mistake += 1;
+    if (countsAsMistake(item)) mistake += 1;
     else if (item.kind === "standard") standard += 1;
-    else dialectCheck += 1;
+    else if (item.kind === "dialect_check" && item.status === "open") {
+      dialectCheck += 1;
+    }
   }
   const parts: string[] = [];
   if (mistake === 1) parts.push("1 faute");

@@ -5,8 +5,9 @@ import type { z } from "zod";
 import { parseJson } from "@/lib/json";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import type { ChatCompletionParams } from "@/modules/openai-client/openai-client";
+import { isNull } from "drizzle-orm";
 import { db } from "@/db";
-import { sessions } from "@/db/schema";
+import { dialectNotes, sessions } from "@/db/schema";
 import type { E2eScenario } from "./ai-client";
 
 const FIXTURES_DIR = path.join(process.cwd(), "src/test/fixtures/ai");
@@ -48,6 +49,19 @@ export class FakeAiClient {
             : "prompt-generator.swap.json"
         : null;
 
+    const dialectFixture =
+      this.scenario === "dialect" && generatorFixture === null
+        ? (
+            await db
+              .select({ id: dialectNotes.id })
+              .from(dialectNotes)
+              .where(isNull(dialectNotes.deletedAt))
+              .limit(1)
+          ).length > 0
+          ? "ok-dialect-repeat.json"
+          : "ok-dialect-check.json"
+        : null;
+
     const fixtureName =
       generatorFixture !== null
         ? generatorFixture
@@ -57,12 +71,12 @@ export class FakeAiClient {
             ? "evaluation.b2.json"
             : this.scenario === "standard"
               ? "ok-standard-louisiana.json"
-              : "ok-mixed-kinds.json";
-    const dir =
-      fixtureName === "ok-mixed-kinds.json" ||
-      fixtureName === "ok-standard-louisiana.json"
-        ? EVALUATOR_FIXTURES_DIR
-        : FIXTURES_DIR;
+              : dialectFixture !== null
+                ? dialectFixture
+                : "ok-mixed-kinds.json";
+    const dir = fixtureName.startsWith("ok-")
+      ? EVALUATOR_FIXTURES_DIR
+      : FIXTURES_DIR;
     const text = fs.readFileSync(path.join(dir, fixtureName), "utf8");
     const result = parseJson(schema, text);
     if (result.ok) {

@@ -3,6 +3,7 @@
 import type { Correction } from "@/contracts/correction";
 import { reviewCopy } from "@/copy/review";
 import { Button } from "@/components/ui/button";
+import { TextLink } from "@/components/ui/text-link";
 import { cn } from "@/lib/utils";
 
 const cardClass =
@@ -11,10 +12,35 @@ const cardClass =
 export function CorrectionCard({
   correction,
   onAcknowledge,
+  onPushBack,
+  onConfirm,
+  onReject,
 }: {
   correction: Correction;
   onAcknowledge: () => void;
+  onPushBack?: () => void;
+  onConfirm?: () => void;
+  onReject?: () => void;
 }) {
+  if (
+    correction.status === "confirmed_dialect" ||
+    correction.status === "overturned"
+  ) {
+    return (
+      <article
+        id={`correction-${correction.ordinal}`}
+        tabIndex={-1}
+        className="outline-none"
+      >
+        <p className="m-0 text-[15px]">
+          {reviewCopy.savedNote}{" "}
+          <TextLink href="/carnet" compact>
+            {reviewCopy.savedNoteLink}
+          </TextLink>
+        </p>
+      </article>
+    );
+  }
   if (correction.kind === "standard") {
     const done = correction.status === "acknowledged";
     return (
@@ -73,19 +99,48 @@ export function CorrectionCard({
       </article>
     );
   }
-  if (correction.kind !== "mistake") {
+  if (correction.kind === "dialect_check" && correction.status === "open") {
     return (
-      <div className="text-[15px] leading-normal">
+      <article
+        id={`correction-${correction.ordinal}`}
+        tabIndex={-1}
+        className={cardClass}
+      >
+        <div className="text-kind text-dialect flex items-center gap-2.5">
+          <span className="rounded-marker-dialect bg-dialect px-[7px] py-0.5 tracking-normal text-white">
+            {correction.ordinal} ?
+          </span>
+          <span className="uppercase">{reviewCopy.kindDialect}</span>
+        </div>
         <p lang="fr" className="text-quote m-0 font-serif">
-          {correction.quote} {reviewCopy.arrow} {correction.suggestion}
+          <span className="bg-dialect-tint px-[3px] py-px">
+            {correction.contextQuote ?? correction.quote}
+          </span>
         </p>
-        <p className="mt-2 mb-0">
+        <p className="m-0 text-[15px] leading-normal">
           {correction.question ?? correction.explanation}
         </p>
-      </div>
+        <div className="flex flex-wrap gap-2 max-sm:flex-col sm:gap-x-4">
+          <Button
+            variant="dialect"
+            className="px-4 text-sm font-semibold max-sm:min-h-[46px] max-sm:w-full max-sm:text-[15px]"
+            onClick={onConfirm}
+          >
+            {reviewCopy.actionConfirm}
+          </Button>
+          <Button
+            variant="secondary"
+            className="max-sm:min-h-[46px] max-sm:w-full max-sm:text-[15px]"
+            onClick={onReject}
+          >
+            {reviewCopy.actionReject}
+          </Button>
+        </div>
+      </article>
     );
   }
   const done = correction.status === "acknowledged";
+  const showActions = correction.kind === "mistake" && !done;
   return (
     <article
       id={`correction-${correction.ordinal}`}
@@ -115,20 +170,29 @@ export function CorrectionCard({
           </>
         )}
       </p>
-      {done ? null : (
+      {showActions ? (
         <>
           <p className="m-0 text-[15px] leading-normal">
             {correction.explanation}
           </p>
-          <Button
-            variant="secondary"
-            className="self-start"
-            onClick={onAcknowledge}
-          >
-            {reviewCopy.actionAck}
-          </Button>
+          <div className="flex flex-wrap items-center gap-1 gap-x-4">
+            <Button
+              variant="secondary"
+              className="self-start"
+              onClick={onAcknowledge}
+            >
+              {reviewCopy.actionAck}
+            </Button>
+            <Button variant="quiet" onClick={onPushBack}>
+              {reviewCopy.actionPushback}
+            </Button>
+          </div>
         </>
-      )}
+      ) : correction.status === "confirmed_mistake" ? (
+        <p className="m-0 text-[15px] leading-normal">
+          {correction.explanation}
+        </p>
+      ) : null}
     </article>
   );
 }
