@@ -431,3 +431,147 @@ describe("HomePage evaluation error", () => {
     expect(evalAttempts).toBe(2);
   });
 });
+
+describe("HomePage review generate error", () => {
+  const originalFetch = globalThis.fetch;
+  const fixedNow = () => new Date("2026-11-14T12:00:00-06:00");
+  const keptText = "Le bayou est calme ce matin.";
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.unstubAllGlobals();
+  });
+
+  it("shows generateFailure on review and clears it on retry", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.mocked(globalThis.fetch);
+    let promptAttempts = 0;
+    let promptCreated = false;
+
+    fetchMock.mockImplementation((input, init) => {
+      const url =
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
+      if (url.includes("/api/today")) {
+        if (!promptCreated) {
+          return Promise.resolve(jsonResponse(todayWriting));
+        }
+        return Promise.resolve(
+          jsonResponse({
+            ...todayWriting,
+            quota: {
+              ...todayWriting.quota,
+              used: 2,
+              remaining: 1,
+            },
+            activeSession: {
+              ...todayWriting.activeSession,
+              id: 10,
+              prompt: "Le Mardi Gras",
+            },
+          }),
+        );
+      }
+      if (url.includes("/api/sessions/") && url.includes("/draft")) {
+        return Promise.resolve(
+          jsonResponse({ savedAt: "2026-11-14T18:00:00.000Z", wordCount: 6 }),
+        );
+      }
+      if (url.includes("/api/evaluate") && init?.method === "POST") {
+        return Promise.resolve(jsonResponse(evaluateOkResponse));
+      }
+      if (url.includes("/api/level") && init?.method === "PUT") {
+        return Promise.resolve(
+          jsonResponse({
+            change: {
+              id: 2,
+              fromLevel: "B1",
+              toLevel: "B1",
+              source: "manual",
+              createdAt: "2026-11-14T18:00:00.000Z",
+            },
+          }),
+        );
+      }
+      if (url.includes("/api/prompt") && init?.method === "POST") {
+        promptAttempts += 1;
+        if (promptAttempts === 1) {
+          return Promise.resolve(
+            jsonResponse(
+              {
+                error: { code: "AI_UNAVAILABLE", message: "fail" },
+              },
+              502,
+            ),
+          );
+        }
+        promptCreated = true;
+        return Promise.resolve(
+          jsonResponse({
+            session: {
+              id: 10,
+              promptText: "Le Mardi Gras",
+              promptMeta: todayWriting.activeSession.promptMeta,
+            },
+            quota: {
+              used: 2,
+              remaining: 1,
+              max: 3,
+              resetsAt: "2026-11-16T06:00:00.000Z",
+            },
+          }),
+        );
+      }
+      if (url.includes("/api/quota")) {
+        return Promise.resolve(
+          jsonResponse({
+            used: promptCreated ? 2 : 1,
+            remaining: promptCreated ? 1 : 2,
+            max: 3,
+            resetsAt: "2026-11-16T06:00:00.000Z",
+          }),
+        );
+      }
+      return Promise.reject(new Error(`unexpected ${url}`));
+    });
+
+    renderHome(<HomePage now={fixedNow} />);
+    const area = await screen.findByLabelText(homeCopy.writingLabel);
+    await user.type(area, keptText);
+    await user.click(
+      screen.getAllByRole("button", { name: homeCopy.submit })[0]!,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Évaluation" }),
+      ).toBeInTheDocument();
+    });
+
+    await user.click(
+      screen.getByRole("button", {
+        name: homeCopy.reviewNextPrompt(2),
+      }),
+    );
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        homeCopy.errorGenerateLead,
+      );
+    });
+    expect(
+      screen.getByRole("heading", { name: "Évaluation" }),
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: homeCopy.errorRetry }));
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText("Le Mardi Gras")).toBeInTheDocument();
+  });
+});

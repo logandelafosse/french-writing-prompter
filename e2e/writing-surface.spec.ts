@@ -55,7 +55,7 @@ test.describe("writing surface @1280", () => {
       main.getByRole("button", { name: "Je cherche une consigne…" }),
     ).toHaveCount(0);
     await expectEvaluationWithScores(page);
-    await expect(area).toHaveValue(twelveWords);
+    await expect(page.getByText(twelveWords)).toBeVisible();
     await captureEvidence(page, testInfo, "desktop-writing-submit");
     await main
       .getByRole("button", { name: /Une autre consigne · reste/ })

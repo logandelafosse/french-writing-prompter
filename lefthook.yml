@@ -18,4 +18,5 @@ pre-commit:
 pre-push:
   commands:
     check:
-      run: npm run check
+      # GIT_DIR from the hook would make nested git tests operate on this repo.
+      run: env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_PREFIX npm run check

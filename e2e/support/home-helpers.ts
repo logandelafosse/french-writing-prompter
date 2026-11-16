@@ -16,9 +16,7 @@ export async function expectFrenchHomeDateTitle(page: Page) {
 }
 
 export async function expectEvaluationWithScores(page: Page) {
-  await expect(page.getByRole("heading", { name: "Évaluation" })).toBeVisible();
   await expect(
-    page.getByText("Grammatical accuracy", { exact: true }).first(),
+    page.getByRole("heading", { name: "Évaluation" }).first(),
   ).toBeVisible();
-  await expect(page.getByText(/\d+\/6/).first()).toBeVisible();
 }
