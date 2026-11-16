@@ -27,3 +27,30 @@ export const CEFR_UI_LABELS: Record<CefrLevel, string> = {
   C1: "Autonome",
   C2: "Maîtrise",
 };
+
+/**
+ * Q5: the evaluator keeps internal 1–6 scores; the UI maps them to CECR
+ * sub-levels. Ensemble uses the model's overall CECR, not this table.
+ */
+export const SCORE_TO_CECR_SUBLEVEL = {
+  1: "A1",
+  2: "A2",
+  3: "A2+",
+  4: "B1",
+  5: "B1+",
+  6: "B2",
+} as const;
+
+export function cefrSubLevelFromScore(score: number): string | null {
+  if (
+    score === 1 ||
+    score === 2 ||
+    score === 3 ||
+    score === 4 ||
+    score === 5 ||
+    score === 6
+  ) {
+    return SCORE_TO_CECR_SUBLEVEL[score];
+  }
+  return null;
+}

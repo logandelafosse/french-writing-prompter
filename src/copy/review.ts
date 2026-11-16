@@ -13,6 +13,26 @@ export const reviewCopy = {
   avant: "avant :",
   actionAck: "Compris",
   srMark: (n: number) => `faute ${n}`,
+  scoresClosed: "Scores ▸",
+  scoresOpen: "Scores ▾",
+  scoresOverall: (level: string) => `Ensemble : ${level}`,
+  pourMonter: "Pour monter",
+  dimensionLabel: {
+    grammatical_accuracy: "Grammaire",
+    vocabulary: "Vocabulaire",
+    coherence: "Cohérence",
+    register_style: "Registre et style",
+  },
+  dimensionDefinition: {
+    grammatical_accuracy:
+      "Conjugaisons, accords, orthographe de structure, et comment tu construis tes phrases.",
+    vocabulary:
+      "Choix des mots, précision, et tournures naturelles — y compris le français louisianais quand il est juste.",
+    coherence:
+      "Enchaînement des idées, structure des paragraphes, et connecteurs qui guident le lecteur.",
+    register_style:
+      "Adéquation du ton à la consigne (lettre, récit…), naturel, et dispositifs rhétoriques sans forcer.",
+  },
 } as const;
 
 export function formatEvaluationSummary(

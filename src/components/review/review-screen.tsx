@@ -1,16 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CorrectionPatchResponse } from "@/contracts/api";
 import type { Correction } from "@/contracts/correction";
+import type { EvaluationV2 } from "@/contracts/evaluation";
 import type { PromptMeta } from "@/contracts/prompt-meta";
 import { formatEvaluationSummary, reviewCopy } from "@/copy/review";
 import { homeCopy } from "@/copy/fr";
 import { countWords } from "@/lib/count-words";
+import { fetchJson } from "@/lib/http";
 import { Surface } from "@/components/ui/surface";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { GenerateButton } from "@/components/writing/generate-button";
 import { CorrectionCard } from "./correction-card";
 import { MarkedText } from "./marked-text";
+import { ScoresDisclosure } from "./scores-disclosure";
 
 function nextOpenMistake(items: Correction[], fromOrdinal: number) {
   return (
@@ -28,6 +32,7 @@ export function ReviewScreen({
   promptMeta,
   writingText,
   corrections,
+  evaluation = null,
   quotaRemaining,
   generating,
   onNextPrompt,
@@ -36,6 +41,7 @@ export function ReviewScreen({
   promptMeta: PromptMeta | null;
   writingText: string;
   corrections: Correction[];
+  evaluation?: EvaluationV2 | null;
   quotaRemaining: number;
   generating: boolean;
   onNextPrompt: () => void;
@@ -64,6 +70,11 @@ export function ReviewScreen({
   }, []);
 
   const acknowledge = (target: Correction) => {
+    void fetchJson(`/api/corrections/${target.id}`, CorrectionPatchResponse, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "acknowledge" }),
+    });
     const nextIds = ackedIds.includes(target.id)
       ? ackedIds
       : [...ackedIds, target.id];
@@ -138,6 +149,7 @@ export function ReviewScreen({
               onAcknowledge={() => acknowledge(item)}
             />
           ))}
+          {evaluation ? <ScoresDisclosure evaluation={evaluation} /> : null}
           <div className="flex flex-wrap items-center gap-2 gap-x-[22px] pt-2.5">
             <GenerateButton
               busy={generating}

@@ -6,6 +6,7 @@ import {
   generateFirstPrompt,
   mainContent,
   PROMPT_FIXTURE_LAFAYETTE,
+  PROMPT_FIXTURE_SWAP_NO,
 } from "./support/prompt-helpers";
 
 const mixedWriting = "Maintenant je vas au bayou. Les enfant jouent.";
@@ -44,6 +45,9 @@ test.describe("review @1280", () => {
     await expect(
       page.getByRole("heading", { name: "Évaluation" }),
     ).toBeFocused();
+    await expect(
+      page.getByRole("button", { name: /Scores ▸/ }),
+    ).toHaveAttribute("aria-expanded", "false");
 
     const region = page.getByRole("region", { name: "Évaluation" });
     const sheetBox = await sheet.boundingBox();
@@ -67,11 +71,73 @@ test.describe("review @1280", () => {
     const card = page.getByRole("article").filter({ hasText: "Les enfant" });
     await expect(card).toBeVisible();
 
+    const patched = page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/corrections/") &&
+        response.request().method() === "PATCH",
+    );
     await card.getByRole("button", { name: "Compris" }).click();
+    await patched;
     await expect(card.getByRole("button", { name: "Compris" })).toHaveCount(0);
     await expect(card).toContainText("Les enfant");
     await expect(page.getByRole("link", { name: "faute 3" })).toBeVisible();
     await expect(card).toBeFocused();
+
+    await page.reload();
+    await expectEvaluationWithScores(page);
+    const restored = page
+      .getByRole("article")
+      .filter({ hasText: "Les enfant" });
+    await expect(restored.getByRole("button", { name: "Compris" })).toHaveCount(
+      0,
+    );
+    await expect(page.getByRole("link", { name: "faute 3" })).toBeVisible();
+  });
+
+  test("scores open to CECR chips and a dimension popover", async ({
+    page,
+    scenario,
+  }, testInfo) => {
+    await scenario("happy");
+    await generateFirstPrompt(page);
+    await submitWriting(page, mixedWriting);
+
+    const toggle = page.getByRole("button", { name: /Scores ▸/ });
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await toggle.click();
+    await expect(
+      page.getByRole("button", { name: /Scores ▾/ }),
+    ).toHaveAttribute("aria-expanded", "true");
+    await expect(page.getByText("Ensemble : B1")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Grammaire" })).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Vocabulaire" }),
+    ).toBeVisible();
+    await expect(page.getByRole("button", { name: "Cohérence" })).toBeVisible();
+    const registre = page.getByRole("button", { name: "Registre et style" });
+    await expect(registre).toBeVisible();
+    await expect(page.getByText("A2+").first()).toBeVisible();
+    await registre.hover();
+    await expect(
+      page.getByText(/Adéquation du ton à la consigne/),
+    ).toBeVisible();
+    await expect(page.getByText("Pour monter").first()).toBeVisible();
+    await captureEvidence(page, testInfo, "desktop-scores");
+  });
+
+  test("another prompt returns to writing", async ({ page, scenario }) => {
+    await scenario("happy");
+    await generateFirstPrompt(page);
+    await submitWriting(page, mixedWriting);
+    const main = mainContent(page);
+    await main
+      .getByRole("button", { name: /Une autre consigne · reste/ })
+      .click();
+    await expect(main.getByText(PROMPT_FIXTURE_SWAP_NO)).toBeVisible();
+    await expect(main.getByLabel("Ton texte", { exact: true })).toBeEditable();
+    await expect(main.getByRole("heading", { name: "Évaluation" })).toHaveCount(
+      0,
+    );
   });
 
   test("unlocatable correction is a card without a mark", async ({
@@ -115,7 +181,9 @@ test.describe("review @390", () => {
     const regionBox = await region.boundingBox();
     expect(regionBox?.y ?? -1).toBeGreaterThan(sheetBox?.y ?? 99999);
 
-    await captureEvidence(page, testInfo, "mobile-review");
+    await page.getByRole("button", { name: /Scores ▸/ }).click();
+    await expect(page.getByRole("button", { name: "Grammaire" })).toBeVisible();
+    await captureEvidence(page, testInfo, "mobile-scores");
     await expectNoAxeViolations(page);
   });
 });

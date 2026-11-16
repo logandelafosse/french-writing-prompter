@@ -68,6 +68,15 @@ export const EvaluatePostResponse = z.strictObject({
 });
 export type EvaluatePostResponse = z.infer<typeof EvaluatePostResponse>;
 
+export const CorrectionPatchBody = z.strictObject({
+  action: z.literal("acknowledge"),
+});
+
+export const CorrectionPatchResponse = z.strictObject({
+  correction: Correction,
+});
+export type CorrectionPatchResponse = z.infer<typeof CorrectionPatchResponse>;
+
 export const QuotaGetResponse = z.strictObject({
   used: z.number(),
   remaining: z.number(),

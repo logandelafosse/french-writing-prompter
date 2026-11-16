@@ -1,9 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/db";
-import { levelChanges, sessions } from "@/db/schema";
+import { corrections, levelChanges, sessions } from "@/db/schema";
+import { Correction } from "@/contracts/correction";
 import { TodayGetResponse } from "@/contracts/today";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
-import { saveSession } from "@/modules/history-store/history-store";
+import {
+  saveCorrections,
+  saveSession,
+} from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { readResponseJson } from "@/test/read-response-json";
 import { GET } from "./route";
@@ -16,6 +20,7 @@ const constraints = JSON.stringify({
 describe("GET /api/today", () => {
   beforeEach(async () => {
     vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
+    await db.delete(corrections).execute();
     await db.delete(sessions).execute();
     await db.delete(levelChanges).execute();
   });
@@ -32,6 +37,7 @@ describe("GET /api/today", () => {
     expect(body.quota.remaining).toBe(3);
     expect(body.focus).toEqual([]);
     expect(body.activeSession).toBeNull();
+    expect(body.reviewSession).toBeNull();
     expect(body.advancement).toBeNull();
   });
 
@@ -112,5 +118,76 @@ describe("GET /api/today", () => {
     const response = await GET();
     const body = await readResponseJson(response, TodayGetResponse);
     expect(body.activeSession).toBeNull();
+    expect(body.reviewSession).toBeNull();
+  });
+
+  it("returns Phase C data with Corrections and their statuses after an evaluation", async () => {
+    await setLevel("B1", "manual");
+    const evaluation = {
+      version: 2 as const,
+      dimensions: {
+        grammatical_accuracy: { score: 4, comment: "a" },
+        vocabulary: { score: 3, comment: "b" },
+        coherence: { score: 4, comment: "c" },
+        register_style: { score: 3, comment: "d" },
+      },
+      overallCefr: "B1" as const,
+      summary: "s",
+      nextLevelTip: "t",
+      model: "test-model",
+      promptVersion: "evaluator@2",
+      evaluatedAt: "2026-11-14T18:00:00.000Z",
+    };
+    const saved = await saveSession({
+      promptText: "Consigne du jour",
+      promptConstraints: constraints,
+      writingText: "Les enfant jouent.",
+      evaluationJson: JSON.stringify(evaluation),
+      cefrLevel: "B1",
+      localDate: "2026-11-14",
+      status: "evaluated",
+    });
+    await saveCorrections(
+      [
+        Correction.parse({
+          id: "c-open",
+          sessionId: saved.id,
+          ordinal: 1,
+          kind: "mistake",
+          quote: "Les enfant",
+          span: { start: 0, end: 11 },
+          anchor: "exact",
+          suggestion: "Les enfants",
+          explanation: "Accord.",
+          question: null,
+          ruleIfDialect: null,
+          category: "accord",
+          dlf: null,
+          resourceIds: [],
+          status: "acknowledged",
+          dialectNoteId: null,
+          isFocus: false,
+        }),
+      ],
+      () => new Date(),
+    );
+
+    const response = await GET();
+    const body = await readResponseJson(response, TodayGetResponse);
+    expect(body.activeSession).toBeNull();
+    expect(body.reviewSession).toEqual({
+      id: saved.id,
+      prompt: "Consigne du jour",
+      promptMeta: null,
+      writingText: "Les enfant jouent.",
+      evaluation,
+      corrections: [
+        expect.objectContaining({
+          id: "c-open",
+          status: "acknowledged",
+          quote: "Les enfant",
+        }),
+      ],
+    });
   });
 });
