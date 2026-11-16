@@ -19,6 +19,7 @@ export function PromptSheet({
   belowMeta,
   generateBusy,
   embedded = false,
+  mode = "write",
 }: {
   promptText: string;
   meta: PromptMeta | null;
@@ -35,11 +36,13 @@ export function PromptSheet({
   belowMeta?: ReactNode;
   generateBusy?: boolean | undefined;
   embedded?: boolean | undefined;
+  mode?: "write" | "review" | undefined;
 }) {
   const metaLine = meta ? formatPromptMeta(meta) : null;
   const swapDisabled = swap?.disabled === true;
   const swapLabel = swap?.label ?? homeCopy.swapPrompt;
-  const onSwap = swap?.onSwap;
+  const onSwap = mode === "review" ? undefined : swap?.onSwap;
+  const review = mode === "review";
 
   const body = (
     <>
@@ -50,16 +53,24 @@ export function PromptSheet({
         key={animateKey}
         lang="fr"
         className={cn(
-          "text-prompt text-ink font-serif text-pretty whitespace-pre-wrap",
-          "max-sm:text-prompt-sm motion-safe:animate-prompt-rise",
+          "font-serif text-pretty whitespace-pre-wrap",
+          review
+            ? "text-prompt-review text-ink-2"
+            : "text-prompt text-ink max-sm:text-prompt-sm motion-safe:animate-prompt-rise",
         )}
       >
         {promptText}
       </p>
-      {metaLine || swap ? (
+      {metaLine || onSwap ? (
         <div className="border-line flex flex-col gap-2 border-b pb-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-4 sm:gap-y-1 sm:pb-3.5">
           {metaLine ? (
-            <p className="text-muted text-sm" lang="fr">
+            <p
+              className={cn(
+                "text-muted",
+                review ? "text-[13px] max-sm:hidden" : "text-sm",
+              )}
+              lang="fr"
+            >
               {metaLine}
             </p>
           ) : (

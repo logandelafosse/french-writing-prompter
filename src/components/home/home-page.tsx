@@ -19,21 +19,17 @@ import { useHeaderShell } from "@/components/shell/header-shell";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { classifyFetchError, fetchJson, type FetchError } from "@/lib/http";
 import type { ClassifiedFetchFailure } from "@/contracts/errors";
+import type { Correction } from "@/contracts/correction";
 import { homeCopy } from "@/copy/fr";
 import { Surface } from "@/components/ui/surface";
-import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
+import { ReviewScreen } from "@/components/review/review-screen";
 import { RuledTextarea } from "@/components/writing/ruled-textarea";
 import { WritingFooter } from "@/components/writing/writing-footer";
-import { GenerateButton } from "@/components/writing/generate-button";
 import { countWords } from "@/lib/count-words";
 import { removeInactiveDrafts } from "@/lib/draft-storage";
 import { useDraftAutosave } from "@/components/writing/use-draft-autosave";
 import { shouldShowWordNudge } from "@/lib/word-meter-math";
 import { cn } from "@/lib/utils";
-import {
-  toPlaceholderEvaluation,
-  type Evaluation,
-} from "@/contracts/evaluation";
 import { ConfirmSwapDialog } from "@/components/states/confirm-swap-dialog";
 import { ErrorAlert } from "@/components/states/error-alert";
 import { QuotaNotice } from "@/components/states/notice";
@@ -92,6 +88,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     kind: "loading",
   });
   const [generateUi, setGenerateUi] = useState<"idle" | "generating">("idle");
+  const [reviewing, setReviewing] = useState(false);
   const offline = useOffline();
 
   const loadToday = useCallback(async () => {
@@ -240,7 +237,12 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
   };
 
   return (
-    <main className="max-w-home mx-auto flex w-full flex-col gap-5 px-5 py-5 pb-20 sm:gap-[22px] sm:px-6 sm:pt-5">
+    <main
+      className={cn(
+        "mx-auto flex w-full flex-col gap-5 px-5 py-5 pb-20 sm:gap-[22px] sm:px-6 sm:pt-5",
+        reviewing ? "max-w-review" : "max-w-home",
+      )}
+    >
       {bootstrap.kind === "loading" && !showOffline ? (
         <p className="text-muted text-sm" aria-live="polite">
           Chargement…
@@ -277,6 +279,8 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
           onGenerate={(level) => void runGenerate(level)}
           onSwap={(body) => runSwap(body)}
           onFreshPrompt={() => void runFreshPrompt()}
+          reviewing={reviewing}
+          onReviewingChange={setReviewing}
           now={now}
         />
       ) : null}
@@ -297,6 +301,8 @@ function HomeBody({
   onGenerate,
   onSwap,
   onFreshPrompt,
+  reviewing,
+  onReviewingChange,
   now,
 }: {
   bootstrap: Extract<BootstrapState, { kind: "ready" }>;
@@ -311,6 +317,8 @@ function HomeBody({
   onGenerate: (level: CefrLevel) => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
+  reviewing: boolean;
+  onReviewingChange: (reviewing: boolean) => void;
   now: () => Date;
 }) {
   const phase = resolveHomePhase(bootstrap.data);
@@ -321,7 +329,9 @@ function HomeBody({
   const quotaExhausted = bootstrap.data.quota.remaining === 0;
   return (
     <>
-      <HomeDateTitle at={titleDate} />
+      <div className={reviewing ? "max-sm:hidden" : undefined}>
+        <HomeDateTitle at={titleDate} />
+      </div>
       {bootstrap.data.advancement !== null ? (
         <AdvancementBanner
           advancement={bootstrap.data.advancement}
@@ -351,6 +361,7 @@ function HomeBody({
           onSwap={onSwap}
           onFreshPrompt={onFreshPrompt}
           onAfterEvaluate={onAfterEvaluate}
+          onReviewingChange={onReviewingChange}
         />
       ) : (
         <HomePhaseA
@@ -383,6 +394,7 @@ function WritingInterim({
   onSwap,
   onFreshPrompt,
   onAfterEvaluate,
+  onReviewingChange,
 }: {
   sessionId: number;
   promptText: string;
@@ -396,6 +408,7 @@ function WritingInterim({
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
   onAfterEvaluate: (advancement: LevelChangeDto | null | undefined) => void;
+  onReviewingChange: (reviewing: boolean) => void;
 }) {
   const autosave = useDraftAutosave(sessionId, draft);
   const writing = autosave.text;
@@ -403,13 +416,15 @@ function WritingInterim({
   const [submitUi, setSubmitUi] = useState<
     "idle" | "evaluating" | "review" | "error"
   >("idle");
-  const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
+  const [review, setReview] = useState<{
+    writingText: string;
+    corrections: Correction[];
+  } | null>(null);
   const [submitFailure, setSubmitFailure] =
     useState<ClassifiedFetchFailure | null>(null);
   const [swapConfirm, setSwapConfirm] = useState<{ wordCount: number } | null>(
     null,
   );
-  const resultsRef = useRef<HTMLElement | null>(null);
   const promptRegionRef = useRef<HTMLDivElement | null>(null);
   const swapRef = useRef<HTMLButtonElement>(null);
   const swapOpen = useRef(false);
@@ -462,7 +477,11 @@ function WritingInterim({
       return;
     }
     setSubmitUi("review");
-    setEvaluation(toPlaceholderEvaluation(result.value.evaluation));
+    setReview({
+      writingText: result.value.session.writingText ?? writing.trim(),
+      corrections: result.value.corrections,
+    });
+    onReviewingChange(true);
     onAfterEvaluate(result.value.advancement);
   };
 
@@ -475,8 +494,8 @@ function WritingInterim({
   }, [saveNow]);
 
   useEffect(() => {
-    if (submitUi === "review" && evaluation) resultsRef.current?.focus();
-  }, [submitUi, evaluation]);
+    return () => onReviewingChange(false);
+  }, [onReviewingChange]);
 
   useEffect(() => {
     swapOpen.current = swapConfirm !== null;
@@ -500,49 +519,17 @@ function WritingInterim({
     }
   };
 
-  if (submitUi === "review" && evaluation) {
+  if (submitUi === "review" && review) {
     return (
-      <div className="flex flex-col gap-5">
-        <Surface
-          padding="home"
-          className="flex flex-col gap-4 max-sm:p-[22px_18px]"
-        >
-          <PromptSheet
-            embedded
-            promptText={promptText}
-            meta={promptMeta}
-            label={promptLabel}
-            animateKey={`${sessionId}-${promptText}`}
-            generateBusy={generating}
-            swap={{
-              onSwap: onFreshPrompt,
-              disabled: quotaExhausted,
-              label: swapLabel,
-            }}
-          />
-          <RuledTextarea
-            label={homeCopy.writingLabel}
-            value={writing}
-            onChange={autosave.onTextChange}
-            readOnly
-          />
-        </Surface>
-        <section
-          ref={resultsRef}
-          tabIndex={-1}
-          aria-live="polite"
-          lang="fr"
-          className="outline-none"
-        >
-          <EvaluationCard evaluation={evaluation} />
-        </section>
-        <GenerateButton
-          busy={generating}
-          disabled={generating}
-          onClick={onFreshPrompt}
-          label={homeCopy.reviewNextPrompt(quotaRemaining)}
-        />
-      </div>
+      <ReviewScreen
+        promptText={promptText}
+        promptMeta={promptMeta}
+        writingText={review.writingText}
+        corrections={review.corrections}
+        quotaRemaining={quotaRemaining}
+        generating={generating}
+        onNextPrompt={onFreshPrompt}
+      />
     );
   }
 
