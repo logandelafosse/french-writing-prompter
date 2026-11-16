@@ -15,8 +15,7 @@ Last updated: 2026-11-15 by coordinator (T15 PR #63 in review).
 
 ## In progress
 
-| ID  | Ticket | Why |
-| --- | ------ | --- |
+_None._
 
 ## In review
 
