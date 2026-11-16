@@ -13,4 +13,4 @@
 - Use `page.route()` only for client-visible network failures (offline, HTTP 500).
 - Locators: `getByRole`, `getByLabel`, `getByText` only. No sleeps.
 - Call `expectNoAxeViolations` for each new screen state. Legacy Home/History may pass explicit disabled rule IDs with reasons until the redesign lands.
-- PR evidence: `E2E_EVIDENCE=<ticket ID> npm run test:e2e` writes `docs/evidence/<ticket ID>/<project>-NN-<name>.png` (CSS scale). Embed in the PR per the `pr-ui-evidence` skill.
+- PR evidence: `E2E_EVIDENCE=<ticket ID> npm run test:e2e` writes `docs/evidence/<ticket ID>/<project>-NN-<name>.png` (CSS scale). Embed in the PR with relative paths (`docs/evidence/...`) per the `pr-ui-evidence` skill (private repo — avoid `raw.githubusercontent.com`).

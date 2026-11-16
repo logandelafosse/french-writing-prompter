@@ -11,7 +11,7 @@
 
 <!-- Required on every PR. Follow pr-ui-evidence (~/.cursor/skills/pr-ui-evidence/SKILL.md). -->
 
-- [ ] **Learner-visible UI:** screenshots and/or a short video embedded below (`raw.githubusercontent.com` URLs, commit-pinned). Files under `docs/evidence/<issue-number>/` on this branch.
+- [ ] **Learner-visible UI:** table of **[View capture](https://github.com/OWNER/REPO/blob/PR-BRANCH/docs/evidence/…)** links on the PR branch (private repo + mobile-safe). No `raw.githubusercontent.com` or `![](docs/evidence/…)` embeds.
 - [ ] **No learner-visible UI:** state explicitly why (e.g. foundations, CI, schema only).
 
 | Step | Evidence |
