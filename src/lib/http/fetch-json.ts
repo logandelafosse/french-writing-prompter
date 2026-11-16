@@ -27,6 +27,11 @@ export type FetchError =
 export type FetchJsonResult<T> =
   { ok: true; value: T } | { ok: false; error: FetchError };
 
+export type FetchJsonInit = RequestInit & {
+  /** Bounded wait for loading/bootstrap fetches only (today, sessions, level GET). */
+  loadingTimeout?: boolean;
+};
+
 export type { ParseRequestBodyResult } from "./parse-request-body";
 export { parseRequestBody } from "./parse-request-body";
 
@@ -52,20 +57,35 @@ function errorFieldsFromBody(
   };
 }
 
-function requestSignal(init: RequestInit | undefined): AbortSignal {
+function withoutLoadingTimeout(init: FetchJsonInit): RequestInit {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- strip before fetch()
+  const { loadingTimeout, ...requestInit } = init;
+  return requestInit;
+}
+
+function requestSignal(
+  init: FetchJsonInit | undefined,
+): AbortSignal | undefined {
+  const userSignal = init?.signal ?? undefined;
+  if (!init?.loadingTimeout) return userSignal;
   const timeout = AbortSignal.timeout(FETCH_TIMEOUT_MS);
-  if (init?.signal === undefined || init.signal === null) return timeout;
-  return AbortSignal.any([init.signal, timeout]);
+  if (userSignal === undefined) return timeout;
+  return AbortSignal.any([userSignal, timeout]);
 }
 
 export async function fetchJson<S extends ZodType>(
   url: string,
   schema: S,
-  init?: RequestInit,
+  init?: FetchJsonInit,
 ): Promise<FetchJsonResult<z.infer<S>>> {
+  const requestInit: RequestInit = init ? withoutLoadingTimeout(init) : {};
+  const signal = requestSignal(init);
   let response: Response;
   try {
-    response = await fetch(url, { ...init, signal: requestSignal(init) });
+    response = await fetch(
+      url,
+      signal === undefined ? requestInit : { ...requestInit, signal },
+    );
   } catch {
     return { ok: false, error: { kind: "network" } };
   }

@@ -14,12 +14,20 @@ function OfflineHarness({ onRetry }: { onRetry: () => void }) {
 describe("offline notice appears on the offline event and clears on retry", () => {
   it("shows the notice after offline and hides it after retry once online", async () => {
     const onRetry = vi.fn(() => {
+      Object.defineProperty(navigator, "onLine", {
+        configurable: true,
+        value: true,
+      });
       window.dispatchEvent(new Event("online"));
     });
     render(<OfflineHarness onRetry={onRetry} />);
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
 
     act(() => {
+      Object.defineProperty(navigator, "onLine", {
+        configurable: true,
+        value: false,
+      });
       window.dispatchEvent(new Event("offline"));
     });
     const notice = screen.getByRole("status");

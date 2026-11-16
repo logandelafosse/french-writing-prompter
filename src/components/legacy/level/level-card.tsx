@@ -28,7 +28,9 @@ export function LevelCard() {
   useEffect(() => {
     let cancelled = false;
     async function loadLevel() {
-      const result = await fetchJson("/api/level", LevelGetResponse);
+      const result = await fetchJson("/api/level", LevelGetResponse, {
+        loadingTimeout: true,
+      });
       if (cancelled) return;
       if (!result.ok) {
         setError(messageFromFetchError(result.error, LOAD_ERROR));

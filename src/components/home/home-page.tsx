@@ -94,7 +94,9 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
   const offline = useOffline();
 
   const loadToday = useCallback(async () => {
-    const result = await fetchJson("/api/today", TodayGetResponse);
+    const result = await fetchJson("/api/today", TodayGetResponse, {
+      loadingTimeout: true,
+    });
     if (!result.ok) {
       setBootstrap((prev) => failBootstrap(prev, result.error, "load"));
       return;
@@ -224,6 +226,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
           titleDate={titleDate}
           generating={generateUi === "generating"}
           offline={offline}
+          onRetryGenerate={retryHome}
           onSelectLevel={(level) =>
             setBootstrap((prev) =>
               prev.kind === "ready" ? { ...prev, selectedLevel: level } : prev,
@@ -244,6 +247,7 @@ function HomeBody({
   titleDate,
   generating,
   offline,
+  onRetryGenerate,
   onSelectLevel,
   onGenerate,
   onSwap,
@@ -254,6 +258,7 @@ function HomeBody({
   titleDate: Date;
   generating: boolean;
   offline: boolean;
+  onRetryGenerate: () => void;
   onSelectLevel: (level: CefrLevel) => void;
   onGenerate: (level: CefrLevel) => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
@@ -286,6 +291,12 @@ function HomeBody({
           generating={generating}
           quotaRemaining={bootstrap.data.quota.remaining}
           offline={offline}
+          generateFailure={
+            bootstrap.actionFailure?.surface === "generate"
+              ? bootstrap.actionFailure
+              : null
+          }
+          onRetryGenerate={onRetryGenerate}
           onSwap={onSwap}
           onFreshPrompt={onFreshPrompt}
         />
@@ -315,6 +326,8 @@ function WritingInterim({
   generating,
   quotaRemaining,
   offline,
+  generateFailure,
+  onRetryGenerate,
   onSwap,
   onFreshPrompt,
 }: {
@@ -325,6 +338,8 @@ function WritingInterim({
   generating: boolean;
   quotaRemaining: number;
   offline: boolean;
+  generateFailure: ActionFailure | null;
+  onRetryGenerate: () => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
 }) {
@@ -552,6 +567,13 @@ function WritingInterim({
               void saveNow();
               if (submitFailure !== null) void submit();
             }}
+          />
+        ) : null}
+        {generateFailure !== null &&
+        !(generateFailure.failure === "offline" && offline) ? (
+          <ErrorAlert
+            lead={homeCopy.errorGenerateLead}
+            onRetry={onRetryGenerate}
           />
         ) : null}
         {submitFailure !== null && submitFailure !== "offline" ? (

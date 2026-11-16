@@ -129,8 +129,8 @@ export function HistoryPage() {
     setLoading(true);
     setFailure(null);
     const [sessionsResult, levelResult] = await Promise.all([
-      fetchJson("/api/sessions", SessionsGetResponse),
-      fetchJson("/api/level", LevelGetResponse),
+      fetchJson("/api/sessions", SessionsGetResponse, { loadingTimeout: true }),
+      fetchJson("/api/level", LevelGetResponse, { loadingTimeout: true }),
     ]);
     if (!sessionsResult.ok) {
       setFailure(classifyFetchError(sessionsResult.error));

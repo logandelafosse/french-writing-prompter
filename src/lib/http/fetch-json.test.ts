@@ -73,6 +73,34 @@ describe("fetchJson", () => {
     expect(result).toEqual({ ok: false, error: { kind: "invalid" } });
   });
 
+  it("does not abort tutor fetches without loadingTimeout", async () => {
+    const fetchMock = vi.fn((_url, options?: RequestInit) => {
+      expect(options?.signal).toBeUndefined();
+      return Promise.resolve(
+        new Response(JSON.stringify({ value: "ok" }), { status: 200 }),
+      );
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await fetchJson("/api/test", TestSchema, { method: "POST" });
+    expect(result.ok).toBe(true);
+  });
+
+  it("passes an abort signal when loadingTimeout is set", async () => {
+    const fetchMock = vi.fn((_url, options?: RequestInit) => {
+      expect(options?.signal).toBeDefined();
+      return Promise.resolve(
+        new Response(JSON.stringify({ value: "ok" }), { status: 200 }),
+      );
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const result = await fetchJson("/api/test", TestSchema, {
+      loadingTimeout: true,
+    });
+    expect(result.ok).toBe(true);
+  });
+
   it("returns the parsed value on success", async () => {
     vi.stubGlobal(
       "fetch",

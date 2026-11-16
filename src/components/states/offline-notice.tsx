@@ -1,24 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { homeCopy } from "@/copy/fr";
 
+function subscribeNavigatorOnline(onStoreChange: () => void): () => void {
+  window.addEventListener("online", onStoreChange);
+  window.addEventListener("offline", onStoreChange);
+  return () => {
+    window.removeEventListener("online", onStoreChange);
+    window.removeEventListener("offline", onStoreChange);
+  };
+}
+
+function navigatorOfflineClient(): boolean {
+  return !navigator.onLine;
+}
+
 export function useOffline(): boolean {
-  const [offline, setOffline] = useState(() => !navigator.onLine);
-
-  useEffect(() => {
-    const goOffline = () => setOffline(true);
-    const goOnline = () => setOffline(false);
-    window.addEventListener("offline", goOffline);
-    window.addEventListener("online", goOnline);
-    return () => {
-      window.removeEventListener("offline", goOffline);
-      window.removeEventListener("online", goOnline);
-    };
-  }, []);
-
-  return offline;
+  return useSyncExternalStore(
+    subscribeNavigatorOnline,
+    navigatorOfflineClient,
+    () => false,
+  );
 }
 
 export function OfflineNotice({ onRetry }: { onRetry: () => void }) {
