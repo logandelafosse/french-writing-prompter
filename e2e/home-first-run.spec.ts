@@ -2,6 +2,7 @@ import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { visibleHeaderQuota } from "./support/header-helpers";
+import { expectLevelPickerSixButtons } from "./support/home-helpers";
 
 const PROMPT_SNIPPET = "La Nouvelle-Orléans";
 
@@ -18,8 +19,7 @@ test.describe("home first run @1280", () => {
     await expect(
       page.getByText(/Bienvenue\. Icitte, on écrit un petit texte par jour/),
     ).toBeVisible();
-    await expect(page.getByRole("button", { name: /A1/i })).toHaveCount(1);
-    await expect(page.getByRole("button", { name: /C2/i })).toHaveCount(1);
+    await expectLevelPickerSixButtons(page);
 
     const generate = page.getByRole("button", {
       name: "Donne-moi une consigne",
@@ -55,6 +55,7 @@ test.describe("home first run @390", () => {
     await expect(
       page.getByText(/Bienvenue\. Icitte, on écrit un petit texte par jour/),
     ).toBeVisible();
+    await expectLevelPickerSixButtons(page);
     const generate = page.getByRole("button", {
       name: "Donne-moi une consigne",
     });

@@ -2,6 +2,10 @@ import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { setLevelB1, visibleHeaderQuota } from "./support/header-helpers";
+import {
+  expectEvaluationWithScores,
+  expectFrenchHomeDateTitle,
+} from "./support/home-helpers";
 
 const PROMPT_SNIPPET = "La Nouvelle-Orléans";
 const HAPPY_WRITING =
@@ -15,10 +19,13 @@ test("returning learner sees generate without level picker", async ({
   await page.goto("/");
   await setLevelB1(page);
 
+  await expectFrenchHomeDateTitle(page);
   await expect(
     page.getByRole("button", { name: "Donne-moi une consigne" }),
   ).toBeVisible();
-  await expect(page.getByText(/Ton niveau CECR/i)).toHaveCount(0);
+  await expect(
+    page.getByRole("group", { name: /ton niveau cecr/i }),
+  ).toHaveCount(0);
   await expectNoAxeViolations(page);
 });
 
@@ -56,5 +63,5 @@ test("interim phase B submit still produces an Evaluation", async ({
   await expect(page.getByText(PROMPT_SNIPPET)).toBeVisible();
   await page.getByRole("textbox").fill(HAPPY_WRITING);
   await page.getByRole("button", { name: "Corrige-moi" }).click();
-  await expect(page.getByRole("heading", { name: "Evaluation" })).toBeVisible();
+  await expectEvaluationWithScores(page);
 });

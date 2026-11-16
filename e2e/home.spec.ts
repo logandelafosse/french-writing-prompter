@@ -1,6 +1,7 @@
 import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations, LEGACY_AXE_DISABLED } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
+import { expectEvaluationWithScores } from "./support/home-helpers";
 
 const PROMPT_SNIPPET = "La Nouvelle-Orléans";
 const HAPPY_WRITING =
@@ -23,7 +24,7 @@ test("learner generates a prompt, writes, and sees the Evaluation and the Histor
 
   await page.getByRole("textbox").fill(HAPPY_WRITING);
   await page.getByRole("button", { name: "Corrige-moi" }).click();
-  await expect(page.getByRole("heading", { name: "Evaluation" })).toBeVisible();
+  await expectEvaluationWithScores(page);
   await captureEvidence(page, testInfo, "evaluation");
 
   await page.getByRole("link", { name: "Historique" }).click();
@@ -58,5 +59,5 @@ test("malformed AI output shows an error and retry recovers", async ({
 
   await scenario("happy");
   await page.getByRole("button", { name: "Réessayer" }).click();
-  await expect(page.getByRole("heading", { name: "Evaluation" })).toBeVisible();
+  await expectEvaluationWithScores(page);
 });
