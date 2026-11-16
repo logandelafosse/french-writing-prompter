@@ -4,19 +4,20 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T15 merged #63; T16 ready).
+Last updated: 2026-11-15 by coordinator (T16 dispatched).
 
 ## Ready
 
 | ID   | Ticket                                                                                                                                  | Why                                     |
 | ---- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | T13g | Wordmark 44px touch ([#59](https://github.com/logandelafosse/french-writing-prompter/issues/59))                                        | HANDOFF regression from PR #57.         |
-| T16  | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18))     | T15 merged; prompt sheet live.          |
 | T20  | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22)) | T14 merged; advancement banner on Home. |
 
 ## In progress
 
-_None._
+| ID  | Ticket                                                                                                                              | Why                                                         |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| T16 | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | Branch `ticket/t16-writing-surface`; critical path Phase 1. |
 
 ## In review
 
@@ -56,8 +57,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **Done** — [PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61) + [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62); closed #60. |
 | T14a | `GET /api/today` + phase resolver                                   | AFK  | —          | **Done** — merged [PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61).                                                                                    |
 | T14b | Home phases UI + placement                                          | AFK  | T14a       | **Done** — merged [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62).                                                                                    |
-| T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | **Done** — merged [PR #63](https://github.com/logandelafosse/french-writing-prompter/pull/63).                                                                                     |
-| T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | **Ready** — see Ready column.                                                                                                                                                     |
+| T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | **Done** — merged [PR #63](https://github.com/logandelafosse/french-writing-prompter/pull/63).                                                                                    |
+| T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | **In progress** — `ticket/t16-writing-surface`.                                                                                                                                   |
 | T17  | Session lifecycle and draft autosave                                | AFK  | T16        | Needs the writing surface. Not alongside T20 (both edit the evaluate route and `/api/today`).                                                                                     |
 | T18  | Quota exhausted, swap confirm, session statuses                     | AFK  | T17        | Needs sessions with drafts. Q8: swap uses a daily slot. Not alongside T19 (both edit `POST /api/prompt` and Phase B).                                                             |
 | T19  | Error and offline states                                            | AFK  | T17        | Needs local draft copy. Builds the shared `withErrors` route wrapper.                                                                                                             |
