@@ -44,7 +44,7 @@
 
 ## Split note (2026-11-15)
 
-[PR #60](https://github.com/logandelafosse/french-writing-prompter/pull/60) = **618** production lines. Deliver as **T14a** then **T14b**: [`T14a-today-api-bootstrap.md`](T14a-today-api-bootstrap.md), [`T14b-home-phases-ui.md`](T14b-home-phases-ui.md).
+[PR #60](https://github.com/logandelafosse/french-writing-prompter/pull/60) exceeded 500 prod lines. Deliver as **[PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61) T14a** (API) then **T14b** (Home UI).
 
 ## Out of scope
 
