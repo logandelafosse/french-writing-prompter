@@ -175,9 +175,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
       setBootstrap((prev) => {
         if (prev.kind !== "ready") return prev;
         const data = { ...prev.data };
-        if (advancement !== undefined) {
-          data.advancement = advancement ?? null;
-        }
+        if (advancement !== undefined) data.advancement = advancement ?? null;
         if (advancement) {
           data.level = advancement.toLevel;
           data.levelName = CEFR_UI_LABELS[advancement.toLevel];

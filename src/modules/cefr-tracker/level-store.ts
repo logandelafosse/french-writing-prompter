@@ -54,10 +54,6 @@ export function nextLevelUp(current: CefrLevel): CefrLevel | null {
   return CEFR_LEVELS[idx + 1] ?? null;
 }
 
-function shouldPromote(streak: number): boolean {
-  return streak >= ADVANCEMENT_STREAK;
-}
-
 function rowToDto(
   row: typeof levelChanges.$inferSelect,
 ): LevelChangeDto | null {
@@ -91,10 +87,7 @@ async function latestChangeRow(): Promise<
     .from(levelChanges)
     .orderBy(desc(levelChanges.createdAt), desc(levelChanges.id))
     .limit(1);
-  if (rows.length === 0) {
-    return null;
-  }
-  return first(rows, "latest level_changes row");
+  return rows.length === 0 ? null : first(rows, "latest level_changes row");
 }
 
 export async function getCurrentLevel(): Promise<CefrLevel | null> {
@@ -135,13 +128,10 @@ async function streakEvaluations(
 
 export async function getStreakCount(): Promise<number> {
   const level = await getCurrentLevel();
-  if (level === null) {
-    return 0;
-  }
+  if (level === null) return 0;
   const latest = await latestChangeRow();
   const since = latest?.createdAt ?? "1970-01-01T00:00:00.000Z";
-  const evaluations = await streakEvaluations(since);
-  return computeStreak(evaluations, level, since);
+  return computeStreak(await streakEvaluations(since), level, since);
 }
 
 export async function getLevelHistory(): Promise<LevelChangeDto[]> {
@@ -150,14 +140,9 @@ export async function getLevelHistory(): Promise<LevelChangeDto[]> {
     .from(levelChanges)
     .orderBy(desc(levelChanges.createdAt), desc(levelChanges.id));
 
-  const history: LevelChangeDto[] = [];
-  for (const row of rows) {
-    const dto = rowToDto(row);
-    if (dto !== null) {
-      history.push(dto);
-    }
-  }
-  return history;
+  return rows
+    .map((row) => rowToDto(row))
+    .filter((dto): dto is LevelChangeDto => dto !== null);
 }
 
 export async function setLevel(
@@ -197,27 +182,17 @@ export async function recordEvaluation(
   if (current === null) {
     return null;
   }
-  if (CEFR_ORDER[overallCefr] <= CEFR_ORDER[current]) {
-    return null;
-  }
-  if (nextLevelUp(current) === null) {
+  const promoted = nextLevelUp(current);
+  if (promoted === null || CEFR_ORDER[overallCefr] <= CEFR_ORDER[current]) {
     return null;
   }
 
   const latest = await latestChangeRow();
   const since = latest?.createdAt ?? "1970-01-01T00:00:00.000Z";
-  const evaluations = await streakEvaluations(since);
-  const streak = computeStreak(evaluations, current, since);
-
-  if (!shouldPromote(streak)) {
+  const streak = computeStreak(await streakEvaluations(since), current, since);
+  if (streak < ADVANCEMENT_STREAK) {
     return null;
   }
-
-  const promoted = nextLevelUp(current);
-  if (promoted === null) {
-    return null;
-  }
-
   return setLevel(promoted, "auto");
 }
 
