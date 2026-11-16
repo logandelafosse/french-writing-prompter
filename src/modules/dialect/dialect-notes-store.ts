@@ -5,6 +5,7 @@ import { DIALECT_NOTE_RULE_MAX, DIALECT_NOTE_RULE_MIN } from "@/config/limits";
 import { DialectNote } from "@/contracts/dialect-note";
 import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import type { Correction } from "@/contracts/correction";
+import type { DialectMarkdownNote } from "@/modules/dialect/export-markdown";
 import type {
   DialectNoteCreateBody,
   DialectNotePatchBody,
@@ -50,6 +51,11 @@ export async function listDialectNotes(): Promise<DialectNote[]> {
     .where(isNull(dialectNotes.deletedAt))
     .orderBy(desc(dialectNotes.createdAt), desc(dialectNotes.id));
   return rows.map(noteFromRow);
+}
+
+export async function listNotesForMarkdown(): Promise<DialectMarkdownNote[]> {
+  const rows = await db.select().from(dialectNotes);
+  return rows.map((row) => ({ ...noteFromRow(row), deletedAt: row.deletedAt }));
 }
 
 type NoteWriteResult =

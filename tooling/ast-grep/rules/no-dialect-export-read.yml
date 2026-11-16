@@ -1,0 +1,12 @@
+id: no-dialect-export-read
+language: Tsx
+severity: error
+message: "docs/dialect/ is a generated snapshot. Do not read it from src/; the database is the runtime source of truth."
+rule:
+  any:
+    - kind: string
+    - kind: template_string
+  regex: docs/dialect
+files: ["src/**"]
+ignores:
+  - src/test/lint-fixtures/**

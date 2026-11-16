@@ -1,0 +1,6 @@
+id: no-dialect-export-read
+valid:
+  - "const notes = await listNotesForMarkdown();"
+invalid:
+  - "const text = fs.readFileSync('docs/dialect/louisiana-french.md', 'utf8');"
+  - "const path = 'docs/dialect/louisiana-french.md';"

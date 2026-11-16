@@ -85,7 +85,7 @@ The variety of French the learner practices. Currently only Louisiana French is 
 _Avoid_: variant, regionalism, “not Standard French” as the default judgment
 
 **Louisiana French** (Cajun French):
-A dialect of French spoken in Louisiana. The canonical grammar and vocabulary rules live in `src/modules/dialect/louisiana-rules.ts` (single source of truth for prompts and Evaluations).
+A dialect of French spoken in Louisiana. Coding agents should read `docs/dialect/louisiana-french.md` (generated snapshot of base rules plus learner Dialect Notes). Runtime rules live only in `src/modules/dialect/louisiana-rules.ts`; learner notes live only in the database. The app never reads the markdown back.
 _Avoid_: dialectal French, Creole (it's a dialect of French, not a creole); inline feature lists in this file
 
 ## Example dialogue
