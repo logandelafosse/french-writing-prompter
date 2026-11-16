@@ -1430,3 +1430,17 @@ Non-blocking for T24 merge. Prioritize **TOOL-PR76-4** and **TOOL-PR76-5** befor
 | TOOL-PR76-9 | `no-dlf-extract-sibling-path`                   | `verify-dlf-seed.ts` still reads `../DLF-extract`.                                                     |
 
 **Already good:** `server-only` loader; suggestion-only DLF attribution after `4a589f0`; hint caps in `limits.ts`; badge via `reviewCopy` + `<abbr>`.
+
+### PR #77 (T25a — dialect server slice)
+
+Non-blocking for T25a merge. Land **TOOL-PR77-1**–**77-4** before T25b.
+
+| ID (draft)  | Rule / change                             | Notes                                                                       |
+| ----------- | ----------------------------------------- | --------------------------------------------------------------------------- |
+| TOOL-PR77-1 | `no-raw-sql-transaction`                  | Prefer `db.transaction()` over raw `BEGIN`/`COMMIT` (fixed race `334ac23`). |
+| TOOL-PR77-2 | `dialect-note-rule-bounds-single-source`  | Zod + store both bound `rule`; validation copy skew on max length.          |
+| TOOL-PR77-3 | `learner-dialect-note-single-source`      | Parse `scope` from DB; avoid silent `pattern` → `word`.                     |
+| TOOL-PR77-4 | `word-scope-match-is-normalized-equality` | Substring `includes` on short lemmas over-suppresses.                       |
+| TOOL-PR77-5 | `quote-normalize-single-source`           | Duplicate NFC/normalize beside `locate-quote`.                              |
+| TOOL-PR77-6 | `no-default-null-on-dialect-fields`       | Evaluator keys vs T25b pattern radio.                                       |
+| TOOL-PR77-7 | `correction-patch-action-single-source`   | Exhaustive switch on `CorrectionPatchAction`.                               |
