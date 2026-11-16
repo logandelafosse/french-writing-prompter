@@ -12,6 +12,7 @@ export const homeCopy = {
   placementLink: "Pas sûr ? Fais le test de placement (3 consignes)",
   aReadyLead: "Prêt pour ta consigne du jour ?",
   writingLabel: "Ton texte",
+  draftSaved: (time: string) => `Brouillon sauvé à ${time}`,
   submit: "Corrige-moi",
   submitBusy: "Je lis ton texte…",
   loadError: "Une erreur s'est produite. Réessaie.",

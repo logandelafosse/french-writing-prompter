@@ -1,6 +1,27 @@
 import { expect, type Page } from "@playwright/test";
 import { mainContent } from "./prompt-helpers";
 
+function requireBox(
+  box: { y: number; height: number } | null,
+  label: string,
+): { y: number; height: number } {
+  if (box === null) {
+    throw new Error(`${label} missing`);
+  }
+  return box;
+}
+
+/** Draft status sits on its own line under the visible word count. */
+export async function expectDraftStatusOnItsOwnLine(page: Page) {
+  const main = mainContent(page);
+  const count = main.getByText(/\d+ \/ \d+–\d+ mots/).filter({ visible: true });
+  const status = main.getByText(/Brouillon sauvé à/).filter({ visible: true });
+  await expect(status).toBeVisible();
+  const countBox = requireBox(await count.boundingBox(), "word count");
+  const statusBox = requireBox(await status.boundingBox(), "draft status");
+  expect(statusBox.y).toBeGreaterThanOrEqual(countBox.y + countBox.height - 1);
+}
+
 /** @390 px: full-width meter track and submit footer sit below the writing sheet. */
 export async function expectMobileWritingFooterBelowSheet(page: Page) {
   const main = mainContent(page);

@@ -11,11 +11,13 @@ export function WordMeter({
   target,
   layout,
   compactActions,
+  draftStatus,
 }: {
   text: string;
   target: { min: number; max: number } | null;
   layout: "desktop" | "mobile";
   compactActions?: ReactNode | undefined;
+  draftStatus?: ReactNode | undefined;
 }) {
   const count = countWords(text);
   const fillPct = target ? wordMeterFillRatio(count, target.max) * 100 : 0;
@@ -66,12 +68,23 @@ export function WordMeter({
         ) : (
           countLabel
         )}
+        {draftStatus ? <div>{draftStatus}</div> : null}
       </div>
     );
   return (
     <div className="flex min-w-60 flex-col gap-2">
       {track}
-      {countLabel}
+      <div className="flex flex-wrap items-baseline gap-x-2">
+        {countLabel}
+        {draftStatus ? (
+          <>
+            <span aria-hidden="true" className="text-muted text-sm">
+              ·
+            </span>
+            {draftStatus}
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }

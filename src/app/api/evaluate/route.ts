@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { getAiClient, scenarioFromRequest } from "@/server/ai-client";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
-import { getSession, saveSession } from "@/modules/history-store/history-store";
+import {
+  getSession,
+  rememberWriting,
+  saveSession,
+} from "@/modules/history-store/history-store";
 import { getTracker } from "@/modules/cefr-tracker/tracker-store";
 import { parseCefrLevel } from "@/contracts/cefr";
 import { PromptConstraints } from "@/contracts/prompt";
@@ -27,18 +31,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Session not found." }, { status: 404 });
   }
 
-  if (session.evaluationJson) {
+  if (session.status === "evaluated" || session.evaluationJson) {
     return NextResponse.json(
-      { error: "This prompt has already been evaluated." },
+      {
+        error: "This prompt has already been evaluated.",
+        code: "ALREADY_EVALUATED",
+      },
       { status: 409 },
     );
   }
+
+  await rememberWriting(body.sessionId, body.writing, new Date().toISOString());
 
   const constraintsResult = parseJson(
     PromptConstraints,
     session.promptConstraints,
   );
-  const fallbackLevel = parseCefrLevel(session.cefrLevel);
+  const fallbackLevel =
+    parseCefrLevel(session.promptLevel) ?? parseCefrLevel(session.cefrLevel);
   const constraints = constraintsResult.ok
     ? constraintsResult.value
     : {

@@ -1,10 +1,11 @@
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { localDateKey } from "@/lib/dates";
+import { countWords } from "@/lib/count-words";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
 import { Evaluation } from "@/contracts/evaluation";
 import { PromptConstraints } from "@/contracts/prompt";
-import type { SessionView } from "@/contracts/session";
+import { SessionStatus, type SessionView } from "@/contracts/session";
 import { first } from "@/lib/first";
 import { parseJson } from "@/lib/json";
 import { eq, desc, sql } from "drizzle-orm";
@@ -18,6 +19,8 @@ export interface SessionData {
   id?: number;
   kind?: string;
   localDate?: string;
+  status?: SessionStatus;
+  promptLevel?: string | null;
 }
 
 export interface Session {
@@ -28,6 +31,19 @@ export interface Session {
   evaluationJson: string | null;
   cefrLevel: string | null;
   createdAt: string;
+  status: SessionStatus;
+  promptLevel: string | null;
+}
+
+function sessionStatus(value: string | null): SessionStatus {
+  const parsed = SessionStatus.safeParse(value);
+  return parsed.success ? parsed.data : "active";
+}
+
+function storedStatus(data: SessionData): SessionStatus {
+  if (data.status) return data.status;
+  if (data.evaluationJson !== null) return "evaluated";
+  return "active";
 }
 
 export async function saveSession(data: SessionData): Promise<Session> {
@@ -40,6 +56,9 @@ export async function saveSession(data: SessionData): Promise<Session> {
         writingText: data.writingText,
         evaluationJson: data.evaluationJson,
         cefrLevel: data.cefrLevel,
+        ...(data.evaluationJson !== null
+          ? { status: "evaluated" as const, evaluatedAt: now }
+          : {}),
       })
       .where(eq(sessions.id, data.id));
 
@@ -54,6 +73,7 @@ export async function saveSession(data: SessionData): Promise<Session> {
 
   const localDate =
     data.localDate ?? localDateKey(new Date(now), quotaTimeZone());
+  const status = storedStatus(data);
   const result = await db.insert(sessions).values({
     promptText: data.promptText,
     promptConstraints: data.promptConstraints,
@@ -63,6 +83,10 @@ export async function saveSession(data: SessionData): Promise<Session> {
     createdAt: now,
     kind: data.kind ?? "daily",
     localDate,
+    status,
+    promptLevel: data.promptLevel ?? null,
+    evaluatedAt: status === "evaluated" ? now : null,
+    abandonedAt: status === "abandoned" ? now : null,
   });
 
   return {
@@ -73,6 +97,8 @@ export async function saveSession(data: SessionData): Promise<Session> {
     evaluationJson: data.evaluationJson,
     cefrLevel: data.cefrLevel,
     createdAt: now,
+    status,
+    promptLevel: data.promptLevel ?? null,
   };
 }
 
@@ -121,7 +147,46 @@ function rowToSession(row: typeof sessions.$inferSelect): Session {
     evaluationJson: row.evaluationJson,
     cefrLevel: row.cefrLevel,
     createdAt: row.createdAt,
+    status: sessionStatus(row.status),
+    promptLevel: row.promptLevel,
   };
+}
+
+export async function saveActiveDraft(
+  sessionId: number,
+  text: string,
+  now: () => Date,
+): Promise<
+  | { ok: true; savedAt: string; wordCount: number }
+  | { ok: false; code: "NOT_FOUND" | "NOT_ACTIVE" }
+> {
+  const rows = await db
+    .select({ status: sessions.status })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+  if (rows.length === 0) return { ok: false, code: "NOT_FOUND" };
+  const row = first(rows, `session ${sessionId}`);
+  if (sessionStatus(row.status) !== "active") {
+    return { ok: false, code: "NOT_ACTIVE" };
+  }
+  const savedAt = now().toISOString();
+  await db
+    .update(sessions)
+    .set({ writingText: text, writingSavedAt: savedAt })
+    .where(eq(sessions.id, sessionId));
+  return { ok: true, savedAt, wordCount: countWords(text) };
+}
+
+export async function rememberWriting(
+  sessionId: number,
+  text: string,
+  savedAt: string,
+): Promise<void> {
+  await db
+    .update(sessions)
+    .set({ writingText: text, writingSavedAt: savedAt })
+    .where(eq(sessions.id, sessionId));
 }
 
 function rowToSessionView(row: typeof sessions.$inferSelect): SessionView {

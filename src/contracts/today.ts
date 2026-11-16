@@ -2,12 +2,13 @@ import { z } from "zod";
 import { CefrLevel } from "./cefr";
 import { LevelChangeDto, QuotaGetResponse } from "./api";
 import { PromptMeta } from "./prompt-meta";
+import { SavedDraft } from "./session";
 
 export const TodayActiveSession = z.object({
   id: z.number(),
   prompt: z.string(),
   promptMeta: PromptMeta.nullable(),
-  draft: z.null(),
+  draft: SavedDraft.nullable(),
 });
 
 export type TodayActiveSession = z.infer<typeof TodayActiveSession>;
@@ -31,6 +32,7 @@ export type ResolvedHomePhase =
       sessionId: number;
       promptText: string;
       promptMeta: z.infer<typeof PromptMeta> | null;
+      draft: z.infer<typeof SavedDraft> | null;
     };
 
 export function resolveHomePhase(bootstrap: TodayGetDto): ResolvedHomePhase {
@@ -43,6 +45,7 @@ export function resolveHomePhase(bootstrap: TodayGetDto): ResolvedHomePhase {
       sessionId: bootstrap.activeSession.id,
       promptText: bootstrap.activeSession.prompt,
       promptMeta: bootstrap.activeSession.promptMeta,
+      draft: bootstrap.activeSession.draft,
     };
   }
   return { kind: "A-ready" };

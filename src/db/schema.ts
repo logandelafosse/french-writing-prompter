@@ -21,6 +21,11 @@ export const sessions = sqliteTable(
     createdAt: text("created_at").notNull(),
     kind: text("kind").notNull().default("daily"),
     localDate: text("local_date"),
+    status: text("status"),
+    promptLevel: text("prompt_level"),
+    writingSavedAt: text("writing_saved_at"),
+    evaluatedAt: text("evaluated_at"),
+    abandonedAt: text("abandoned_at"),
   },
   (table) => [index("sessions_quota_idx").on(table.kind, table.localDate)],
 );

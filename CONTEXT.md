@@ -12,6 +12,10 @@ _Avoid_: topic as the main label for the whole prompt, question, exercise
 The text a learner submits in response to a Writing Prompt.
 _Avoid_: answer, response, submission, essay
 
+**Draft**:
+Unsubmitted Student Writing saved against an active session.
+_Avoid_: autosave blob, scratch text, temporary note
+
 **Evaluation**:
 An AI-generated assessment of a Student Writing across four dimensions (grammatical accuracy, vocabulary range & control, coherence & cohesion, register & style), yielding per-dimension scores, an overall CEFR level, and **Corrections** (tutor notes on quoted spans).
 _Avoid_: grading, marking, feedback (Evaluation includes the scores and Corrections, not only free text)
