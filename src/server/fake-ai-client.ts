@@ -10,6 +10,10 @@ import { sessions } from "@/db/schema";
 import type { E2eScenario } from "./ai-client";
 
 const FIXTURES_DIR = path.join(process.cwd(), "src/test/fixtures/ai");
+const EVALUATOR_FIXTURES_DIR = path.join(
+  process.cwd(),
+  "src/modules/writing-evaluator/__fixtures__",
+);
 
 function readFixtureText(name: string): string {
   return fs.readFileSync(path.join(FIXTURES_DIR, name), "utf8");
@@ -51,8 +55,12 @@ export class FakeAiClient {
           ? "evaluation.invalid.json"
           : this.scenario === "advance"
             ? "evaluation.b2.json"
-            : "evaluation.valid.json";
-    const text = readFixtureText(fixtureName);
+            : "ok-mixed-kinds.json";
+    const dir =
+      fixtureName === "ok-mixed-kinds.json"
+        ? EVALUATOR_FIXTURES_DIR
+        : FIXTURES_DIR;
+    const text = fs.readFileSync(path.join(dir, fixtureName), "utf8");
     const result = parseJson(schema, text);
     if (result.ok) {
       return Promise.resolve(result.value);

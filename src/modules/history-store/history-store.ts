@@ -1,8 +1,9 @@
 import { db } from "@/db";
-import { sessions } from "@/db/schema";
+import { corrections, sessions } from "@/db/schema";
 import { localDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
+import type { Correction } from "@/contracts/correction";
 import {
   parseStoredEvaluation,
   toPlaceholderEvaluation,
@@ -18,6 +19,7 @@ export interface SessionData {
   promptConstraints: string;
   writingText: string | null;
   evaluationJson: string | null;
+  evaluationRaw?: string | null;
   cefrLevel: string;
   id?: number;
   kind?: string;
@@ -30,6 +32,7 @@ export interface Session {
   id: number;
   promptText: string;
   promptConstraints: string;
+  promptMetaJson: string | null;
   writingText: string | null;
   evaluationJson: string | null;
   cefrLevel: string | null;
@@ -59,6 +62,9 @@ export async function saveSession(data: SessionData): Promise<Session> {
         writingText: data.writingText,
         evaluationJson: data.evaluationJson,
         cefrLevel: data.cefrLevel,
+        ...(data.evaluationRaw !== undefined
+          ? { evaluationRaw: data.evaluationRaw }
+          : {}),
         ...(data.evaluationJson !== null
           ? { status: "evaluated" as const, evaluatedAt: now }
           : {}),
@@ -96,6 +102,7 @@ export async function saveSession(data: SessionData): Promise<Session> {
     id: Number(result.lastInsertRowid),
     promptText: data.promptText,
     promptConstraints: data.promptConstraints,
+    promptMetaJson: null,
     writingText: data.writingText,
     evaluationJson: data.evaluationJson,
     cefrLevel: data.cefrLevel,
@@ -146,6 +153,7 @@ function rowToSession(row: typeof sessions.$inferSelect): Session {
     id: row.id,
     promptText: row.promptText,
     promptConstraints: row.promptConstraints,
+    promptMetaJson: row.promptMetaJson,
     writingText: row.writingText,
     evaluationJson: row.evaluationJson,
     cefrLevel: row.cefrLevel,
@@ -153,6 +161,38 @@ function rowToSession(row: typeof sessions.$inferSelect): Session {
     status: sessionStatus(row.status),
     promptLevel: row.promptLevel,
   };
+}
+
+export async function saveCorrections(
+  rows: Correction[],
+  now: () => Date,
+): Promise<void> {
+  if (rows.length === 0) return;
+  const createdAt = now().toISOString();
+  await db.insert(corrections).values(
+    rows.map((row) => ({
+      id: row.id,
+      sessionId: row.sessionId,
+      ordinal: row.ordinal,
+      kind: row.kind,
+      category: row.category,
+      quote: row.quote,
+      spanStart: row.span?.start ?? null,
+      spanEnd: row.span?.end ?? null,
+      anchor: row.anchor,
+      suggestion: row.suggestion,
+      explanation: row.explanation,
+      question: row.question,
+      ruleIfDialect: row.ruleIfDialect,
+      dlfEntryId: row.dlf?.entryId ?? null,
+      dlfHeadword: row.dlf?.headword ?? null,
+      resourceIdsJson: JSON.stringify(row.resourceIds),
+      status: row.status,
+      dialectNoteId: row.dialectNoteId,
+      createdAt,
+      resolvedAt: null,
+    })),
+  );
 }
 
 export async function saveActiveDraft(

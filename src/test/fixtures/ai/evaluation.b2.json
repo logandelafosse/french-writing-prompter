@@ -1,18 +1,12 @@
 {
   "dimensions": {
-    "grammatical_accuracy": { "score": 4, "max": 6, "comment": "Good grammar" },
-    "vocabulary": { "score": 4, "max": 6, "comment": "Solid vocab" },
-    "coherence": { "score": 4, "max": 6, "comment": "Well structured" },
-    "register_style": { "score": 4, "max": 6, "comment": "Ok register" }
+    "grammatical_accuracy": { "score": 4, "comment": "Good grammar" },
+    "vocabulary": { "score": 4, "comment": "Solid vocab" },
+    "coherence": { "score": 4, "comment": "Well structured" },
+    "register_style": { "score": 4, "comment": "Ok register" }
   },
   "overall_cefr": "B2",
-  "tips": {
-    "per_dimension": {
-      "grammatical_accuracy": "Work on conjugations",
-      "vocabulary": "Expand your word choice",
-      "coherence": "Use more connectors",
-      "register_style": "Vary your register"
-    },
-    "holistic": "Continue refining complex structures."
-  }
+  "summary": "Texte solide au niveau B2.",
+  "next_level_tip": "Pour atteindre C1, raffine les structures complexes.",
+  "corrections": []
 }

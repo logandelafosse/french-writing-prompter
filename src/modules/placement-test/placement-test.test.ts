@@ -5,7 +5,7 @@ import {
   type PromptGeneratorLike,
 } from "./placement-test";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
-import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
+import type { EvaluatorOutput } from "@/contracts/evaluation";
 import type { CefrLevel } from "@/contracts/cefr";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { WORD_TARGET_BY_LEVEL } from "@/config/limits";
@@ -26,24 +26,18 @@ function makePrompt(level: CefrLevel): WritingPrompt {
   };
 }
 
-function makeEvaluation(cefr: CefrLevel): Evaluation {
+function makeEvaluation(cefr: CefrLevel): EvaluatorOutput {
   return {
     dimensions: {
-      grammatical_accuracy: { score: 3, max: 6, comment: "" },
-      vocabulary: { score: 3, max: 6, comment: "" },
-      coherence: { score: 3, max: 6, comment: "" },
-      register_style: { score: 3, max: 6, comment: "" },
+      grammatical_accuracy: { score: 3, comment: "" },
+      vocabulary: { score: 3, comment: "" },
+      coherence: { score: 3, comment: "" },
+      register_style: { score: 3, comment: "" },
     },
     overall_cefr: cefr,
-    tips: {
-      per_dimension: {
-        grammatical_accuracy: "",
-        vocabulary: "",
-        coherence: "",
-        register_style: "",
-      },
-      holistic: "",
-    },
+    summary: "",
+    next_level_tip: "",
+    corrections: [],
   };
 }
 

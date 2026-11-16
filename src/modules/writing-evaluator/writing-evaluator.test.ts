@@ -1,10 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { WritingEvaluator, type OpenAiClientLike } from "./writing-evaluator";
+import { buildEvaluatorPrompt } from "./build-evaluator-prompt";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import type { CefrLevel } from "@/contracts/cefr";
-import evaluationFixture from "@/test/fixtures/ai/evaluation.valid.json";
+import { MISTAKE_CATEGORY_IDS } from "@/contracts/mistake-category";
+import { EvaluatorOutputSchema } from "@/contracts/evaluation";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { renderForEvaluator } from "@/modules/dialect/render";
+import { parseJson } from "@/lib/json";
+import okMixedKinds from "./__fixtures__/ok-mixed-kinds.json";
 
 function makePrompt(cefr: CefrLevel): WritingPrompt {
   return {
@@ -22,10 +26,16 @@ function makePrompt(cefr: CefrLevel): WritingPrompt {
   };
 }
 
+function outputFixture() {
+  const parsed = parseJson(EvaluatorOutputSchema, JSON.stringify(okMixedKinds));
+  if (!parsed.ok) throw new Error(String(parsed.cause));
+  return parsed.value;
+}
+
 describe("WritingEvaluator", () => {
-  it("returns a structured evaluation", async () => {
+  it("returns a structured evaluator output", async () => {
     const mockClient: OpenAiClientLike = {
-      chatCompletionJSON: vi.fn().mockResolvedValue(evaluationFixture),
+      chatCompletionJSON: vi.fn().mockResolvedValue(outputFixture()),
     };
     const evaluator = new WritingEvaluator(mockClient);
     const result = await evaluator.evaluate(
@@ -34,20 +44,14 @@ describe("WritingEvaluator", () => {
       DEFAULT_DIALECT,
     );
 
-    expect(result).toHaveProperty("dimensions");
     expect(result.dimensions).toHaveProperty("grammatical_accuracy");
-    expect(result.dimensions).toHaveProperty("vocabulary");
-    expect(result.dimensions).toHaveProperty("coherence");
-    expect(result.dimensions).toHaveProperty("register_style");
-    expect(result).toHaveProperty("overall_cefr");
-    expect(result).toHaveProperty("tips");
-    expect(result.tips).toHaveProperty("per_dimension");
-    expect(result.tips).toHaveProperty("holistic");
+    expect(result.overall_cefr).toBe("B1");
+    expect(result.corrections.length).toBeGreaterThan(0);
   });
 
   it("embeds renderForEvaluator() output in the system prompt", async () => {
     const mockClient: OpenAiClientLike = {
-      chatCompletionJSON: vi.fn().mockResolvedValue(evaluationFixture),
+      chatCompletionJSON: vi.fn().mockResolvedValue(outputFixture()),
     };
     const evaluator = new WritingEvaluator(mockClient);
     await evaluator.evaluate(
@@ -64,7 +68,7 @@ describe("WritingEvaluator", () => {
 
   it("includes the student writing and prompt in the user message", async () => {
     const mockClient: OpenAiClientLike = {
-      chatCompletionJSON: vi.fn().mockResolvedValue(evaluationFixture),
+      chatCompletionJSON: vi.fn().mockResolvedValue(outputFixture()),
     };
     const evaluator = new WritingEvaluator(mockClient);
     await evaluator.evaluate(
@@ -77,5 +81,25 @@ describe("WritingEvaluator", () => {
     const userMsg = params?.messages.find((m) => m.role === "user");
     expect(userMsg?.content).toContain("Mon texte en français.");
     expect(userMsg?.content).toContain("Décrivez votre ville natale");
+  });
+
+  it("evaluator prompt is French and forbids penalising Standard French", () => {
+    const built = buildEvaluatorPrompt({
+      writing: "Texte.",
+      promptText: "Consigne.",
+      registre: "formel",
+      dialect: DEFAULT_DIALECT,
+    });
+    expect(built.version).toBe("evaluator@2");
+    expect(built.system).toMatch(/tuteur de français louisianais/i);
+    expect(built.system).toContain("mistake");
+    expect(built.system).toContain("standard");
+    expect(built.system).toContain("dialect_check");
+    expect(built.system).toMatch(/français standard n'est jamais une faute/i);
+    expect(built.system).toContain("overall_cefr");
+    expect(built.system).toContain("formel");
+    for (const id of MISTAKE_CATEGORY_IDS) {
+      expect(built.system).toContain(id);
+    }
   });
 });

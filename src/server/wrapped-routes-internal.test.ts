@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ErrorEnvelope } from "@/contracts/errors";
 import { EvaluatePostBody } from "@/contracts/api";
 import { db } from "@/db";
-import { sessions } from "@/db/schema";
+import { corrections, sessions } from "@/db/schema";
 import { readResponseJson } from "@/test/read-response-json";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import * as levelService from "@/modules/cefr-tracker/level-store";
@@ -22,6 +22,7 @@ import { saveSession } from "@/modules/history-store/history-store";
 describe("wrapped API routes return INTERNAL JSON on unexpected errors", () => {
   beforeEach(async () => {
     vi.restoreAllMocks();
+    await db.delete(corrections).execute();
     await db.delete(sessions).execute();
   });
 

@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { CefrLevel, LevelSource } from "./cefr";
-import { Evaluation } from "./evaluation";
+import { Evaluation, EvaluationV2 } from "./evaluation";
+import { Correction } from "./correction";
 import { PromptConstraints } from "./prompt";
 import { PromptMeta } from "./prompt-meta";
-import { SessionView } from "./session";
+import { SessionStatus, SessionView } from "./session";
 
 export const LevelChangeDto = z.object({
   id: z.number().int().positive(),
@@ -45,10 +46,27 @@ export const EvaluatePostBody = z.strictObject({
   sessionId: z.number(),
 });
 
-export const EvaluatePostResponse = z.strictObject({
-  evaluation: Evaluation,
-  advancement: LevelChangeDto.nullable().optional(),
+export const SessionEvaluatePostBody = z.strictObject({
+  text: z.string(),
 });
+
+export const EvaluateSessionDto = z.strictObject({
+  id: z.number().int(),
+  createdAt: z.string(),
+  promptText: z.string(),
+  writingText: z.string().nullable(),
+  promptLevel: CefrLevel.nullable(),
+  status: SessionStatus,
+  cefrLevel: CefrLevel.nullable(),
+});
+
+export const EvaluatePostResponse = z.strictObject({
+  session: EvaluateSessionDto,
+  evaluation: EvaluationV2,
+  corrections: z.array(Correction),
+  advancement: LevelChangeDto.nullable(),
+});
+export type EvaluatePostResponse = z.infer<typeof EvaluatePostResponse>;
 
 export const QuotaGetResponse = z.strictObject({
   used: z.number(),

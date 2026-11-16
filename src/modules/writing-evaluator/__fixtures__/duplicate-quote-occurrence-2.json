@@ -1,0 +1,25 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": { "score": 4, "comment": "ok" },
+    "vocabulary": { "score": 3, "comment": "ok" },
+    "coherence": { "score": 4, "comment": "ok" },
+    "register_style": { "score": 3, "comment": "ok" }
+  },
+  "overall_cefr": "B1",
+  "summary": "Deuxième occurrence.",
+  "next_level_tip": "Pour atteindre B2, varie tes phrases.",
+  "corrections": [
+    {
+      "kind": "mistake",
+      "quote": "enfant",
+      "occurrence": 2,
+      "suggestion": "enfants",
+      "explanation": "Le second enfant n'a pas de s.",
+      "category": "accord",
+      "question": null,
+      "rule_if_dialect": "n/a",
+      "dlf_headword": null,
+      "resource_ids": []
+    }
+  ]
+}

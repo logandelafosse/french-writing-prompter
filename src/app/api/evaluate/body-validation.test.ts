@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { sessions } from "@/db/schema";
+import { corrections, sessions } from "@/db/schema";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { readResponseJson } from "@/test/read-response-json";
@@ -14,6 +14,7 @@ vi.mock("@/modules/openai-client/openai-client", () => ({
 }));
 
 async function clearSessions() {
+  await db.delete(corrections).execute();
   await db.delete(sessions).execute();
 }
 

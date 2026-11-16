@@ -1,0 +1,37 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": { "score": 4, "comment": "ok" },
+    "vocabulary": { "score": 3, "comment": "ok" },
+    "coherence": { "score": 4, "comment": "ok" },
+    "register_style": { "score": 3, "comment": "ok" }
+  },
+  "overall_cefr": "B1",
+  "summary": "Citations à normaliser.",
+  "next_level_tip": "Pour atteindre B2, soigne l'orthographe.",
+  "corrections": [
+    {
+      "kind": "standard",
+      "quote": "MAINTENANT",
+      "occurrence": 1,
+      "suggestion": "Asteur",
+      "explanation": "Même mot, casse différente.",
+      "category": null,
+      "question": null,
+      "rule_if_dialect": null,
+      "dlf_headword": "asteur",
+      "resource_ids": []
+    },
+    {
+      "kind": "mistake",
+      "quote": "j’ai",
+      "occurrence": 1,
+      "suggestion": "j'ai",
+      "explanation": "Apostrophe courbe.",
+      "category": "orthographe",
+      "question": null,
+      "rule_if_dialect": "n/a",
+      "dlf_headword": null,
+      "resource_ids": []
+    }
+  ]
+}

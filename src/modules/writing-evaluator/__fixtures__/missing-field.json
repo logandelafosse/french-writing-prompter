@@ -1,0 +1,11 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": { "score": 4, "comment": "ok" },
+    "vocabulary": { "score": 3, "comment": "ok" },
+    "coherence": { "score": 4, "comment": "ok" },
+    "register_style": { "score": 3, "comment": "ok" }
+  },
+  "summary": "Il manque overall_cefr.",
+  "next_level_tip": "Pour atteindre B2, complète le schéma.",
+  "corrections": []
+}

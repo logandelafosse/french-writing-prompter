@@ -1,8 +1,21 @@
 import { z } from "zod";
-import { EVALUATION_SCORE_MAX } from "@/config/limits";
+import {
+  EVALUATION_SCORE_MAX,
+  EVALUATOR_CORRECTIONS_MAX,
+} from "@/config/limits";
 import { CefrLevel } from "./cefr";
 import { CorrectionKind } from "./correction";
+import { MistakeCategory } from "./mistake-category";
 import { parseJson } from "@/lib/json";
+
+export const DIMENSION_IDS = [
+  "grammatical_accuracy",
+  "vocabulary",
+  "coherence",
+  "register_style",
+] as const;
+export const Dimension = z.enum(DIMENSION_IDS);
+export type Dimension = z.infer<typeof Dimension>;
 
 const LegacyDimensionScore = z.object({
   score: z.number(),
@@ -38,19 +51,19 @@ export type DimensionScore = z.infer<typeof LegacyDimensionScore>;
 export type EvaluationDimensions = z.infer<typeof EvaluationDimensions>;
 export type EvaluationTips = z.infer<typeof EvaluationTips>;
 
-const OutputDimensionScore = z.object({
+const OutputDimensionScore = z.strictObject({
   score: z.number().int().min(1).max(EVALUATION_SCORE_MAX),
   comment: z.string(),
 });
 
-const OutputDimensions = z.object({
+const OutputDimensions = z.strictObject({
   grammatical_accuracy: OutputDimensionScore,
   vocabulary: OutputDimensionScore,
   coherence: OutputDimensionScore,
   register_style: OutputDimensionScore,
-});
+} satisfies Record<Dimension, typeof OutputDimensionScore>);
 
-const EvaluatorOutputCorrectionSchema = z.object({
+export const EvaluatorOutputCorrectionSchema = z.strictObject({
   kind: CorrectionKind,
   quote: z.string(),
   occurrence: z.number().int(),
@@ -63,16 +76,19 @@ const EvaluatorOutputCorrectionSchema = z.object({
   resource_ids: z.array(z.string()),
 });
 
-export const EvaluatorOutputSchema = z.object({
+export const EvaluatorOutputSchema = z.strictObject({
   dimensions: OutputDimensions,
   overall_cefr: CefrLevel,
   summary: z.string(),
   next_level_tip: z.string(),
-  corrections: z.array(EvaluatorOutputCorrectionSchema).max(15),
+  corrections: z
+    .array(EvaluatorOutputCorrectionSchema)
+    .max(EVALUATOR_CORRECTIONS_MAX),
 });
 export type EvaluatorOutput = z.infer<typeof EvaluatorOutputSchema>;
+export type EvaluatorOutputDraft = EvaluatorOutput;
 
-export const EvaluationV2 = z.object({
+export const EvaluationV2 = z.strictObject({
   version: z.literal(2),
   dimensions: OutputDimensions,
   overallCefr: CefrLevel,
@@ -147,4 +163,12 @@ export function toPlaceholderEvaluation(
     value.overall_cefr,
     value.next_level_tip,
   );
+}
+
+export function parseCorrectionCategory(
+  raw: string | null,
+): MistakeCategory | null {
+  if (raw === null) return null;
+  const parsed = MistakeCategory.safeParse(raw);
+  return parsed.success ? parsed.data : null;
 }
