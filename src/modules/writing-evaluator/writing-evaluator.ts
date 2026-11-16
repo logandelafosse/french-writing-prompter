@@ -6,6 +6,7 @@ import {
 } from "@/contracts/evaluation";
 import type { z } from "zod";
 import { AI_MODEL } from "@/config/ai";
+import { emptyDlfIndex, type DlfIndex } from "@/modules/dlf/lookup";
 import { buildEvaluatorPrompt } from "./build-evaluator-prompt";
 
 export type { Evaluation } from "@/contracts/evaluation";
@@ -22,7 +23,10 @@ export interface OpenAiClientLike {
 }
 
 export class WritingEvaluator {
-  constructor(private openai: OpenAiClientLike) {}
+  constructor(
+    private openai: OpenAiClientLike,
+    private dlf: DlfIndex = emptyDlfIndex(),
+  ) {}
 
   async evaluate(
     writing: string,
@@ -34,6 +38,7 @@ export class WritingEvaluator {
       promptText: prompt.text,
       registre: prompt.meta?.registre ?? null,
       dialect,
+      dlfCards: this.dlf.cardsForText(writing),
     });
 
     return this.openai.chatCompletionJSON(

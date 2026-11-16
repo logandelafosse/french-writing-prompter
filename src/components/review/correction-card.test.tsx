@@ -6,7 +6,7 @@ import { CorrectionCard } from "./correction-card";
 
 function standard(
   partial: Pick<Correction, "id" | "ordinal" | "quote" | "suggestion"> &
-    Partial<Pick<Correction, "explanation" | "status">>,
+    Partial<Pick<Correction, "explanation" | "status" | "dlf">>,
 ): Correction {
   return Correction.parse({
     sessionId: 1,
@@ -66,6 +66,24 @@ describe("CorrectionCard standard", () => {
     ).not.toBeInTheDocument();
     expect(within(card).queryByRole("link")).not.toBeInTheDocument();
     expect(within(card).queryByText("DLF")).not.toBeInTheDocument();
+  });
+
+  it("shows a DLF abbr badge on an attested standard suggestion", () => {
+    render(
+      <CorrectionCard
+        correction={standard({
+          id: "s1",
+          ordinal: 1,
+          quote: "Maintenant",
+          suggestion: "Asteur",
+          dlf: { entryId: "asteur-0a4c0152c15a", headword: "asteur" },
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    const badge = screen.getByTitle(reviewCopy.dlfTitle);
+    expect(badge).toHaveTextContent(reviewCopy.dlf);
+    expect(badge.tagName).toBe("ABBR");
   });
 
   it("Compris collapse keeps the mark target and muted quote", () => {

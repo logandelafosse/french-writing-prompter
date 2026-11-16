@@ -7,6 +7,7 @@ const EnvSchema = z
     AI_CLIENT: z.enum(["openai", "fake"]).default("openai"),
     VITEST: z.string().optional(),
     APP_TIME_ZONE: z.string().optional(),
+    DLF_LEXICON_PATH: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (
@@ -44,6 +45,7 @@ export function getEnv(): AppEnv {
     AI_CLIENT: process.env.AI_CLIENT,
     VITEST: process.env.VITEST,
     APP_TIME_ZONE: process.env.APP_TIME_ZONE,
+    DLF_LEXICON_PATH: process.env.DLF_LEXICON_PATH,
   });
 
   if (!parsed.success) {

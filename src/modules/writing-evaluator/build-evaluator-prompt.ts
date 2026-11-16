@@ -3,6 +3,7 @@ import type { Registre } from "@/contracts/prompt-meta";
 import { MISTAKE_CATEGORY_IDS } from "@/contracts/mistake-category";
 import { EVALUATION_SCORE_MAX } from "@/config/limits";
 import { renderForEvaluator } from "@/modules/dialect/render";
+import { formatDlfHintSection, type DlfHintCard } from "@/modules/dlf/lookup";
 import { EVALUATOR_PROMPT_VERSION } from "./post-process";
 
 export type EvaluatorPromptInput = {
@@ -10,6 +11,7 @@ export type EvaluatorPromptInput = {
   promptText: string;
   registre: Registre | null;
   dialect: FrenchDialect;
+  dlfCards?: DlfHintCard[];
 };
 
 const TEMPLATE = `Tu es un tuteur de français louisianais. Écris toutes tes explications, questions, résumé et conseils en français. Le français louisianais est préféré. Le français standard est acceptable. Ne réponds jamais en anglais.
@@ -31,6 +33,8 @@ Catégories (IDs stables) :
 
 Citation : copie quote caractère pour caractère (1–8 mots, sans ellipse). Plus courte empan possible. Si la même quote apparaît plusieurs fois, renseigne occurrence (1-based). Ordre du texte, sans chevauchement.
 
+{{dlf}}
+
 Scores : chaque dimension de 1 à {{scoreMax}}. overall_cefr. next_level_tip cadré « Pour atteindre … ».`;
 
 export function buildEvaluatorPrompt(input: EvaluatorPromptInput): {
@@ -51,7 +55,8 @@ export function buildEvaluatorPrompt(input: EvaluatorPromptInput): {
       "{{categories}}",
       MISTAKE_CATEGORY_IDS.map((id) => `- ${id}`).join("\n"),
     )
-    .replace("{{scoreMax}}", String(EVALUATION_SCORE_MAX));
+    .replace("{{scoreMax}}", String(EVALUATION_SCORE_MAX))
+    .replace("{{dlf}}", formatDlfHintSection(input.dlfCards ?? []));
   return {
     version: EVALUATOR_PROMPT_VERSION,
     system,

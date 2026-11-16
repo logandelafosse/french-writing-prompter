@@ -7,12 +7,14 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "server-only": path.resolve(__dirname, "./src/test/server-only-stub.ts"),
     },
   },
   test: {
     env: {
       DATABASE_URL: ":memory:",
       AI_CLIENT: "fake",
+      DLF_LEXICON_PATH: "src/test/fixtures/dlf/lexicon.json",
     },
     hookTimeout: 120_000,
     restoreMocks: true,

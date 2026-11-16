@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { type EvaluatorOutputDraft } from "@/contracts/evaluation";
+import path from "node:path";
+import { countsAsMistake } from "@/contracts/correction";
+import { loadDlfLexicon } from "@/modules/dlf/load";
 import { dialectCheckQuestion, postProcessEvaluation } from "./post-process";
+
+const dlfIndex = loadDlfLexicon(
+  path.join(process.cwd(), "src/test/fixtures/dlf/lexicon.json"),
+);
 
 const writing =
   "Maintenant je vas au bayou. Les enfant jouent. J'ai vu les enfant près du pont.";
@@ -128,5 +135,56 @@ describe("postProcessEvaluation", () => {
     expect(standard?.resourceIds).toEqual([]);
     expect(unknown?.category).toBe("autre");
     expect(check?.question).toBe(dialectCheckQuestion("je vas"));
+  });
+
+  it("sets dlf on an attested standard suggestion", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "standard",
+          quote: "Maintenant",
+          suggestion: "Asteur",
+          dlf_headword: "asteur",
+        }),
+      ]),
+      {
+        text: writing,
+        sessionId: 1,
+        now,
+        createId: ids(),
+        lookupDlf: (word) => dlfIndex.lookup(word),
+      },
+    );
+    expect(result.corrections).toHaveLength(1);
+    expect(result.corrections[0]?.kind).toBe("standard");
+    expect(result.corrections[0]?.dlf).toEqual({
+      entryId: "asteur-0a4c0152c15a",
+      headword: "asteur",
+    });
+  });
+
+  it("keeps an unattested standard Correction with dlf null and does not make a Mistake", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "standard",
+          quote: "Maintenant",
+          suggestion: "mon char",
+          dlf_headword: "char",
+        }),
+      ]),
+      {
+        text: writing,
+        sessionId: 1,
+        now,
+        createId: ids(),
+        lookupDlf: (word) => dlfIndex.lookup(word),
+      },
+    );
+    const item = result.corrections[0];
+    expect(item?.kind).toBe("standard");
+    expect(item?.suggestion).toBe("mon char");
+    expect(item?.dlf).toBeNull();
+    expect(item ? countsAsMistake(item) : true).toBe(false);
   });
 });

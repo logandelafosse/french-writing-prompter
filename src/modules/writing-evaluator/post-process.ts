@@ -5,6 +5,7 @@ import {
   type EvaluationV2,
   type EvaluatorOutputDraft,
 } from "@/contracts/evaluation";
+import { attributeStandard, type DlfHit } from "@/modules/dlf/lookup";
 import { locateQuote, spansOverlap } from "./locate-quote";
 
 export const EVALUATOR_PROMPT_VERSION = "evaluator@2";
@@ -18,6 +19,7 @@ export type PostProcessContext = {
   sessionId: number;
   now: () => Date;
   createId: () => string;
+  lookupDlf?: (word: string) => DlfHit | null;
 };
 
 export function postProcessEvaluation(
@@ -77,7 +79,14 @@ export function postProcessEvaluation(
         row.item.kind === "standard"
           ? null
           : (parseCorrectionCategory(row.item.category) ?? "autre"),
-      dlf: null,
+      dlf:
+        row.item.kind === "standard"
+          ? attributeStandard({
+              suggestion: row.item.suggestion,
+              dlfHeadword: row.item.dlf_headword,
+              lookup: ctx.lookupDlf ?? (() => null),
+            })
+          : null,
       resourceIds: [],
       status: "open",
       dialectNoteId: null,

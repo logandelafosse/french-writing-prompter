@@ -1,5 +1,13 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## DLF lexicon
+
+Louisiana French glosses come from a versioned lexicon artifact published by
+`logandelafosse/DLF-extract`. Bump the pin with
+`DLF_LEXICON_VERSION=x.y.z npm run dlf:fetch` and set `DLF_LEXICON_PATH`.
+Tests use the committed fixture via `DLF_LEXICON_PATH`. See
+`docs/plan/dlf-lexicon.md`.
+
 ## Getting Started
 
 First, run the development server:

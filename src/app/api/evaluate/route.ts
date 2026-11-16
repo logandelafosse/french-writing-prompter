@@ -20,11 +20,14 @@ import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { postProcessEvaluation } from "@/modules/writing-evaluator/post-process";
+import { getDlfIndex } from "@/modules/dlf/load";
 import { DRAFT_TEXT_MAX } from "@/config/limits";
 
 export const POST = withErrors(async function postEvaluate(request: Request) {
+  const dlf = getDlfIndex();
   const evaluator = new WritingEvaluator(
     getAiClient(scenarioFromRequest(request)),
+    dlf,
   );
   const parsed = await parseRequestBody(request, EvaluatePostBody);
   if (!parsed.ok) {
@@ -103,6 +106,7 @@ export const POST = withErrors(async function postEvaluate(request: Request) {
     sessionId: body.sessionId,
     now: () => now,
     createId: () => crypto.randomUUID(),
+    lookupDlf: (word) => dlf.lookup(word),
   });
 
   await saveSession({
