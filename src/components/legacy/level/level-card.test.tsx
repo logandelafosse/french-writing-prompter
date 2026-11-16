@@ -1,5 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
+
+vi.mock("@/components/shell/header-shell", () => ({
+  useHeaderShell: () => ({
+    level: null,
+    refreshShell: vi.fn().mockResolvedValue(undefined),
+    refreshQuota: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 import { LevelCard } from "./level-card";
 
 describe("LevelCard", () => {

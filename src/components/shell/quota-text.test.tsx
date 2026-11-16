@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { QuotaText, quotaMessage } from "./header-shell";
-import type { QuotaState } from "@/modules/quota-manager/quota-store";
+import type { QuotaGetDto } from "@/contracts/api";
 
-const baseQuota = (remaining: number): QuotaState => ({
+const baseQuota = (remaining: number): QuotaGetDto => ({
   used: 3 - remaining,
   remaining,
   max: 3,

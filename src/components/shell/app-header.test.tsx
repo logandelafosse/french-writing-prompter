@@ -9,6 +9,8 @@ describe("AppHeader placement variant", () => {
         variant="placement"
         level={null}
         quota={null}
+        levelReady
+        quotaReady
         placementLink={{
           href: "/placement",
           label: "Je connais mon niveau",

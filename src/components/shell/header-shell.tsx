@@ -14,7 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import { APP_TAGLINE, APP_WORDMARK } from "@/config/app-brand";
-import { CEFR_UI_LABELS } from "@/contracts/cefr";
+import { CEFR_UI_LABELS, parseCefrLevel } from "@/contracts/cefr";
 import { TextLink } from "@/components/ui/text-link";
 import type { CefrLevel } from "@/contracts/cefr";
 import { CEFR_LEVELS } from "@/contracts/cefr";
@@ -22,13 +22,24 @@ import {
   LevelGetResponse,
   LevelPutResponse,
   QuotaGetResponse,
+  type QuotaGetDto,
 } from "@/contracts/api";
 import { fetchJson } from "@/lib/http";
 import { cn } from "@/lib/utils";
-import type { QuotaState } from "@/modules/quota-manager/quota-store";
+
+export function nextLevelFromMenuValue(
+  value: string,
+  current: CefrLevel,
+): CefrLevel | null {
+  const next = parseCefrLevel(value);
+  if (next === null || next === current) {
+    return null;
+  }
+  return next;
+}
 
 export function quotaMessage(
-  quota: QuotaState,
+  quota: QuotaGetDto,
   firstRun: boolean,
   compact?: boolean,
 ): string {
@@ -52,7 +63,7 @@ export function QuotaText({
   firstRun,
   compact,
 }: {
-  quota: QuotaState;
+  quota: QuotaGetDto;
   firstRun: boolean;
   compact?: boolean | undefined;
 }) {
@@ -102,8 +113,8 @@ export function LevelMenu({
             <Menu.RadioGroup
               value={level}
               onValueChange={(value) => {
-                const next = value as CefrLevel;
-                if (next !== level) {
+                const next = nextLevelFromMenuValue(String(value), level);
+                if (next !== null) {
                   void onChange(next);
                 }
               }}
@@ -133,7 +144,9 @@ export function LevelMenu({
 export type AppHeaderProps = {
   variant: "full" | "placement";
   level: CefrLevel | null;
-  quota: QuotaState | null;
+  quota: QuotaGetDto | null;
+  levelReady: boolean;
+  quotaReady: boolean;
   placementLink?: {
     href: string;
     label: "Je connais mon niveau" | "Finir plus tard";
@@ -146,6 +159,8 @@ export function AppHeader({
   variant,
   level,
   quota,
+  levelReady,
+  quotaReady,
   placementLink = null,
   current,
   onLevelChange,
@@ -171,40 +186,27 @@ export function AppHeader({
     );
   }
 
-  const firstRun = level === null;
-  const quotaState =
-    quota ??
-    ({
-      used: 0,
-      remaining: 3,
-      max: 3,
-      resetsAt: new Date().toISOString(),
-    } satisfies QuotaState);
+  const showQuota = levelReady && quotaReady && quota !== null;
+  const firstRun = levelReady && level === null;
 
   return (
-    <header className="border-line/0 flex flex-col gap-0.5 px-5 pt-3.5 pb-1.5 sm:gap-2 sm:px-10 sm:py-[18px]">
-      <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-6">
-        <Link
-          href="/"
-          className="text-wordmark-sm sm:text-wordmark min-h-touch text-ink inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-bold tracking-[-0.03em] no-underline"
-        >
-          <h1 className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
-            {APP_WORDMARK}
-            <span className="text-mistake">.</span>
-          </h1>
-          <span className="text-muted hidden text-[13px] font-normal sm:inline">
-            {APP_TAGLINE}
-          </span>
-        </Link>
-        {level && onLevelChange ? (
-          <LevelMenu level={level} onChange={onLevelChange} />
-        ) : null}
-      </div>
-      <div
-        className={cn(
-          "flex flex-wrap items-center gap-x-5 gap-y-2 sm:ml-auto sm:gap-x-[22px]",
-        )}
+    <header className="border-line/0 flex flex-col gap-0.5 px-5 pt-3.5 pb-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-2 sm:px-10 sm:py-[18px]">
+      <Link
+        href="/"
+        className="text-wordmark-sm sm:text-wordmark min-h-touch text-ink inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-bold tracking-[-0.03em] no-underline"
       >
+        <h1 className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
+          {APP_WORDMARK}
+          <span className="text-mistake">.</span>
+        </h1>
+        <span className="text-muted hidden text-[13px] font-normal sm:inline">
+          {APP_TAGLINE}
+        </span>
+      </Link>
+      {level && onLevelChange ? (
+        <LevelMenu level={level} onChange={onLevelChange} />
+      ) : null}
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:contents">
         <nav
           aria-label="Navigation"
           className="flex flex-wrap items-center gap-x-5 text-[15px] font-medium sm:gap-x-[22px]"
@@ -212,7 +214,7 @@ export function AppHeader({
           <TextLink
             href="/history"
             className={cn(
-              "min-h-9",
+              "min-h-touch",
               current === "historique"
                 ? "font-semibold underline decoration-2 underline-offset-[6px]"
                 : "no-underline",
@@ -222,24 +224,26 @@ export function AppHeader({
             Historique
           </TextLink>
         </nav>
-        <span className="ml-auto sm:ml-0">
-          <span className="sm:hidden">
-            <QuotaText quota={quotaState} firstRun={firstRun} compact />
+        {showQuota ? (
+          <span className="ml-auto sm:ml-0">
+            <span className="sm:hidden">
+              <QuotaText quota={quota} firstRun={firstRun} compact />
+            </span>
+            <span className="hidden sm:inline">
+              <QuotaText quota={quota} firstRun={firstRun} />
+            </span>
           </span>
-          <span className="hidden sm:inline">
-            <QuotaText quota={quotaState} firstRun={firstRun} />
-          </span>
-        </span>
+        ) : null}
       </div>
     </header>
   );
 }
 
 type HeaderContextValue = {
+  level: CefrLevel | null;
   refreshQuota: () => Promise<void>;
+  refreshShell: () => Promise<void>;
 };
-
-export const HEADER_SHELL_REFRESH_EVENT = "fwp:header-shell-refresh";
 
 const HeaderContext = createContext<HeaderContextValue | null>(null);
 
@@ -254,49 +258,79 @@ export function useHeaderShell(): HeaderContextValue {
 export function HeaderShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [level, setLevel] = useState<CefrLevel | null>(null);
-  const [quota, setQuota] = useState<QuotaState | null>(null);
+  const [quota, setQuota] = useState<QuotaGetDto | null>(null);
+  const [levelReady, setLevelReady] = useState(false);
+  const [quotaReady, setQuotaReady] = useState(false);
+  const quotaFetchGen = useRef(0);
+
+  const fetchQuota = useCallback(async () => {
+    const gen = ++quotaFetchGen.current;
+    const result = await fetchJson("/api/quota", QuotaGetResponse);
+    if (gen !== quotaFetchGen.current) {
+      return;
+    }
+    if (result.ok) {
+      setQuota(result.value);
+      setQuotaReady(true);
+    }
+  }, []);
 
   const refreshQuota = useCallback(async () => {
-    const result = await fetchJson("/api/quota", QuotaGetResponse);
-    if (result.ok) setQuota(result.value);
-  }, []);
+    await fetchQuota();
+  }, [fetchQuota]);
+
+  const refreshShell = useCallback(async () => {
+    const [levelRes] = await Promise.all([
+      fetchJson("/api/level", LevelGetResponse),
+      fetchQuota(),
+    ]);
+    if (levelRes.ok) {
+      setLevel(levelRes.value.level);
+      setLevelReady(true);
+    }
+  }, [fetchQuota]);
 
   useEffect(() => {
     let cancelled = false;
     async function loadAll() {
-      const [levelRes, quotaRes] = await Promise.all([
-        fetchJson("/api/level", LevelGetResponse),
-        fetchJson("/api/quota", QuotaGetResponse),
-      ]);
+      const levelRes = await fetchJson("/api/level", LevelGetResponse);
       if (cancelled) return;
-      if (levelRes.ok) setLevel(levelRes.value.level);
-      if (quotaRes.ok) setQuota(quotaRes.value);
+      if (levelRes.ok) {
+        setLevel(levelRes.value.level);
+        setLevelReady(true);
+      }
+      await fetchQuota();
     }
-    const onRefresh = () => void loadAll();
     void loadAll();
-    window.addEventListener(HEADER_SHELL_REFRESH_EVENT, onRefresh);
     return () => {
       cancelled = true;
-      window.removeEventListener(HEADER_SHELL_REFRESH_EVENT, onRefresh);
     };
-  }, []);
+  }, [fetchQuota]);
 
-  const onLevelChange = useCallback(async (next: CefrLevel) => {
-    const result = await fetchJson("/api/level", LevelPutResponse, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ level: next }),
-    });
-    if (result.ok) {
-      setLevel(next);
-    }
-  }, []);
+  const onLevelChange = useCallback(
+    async (next: CefrLevel) => {
+      const result = await fetchJson("/api/level", LevelPutResponse, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level: next }),
+      });
+      if (result.ok) {
+        setLevel(next);
+        setLevelReady(true);
+        await refreshQuota();
+      }
+    },
+    [refreshQuota],
+  );
 
   const current = pathname.startsWith("/history")
     ? ("historique" as const)
     : undefined;
 
-  const contextValue = useMemo(() => ({ refreshQuota }), [refreshQuota]);
+  const contextValue = useMemo(
+    () => ({ level, refreshQuota, refreshShell }),
+    [level, refreshQuota, refreshShell],
+  );
 
   return (
     <HeaderContext.Provider value={contextValue}>
@@ -304,6 +338,8 @@ export function HeaderShell({ children }: { children: ReactNode }) {
         variant="full"
         level={level}
         quota={quota}
+        levelReady={levelReady}
+        quotaReady={quotaReady}
         current={current}
         onLevelChange={onLevelChange}
       />
