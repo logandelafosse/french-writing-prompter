@@ -154,7 +154,11 @@ test.describe("review @1280", () => {
 });
 
 test.describe("review @390", () => {
-  test.use({ viewport: { width: 390, height: 900 } });
+  test.use({
+    viewport: { width: 390, height: 900 },
+    isMobile: true,
+    hasTouch: true,
+  });
 
   test("stacks corrections under the text", async ({
     page,
@@ -183,6 +187,9 @@ test.describe("review @390", () => {
 
     await page.getByRole("button", { name: /Scores ▸/ }).click();
     await expect(page.getByRole("button", { name: "Grammaire" })).toBeVisible();
+    const registre = page.getByRole("button", { name: "Registre et style" });
+    await registre.tap();
+    await expect(page.getByText("Pour monter")).toBeVisible();
     await captureEvidence(page, testInfo, "mobile-scores");
     await expectNoAxeViolations(page);
   });

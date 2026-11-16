@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { cefrSubLevelFromScore } from "@/contracts/cefr";
 import { reviewCopy } from "@/copy/review";
@@ -71,5 +71,27 @@ describe("ScoresDisclosure", () => {
     ).toBeVisible();
     expect(screen.getByText(reviewCopy.pourMonter)).toBeVisible();
     expect(screen.getByText("Registre familier respecté.")).toBeVisible();
+  });
+
+  it("toggles the popover on tap and keeps it open after a touch mouseleave", async () => {
+    const user = userEvent.setup();
+    render(<ScoresDisclosure evaluation={evaluation} />);
+    await user.click(screen.getByRole("button", { name: /Scores/ }));
+
+    const row = screen.getByRole("button", { name: /Registre et style/ });
+    fireEvent.pointerDown(row, { pointerType: "touch" });
+    fireEvent.click(row);
+
+    expect(
+      screen.getByText(reviewCopy.dimensionDefinition.register_style),
+    ).toBeVisible();
+    expect(screen.getByText(reviewCopy.pourMonter)).toBeVisible();
+
+    fireEvent.mouseLeave(row);
+    expect(screen.getByText(reviewCopy.pourMonter)).toBeVisible();
+
+    fireEvent.pointerDown(row, { pointerType: "touch" });
+    fireEvent.click(row);
+    expect(screen.queryByText(reviewCopy.pourMonter)).not.toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Collapsible } from "@base-ui/react/collapsible";
 import { Button } from "@/components/ui/button";
 import { cefrSubLevelFromScore } from "@/contracts/cefr";
@@ -19,6 +19,18 @@ export function ScoresDisclosure({
 }) {
   const [open, setOpen] = useState(false);
   const [hint, setHint] = useState<Dimension | null>(null);
+  const touchOnly = useRef(false);
+
+  const openHint = (key: Dimension) => {
+    if (!touchOnly.current) setHint(key);
+  };
+  const closeHint = () => {
+    if (!touchOnly.current) setHint(null);
+  };
+  const toggleHint = (key: Dimension) => {
+    setHint((current) => (current === key ? null : key));
+  };
+
   return (
     <Collapsible.Root
       open={open}
@@ -45,10 +57,16 @@ export function ScoresDisclosure({
                 <Button
                   variant="text"
                   aria-expanded={hint === key}
-                  onMouseEnter={() => setHint(key)}
-                  onMouseLeave={() => setHint(null)}
-                  onFocus={() => setHint(key)}
-                  onBlur={() => setHint(null)}
+                  onPointerDown={(event) => {
+                    touchOnly.current = event.pointerType !== "mouse";
+                  }}
+                  onClick={() => {
+                    if (touchOnly.current) toggleHint(key);
+                  }}
+                  onMouseEnter={() => openHint(key)}
+                  onMouseLeave={closeHint}
+                  onFocus={() => openHint(key)}
+                  onBlur={closeHint}
                   className={cn(
                     "rounded-base grid min-h-11 w-full grid-cols-[1fr_auto] items-center gap-3 border border-transparent px-3 py-2.5",
                     "hover:border-line-strong hover:bg-primary-tint",

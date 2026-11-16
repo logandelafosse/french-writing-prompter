@@ -49,6 +49,9 @@ export function ReviewScreen({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mobileTitleRef = useRef<HTMLHeadingElement>(null);
   const [ackedIds, setAckedIds] = useState<string[]>([]);
+  const [ackUi, setAckUi] = useState<
+    { status: "idle" } | { status: "saving" } | { status: "error" }
+  >({ status: "idle" });
   const [desktop, setDesktop] = useState(true);
   const items = corrections.map((item) =>
     ackedIds.includes(item.id)
@@ -69,12 +72,23 @@ export function ReviewScreen({
     return () => media.removeEventListener("change", sync);
   }, []);
 
-  const acknowledge = (target: Correction) => {
-    void fetchJson(`/api/corrections/${target.id}`, CorrectionPatchResponse, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "acknowledge" }),
-    });
+  const acknowledge = async (target: Correction) => {
+    if (ackUi.status === "saving") return;
+    setAckUi({ status: "saving" });
+    const result = await fetchJson(
+      `/api/corrections/${target.id}`,
+      CorrectionPatchResponse,
+      {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "acknowledge" }),
+      },
+    );
+    if (!result.ok) {
+      setAckUi({ status: "error" });
+      return;
+    }
+    setAckUi({ status: "idle" });
     const nextIds = ackedIds.includes(target.id)
       ? ackedIds
       : [...ackedIds, target.id];
@@ -142,11 +156,18 @@ export function ReviewScreen({
           <h2 className="text-label text-muted m-0 uppercase sm:hidden">
             {reviewCopy.mobileListLabel}
           </h2>
+          {ackUi.status === "error" ? (
+            <p role="alert" lang="fr" className="text-mistake m-0 text-sm">
+              {homeCopy.loadError}
+            </p>
+          ) : null}
           {items.map((item) => (
             <CorrectionCard
               key={item.id}
               correction={item}
-              onAcknowledge={() => acknowledge(item)}
+              onAcknowledge={() => {
+                void acknowledge(item);
+              }}
             />
           ))}
           {evaluation ? <ScoresDisclosure evaluation={evaluation} /> : null}
