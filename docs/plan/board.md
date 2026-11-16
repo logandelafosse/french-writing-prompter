@@ -8,7 +8,9 @@ Last updated: 2026-11-15 by coordinator (T13e merged #57; T14 dispatch).
 
 ## Ready
 
-_None._
+| ID   | Ticket                                                                                           | Why                             |
+| ---- | ------------------------------------------------------------------------------------------------ | ------------------------------- |
+| T13g | Wordmark 44px touch ([#59](https://github.com/logandelafosse/french-writing-prompter/issues/59)) | HANDOFF regression from PR #57. |
 
 ## In progress
 
@@ -48,7 +50,9 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T13  | App header, level menu, local-midnight quota                        | AFK  | —          | **Done** — [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) + [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52) 2026-11-15. |
 | T13c | Header PR #52 review fixes                                          | AFK  | T13        | **Done** — merged [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) 2026-11-15.                                                                        |
 | T13d | T13c e2e acceptance hardening                                       | AFK  | T13c       | **Backlog** — [#55](https://github.com/logandelafosse/french-writing-prompter/issues/55); PR #54 test gaps; does not block T14.                                                  |
-| T13e | Mobile header rows + level card sync                                | AFK  | T13c       | **Done** — merged [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57) 2026-11-15.                                                                        |
+| T13e | Mobile header rows + level card sync                                | AFK  | T13c       | **Done** — [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57); mobile OK; **T13f** for stale level GET.                                                 |
+| T13f | Level card vs stale GET /api/level                                  | AFK  | T13e       | **Backlog** — [#58](https://github.com/logandelafosse/french-writing-prompter/issues/58).                                                                                        |
+| T13g | Wordmark 44px touch target                                          | AFK  | T13e       | **Ready** — [#59](https://github.com/logandelafosse/french-writing-prompter/issues/59); adversarial blocker PR #57.                                                              |
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **In progress** — `ticket/t14-home-today-bootstrap`.                                                                                                                             |
 | T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300.                                                                                                                       |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                                           |
@@ -111,4 +115,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T12  | Lefthook pre-commit ([#14](https://github.com/logandelafosse/french-writing-prompter/issues/14))                                  | Merged [PR #49](https://github.com/logandelafosse/french-writing-prompter/pull/49) 2026-11-15; hook integration tests + `opencode.json` guards.                                                                                                                            |
 | T13  | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15))         | Merged [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) + [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52); follow-up [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) (T13c). T14 ready. |
 | T13c | Header PR #52 review fixes ([#53](https://github.com/logandelafosse/french-writing-prompter/issues/53))                           | Merged [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) 2026-11-15; spawned T13d #55, T13e [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57).                                                                         |
-| T13e | Mobile header rows + level card sync ([#56](https://github.com/logandelafosse/french-writing-prompter/issues/56))                 | Merged [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57) 2026-11-15; evidence `docs/evidence/56/`. T14 dispatch.                                                                                                                                 |
+| T13e | Mobile header rows + level card sync ([#56](https://github.com/logandelafosse/french-writing-prompter/issues/56))                 | Merged [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57); mobile OK; spawned **T13f** (stale level GET).                                                                                                                                         |
