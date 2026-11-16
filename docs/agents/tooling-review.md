@@ -1065,3 +1065,15 @@ Non-blocking for T18 merge. Prioritize TOOL-PR67-3 before T19. Full proposals: [
 **Test review** (no blockers): [T18 test review PR #67](542b8902-0471-49f6-816b-2f8021a78221). Non-blocking: empty-swap quota `used + 1` in integration + e2e; 390 overflow asserts long copy before geometry; exhausted spec asserts label absent before prompt 3; evaluate-at-zero parses `EvaluatePostResponse` or re-reads `evaluated`.
 
 **Adversarial** (blockers fixed pre-merge): [T18 adversarial PR #67](664a59c5-cd45-47df-b9b6-e409c6d2098e). Non-blocking product: `saveNow` on failed PUT (TOOL-PR66-7 / T19); transaction rollback vs quota lock; multi-`active` `replaceSessionId` semantics.
+
+### Backlog from PR #68 tooling review (2026-11-16)
+
+Non-blocking for T19 merge. Land **TOOL-PR68-1** and **TOOL-PR68-2** before T21. Full proposals: [T19 tooling review PR #68](0b74c861-e056-49fc-9c13-f3d900335097).
+
+| ID (draft)  | Rule / change                                                | Notes                                                                  |
+| ----------- | ------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| TOOL-PR68-1 | `error-envelope-single-source`, `no-unwrapped-route-handler` | Mixed error shapes; `classifyFetchFailure` only hit from tests         |
+| TOOL-PR68-2 | `no-erased-ai-error`, `no-error-message-sniff`               | `new Error("AI service error")`; `504 AI_TIMEOUT` never on real client |
+| TOOL-PR68-3 | `no-animate-pulse`; e2e hung routes must not `route.abort`   | T19 removes pulse; offline spec aborts after 11s hides missing timeout |
+| TOOL-PR68-4 | `no-connectivity-in-render`                                  | `useState(!navigator.onLine)` true on SSR; duplicate `online` listener |
+| —           | Folds TOOL-PR62-1/3, PR57-1, PR54-5, PR62-2, PR66-*, PR67-3  | Brackets, copy, e2e geometry/viewports, draft route, flat error codes  |
