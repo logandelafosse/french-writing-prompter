@@ -29,8 +29,16 @@ export const homeCopy = {
   submit: "Corrige-moi",
   submitBusy: "Je lis ton texte…",
   loadError: "Une erreur s'est produite. Réessaie.",
-  evalError: "Une erreur s'est produite pendant l'évaluation.",
   retry: "Réessayer",
+  errorEvaluateLead: "J'ai pas pu lire ton texte ce coup-ci.",
+  errorEvaluateBody: "Il est toujours là, y a rien de perdu.",
+  errorGenerateLead: "J'ai pas pu trouver de consigne ce coup-ci.",
+  errorRetry: "Essayer encore",
+  offlineLead: "Pas de connexion.",
+  offlineBody:
+    "Ton brouillon est gardé sur cet appareil. Tu peux continuer à écrire.",
+  offlineRetry: "Réessayer",
+  draftLocal: "Brouillon gardé sur cet appareil",
   wordNudge:
     "Encore une cinquantaine de mots, si le cœur t'en dit. Tu peux envoyer n'importe quand.",
   reviewNextPrompt: (remaining: number) =>

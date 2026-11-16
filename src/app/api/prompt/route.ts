@@ -15,8 +15,8 @@ import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { localDateKey, todayLocalDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { parseRequestBody } from "@/lib/http";
-import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { PromptPostBody, type PromptPostBodyValue } from "@/contracts/api";
+import { withErrors } from "@/server/with-errors";
 
 let quotaPromptChain = Promise.resolve();
 
@@ -78,7 +78,7 @@ function draftAbandonBlocked(
   return null;
 }
 
-export async function POST(request: Request) {
+export const POST = withErrors(async function postPrompt(request: Request) {
   const level = await getCurrentLevel();
   if (!level) {
     return NextResponse.json(
@@ -104,21 +104,7 @@ export async function POST(request: Request) {
         getAiClient(scenarioFromRequest(request)),
       );
 
-      let prompt;
-      try {
-        prompt = await promptGenerator.generate(level, DEFAULT_DIALECT);
-      } catch (error) {
-        if (error instanceof AiOutputError) {
-          return NextResponse.json(
-            { error: "Prompt generation failed." },
-            { status: 502 },
-          );
-        }
-        return NextResponse.json(
-          { error: "Prompt generation failed." },
-          { status: 502 },
-        );
-      }
+      const prompt = await promptGenerator.generate(level, DEFAULT_DIALECT);
 
       activeRows = await todayActiveSessions();
       blocked = draftAbandonBlocked(activeRows, body);
@@ -180,4 +166,4 @@ export async function POST(request: Request) {
     }
     throw error;
   }
-}
+});

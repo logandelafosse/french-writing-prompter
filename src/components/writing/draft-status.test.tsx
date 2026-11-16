@@ -17,4 +17,11 @@ describe("DraftStatus", () => {
     rerender(<DraftStatus savedAt="2026-11-14T00:00:00-06:00" />);
     expect(screen.getByText("Brouillon sauvé à 0 h 00")).toBeInTheDocument();
   });
+
+  it("reads the local copy while offline", () => {
+    render(<DraftStatus savedAt="2026-11-14T21:42:00-06:00" localOnly />);
+    expect(
+      screen.getByText("Brouillon gardé sur cet appareil"),
+    ).toBeInTheDocument();
+  });
 });

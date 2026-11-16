@@ -54,16 +54,15 @@ test("malformed AI output shows an error and retry recovers", async ({
 
   await scenario("malformed");
   await page.getByRole("button", { name: "Corrige-moi" }).click();
-  await expect(page.getByText("AI output was invalid.")).toBeVisible();
+  await expect(page.getByRole("alert")).toContainText(
+    "J'ai pas pu lire ton texte ce coup-ci.",
+  );
   await expect(page.getByText("Unhandled Runtime Error")).toHaveCount(0);
   await expect(
     page.getByText(/Application error: a client-side exception has occurred/i),
   ).toHaveCount(0);
 
   await scenario("happy");
-  await page
-    .getByRole("button", { name: "Réessayer" })
-    .filter({ visible: true })
-    .click();
+  await page.getByRole("button", { name: "Essayer encore" }).click();
   await expectEvaluationWithScores(page);
 });

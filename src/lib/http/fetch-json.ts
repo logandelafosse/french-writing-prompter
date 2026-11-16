@@ -1,9 +1,15 @@
 import { z, type ZodType } from "zod";
+import { FETCH_TIMEOUT_MS } from "@/config/limits";
 import { parseJson } from "@/lib/json";
 
-const ErrorBodySchema = z.object({
+const NestedErrorBody = z.object({
+  error: z.object({ code: z.string(), message: z.string() }),
+});
+
+const FlatErrorBody = z.object({
   error: z.string().optional(),
   message: z.string().optional(),
+  code: z.string().optional(),
   wordCount: z.number().int().nonnegative().optional(),
 });
 
@@ -13,6 +19,7 @@ export type FetchError =
       kind: "http";
       status: number;
       message: string;
+      code?: string;
       wordCount?: number;
     }
   | { kind: "invalid" };
@@ -26,12 +33,29 @@ export { parseRequestBody } from "./parse-request-body";
 function errorFieldsFromBody(
   text: string,
   fallback: string,
-): { message: string; wordCount?: number } {
-  const parsed = parseJson(ErrorBodySchema, text);
-  if (!parsed.ok) return { message: fallback };
-  const message = parsed.value.error ?? parsed.value.message ?? fallback;
-  if (parsed.value.wordCount === undefined) return { message };
-  return { message, wordCount: parsed.value.wordCount };
+): { message: string; code?: string; wordCount?: number } {
+  const nested = parseJson(NestedErrorBody, text);
+  if (nested.ok) {
+    return {
+      message: nested.value.error.message,
+      code: nested.value.error.code,
+    };
+  }
+  const flat = parseJson(FlatErrorBody, text);
+  if (!flat.ok) return { message: fallback };
+  return {
+    message: flat.value.error ?? flat.value.message ?? fallback,
+    ...(flat.value.code === undefined ? {} : { code: flat.value.code }),
+    ...(flat.value.wordCount === undefined
+      ? {}
+      : { wordCount: flat.value.wordCount }),
+  };
+}
+
+function requestSignal(init: RequestInit | undefined): AbortSignal {
+  const timeout = AbortSignal.timeout(FETCH_TIMEOUT_MS);
+  if (init?.signal === undefined || init.signal === null) return timeout;
+  return AbortSignal.any([init.signal, timeout]);
 }
 
 export async function fetchJson<S extends ZodType>(
@@ -41,7 +65,7 @@ export async function fetchJson<S extends ZodType>(
 ): Promise<FetchJsonResult<z.infer<S>>> {
   let response: Response;
   try {
-    response = await fetch(url, init);
+    response = await fetch(url, { ...init, signal: requestSignal(init) });
   } catch {
     return { ok: false, error: { kind: "network" } };
   }
@@ -61,6 +85,7 @@ export async function fetchJson<S extends ZodType>(
         kind: "http",
         status: response.status,
         message: fields.message,
+        ...(fields.code === undefined ? {} : { code: fields.code }),
         ...(fields.wordCount === undefined
           ? {}
           : { wordCount: fields.wordCount }),

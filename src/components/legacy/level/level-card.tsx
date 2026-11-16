@@ -122,9 +122,8 @@ export function LevelCard() {
 
   if (loading) {
     return (
-      <div className="animate-pulse rounded-xl border bg-white p-6">
-        <div className="h-5 w-24 rounded bg-zinc-100" />
-        <div className="mt-3 h-8 w-48 rounded bg-zinc-100" />
+      <div className="rounded-xl border bg-white p-6">
+        <p className="text-sm text-zinc-500">Chargement…</p>
       </div>
     );
   }

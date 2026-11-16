@@ -8,7 +8,7 @@ import { saveSession, getSession } from "@/modules/history-store/history-store";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { readResponseJson } from "@/test/read-response-json";
-import { EvaluateFailureBody } from "@/test/api-response-schemas";
+import { ErrorEnvelope } from "@/contracts/errors";
 
 const evaluateMock = vi.fn();
 
@@ -82,8 +82,8 @@ describe("POST /api/evaluate", () => {
     );
 
     expect(response.status).toBe(502);
-    const body = await readResponseJson(response, EvaluateFailureBody);
-    expect(body.code).toBe("schema_mismatch");
+    const body = await readResponseJson(response, ErrorEnvelope);
+    expect(body.error.code).toBe("AI_INVALID_OUTPUT");
 
     const stored = await getSession(session.id);
     expect(stored?.evaluationJson).toBeNull();

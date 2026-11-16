@@ -7,6 +7,8 @@ export const DRAFT_TEXT_MAX = 20_000;
 
 export const DRAFT_AUTOSAVE_MS = 1_500;
 
+export const FETCH_TIMEOUT_MS = 10_000;
+
 export const PLACEMENT_STEPS = 3;
 
 export const ADVANCEMENT_STREAK = 3;

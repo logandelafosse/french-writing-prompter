@@ -9,6 +9,7 @@ import { saveSession } from "@/modules/history-store/history-store";
 import { getQuotaState } from "@/modules/quota-manager/quota-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { PromptPostResponse } from "@/contracts/api";
+import { ErrorEnvelope } from "@/contracts/errors";
 import { readResponseJson } from "@/test/read-response-json";
 
 const ConflictBody = z.object({
@@ -59,21 +60,23 @@ describe("evaluate session lifecycle", () => {
     });
 
     const { POST } = await import("./route");
-    await expect(
-      POST(
-        new Request("http://localhost/api/evaluate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-e2e-scenario": "failure",
-          },
-          body: JSON.stringify({
-            writing: "Mon texte à garder.",
-            sessionId: session.id,
-          }),
+    const failed = await POST(
+      new Request("http://localhost/api/evaluate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-e2e-scenario": "failure",
+        },
+        body: JSON.stringify({
+          writing: "Mon texte à garder.",
+          sessionId: session.id,
         }),
-      ),
-    ).rejects.toThrow(/AI service error/);
+      }),
+    );
+    expect(failed.status).toBe(502);
+    expect(failed.headers.get("content-type")).toMatch(/json/);
+    const failedBody = await readResponseJson(failed, ErrorEnvelope);
+    expect(failedBody.error.code).toBe("AI_UNAVAILABLE");
 
     const rows = await db
       .select()
