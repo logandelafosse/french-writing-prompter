@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T14b adversarial fix loop; do not merge).
+Last updated: 2026-11-15 by coordinator (T14b e2e AC c350e27; adversarial product loop).
 
 ## Ready
 
@@ -21,7 +21,7 @@ _None._
 | ID   | Ticket                                                                                                                 | Why                                                                                                                                    |
 | ---- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | T14  | Home first run and `/api/today` bootstrap ([#16](https://github.com/logandelafosse/french-writing-prompter/issues/16)) | T14a #61 done; [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62) T14b (498 prod lines).                      |
-| T14b | Home phases UI + placement                                                                                             | [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62); **adversarial fix loop** — error retry, tests, eval a11y. |
+| T14b | Home phases UI + placement                                                                                             | [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62) `c350e27` e2e AC; adversarial product fixes in flight.   |
 
 ## Blocked
 
@@ -56,7 +56,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T13g | Wordmark 44px touch target                                          | AFK  | T13e       | **Ready** — [#59](https://github.com/logandelafosse/french-writing-prompter/issues/59); adversarial blocker PR #57.                                                              |
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **In review** — T14a done (#61); T14b [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62). Close #60 on T14b merge.                                      |
 | T14a | `GET /api/today` + phase resolver                                   | AFK  | —          | **Done** — merged [PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61).                                                                                   |
-| T14b | Home phases UI + placement                                          | AFK  | T14a       | **In review** — [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62); adversarial blocking fixes + test-review e2e; TOOL-PR62-* non-blocking.             |
+| T14b | Home phases UI + placement                                          | AFK  | T14a       | **In review** — [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62); e2e AC `c350e27`; adversarial product loop; TOOL-PR62-* non-blocking.              |
 | T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300.                                                                                                                       |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                                           |
 | T17  | Session lifecycle and draft autosave                                | AFK  | T16        | Needs the writing surface. Not alongside T20 (both edit the evaluate route and `/api/today`).                                                                                    |
