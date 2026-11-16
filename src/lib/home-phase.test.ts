@@ -50,6 +50,7 @@ describe("resolveHomePhase", () => {
       kind: "B-writing",
       sessionId: 42,
       promptText: "Écrivez sur la Nouvelle-Orléans.",
+      promptMeta: null,
     });
   });
 

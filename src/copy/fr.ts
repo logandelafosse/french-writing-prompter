@@ -7,6 +7,8 @@ export const homeCopy = {
   levelLegend: "Ton niveau CECR",
   generate: "Donne-moi une consigne",
   generateBusy: "Je cherche une consigne…",
+  promptLabel: "Consigne d'écriture",
+  swapPrompt: "↻ Une autre consigne",
   placementLink: "Pas sûr ? Fais le test de placement (3 consignes)",
   aReadyLead: "Prêt pour ta consigne du jour ?",
   writingLabel: "Ton texte",

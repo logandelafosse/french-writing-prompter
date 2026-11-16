@@ -15,6 +15,13 @@
       "when": 1794755432312,
       "tag": "0001_sessions_quota",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794755432313,
+      "tag": "0002_prompt_meta_json",
+      "breakpoints": true
     }
   ]
 }

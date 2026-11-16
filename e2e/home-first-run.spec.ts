@@ -4,7 +4,7 @@ import { captureEvidence } from "./support/evidence";
 import { setLevelB1, visibleHeaderQuota } from "./support/header-helpers";
 import { expectLevelPickerSixButtons } from "./support/home-helpers";
 
-const PROMPT_SNIPPET = "La Nouvelle-Orléans";
+const PROMPT_SNIPPET = "Lafayette";
 
 test.describe("home first run @1280", () => {
   test.use({ viewport: { width: 1280, height: 860 } });

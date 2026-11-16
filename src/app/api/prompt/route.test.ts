@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
@@ -66,7 +67,52 @@ describe("POST /api/prompt quota", { concurrent: false }, () => {
     );
     expect(response.status).toBe(200);
     const body = await readResponseJson(response, PromptPostResponse);
-    expect(body.sessionId).toBeGreaterThan(0);
+    expect(body.session.id).toBeGreaterThan(0);
+    expect(body.quota.remaining).toBeGreaterThanOrEqual(0);
+  });
+
+  it("persists prompt_meta_json and returns promptMeta", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/prompt", { method: "POST" }),
+    );
+    expect(response.status).toBe(200);
+    const body = await readResponseJson(response, PromptPostResponse);
+    expect(body.session.promptMeta.registre).toMatch(
+      /^(formel|familier|mixt)$/,
+    );
+    expect(body.session.promptMeta.wordTarget).toEqual({ min: 250, max: 300 });
+
+    const rows = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, body.session.id));
+    expect(rows[0]?.promptMetaJson).toBeTruthy();
+  });
+
+  it("returns promptMeta null for a legacy row without throwing", async () => {
+    const saved = await saveSession({
+      promptText: "legacy",
+      promptConstraints: JSON.stringify({
+        cefrLevel: "B1",
+        dialect: DEFAULT_DIALECT,
+      }),
+      writingText: null,
+      evaluationJson: null,
+      cefrLevel: "B1",
+      localDate: "2026-11-14",
+    });
+
+    const { GET } = await import("../today/route");
+    const today = await GET();
+    const TodayGetResponse = (await import("@/contracts/today"))
+      .TodayGetResponse;
+    const body = await readResponseJson(today, TodayGetResponse);
+    expect(body.activeSession).toEqual({
+      id: saved.id,
+      prompt: "legacy",
+      meta: null,
+      draft: null,
+    });
   });
 
   it("never exceeds the daily max under concurrent requests", async () => {

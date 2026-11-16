@@ -3,7 +3,6 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { homeCopy } from "@/copy/fr";
-import { DEFAULT_DIALECT } from "@/contracts/prompt";
 import type { CefrLevel } from "@/contracts/cefr";
 
 vi.mock("next/navigation", () => ({
@@ -107,7 +106,7 @@ describe("HomePage first-run generate", () => {
             focus: [],
             activeSession: {
               id: 9,
-              prompt: "La Nouvelle-Orléans",
+              prompt: "Lafayette",
               meta: null,
               draft: null,
             },
@@ -137,13 +136,24 @@ describe("HomePage first-run generate", () => {
         promptCreated = true;
         return Promise.resolve(
           jsonResponse({
-            sessionId: 9,
-            prompt: {
-              text: "La Nouvelle-Orléans",
-              constraints: {
-                cefrLevel: "B1",
-                dialect: DEFAULT_DIALECT,
+            session: {
+              id: 9,
+              promptText: "Lafayette",
+              promptMeta: {
+                genre: "récit",
+                tense: "passé composé",
+                tone: "",
+                registre: "familier",
+                wordTarget: { min: 250, max: 300 },
+                topic: "famille",
+                topicTags: [],
               },
+            },
+            quota: {
+              used: 1,
+              remaining: 2,
+              max: 3,
+              resetsAt: "2026-11-16T06:00:00.000Z",
             },
           }),
         );
@@ -169,7 +179,7 @@ describe("HomePage first-run generate", () => {
     await user.click(generate);
 
     await waitFor(() => {
-      expect(screen.getByText("La Nouvelle-Orléans")).toBeInTheDocument();
+      expect(screen.getByText("Lafayette")).toBeInTheDocument();
     });
   });
 
@@ -217,13 +227,24 @@ describe("HomePage first-run generate", () => {
         }
         return Promise.resolve(
           jsonResponse({
-            sessionId: 9,
-            prompt: {
-              text: "La Nouvelle-Orléans",
-              constraints: {
-                cefrLevel: "B1",
-                dialect: DEFAULT_DIALECT,
+            session: {
+              id: 9,
+              promptText: "Lafayette",
+              promptMeta: {
+                genre: "récit",
+                tense: "passé composé",
+                tone: "",
+                registre: "familier",
+                wordTarget: { min: 250, max: 300 },
+                topic: "famille",
+                topicTags: [],
               },
+            },
+            quota: {
+              used: 1,
+              remaining: 2,
+              max: 3,
+              resetsAt: "2026-11-16T06:00:00.000Z",
             },
           }),
         );

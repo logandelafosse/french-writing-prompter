@@ -9,6 +9,15 @@ import { renderForEvaluator } from "@/modules/dialect/render";
 function makePrompt(cefr: CefrLevel): WritingPrompt {
   return {
     text: "Décrivez votre ville natale en 100 mots.",
+    meta: {
+      genre: "description",
+      tense: "présent",
+      tone: "",
+      registre: "familier",
+      wordTarget: { min: 80, max: 120 },
+      topic: "ville",
+      topicTags: [],
+    },
     constraints: { cefrLevel: cefr, dialect: DEFAULT_DIALECT },
   };
 }

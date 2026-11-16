@@ -8,10 +8,20 @@ import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator"
 import type { Evaluation } from "@/modules/writing-evaluator/writing-evaluator";
 import type { CefrLevel } from "@/contracts/cefr";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { WORD_TARGET_BY_LEVEL } from "@/config/limits";
 
 function makePrompt(level: CefrLevel): WritingPrompt {
   return {
     text: `Prompt for ${level}`,
+    meta: {
+      genre: "récit",
+      tense: "présent",
+      tone: "",
+      registre: "familier",
+      wordTarget: WORD_TARGET_BY_LEVEL[level],
+      topic: "test",
+      topicTags: [],
+    },
     constraints: { cefrLevel: level, dialect: DEFAULT_DIALECT },
   };
 }

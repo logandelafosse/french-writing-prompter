@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { CefrLevel } from "./cefr";
 import { LevelChangeDto, QuotaGetResponse } from "./api";
+import { PromptMeta } from "./prompt-meta";
 
 export const TodayActiveSession = z.object({
   id: z.number(),
   prompt: z.string(),
-  meta: z.null(),
+  meta: PromptMeta.nullable(),
   draft: z.null(),
 });
 
@@ -29,6 +30,7 @@ export type ResolvedHomePhase =
       kind: "B-writing";
       sessionId: number;
       promptText: string;
+      promptMeta: z.infer<typeof PromptMeta> | null;
     };
 
 export function resolveHomePhase(bootstrap: TodayGetDto): ResolvedHomePhase {
@@ -40,6 +42,7 @@ export function resolveHomePhase(bootstrap: TodayGetDto): ResolvedHomePhase {
       kind: "B-writing",
       sessionId: bootstrap.activeSession.id,
       promptText: bootstrap.activeSession.prompt,
+      promptMeta: bootstrap.activeSession.meta,
     };
   }
   return { kind: "A-ready" };

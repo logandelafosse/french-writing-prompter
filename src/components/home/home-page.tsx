@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CefrLevel } from "@/contracts/cefr";
+import type { PromptMeta } from "@/contracts/prompt-meta";
 import {
   EvaluatePostResponse,
   LevelPutResponse,
@@ -13,6 +14,7 @@ import {
   type TodayGetDto,
 } from "@/contracts/today";
 import { useHeaderShell } from "@/components/shell/header-shell";
+import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { homeCopy } from "@/copy/fr";
 import { Button } from "@/components/ui/button";
@@ -79,6 +81,24 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     void loadToday();
   }, [loadToday]);
 
+  const postPrompt = async (): Promise<boolean> => {
+    const promptResult = await fetchJson("/api/prompt", PromptPostResponse, {
+      method: "POST",
+    });
+    if (!promptResult.ok) {
+      setBootstrap((prev) =>
+        failBootstrap(
+          prev,
+          messageFromFetchError(promptResult.error, homeCopy.loadError),
+        ),
+      );
+      return false;
+    }
+    await refreshQuota();
+    await loadToday();
+    return true;
+  };
+
   const runGenerate = async (level: CefrLevel) => {
     setGenerateUi("generating");
     const levelResult = await fetchJson("/api/level", LevelPutResponse, {
@@ -96,21 +116,14 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
       );
       return;
     }
-    const promptResult = await fetchJson("/api/prompt", PromptPostResponse, {
-      method: "POST",
-    });
+    await postPrompt();
     setGenerateUi("idle");
-    if (!promptResult.ok) {
-      setBootstrap((prev) =>
-        failBootstrap(
-          prev,
-          messageFromFetchError(promptResult.error, homeCopy.loadError),
-        ),
-      );
-      return;
-    }
-    await refreshQuota();
-    await loadToday();
+  };
+
+  const runSwap = async () => {
+    setGenerateUi("generating");
+    await postPrompt();
+    setGenerateUi("idle");
   };
 
   return (
@@ -156,6 +169,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
             )
           }
           onGenerate={(level) => void runGenerate(level)}
+          onSwap={() => void runSwap()}
         />
       ) : null}
     </main>
@@ -168,12 +182,14 @@ function HomeBody({
   generating,
   onSelectLevel,
   onGenerate,
+  onSwap,
 }: {
   bootstrap: Extract<BootstrapState, { kind: "ready" }>;
   titleDate: Date;
   generating: boolean;
   onSelectLevel: (level: CefrLevel) => void;
   onGenerate: (level: CefrLevel) => void;
+  onSwap: () => void;
 }) {
   const phase = resolveHomePhase(bootstrap.data);
   const phaseLevel =
@@ -187,6 +203,9 @@ function HomeBody({
         <WritingInterim
           sessionId={phase.sessionId}
           promptText={phase.promptText}
+          promptMeta={phase.promptMeta}
+          generating={generating}
+          onSwap={onSwap}
         />
       ) : (
         <HomePhaseA
@@ -209,9 +228,15 @@ function HomeBody({
 function WritingInterim({
   sessionId,
   promptText,
+  promptMeta,
+  generating,
+  onSwap,
 }: {
   sessionId: number;
   promptText: string;
+  promptMeta: PromptMeta | null;
+  generating: boolean;
+  onSwap: () => void;
 }) {
   const [writing, setWriting] = useState("");
   const [submitUi, setSubmitUi] = useState<
@@ -220,6 +245,7 @@ function WritingInterim({
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const resultsRef = useRef<HTMLElement | null>(null);
+  const promptRegionRef = useRef<HTMLDivElement | null>(null);
 
   const submit = async () => {
     if (!writing.trim()) return;
@@ -243,13 +269,28 @@ function WritingInterim({
     if (submitUi === "review" && evaluation) resultsRef.current?.focus();
   }, [submitUi, evaluation]);
 
+  useEffect(() => {
+    if (!generating && promptRegionRef.current) {
+      promptRegionRef.current.focus();
+    }
+  }, [promptText, generating]);
+
   return (
     <div className="flex flex-col gap-5">
-      <Surface padding="home">
-        <p className="text-prompt text-ink font-serif whitespace-pre-wrap">
-          {promptText}
-        </p>
-      </Surface>
+      <div
+        ref={promptRegionRef}
+        tabIndex={-1}
+        aria-live="polite"
+        className="outline-none"
+      >
+        <PromptSheet
+          promptText={promptText}
+          meta={promptMeta}
+          animateKey={`${sessionId}-${promptText}`}
+          generateBusy={generating}
+          swap={{ onSwap }}
+        />
+      </div>
       {submitUi === "review" && evaluation ? (
         <section
           ref={resultsRef}

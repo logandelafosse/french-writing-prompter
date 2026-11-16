@@ -4,6 +4,7 @@ import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import {
   QuotaExhaustedError,
   assertQuotaAvailable,
+  getQuotaState,
   quotaTimeZone,
 } from "@/modules/quota-manager/quota-store";
 import { getCurrentLevel } from "@/modules/cefr-tracker/db-store";
@@ -11,6 +12,7 @@ import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { localDateKey } from "@/lib/dates";
+import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 
 let quotaPromptChain = Promise.resolve();
 
@@ -43,7 +45,13 @@ export async function POST(request: Request) {
       let prompt;
       try {
         prompt = await promptGenerator.generate(level, DEFAULT_DIALECT);
-      } catch {
+      } catch (error) {
+        if (error instanceof AiOutputError) {
+          return NextResponse.json(
+            { error: "Prompt generation failed." },
+            { status: 502 },
+          );
+        }
         return NextResponse.json(
           { error: "Prompt generation failed." },
           { status: 502 },
@@ -55,6 +63,7 @@ export async function POST(request: Request) {
 
       const inserted = await db.insert(sessions).values({
         promptText: prompt.text,
+        promptMetaJson: JSON.stringify(prompt.meta),
         promptConstraints: JSON.stringify(prompt.constraints),
         writingText: null,
         evaluationJson: null,
@@ -64,8 +73,16 @@ export async function POST(request: Request) {
         localDate,
       });
       const sessionId = Number(inserted.lastInsertRowid);
+      const quota = await getQuotaState();
 
-      return NextResponse.json({ prompt, sessionId });
+      return NextResponse.json({
+        session: {
+          id: sessionId,
+          promptText: prompt.text,
+          promptMeta: prompt.meta,
+        },
+        quota,
+      });
     });
   } catch (error) {
     if (error instanceof QuotaExhaustedError) {
