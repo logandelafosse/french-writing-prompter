@@ -1412,3 +1412,21 @@ Non-blocking for T23 merge. Land **TOOL-PR75-1** and **TOOL-PR75-2** before T25.
 | TOOL-PR75-5 | Review `no-arbitrary-tailwind-bracket`  | Outlined marker `px-[5px]` / card pill `px-[7px]`; delete slice when TOOL-PR73-4 lands.                                                                                                 |
 
 **Folds:** `E2eScenario` `"standard"` duplicated in `ai-client.ts` and `e2e/support/fixtures.ts` (TOOL-PR69-1, open).
+
+### PR #76 (T24 — DLF lexicon)
+
+Non-blocking for T24 merge. Prioritize **TOOL-PR76-4** and **TOOL-PR76-5** before first lexicon Release ([DLF-extract#41](https://github.com/logandelafosse/DLF-extract/issues/41)).
+
+| ID (draft)  | Rule / change                                   | Notes                                                                                                  |
+| ----------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| TOOL-PR76-1 | `no-client-lexicon-json` + ESLint probe restore | Ban client `lexicon.json` imports; restore dropped `eslint-config.test.ts` case for `@/modules/dlf/*`. |
+| TOOL-PR76-2 | `modules-fs-server-allowlist`                   | Only `src/modules/dlf/load.ts` may import `node:fs` / `server-only` from modules.                      |
+| TOOL-PR76-3 | `dlf-attribution-single-source`                 | `DlfAttribution` Zod in `contracts/dlf.ts`; no parallel object types.                                  |
+| TOOL-PR76-4 | `dlf-fetch-validates-artifact`                  | `scripts/dlf-fetch.ts` must parse `DlfLexicon`; semver + auth for private releases.                    |
+| TOOL-PR76-5 | `dlf-version-pin-tracked`                       | `.gitignore` vs docs on committing `src/data/dlf/version`; align pin story.                            |
+| TOOL-PR76-6 | `dlf-fixture-path-single-source`                | Literal fixture path repeated in configs/tests/scripts.                                                |
+| TOOL-PR76-7 | `dlf-limits-single-source`                      | Token estimate and plural min in `lookup.ts` instead of `src/config`.                                  |
+| TOOL-PR76-8 | `e2e-dlf-copy-single-source`                    | Hardcoded DLF strings in `e2e/dlf-badge.spec.ts`.                                                      |
+| TOOL-PR76-9 | `no-dlf-extract-sibling-path`                   | `verify-dlf-seed.ts` still reads `../DLF-extract`.                                                     |
+
+**Already good:** `server-only` loader; suggestion-only DLF attribution after `4a589f0`; hint caps in `limits.ts`; badge via `reviewCopy` + `<abbr>`.
