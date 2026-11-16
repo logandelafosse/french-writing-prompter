@@ -61,6 +61,9 @@ test.describe("quota exhausted @1280", () => {
     await captureEvidence(page, testInfo, "quota-notice-1280");
     await submit.click();
     await expectEvaluationWithScores(page);
+    await expect(
+      main.getByRole("button", { name: "Une autre consigne · à minuit" }),
+    ).toBeDisabled();
   });
 });
 

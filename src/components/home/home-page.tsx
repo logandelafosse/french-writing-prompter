@@ -521,15 +521,24 @@ function WritingInterim({
 
   if (submitUi === "review" && review) {
     return (
-      <ReviewScreen
-        promptText={promptText}
-        promptMeta={promptMeta}
-        writingText={review.writingText}
-        corrections={review.corrections}
-        quotaRemaining={quotaRemaining}
-        generating={generating}
-        onNextPrompt={onFreshPrompt}
-      />
+      <>
+        <ReviewScreen
+          promptText={promptText}
+          promptMeta={promptMeta}
+          writingText={review.writingText}
+          corrections={review.corrections}
+          quotaRemaining={quotaRemaining}
+          generating={generating}
+          onNextPrompt={onFreshPrompt}
+        />
+        {generateFailure !== null &&
+        !(generateFailure === "offline" && offline) ? (
+          <ErrorAlert
+            lead={homeCopy.errorGenerateLead}
+            onRetry={onRetryGenerate}
+          />
+        ) : null}
+      </>
     );
   }
 

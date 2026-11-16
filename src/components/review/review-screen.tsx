@@ -74,9 +74,8 @@ export function ReviewScreen({
         : item,
     );
     const next = nextOpenMistake(nextItems, target.ordinal);
-    if (next) {
-      document.getElementById(`correction-${next.ordinal}`)?.focus();
-    }
+    const focusId = `correction-${(next ?? target).ordinal}`;
+    document.getElementById(focusId)?.focus();
   };
 
   return (
@@ -142,9 +141,13 @@ export function ReviewScreen({
           <div className="flex flex-wrap items-center gap-2 gap-x-[22px] pt-2.5">
             <GenerateButton
               busy={generating}
-              disabled={generating}
+              disabled={quotaRemaining === 0}
               onClick={onNextPrompt}
-              label={homeCopy.reviewNextPrompt(quotaRemaining)}
+              label={
+                quotaRemaining === 0
+                  ? homeCopy.reviewNextPromptDisabled
+                  : homeCopy.reviewNextPrompt(quotaRemaining)
+              }
             />
           </div>
         </section>
