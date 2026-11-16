@@ -111,3 +111,140 @@ describe("CorrectionCard standard", () => {
     expect(onAcknowledge).not.toHaveBeenCalled();
   });
 });
+
+function dialect(
+  partial: Pick<Correction, "id" | "ordinal" | "quote" | "suggestion"> &
+    Partial<Correction>,
+): Correction {
+  return Correction.parse({
+    sessionId: 1,
+    kind: "dialect_check",
+    span: { start: 0, end: 7 },
+    anchor: "exact",
+    explanation: "Le français standard prend « est tombé ».",
+    question: "Ça se dit comme ça chez toi, « a tombé » ?",
+    ruleIfDialect: "On dit a tombé.",
+    category: "auxiliaire",
+    dlf: null,
+    resourceIds: [],
+    status: "open",
+    dialectNoteId: null,
+    isFocus: false,
+    ...partial,
+  });
+}
+
+function mistake(
+  partial: Pick<Correction, "id" | "ordinal" | "quote" | "suggestion"> &
+    Partial<Correction>,
+): Correction {
+  return Correction.parse({
+    sessionId: 1,
+    kind: "mistake",
+    span: { start: 0, end: 10 },
+    anchor: "exact",
+    explanation: "Accord.",
+    question: null,
+    ruleIfDialect: "Si c'est louisianais, on garderait enfant.",
+    category: "accord",
+    dlf: null,
+    resourceIds: [],
+    status: "open",
+    dialectNoteId: null,
+    isFocus: false,
+    ...partial,
+  });
+}
+
+describe("CorrectionCard dialect_check", () => {
+  it("shows the dialect question and both answers", () => {
+    render(
+      <CorrectionCard
+        correction={dialect({
+          id: "d1",
+          ordinal: 6,
+          quote: "a tombé",
+          suggestion: "est tombé",
+          contextQuote: "mon petit cousin a tombé",
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    const card = screen.getByRole("article");
+    expect(card).toHaveAttribute("id", "correction-6");
+    expect(within(card).getByText(reviewCopy.kindDialect)).toBeVisible();
+    expect(within(card).getByText("mon petit cousin a tombé")).toBeVisible();
+    expect(
+      within(card).getByText("Ça se dit comme ça chez toi, « a tombé » ?"),
+    ).toBeVisible();
+    expect(
+      within(card).getByRole("button", { name: reviewCopy.actionConfirm }),
+    ).toBeVisible();
+    expect(
+      within(card).getByRole("button", { name: reviewCopy.actionReject }),
+    ).toBeVisible();
+  });
+
+  it("confirmed_mistake re-renders as a Faute with no actions", () => {
+    render(
+      <CorrectionCard
+        correction={dialect({
+          id: "d1",
+          ordinal: 6,
+          quote: "a tombé",
+          suggestion: "est tombé",
+          status: "confirmed_mistake",
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    const card = screen.getByRole("article");
+    expect(within(card).getByText(reviewCopy.kindMistake)).toBeVisible();
+    expect(within(card).getByText("a tombé")).toBeVisible();
+    expect(within(card).getByText("est tombé")).toBeVisible();
+    expect(
+      within(card).queryByRole("button", { name: reviewCopy.actionReject }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(card).queryByRole("button", { name: reviewCopy.actionAck }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("confirmed_dialect is replaced by the saved-note line", () => {
+    render(
+      <CorrectionCard
+        correction={dialect({
+          id: "d1",
+          ordinal: 6,
+          quote: "a tombé",
+          suggestion: "est tombé",
+          status: "confirmed_dialect",
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    expect(screen.getByText(reviewCopy.savedNote)).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: reviewCopy.savedNoteLink }),
+    ).toHaveAttribute("href", "/carnet");
+  });
+});
+
+describe("CorrectionCard mistake pushback", () => {
+  it("open mistake cards offer C'est du français louisianais", () => {
+    render(
+      <CorrectionCard
+        correction={mistake({
+          id: "m1",
+          ordinal: 3,
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    expect(
+      screen.getByRole("button", { name: reviewCopy.actionPushback }),
+    ).toBeVisible();
+  });
+});

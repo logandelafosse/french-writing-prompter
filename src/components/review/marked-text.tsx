@@ -2,20 +2,31 @@ import type { ReactNode } from "react";
 import type { Correction } from "@/contracts/correction";
 import { reviewCopy } from "@/copy/review";
 
-type MarkedKind = "mistake" | "standard";
+type MarkedKind = "mistake" | "standard" | "dialect_check";
 
 type Mark = Pick<Correction, "id" | "ordinal"> & {
   kind: MarkedKind;
   span: { start: number; end: number };
 };
 
-function isMarkedKind(kind: Correction["kind"]): kind is MarkedKind {
-  return kind === "mistake" || kind === "standard";
+function markKind(
+  item: Pick<Correction, "kind" | "status" | "span">,
+): MarkedKind | null {
+  if (item.span === null) return null;
+  if (item.status === "confirmed_dialect" || item.status === "overturned")
+    return null;
+  if (item.kind === "dialect_check" && item.status === "confirmed_mistake") {
+    return "mistake";
+  }
+  return item.kind;
 }
 
 function markClass(kind: Mark["kind"]) {
   if (kind === "standard") {
     return "border-b-standard border-b-2 border-dashed bg-transparent py-px text-inherit";
+  }
+  if (kind === "dialect_check") {
+    return "bg-dialect-tint decoration-dialect px-0.5 py-px text-inherit underline decoration-wavy underline-offset-[5px]";
   }
   return "bg-mistake-tint border-b-mistake border-b-2 px-0.5 py-px text-inherit";
 }
@@ -23,6 +34,9 @@ function markClass(kind: Mark["kind"]) {
 function markerClass(kind: Mark["kind"]) {
   if (kind === "standard") {
     return "rounded-marker border-standard text-marker border bg-white px-[5px] font-sans font-bold text-standard no-underline";
+  }
+  if (kind === "dialect_check") {
+    return "rounded-marker-dialect bg-dialect text-marker px-[5px] py-px font-sans font-bold text-white no-underline";
   }
   return "rounded-marker bg-mistake text-marker px-1.5 py-px font-sans font-bold text-white no-underline";
 }
@@ -57,7 +71,7 @@ function renderRange(text: string, start: number, end: number, marks: Mark[]) {
           aria-label={reviewCopy.srMark(item.kind, item.ordinal)}
           className={markerClass(item.kind)}
         >
-          {item.ordinal}
+          {item.kind === "dialect_check" ? `${item.ordinal} ?` : item.ordinal}
         </a>
       </sup>,
       <span key={`${item.id}-sr`} className="sr-only">
@@ -80,18 +94,12 @@ export function MarkedText({
     "id" | "ordinal" | "kind" | "span" | "status"
   >[];
 }) {
-  const marks = corrections.flatMap((item) =>
-    isMarkedKind(item.kind) && item.span !== null
-      ? [
-          {
-            id: item.id,
-            ordinal: item.ordinal,
-            kind: item.kind,
-            span: item.span,
-          },
-        ]
-      : [],
-  );
+  const marks = corrections.flatMap((item) => {
+    const kind = markKind(item);
+    return kind !== null && item.span !== null
+      ? [{ id: item.id, ordinal: item.ordinal, kind, span: item.span }]
+      : [];
+  });
   marks.sort((a, b) => a.span.start - b.span.start);
   return (
     <div

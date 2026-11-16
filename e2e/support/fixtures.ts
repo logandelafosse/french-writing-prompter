@@ -1,7 +1,8 @@
 import { test as base } from "@playwright/test";
 import { resetE2eDatabase } from "./reset-db";
 
-type E2eScenario = "happy" | "malformed" | "failure" | "advance" | "standard";
+type E2eScenario =
+  "happy" | "malformed" | "failure" | "advance" | "standard" | "dialect";
 
 type E2eFixtures = {
   resetDb: void;
