@@ -4,18 +4,19 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T13c filed from PR #52 reviews; T14 ready).
+Last updated: 2026-11-15 by coordinator (T13c dispatch; T14 ready).
 
 ## Ready
 
-| ID   | Ticket                                                                                                                 | Why                                                                    |
-| ---- | ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| T13c | Header PR #52 review fixes ([#53](https://github.com/logandelafosse/french-writing-prompter/issues/53))                | Blocking review debt from #52 merge.                                   |
-| T14  | Home first run and `/api/today` bootstrap ([#16](https://github.com/logandelafosse/french-writing-prompter/issues/16)) | T13 merged 2026-11-15. T13c can run in parallel (different home seam). |
+| ID  | Ticket                                                                                                                 | Why                                                         |
+| --- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| T14 | Home first run and `/api/today` bootstrap ([#16](https://github.com/logandelafosse/french-writing-prompter/issues/16)) | T13 merged; queue after T13c or parallel (different seams). |
 
 ## In progress
 
-_None._
+| ID   | Ticket                                                                                                  | Why                                                               |
+| ---- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| T13c | Header PR #52 review fixes ([#53](https://github.com/logandelafosse/french-writing-prompter/issues/53)) | Branch `ticket/t13c-header-review-fixes`; implementer dispatched. |
 
 ## In review
 
@@ -47,7 +48,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | ID   | Ticket                                                              | Type | Blocked by | Why not ready                                                                                                                                                                    |
 | ---- | ------------------------------------------------------------------- | ---- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | T13  | App header, level menu, local-midnight quota                        | AFK  | —          | **Done** — [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) + [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52) 2026-11-15. |
-| T13c | Header PR #52 review fixes                                          | AFK  | T13        | **Ready** — [#53](https://github.com/logandelafosse/french-writing-prompter/issues/53); spec `T13c-header-pr52-review-fixes.md`.                                                 |
+| T13c | Header PR #52 review fixes                                          | AFK  | T13        | **In progress** — [#53](https://github.com/logandelafosse/french-writing-prompter/issues/53); branch `ticket/t13c-header-review-fixes`.                                          |
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **Ready** — T13 done.                                                                                                                                                            |
 | T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300.                                                                                                                       |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                                           |
