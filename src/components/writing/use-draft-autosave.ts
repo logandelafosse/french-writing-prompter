@@ -50,7 +50,11 @@ export function useDraftAutosave(
           body: JSON.stringify({ text }),
         },
       ).then((result) => {
-        if (seq !== seqRef.current || !result.ok) return;
+        if (seq !== seqRef.current) return;
+        if (!result.ok) {
+          dirtyRef.current = true;
+          return;
+        }
         if (textRef.current !== text) return;
         writeLocalDraft(sessionId, { text, savedAt: result.value.savedAt });
         setDraft((prev) => ({

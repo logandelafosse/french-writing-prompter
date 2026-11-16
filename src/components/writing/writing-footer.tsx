@@ -11,6 +11,7 @@ export function WritingFooter({
   submitBusy,
   submitRetry,
   savedAt,
+  localOnly = false,
   onSubmit,
 }: {
   text: string;
@@ -19,9 +20,10 @@ export function WritingFooter({
   submitBusy: boolean;
   submitRetry?: boolean | undefined;
   savedAt?: string | null | undefined;
+  localOnly?: boolean | undefined;
   onSubmit: () => void;
 }) {
-  const draftStatus = savedAt ? <DraftStatus savedAt={savedAt} /> : null;
+  const draftStatus = <DraftStatus savedAt={savedAt} localOnly={localOnly} />;
   const disabled = isSubmitDisabled(text, submitBusy);
   if (layout === "mobile")
     return (

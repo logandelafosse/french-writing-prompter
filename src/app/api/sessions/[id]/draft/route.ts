@@ -3,6 +3,7 @@ import { z } from "zod";
 import { DRAFT_TEXT_MAX } from "@/config/limits";
 import { parseRequestBody } from "@/lib/http";
 import { saveActiveDraft } from "@/modules/history-store/history-store";
+import { withErrors } from "@/server/with-errors";
 
 const DraftPutBody = z.strictObject({ text: z.string() });
 const SessionId = z.coerce.number().int().positive();
@@ -18,7 +19,7 @@ function draftError(code: keyof typeof DRAFT_ERRORS) {
   return NextResponse.json({ error, code }, { status });
 }
 
-export async function PUT(
+export const PUT = withErrors(async function putDraft(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
@@ -38,4 +39,4 @@ export async function PUT(
     savedAt: saved.savedAt,
     wordCount: saved.wordCount,
   });
-}
+});

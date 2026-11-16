@@ -15,9 +15,9 @@ import {
 } from "@/contracts/today";
 import { useHeaderShell } from "@/components/shell/header-shell";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
-import { fetchJson, messageFromFetchError } from "@/lib/http";
+import { classifyFetchError, fetchJson, type FetchError } from "@/lib/http";
+import type { ClassifiedFetchFailure } from "@/contracts/errors";
 import { homeCopy } from "@/copy/fr";
-import { Button } from "@/components/ui/button";
 import { Surface } from "@/components/ui/surface";
 import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
 import { RuledTextarea } from "@/components/writing/ruled-textarea";
@@ -30,7 +30,9 @@ import { shouldShowWordNudge } from "@/lib/word-meter-math";
 import { cn } from "@/lib/utils";
 import type { Evaluation } from "@/contracts/evaluation";
 import { ConfirmSwapDialog } from "@/components/states/confirm-swap-dialog";
+import { ErrorAlert } from "@/components/states/error-alert";
 import { QuotaNotice } from "@/components/states/notice";
+import { OfflineNotice, useOffline } from "@/components/states/offline-notice";
 import { HomeDateTitle, HomePhaseA } from "./home-phase-a";
 
 type PromptAttempt =
@@ -46,13 +48,17 @@ type SwapBody = {
 // prettier-ignore
 type BootstrapState =
   | { kind: "loading" }
-  | { kind: "initial-error"; message: string }
-  | { kind: "ready"; data: TodayGetDto; selectedLevel: CefrLevel | null; actionError: string | null };
+  | { kind: "initial-error"; failure: ClassifiedFetchFailure }
+  | { kind: "ready"; data: TodayGetDto; selectedLevel: CefrLevel | null; actionFailure: ClassifiedFetchFailure | null };
 
-function failBootstrap(prev: BootstrapState, message: string): BootstrapState {
+function failBootstrap(
+  prev: BootstrapState,
+  error: FetchError,
+): BootstrapState {
+  const failure = classifyFetchError(error);
   return prev.kind === "ready"
-    ? { ...prev, actionError: message }
-    : { kind: "initial-error", message };
+    ? { ...prev, actionFailure: failure }
+    : { kind: "initial-error", failure };
 }
 
 function applyToday(
@@ -68,7 +74,7 @@ function applyToday(
       prev.kind === "ready" && prev.selectedLevel !== null
         ? prev.selectedLevel
         : value.level,
-    actionError: null,
+    actionFailure: null,
   };
 }
 
@@ -79,16 +85,14 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     kind: "loading",
   });
   const [generateUi, setGenerateUi] = useState<"idle" | "generating">("idle");
+  const offline = useOffline();
 
   const loadToday = useCallback(async () => {
-    const result = await fetchJson("/api/today", TodayGetResponse);
+    const result = await fetchJson("/api/today", TodayGetResponse, {
+      loadingTimeout: true,
+    });
     if (!result.ok) {
-      setBootstrap((prev) =>
-        failBootstrap(
-          prev,
-          messageFromFetchError(result.error, homeCopy.loadError),
-        ),
-      );
+      setBootstrap((prev) => failBootstrap(prev, result.error));
       return;
     }
     setBootstrap((prev) => applyToday(result.value, prev, syncFromToday));
@@ -125,9 +129,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
       ) {
         return { ok: false, reason: "draft", wordCount: error.wordCount };
       }
-      setBootstrap((prev) =>
-        failBootstrap(prev, messageFromFetchError(error, homeCopy.loadError)),
-      );
+      setBootstrap((prev) => failBootstrap(prev, error));
       return { ok: false, reason: "failed" };
     }
     await refreshQuota();
@@ -144,12 +146,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     });
     if (!levelResult.ok) {
       setGenerateUi("idle");
-      setBootstrap((prev) =>
-        failBootstrap(
-          prev,
-          messageFromFetchError(levelResult.error, homeCopy.loadError),
-        ),
-      );
+      setBootstrap((prev) => failBootstrap(prev, levelResult.error));
       return;
     }
     await postPrompt();
@@ -169,43 +166,58 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     return result;
   };
 
+  const generateFailure =
+    bootstrap.kind === "ready" ? bootstrap.actionFailure : null;
+  const loadFailure =
+    bootstrap.kind === "initial-error" ? bootstrap.failure : null;
+  const writing =
+    bootstrap.kind === "ready" &&
+    resolveHomePhase(bootstrap.data).kind === "B-writing";
+  const showOffline =
+    (offline || loadFailure === "offline" || generateFailure === "offline") &&
+    !writing;
+
+  const retryHome = () => {
+    if (bootstrap.kind === "initial-error") {
+      void loadToday();
+      return;
+    }
+    if (bootstrap.kind === "ready" && generateFailure) {
+      const level = bootstrap.selectedLevel ?? bootstrap.data.level;
+      if (level) void runGenerate(level);
+      else void loadToday();
+      return;
+    }
+    void loadToday();
+  };
+
   return (
     <main className="max-w-home mx-auto flex w-full flex-col gap-5 px-5 py-5 pb-20 sm:gap-[22px] sm:px-6 sm:pt-5">
-      {bootstrap.kind === "loading" ? (
+      {bootstrap.kind === "loading" && !showOffline ? (
         <p className="text-muted text-sm" aria-live="polite">
           Chargement…
         </p>
       ) : null}
-      {bootstrap.kind === "initial-error" ||
-      (bootstrap.kind === "ready" && bootstrap.actionError) ? (
-        <div className="flex flex-col gap-2">
-          <p role="alert" className="text-mistake text-sm">
-            {bootstrap.kind === "initial-error"
-              ? bootstrap.message
-              : bootstrap.actionError}
-          </p>
-          <Button
-            variant="secondary-strong"
-            size="lg"
-            className="min-h-touch"
-            onClick={() => {
-              if (bootstrap.kind === "initial-error") void loadToday();
-              else {
-                const level = bootstrap.selectedLevel ?? bootstrap.data.level;
-                if (level) void runGenerate(level);
-                else void loadToday();
-              }
-            }}
-          >
-            {homeCopy.retry}
-          </Button>
-        </div>
+      {showOffline ? <OfflineNotice onRetry={retryHome} /> : null}
+      {!showOffline && loadFailure !== null ? (
+        <ErrorAlert
+          lead={homeCopy.loadError}
+          onRetry={() => void loadToday()}
+        />
+      ) : null}
+      {!showOffline &&
+      !writing &&
+      generateFailure !== null &&
+      generateFailure !== "offline" ? (
+        <ErrorAlert lead={homeCopy.errorGenerateLead} onRetry={retryHome} />
       ) : null}
       {bootstrap.kind === "ready" ? (
         <HomeBody
           bootstrap={bootstrap}
           titleDate={titleDate}
           generating={generateUi === "generating"}
+          offline={offline}
+          onRetryGenerate={retryHome}
           onSelectLevel={(level) =>
             setBootstrap((prev) =>
               prev.kind === "ready" ? { ...prev, selectedLevel: level } : prev,
@@ -225,6 +237,8 @@ function HomeBody({
   bootstrap,
   titleDate,
   generating,
+  offline,
+  onRetryGenerate,
   onSelectLevel,
   onGenerate,
   onSwap,
@@ -234,6 +248,8 @@ function HomeBody({
   bootstrap: Extract<BootstrapState, { kind: "ready" }>;
   titleDate: Date;
   generating: boolean;
+  offline: boolean;
+  onRetryGenerate: () => void;
   onSelectLevel: (level: CefrLevel) => void;
   onGenerate: (level: CefrLevel) => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
@@ -265,6 +281,9 @@ function HomeBody({
           draft={phase.draft}
           generating={generating}
           quotaRemaining={bootstrap.data.quota.remaining}
+          offline={offline}
+          generateFailure={bootstrap.actionFailure}
+          onRetryGenerate={onRetryGenerate}
           onSwap={onSwap}
           onFreshPrompt={onFreshPrompt}
         />
@@ -293,6 +312,9 @@ function WritingInterim({
   draft,
   generating,
   quotaRemaining,
+  offline,
+  generateFailure,
+  onRetryGenerate,
   onSwap,
   onFreshPrompt,
 }: {
@@ -302,16 +324,21 @@ function WritingInterim({
   draft: { text: string; savedAt: string } | null;
   generating: boolean;
   quotaRemaining: number;
+  offline: boolean;
+  generateFailure: ClassifiedFetchFailure | null;
+  onRetryGenerate: () => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
 }) {
   const autosave = useDraftAutosave(sessionId, draft);
   const writing = autosave.text;
+  const saveNow = autosave.saveNow;
   const [submitUi, setSubmitUi] = useState<
     "idle" | "evaluating" | "review" | "error"
   >("idle");
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [submitFailure, setSubmitFailure] =
+    useState<ClassifiedFetchFailure | null>(null);
   const [swapConfirm, setSwapConfirm] = useState<{ wordCount: number } | null>(
     null,
   );
@@ -328,7 +355,7 @@ function WritingInterim({
     : homeCopy.swapPrompt;
 
   const requestSwap = async () => {
-    await autosave.saveNow();
+    await saveNow();
     const words = countWords(writing);
     if (words >= 1) {
       setSwapConfirm({ wordCount: words });
@@ -342,7 +369,7 @@ function WritingInterim({
 
   const confirmSwap = async () => {
     setSwapConfirm(null);
-    await autosave.saveNow();
+    await saveNow();
     const result = await onSwap({
       replaceSessionId: sessionId,
       confirmAbandon: true,
@@ -355,20 +382,29 @@ function WritingInterim({
   const submit = async () => {
     if (!writing.trim()) return;
     setSubmitUi("evaluating");
-    setError(null);
+    setSubmitFailure(null);
     const result = await fetchJson("/api/evaluate", EvaluatePostResponse, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ writing: writing.trim(), sessionId }),
     });
     if (!result.ok) {
+      const failure = classifyFetchError(result.error);
       setSubmitUi("error");
-      setError(messageFromFetchError(result.error, homeCopy.evalError));
+      setSubmitFailure(failure);
       return;
     }
     setSubmitUi("review");
     setEvaluation(result.value.evaluation);
   };
+
+  useEffect(() => {
+    const onOnline = () => {
+      void saveNow();
+    };
+    window.addEventListener("online", onOnline);
+    return () => window.removeEventListener("online", onOnline);
+  }, [saveNow]);
 
   useEffect(() => {
     if (submitUi === "review" && evaluation) resultsRef.current?.focus();
@@ -490,8 +526,8 @@ function WritingInterim({
               target={wordTarget}
               layout="desktop"
               submitBusy={evaluating}
-              submitRetry={submitUi === "error"}
               savedAt={autosave.savedAt}
+              localOnly={offline || submitFailure === "offline"}
               onSubmit={() => void submit()}
             />
           </div>
@@ -502,8 +538,8 @@ function WritingInterim({
             target={wordTarget}
             layout="mobile"
             submitBusy={evaluating}
-            submitRetry={submitUi === "error"}
             savedAt={autosave.savedAt}
+            localOnly={offline || submitFailure === "offline"}
             onSubmit={() => void submit()}
           />
         </div>
@@ -512,10 +548,27 @@ function WritingInterim({
             {homeCopy.wordNudge}
           </p>
         ) : null}
-        {error ? (
-          <p role="alert" className="text-mistake text-sm">
-            {error}
-          </p>
+        {offline || submitFailure === "offline" ? (
+          <OfflineNotice
+            onRetry={() => {
+              void saveNow();
+              if (submitFailure !== null) void submit();
+            }}
+          />
+        ) : null}
+        {generateFailure !== null &&
+        !(generateFailure === "offline" && offline) ? (
+          <ErrorAlert
+            lead={homeCopy.errorGenerateLead}
+            onRetry={onRetryGenerate}
+          />
+        ) : null}
+        {submitFailure !== null && submitFailure !== "offline" ? (
+          <ErrorAlert
+            lead={homeCopy.errorEvaluateLead}
+            body={homeCopy.errorEvaluateBody}
+            onRetry={() => void submit()}
+          />
         ) : null}
       </div>
     </div>
