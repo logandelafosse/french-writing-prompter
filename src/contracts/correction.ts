@@ -42,6 +42,10 @@ export const Correction = z.object({
   status: CorrectionStatus,
   dialectNoteId: z.number().int().nullable(),
   isFocus: z.boolean(),
+  contextQuote: z.string().nullable().default(null),
+  dialectExample: z.string().nullable().default(null),
+  dialectLemma: z.string().nullable().default(null),
+  dialectPattern: z.string().nullable().default(null),
 });
 export type Correction = z.infer<typeof Correction>;
 

@@ -76,6 +76,10 @@ describe("EvaluatorOutputSchema", () => {
           rule_if_dialect: null,
           dlf_headword: null,
           resource_ids: [],
+          context_quote: null,
+          dialect_example: null,
+          dialect_lemma: null,
+          dialect_pattern: null,
         },
       ],
     });
@@ -134,6 +138,10 @@ describe("EvaluatorOutputSchema", () => {
           rule_if_dialect: null,
           dlf_headword: null,
           resource_ids: [],
+          context_quote: null,
+          dialect_example: null,
+          dialect_lemma: null,
+          dialect_pattern: null,
         },
       ],
     });
@@ -154,6 +162,10 @@ describe("EvaluatorOutputSchema", () => {
           rule_if_dialect: null,
           dlf_headword: null,
           resource_ids: [],
+          context_quote: null,
+          dialect_example: null,
+          dialect_lemma: null,
+          dialect_pattern: null,
         }),
       ),
     });

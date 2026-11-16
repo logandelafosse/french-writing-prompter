@@ -1,11 +1,13 @@
 import { AI_MODEL } from "@/config/ai";
 import { Correction, type Span } from "@/contracts/correction";
+import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import {
   parseCorrectionCategory,
   type EvaluationV2,
   type EvaluatorOutputDraft,
 } from "@/contracts/evaluation";
 import { attributeStandard, type DlfHit } from "@/modules/dlf/lookup";
+import { matchesActiveWordScopeNote } from "@/modules/dialect/learner-notes";
 import { locateQuote, spansOverlap } from "./locate-quote";
 
 export const EVALUATOR_PROMPT_VERSION = "evaluator@2";
@@ -20,17 +22,82 @@ export type PostProcessContext = {
   now: () => Date;
   createId: () => string;
   lookupDlf?: (word: string) => DlfHit | null;
+  dialectNotes?: readonly LearnerDialectNote[];
 };
+
+function nonEmpty(value: string | null): string | null {
+  return value !== null && value.length > 0 ? value : null;
+}
+
+function sentenceContaining(
+  text: string,
+  span: Span | null,
+  quote: string,
+): string {
+  const start = span?.start ?? text.indexOf(quote);
+  const end = span?.end ?? (start === -1 ? -1 : start + quote.length);
+  if (start < 0 || end < 0) return quote;
+  let from = start;
+  while (from > 0) {
+    const prev = text[from - 1];
+    if (prev === "." || prev === "!" || prev === "?" || prev === "\n") break;
+    from -= 1;
+  }
+  while (from < start && /\s/.test(text[from] ?? "")) from += 1;
+  let to = end;
+  while (to < text.length) {
+    const ch = text[to];
+    to += 1;
+    if (ch === "." || ch === "!" || ch === "?") break;
+    if (ch === "\n") {
+      to -= 1;
+      break;
+    }
+  }
+  const sliced = text.slice(from, to).trim();
+  return sliced.length > 0 ? sliced : quote;
+}
+
+function dialectFields(
+  item: EvaluatorOutputDraft["corrections"][number],
+  text: string,
+  span: Span | null,
+) {
+  if (item.kind !== "mistake" && item.kind !== "dialect_check") {
+    return {
+      contextQuote: null,
+      dialectExample: null,
+      dialectLemma: null,
+      dialectPattern: null,
+    };
+  }
+  return {
+    contextQuote: nonEmpty(item.context_quote) ?? item.quote,
+    dialectExample:
+      nonEmpty(item.dialect_example) ??
+      sentenceContaining(text, span, item.quote),
+    dialectLemma: nonEmpty(item.dialect_lemma) ?? item.quote,
+    dialectPattern: nonEmpty(item.dialect_pattern),
+  };
+}
 
 export function postProcessEvaluation(
   raw: EvaluatorOutputDraft,
   ctx: PostProcessContext,
 ): { evaluation: EvaluationV2; corrections: Correction[] } {
-  const kept = raw.corrections.filter(
-    (item) =>
-      item.quote.length > 0 &&
-      !(item.kind === "standard" && item.suggestion === item.quote),
-  );
+  const notes = ctx.dialectNotes ?? [];
+  const kept = raw.corrections.filter((item) => {
+    if (item.quote.length === 0) return false;
+    if (item.kind === "standard" && item.suggestion === item.quote)
+      return false;
+    if (
+      (item.kind === "mistake" || item.kind === "dialect_check") &&
+      matchesActiveWordScopeNote(item.quote, item.suggestion, notes)
+    ) {
+      return false;
+    }
+    return true;
+  });
 
   let cursor = 0;
   const accepted: Span[] = [];
@@ -90,6 +157,7 @@ export function postProcessEvaluation(
       status: "open",
       dialectNoteId: null,
       isFocus: false,
+      ...dialectFields(row.item, ctx.text, row.found.span),
     }),
   );
 

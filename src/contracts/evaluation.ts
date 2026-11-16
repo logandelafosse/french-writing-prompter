@@ -74,6 +74,10 @@ export const EvaluatorOutputCorrectionSchema = z.strictObject({
   rule_if_dialect: z.string().nullable(),
   dlf_headword: z.string().nullable(),
   resource_ids: z.array(z.string()),
+  context_quote: z.string().nullable(),
+  dialect_example: z.string().nullable(),
+  dialect_lemma: z.string().nullable(),
+  dialect_pattern: z.string().nullable(),
 });
 
 export const EvaluatorOutputSchema = z.strictObject({

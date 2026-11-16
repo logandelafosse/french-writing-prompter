@@ -19,6 +19,11 @@ export const EVALUATION_SCORE_MAX = 6;
 /** Max Corrections the evaluator may return per Evaluation. */
 export const EVALUATOR_CORRECTIONS_MAX = 15;
 
+export const DIALECT_NOTE_RULE_MIN = 3;
+export const DIALECT_NOTE_RULE_MAX = 500;
+export const DIALECT_NOTE_EXAMPLE_MAX = 300;
+export const DIALECT_NOTE_FORM_MAX = 80;
+
 /** Content words shorter than this are skipped for DLF prompt cards. */
 export const DLF_HINT_MIN_LETTERS = 4;
 

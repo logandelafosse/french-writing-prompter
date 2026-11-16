@@ -26,6 +26,10 @@ const CORRECTION_COLUMNS = [
   "dialect_note_id",
   "created_at",
   "resolved_at",
+  "context_quote",
+  "dialect_example",
+  "dialect_lemma",
+  "dialect_pattern",
 ] as const;
 
 describe("corrections migration", () => {

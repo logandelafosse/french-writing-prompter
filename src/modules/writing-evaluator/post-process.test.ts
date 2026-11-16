@@ -53,6 +53,10 @@ function correction(
     rule_if_dialect: "r",
     dlf_headword: null,
     resource_ids: [],
+    context_quote: null,
+    dialect_example: null,
+    dialect_lemma: null,
+    dialect_pattern: null,
     ...partial,
   };
 }
@@ -210,5 +214,111 @@ describe("postProcessEvaluation", () => {
     expect(item?.suggestion).toBe("mon char");
     expect(item?.dlf).toBeNull();
     expect(item ? countsAsMistake(item) : true).toBe(false);
+  });
+
+  it("fills lemma from the quote and example from the containing sentence when the model leaves them null", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "mistake",
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+          context_quote: null,
+          dialect_example: null,
+          dialect_lemma: null,
+          dialect_pattern: null,
+        }),
+      ]),
+      { text: writing, sessionId: 1, now, createId: ids() },
+    );
+    const item = result.corrections[0];
+    expect(item?.dialectLemma).toBe("Les enfant");
+    expect(item?.dialectExample).toBe("Les enfant jouent.");
+    expect(item?.contextQuote).toBe("Les enfant");
+    expect(item?.dialectPattern).toBeNull();
+  });
+
+  it("keeps model-provided dialect fields and hides no pattern when one is given", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "dialect_check",
+          quote: "je vas",
+          suggestion: "je vais",
+          context_quote: "Maintenant je vas",
+          dialect_example: "je vas au bayou",
+          dialect_lemma: "aller",
+          dialect_pattern: "aller au présent",
+        }),
+      ]),
+      { text: writing, sessionId: 1, now, createId: ids() },
+    );
+    const item = result.corrections[0];
+    expect(item?.contextQuote).toBe("Maintenant je vas");
+    expect(item?.dialectExample).toBe("je vas au bayou");
+    expect(item?.dialectLemma).toBe("aller");
+    expect(item?.dialectPattern).toBe("aller au présent");
+  });
+
+  it("drops a mistake whose quote matches an active word-scope note", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "mistake",
+          quote: "a tombé",
+          suggestion: "est tombé",
+        }),
+        correction({
+          kind: "mistake",
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+        }),
+      ]),
+      {
+        text: "Il a tombé hier. Les enfant jouent.",
+        sessionId: 1,
+        now,
+        createId: ids(),
+        dialectNotes: [
+          {
+            scope: "word",
+            form: "tomber",
+            learnerForm: "a tombé",
+            rule: "On dit a tombé.",
+            deletedAt: null,
+          },
+        ],
+      },
+    );
+    expect(result.corrections.map((c) => c.quote)).toEqual(["Les enfant"]);
+  });
+
+  it("keeps the mistake when the matching word-scope note is soft-deleted", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "mistake",
+          quote: "a tombé",
+          suggestion: "est tombé",
+        }),
+      ]),
+      {
+        text: "Il a tombé hier.",
+        sessionId: 1,
+        now,
+        createId: ids(),
+        dialectNotes: [
+          {
+            scope: "word",
+            form: "a tombé",
+            learnerForm: "a tombé",
+            rule: "On dit a tombé.",
+            deletedAt: "2026-11-01T00:00:00.000Z",
+          },
+        ],
+      },
+    );
+    expect(result.corrections).toHaveLength(1);
+    expect(result.corrections[0]?.quote).toBe("a tombé");
   });
 });

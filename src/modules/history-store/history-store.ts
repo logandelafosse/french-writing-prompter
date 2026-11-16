@@ -192,6 +192,10 @@ export async function saveCorrections(
       dialectNoteId: row.dialectNoteId,
       createdAt,
       resolvedAt: null,
+      contextQuote: row.contextQuote,
+      dialectExample: row.dialectExample,
+      dialectLemma: row.dialectLemma,
+      dialectPattern: row.dialectPattern,
     })),
   );
 }
@@ -230,6 +234,10 @@ function correctionFromRow(
     status: row.status,
     dialectNoteId: row.dialectNoteId,
     isFocus: false,
+    contextQuote: row.contextQuote,
+    dialectExample: row.dialectExample,
+    dialectLemma: row.dialectLemma,
+    dialectPattern: row.dialectPattern,
   });
   return parsed.success ? parsed.data : null;
 }

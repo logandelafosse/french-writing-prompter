@@ -2,6 +2,11 @@ import { z } from "zod";
 import { CefrLevel, LevelSource } from "./cefr";
 import { Evaluation, EvaluationV2 } from "./evaluation";
 import { Correction } from "./correction";
+import { DialectNote, DialectNoteScope } from "./dialect-note";
+import {
+  DIALECT_NOTE_EXAMPLE_MAX,
+  DIALECT_NOTE_FORM_MAX,
+} from "@/config/limits";
 import { PromptConstraints } from "./prompt";
 import { PromptMeta } from "./prompt-meta";
 import { SessionStatus, SessionView } from "./session";
@@ -69,13 +74,32 @@ export const EvaluatePostResponse = z.strictObject({
 export type EvaluatePostResponse = z.infer<typeof EvaluatePostResponse>;
 
 export const CorrectionPatchBody = z.strictObject({
-  action: z.literal("acknowledge"),
+  action: z.enum(["acknowledge", "reject_dialect"]),
 });
 
 export const CorrectionPatchResponse = z.strictObject({
   correction: Correction,
 });
 export type CorrectionPatchResponse = z.infer<typeof CorrectionPatchResponse>;
+
+export const DialectNoteCreateBody = z.strictObject({
+  rule: z.string(),
+  example: z.string().max(DIALECT_NOTE_EXAMPLE_MAX).nullable().optional(),
+  scope: DialectNoteScope,
+  form: z.string().min(1).max(DIALECT_NOTE_FORM_MAX),
+  learnerForm: z.string().nullable().optional(),
+  tutorSuggestion: z.string().nullable().optional(),
+  fromCorrectionId: z.string().optional(),
+});
+export type DialectNoteCreateBody = z.infer<typeof DialectNoteCreateBody>;
+
+export const DialectNoteCreateResponse = z.strictObject({
+  note: DialectNote,
+  correction: Correction.optional(),
+});
+export type DialectNoteCreateResponse = z.infer<
+  typeof DialectNoteCreateResponse
+>;
 
 export const QuotaGetResponse = z.strictObject({
   used: z.number(),
