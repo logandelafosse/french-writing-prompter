@@ -2,7 +2,10 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { db } from "@/db";
 import { corrections, dialectNotes, sessions } from "@/db/schema";
 import { Correction } from "@/contracts/correction";
-import { DialectNoteCreateResponse } from "@/contracts/api";
+import {
+  DialectNoteCreateResponse,
+  DialectNoteListResponse,
+} from "@/contracts/api";
 import { ErrorEnvelope } from "@/contracts/errors";
 import {
   getCorrection,
@@ -11,7 +14,7 @@ import {
 } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { readResponseJson } from "@/test/read-response-json";
-import { POST } from "./route";
+import { GET, POST } from "./route";
 
 function correction(
   sessionId: number,
@@ -180,5 +183,53 @@ describe("POST /api/dialect-notes", () => {
     expect((await readResponseJson(short, ErrorEnvelope)).error.code).toBe(
       "VALIDATION",
     );
+  });
+});
+
+describe("GET /api/dialect-notes", () => {
+  beforeEach(async () => {
+    await db.delete(dialectNotes).execute();
+    await db.delete(corrections).execute();
+    await db.delete(sessions).execute();
+  });
+
+  it("returns active notes newest first and excludes soft-deleted ones", async () => {
+    await db.insert(dialectNotes).values([
+      {
+        rule: "Note ancienne.",
+        example: "Hier.",
+        scope: "word",
+        form: "hier",
+        createdAt: "2026-11-01T12:00:00.000Z",
+        updatedAt: "2026-11-01T12:00:00.000Z",
+        deletedAt: null,
+      },
+      {
+        rule: "Note récente.",
+        example: "Asteur.",
+        scope: "pattern",
+        form: "asteur",
+        createdAt: "2026-11-14T12:00:00.000Z",
+        updatedAt: "2026-11-14T12:00:00.000Z",
+        deletedAt: null,
+      },
+      {
+        rule: "Note effacée.",
+        example: null,
+        scope: "word",
+        form: "gone",
+        createdAt: "2026-11-15T12:00:00.000Z",
+        updatedAt: "2026-11-15T12:00:00.000Z",
+        deletedAt: "2026-11-16T12:00:00.000Z",
+      },
+    ]);
+
+    const response = await GET();
+    expect(response.status).toBe(200);
+    const body = await readResponseJson(response, DialectNoteListResponse);
+    expect(body.notes.map((note) => note.rule)).toEqual([
+      "Note récente.",
+      "Note ancienne.",
+    ]);
   });
 });

@@ -32,6 +32,31 @@ describe("AppHeader full variant mobile rows", () => {
   });
 });
 
+describe("AppHeader carnet nav", () => {
+  it("marks Carnet as the current page", () => {
+    render(
+      <AppHeader
+        variant="full"
+        level="B1"
+        quota={defaultQuota}
+        levelReady
+        quotaReady
+        current="carnet"
+        onLevelChange={async () => {}}
+      />,
+    );
+
+    const nav = screen.getByRole("navigation", { name: "Navigation" });
+    expect(within(nav).getByRole("link", { name: "Carnet" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(
+      within(nav).getByRole("link", { name: "Historique" }),
+    ).not.toHaveAttribute("aria-current");
+  });
+});
+
 describe("AppHeader placement variant", () => {
   it("renders wordmark and placement link without nav, quota or chip", () => {
     render(

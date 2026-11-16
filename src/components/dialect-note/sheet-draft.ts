@@ -1,10 +1,12 @@
 import type { Correction } from "@/contracts/correction";
+import type { DialectNoteScope } from "@/contracts/dialect-note";
 
 export type DialectSheetDraft = {
   lemma: string;
   example: string;
   pattern: string | null;
   rule: string;
+  scope?: DialectNoteScope;
 };
 
 export function containingSentence(

@@ -14,7 +14,10 @@ export type DialectNoteSheetSave = {
   rule: string;
   example: string;
   scope: DialectNoteScope;
+  form: string;
 };
+
+type DialectNoteSheetMode = "from-correction" | "new" | "edit";
 
 // prettier-ignore
 type SaveUi = { status: "idle" } | { status: "saving" } | { status: "error"; message: string };
@@ -22,6 +25,7 @@ type SaveUi = { status: "idle" } | { status: "saving" } | { status: "error"; mes
 export function DialectNoteSheet({
   open,
   onOpenChange,
+  mode = "from-correction",
   written,
   tutorProposed,
   draft,
@@ -29,18 +33,29 @@ export function DialectNoteSheet({
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  mode?: DialectNoteSheetMode;
   written: string;
   tutorProposed: string;
   draft: DialectSheetDraft;
   // prettier-ignore
   onSave: (note: DialectNoteSheetSave, signal: AbortSignal) => Promise<string | null>;
 }) {
+  const fromCorrection = mode === "from-correction";
   const [rule, setRule] = useState(draft.rule);
   const [example, setExample] = useState(draft.example);
-  const [scope, setScope] = useState<DialectNoteScope>("word");
+  const [form, setForm] = useState(draft.lemma);
+  const [scope, setScope] = useState<DialectNoteScope>(draft.scope ?? "word");
   const [saveUi, setSaveUi] = useState<SaveUi>({ status: "idle" });
   const [entered, setEntered] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const wordLabel = fromCorrection
+    ? reviewCopy.sheetScopeWord(draft.lemma)
+    : reviewCopy.sheetScopeWordGeneric;
+  const patternLabel =
+    fromCorrection && draft.pattern !== null
+      ? reviewCopy.sheetScopePattern(draft.pattern)
+      : reviewCopy.sheetScopePatternGeneric;
+  const showPattern = !fromCorrection || draft.pattern !== null;
 
   useEffect(() => {
     if (!open) return;
@@ -69,7 +84,10 @@ export function DialectNoteSheet({
                 {reviewCopy.sheetEyebrow}
               </SectionLabel>
               <Dialog.Title className="text-panel-title m-0 font-semibold">
-                {reviewCopy.sheetTitle}
+                {/* prettier-ignore */}
+                {mode === "edit"
+                  ? reviewCopy.sheetTitleEdit
+                  : reviewCopy.sheetTitle}
               </Dialog.Title>
             </div>
             <Dialog.Close
@@ -81,26 +99,9 @@ export function DialectNoteSheet({
             </Dialog.Close>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">
-            <div className="border-line grid grid-cols-2 gap-4 border-y py-4">
-              <div className="flex flex-col gap-1">
-                <span className="text-muted text-[13px]">
-                  {reviewCopy.sheetWritten}
-                </span>
-                <span lang="fr" className="font-serif text-xl">
-                  <span className="bg-dialect-tint px-[3px] py-px">
-                    {written}
-                  </span>
-                </span>
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-muted text-[13px]">
-                  {reviewCopy.sheetProposed}
-                </span>
-                <span lang="fr" className="text-muted font-serif text-xl">
-                  {tutorProposed}
-                </span>
-              </div>
-            </div>
+            {fromCorrection ? (
+              <Comparison written={written} proposed={tutorProposed} />
+            ) : null}
             <form
               className="mt-4 flex flex-col gap-4"
               onSubmit={(event) => {
@@ -110,14 +111,19 @@ export function DialectNoteSheet({
                 const controller = new AbortController();
                 abortRef.current = controller;
                 setSaveUi({ status: "saving" });
-                void onSave({ rule, example, scope }, controller.signal).then(
-                  (message) => {
-                    if (controller.signal.aborted || message === null) return;
-                    setSaveUi({ status: "error", message });
-                  },
-                );
+                // prettier-ignore
+                void onSave({ rule, example, scope, form: fromCorrection ? draft.lemma : form }, controller.signal).then((message) => {
+                  if (controller.signal.aborted || message === null) return;
+                  setSaveUi({ status: "error", message });
+                });
               }}
             >
+              {fromCorrection ? null : (
+                <Field label={reviewCopy.sheetForm}>
+                  {/* prettier-ignore */}
+                  <Input lang="fr" value={form} onChange={(event) => setForm(event.target.value)} required />
+                </Field>
+              )}
               <Field
                 label={reviewCopy.sheetRule}
                 hint={`· ${reviewCopy.sheetRuleHint}`}
@@ -143,13 +149,13 @@ export function DialectNoteSheet({
                 <label className="min-h-touch flex items-center gap-3 text-base">
                   {/* prettier-ignore */}
                   <Radio name="portee" checked={scope === "word"} onChange={() => setScope("word")} />
-                  <span>{reviewCopy.sheetScopeWord(draft.lemma)}</span>
+                  <span>{wordLabel}</span>
                 </label>
-                {draft.pattern !== null ? (
+                {showPattern ? (
                   <label className="min-h-touch flex items-center gap-3 text-base">
                     {/* prettier-ignore */}
                     <Radio name="portee" checked={scope === "pattern"} onChange={() => setScope("pattern")} />
-                    <span>{reviewCopy.sheetScopePattern(draft.pattern)}</span>
+                    <span>{patternLabel}</span>
                   </label>
                 ) : null}
               </fieldset>
@@ -184,5 +190,27 @@ export function DialectNoteSheet({
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
+  );
+}
+
+function Comparison({
+  written,
+  proposed,
+}: {
+  written: string;
+  proposed: string;
+}) {
+  // prettier-ignore
+  return (
+    <div className="border-line grid grid-cols-2 gap-4 border-y py-4">
+      <div className="flex flex-col gap-1">
+        <span className="text-muted text-[13px]">{reviewCopy.sheetWritten}</span>
+        <span lang="fr" className="font-serif text-xl"><span className="bg-dialect-tint px-[3px] py-px">{written}</span></span>
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-muted text-[13px]">{reviewCopy.sheetProposed}</span>
+        <span lang="fr" className="text-muted font-serif text-xl">{proposed}</span>
+      </div>
+    </div>
   );
 }
