@@ -43,4 +43,8 @@ export const homeCopy = {
     "Encore une cinquantaine de mots, si le cœur t'en dit. Tu peux envoyer n'importe quand.",
   reviewNextPrompt: (remaining: number) =>
     `Une autre consigne · reste ${remaining}`,
+  advanceLead: (to: string) => `Te voilà en ${to}.`,
+  advanceBody: (from: string) =>
+    `Tes dernières évaluations étaient au-dessus de ${from}, ça fait que les consignes vont monter d'un cran.`,
+  advanceUndo: (from: string) => `Rester en ${from}`,
 } as const;

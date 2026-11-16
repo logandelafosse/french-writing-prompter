@@ -8,7 +8,7 @@ import {
 } from "@/contracts/api";
 import { SessionStatus } from "@/contracts/session";
 import { deriveDisplayStatus } from "@/lib/display-status";
-import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import { getQuotaState } from "@/modules/quota-manager/quota-store";
@@ -51,7 +51,7 @@ describe("POST /api/prompt swap", { concurrent: false }, () => {
   beforeEach(async () => {
     vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
     await db.delete(sessions).execute();
-    await setTrackerLevel("B1", "manual");
+    await setLevel("B1", "manual");
   });
 
   afterEach(() => {

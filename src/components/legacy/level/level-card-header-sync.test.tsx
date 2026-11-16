@@ -17,13 +17,18 @@ vi.mock("@/components/shell/header-shell", () => ({
 
 import { LevelCard } from "./level-card";
 
+let changeId = 1;
+
 function levelChange(level: CefrLevel) {
-  return {
+  const change = {
+    id: changeId,
     fromLevel: "B1" as CefrLevel,
     toLevel: level,
     source: "manual" as const,
     createdAt: "2026-01-01T00:00:00.000Z",
   };
+  changeId += 1;
+  return change;
 }
 
 function isLevelPut(
@@ -67,6 +72,7 @@ describe("LevelCard header level sync", () => {
             JSON.stringify({
               level: persistedLevel,
               history: [],
+              streak: 0,
             }),
             { status: 200 },
           ),

@@ -3,7 +3,10 @@ import { sessions } from "@/db/schema";
 import { CEFR_UI_LABELS } from "@/contracts/cefr";
 import type { TodayActiveSession, TodayGetDto } from "@/contracts/today";
 import { todayLocalDateKey } from "@/lib/dates";
-import { getCurrentLevel } from "@/modules/cefr-tracker/db-store";
+import {
+  getCurrentLevel,
+  getPendingAdvancement,
+} from "@/modules/cefr-tracker/level-store";
 import {
   getQuotaState,
   quotaTimeZone,
@@ -42,10 +45,11 @@ async function getTodayActiveSession(): Promise<TodayActiveSession | null> {
 }
 
 export async function buildTodayResponse(): Promise<TodayGetDto> {
-  const [level, quota, activeSession] = await Promise.all([
+  const [level, quota, activeSession, advancement] = await Promise.all([
     getCurrentLevel(),
     getQuotaState(),
     getTodayActiveSession(),
+    getPendingAdvancement(),
   ]);
 
   return {
@@ -54,6 +58,6 @@ export async function buildTodayResponse(): Promise<TodayGetDto> {
     quota,
     focus: [],
     activeSession,
-    advancement: null,
+    advancement,
   };
 }

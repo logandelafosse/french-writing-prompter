@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
-import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { PromptPostResponse } from "@/contracts/api";
@@ -20,7 +20,7 @@ describe("POST /api/prompt quota", { concurrent: false }, () => {
   beforeEach(async () => {
     vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
     await db.delete(sessions).execute();
-    await setTrackerLevel("B1", "manual");
+    await setLevel("B1", "manual");
   });
 
   afterEach(() => {

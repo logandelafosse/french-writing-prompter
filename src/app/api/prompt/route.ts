@@ -8,7 +8,7 @@ import {
   getQuotaState,
   quotaTimeZone,
 } from "@/modules/quota-manager/quota-store";
-import { getCurrentLevel } from "@/modules/cefr-tracker/db-store";
+import { getCurrentLevel } from "@/modules/cefr-tracker/level-store";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";

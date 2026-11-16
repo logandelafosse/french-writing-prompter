@@ -7,7 +7,10 @@ import {
   rememberWriting,
   saveSession,
 } from "@/modules/history-store/history-store";
-import { getTracker } from "@/modules/cefr-tracker/tracker-store";
+import {
+  getCurrentLevel,
+  recordEvaluation,
+} from "@/modules/cefr-tracker/level-store";
 import { parseCefrLevel } from "@/contracts/cefr";
 import { PromptConstraints } from "@/contracts/prompt";
 import { EvaluatePostBody } from "@/contracts/api";
@@ -41,6 +44,20 @@ export const POST = withErrors(async function postEvaluate(request: Request) {
     );
   }
 
+  const level = await getCurrentLevel();
+  if (level === null) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "NO_LEVEL",
+          message:
+            "Aucun niveau n'est défini. Choisis ton niveau avant d'envoyer ton texte.",
+        },
+      },
+      { status: 400 },
+    );
+  }
+
   await rememberWriting(body.sessionId, body.writing, new Date().toISOString());
 
   const constraintsResult = parseJson(
@@ -52,7 +69,7 @@ export const POST = withErrors(async function postEvaluate(request: Request) {
   const constraints = constraintsResult.ok
     ? constraintsResult.value
     : {
-        cefrLevel: fallbackLevel ?? "A2",
+        cefrLevel: fallbackLevel ?? level,
         dialect: DEFAULT_DIALECT,
       };
 
@@ -71,20 +88,7 @@ export const POST = withErrors(async function postEvaluate(request: Request) {
     id: body.sessionId,
   });
 
-  const tracker = getTracker();
-  if (!tracker.getLevel()) {
-    tracker.setLevel("A2", "manual");
-  }
-
-  const advancement = tracker.recordEvaluation({
-    overallCefr: evaluation.overall_cefr,
-  });
-
-  if (advancement) {
-    const { setTrackerLevel } =
-      await import("@/modules/cefr-tracker/tracker-store");
-    await setTrackerLevel(advancement.toLevel, "auto");
-  }
+  const advancement = await recordEvaluation(evaluation.overall_cefr);
 
   return NextResponse.json({ evaluation, advancement });
 });

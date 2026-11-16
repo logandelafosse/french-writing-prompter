@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { LevelBadge } from "@/components/legacy/level/level-components";
 import type { CefrLevel } from "@/components/legacy/level/level-components";
-import type { LevelChange } from "@/modules/cefr-tracker/cefr-tracker";
+import type { LevelChangeDto } from "@/contracts/api";
 import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
 import type { ClassifiedFetchFailure } from "@/contracts/errors";
 import type { SessionView } from "@/contracts/session";
@@ -119,7 +119,7 @@ export function HistoryPage() {
   const [sessions, setSessions] = useState<SessionView[]>([]);
   const [levelData, setLevelData] = useState<{
     level: CefrLevel | null;
-    history: LevelChange[];
+    history: LevelChangeDto[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [failure, setFailure] = useState<ClassifiedFetchFailure | null>(null);

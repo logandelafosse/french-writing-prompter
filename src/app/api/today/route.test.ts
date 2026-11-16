@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/db";
 import { levelChanges, sessions } from "@/db/schema";
 import { TodayGetResponse } from "@/contracts/today";
-import { setLevel } from "@/modules/cefr-tracker/db-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { readResponseJson } from "@/test/read-response-json";

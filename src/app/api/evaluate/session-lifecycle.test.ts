@@ -4,7 +4,7 @@ import { z } from "zod";
 import { db } from "@/db";
 import { levelChanges, sessions } from "@/db/schema";
 import { clearEnvCache } from "@/server/env";
-import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { getQuotaState } from "@/modules/quota-manager/quota-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
@@ -23,7 +23,7 @@ const constraints = JSON.stringify({
 });
 
 async function createPromptSession(): Promise<number> {
-  await setTrackerLevel("A2", "manual");
+  await setLevel("A2", "manual");
   const { POST } = await import("../prompt/route");
   const created = await POST(
     new Request("http://localhost/api/prompt", { method: "POST" }),
@@ -50,6 +50,7 @@ describe("evaluate session lifecycle", () => {
   });
 
   it("persists the text before the AI call when FakeAiClient fails", async () => {
+    await setLevel("A2", "manual");
     const session = await saveSession({
       promptText: "Écris sur le bayou.",
       promptConstraints: constraints,
@@ -109,6 +110,7 @@ describe("evaluate session lifecycle", () => {
   });
 
   it("is allowed when quota is exhausted", async () => {
+    await setLevel("A2", "manual");
     const session = await saveSession({
       promptText: "Troisième consigne",
       promptConstraints: constraints,

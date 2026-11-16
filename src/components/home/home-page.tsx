@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CefrLevel } from "@/contracts/cefr";
+import { CEFR_UI_LABELS, type CefrLevel } from "@/contracts/cefr";
+import type { LevelChangeDto } from "@/contracts/api";
 import type { PromptMeta } from "@/contracts/prompt-meta";
 import {
   EvaluatePostResponse,
   LevelPutResponse,
+  LevelUndoResponse,
   PromptPostResponse,
 } from "@/contracts/api";
 import {
@@ -34,6 +36,7 @@ import { ErrorAlert } from "@/components/states/error-alert";
 import { QuotaNotice } from "@/components/states/notice";
 import { OfflineNotice, useOffline } from "@/components/states/offline-notice";
 import { HomeDateTitle, HomePhaseA } from "./home-phase-a";
+import { AdvancementBanner } from "@/components/states/advancement-banner";
 
 type PromptAttempt =
   | { ok: true }
@@ -79,7 +82,8 @@ function applyToday(
 }
 
 export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
-  const { syncFromToday, refreshQuota } = useHeaderShell();
+  const { syncFromToday, refreshQuota, refreshShell } = useHeaderShell();
+  const [undoBusy, setUndoBusy] = useState(false);
   const [titleDate] = useState(() => now());
   const [bootstrap, setBootstrap] = useState<BootstrapState>({
     kind: "loading",
@@ -166,6 +170,47 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     return result;
   };
 
+  const handleAfterEvaluate = useCallback(
+    (advancement: LevelChangeDto | null | undefined) => {
+      setBootstrap((prev) => {
+        if (prev.kind !== "ready") return prev;
+        const data = { ...prev.data };
+        if (advancement !== undefined) data.advancement = advancement ?? null;
+        if (advancement) {
+          data.level = advancement.toLevel;
+          data.levelName = CEFR_UI_LABELS[advancement.toLevel];
+        }
+        syncFromToday(data);
+        return { ...prev, data };
+      });
+      if (advancement?.toLevel) {
+        void refreshShell(advancement.toLevel);
+      }
+    },
+    [refreshShell, syncFromToday],
+  );
+
+  const undoAdvancement = useCallback(async () => {
+    const changeId =
+      bootstrap.kind === "ready" ? bootstrap.data.advancement?.id : undefined;
+    if (changeId === undefined) {
+      return;
+    }
+    setUndoBusy(true);
+    const result = await fetchJson("/api/level/undo", LevelUndoResponse, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ changeId }),
+    });
+    setUndoBusy(false);
+    if (!result.ok) {
+      setBootstrap((prev) => failBootstrap(prev, result.error));
+      return;
+    }
+    await refreshShell(result.value.change.toLevel);
+    await loadToday();
+  }, [bootstrap, loadToday, refreshShell]);
+
   const generateFailure =
     bootstrap.kind === "ready" ? bootstrap.actionFailure : null;
   const loadFailure =
@@ -217,7 +262,10 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
           titleDate={titleDate}
           generating={generateUi === "generating"}
           offline={offline}
+          undoBusy={undoBusy}
           onRetryGenerate={retryHome}
+          onUndoAdvancement={() => void undoAdvancement()}
+          onAfterEvaluate={handleAfterEvaluate}
           onSelectLevel={(level) =>
             setBootstrap((prev) =>
               prev.kind === "ready" ? { ...prev, selectedLevel: level } : prev,
@@ -238,7 +286,10 @@ function HomeBody({
   titleDate,
   generating,
   offline,
+  undoBusy,
   onRetryGenerate,
+  onUndoAdvancement,
+  onAfterEvaluate,
   onSelectLevel,
   onGenerate,
   onSwap,
@@ -249,7 +300,10 @@ function HomeBody({
   titleDate: Date;
   generating: boolean;
   offline: boolean;
+  undoBusy: boolean;
   onRetryGenerate: () => void;
+  onUndoAdvancement: () => void;
+  onAfterEvaluate: (advancement: LevelChangeDto | null | undefined) => void;
   onSelectLevel: (level: CefrLevel) => void;
   onGenerate: (level: CefrLevel) => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
@@ -265,6 +319,13 @@ function HomeBody({
   return (
     <>
       <HomeDateTitle at={titleDate} />
+      {bootstrap.data.advancement !== null ? (
+        <AdvancementBanner
+          advancement={bootstrap.data.advancement}
+          onUndo={onUndoAdvancement}
+          undoBusy={undoBusy}
+        />
+      ) : null}
       {quotaExhausted && phase.kind !== "A0-first-run" ? (
         <QuotaNotice
           resetsAt={bootstrap.data.quota.resetsAt}
@@ -286,6 +347,7 @@ function HomeBody({
           onRetryGenerate={onRetryGenerate}
           onSwap={onSwap}
           onFreshPrompt={onFreshPrompt}
+          onAfterEvaluate={onAfterEvaluate}
         />
       ) : (
         <HomePhaseA
@@ -317,6 +379,7 @@ function WritingInterim({
   onRetryGenerate,
   onSwap,
   onFreshPrompt,
+  onAfterEvaluate,
 }: {
   sessionId: number;
   promptText: string;
@@ -329,6 +392,7 @@ function WritingInterim({
   onRetryGenerate: () => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
+  onAfterEvaluate: (advancement: LevelChangeDto | null | undefined) => void;
 }) {
   const autosave = useDraftAutosave(sessionId, draft);
   const writing = autosave.text;
@@ -396,6 +460,7 @@ function WritingInterim({
     }
     setSubmitUi("review");
     setEvaluation(result.value.evaluation);
+    onAfterEvaluate(result.value.advancement);
   };
 
   useEffect(() => {

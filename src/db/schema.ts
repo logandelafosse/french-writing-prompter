@@ -6,6 +6,7 @@ export const levelChanges = sqliteTable("level_changes", {
   toLevel: text("to_level").notNull(),
   source: text("source").notNull(),
   createdAt: text("created_at").notNull(),
+  revertsChangeId: integer("reverts_change_id"),
 });
 
 export const sessions = sqliteTable(

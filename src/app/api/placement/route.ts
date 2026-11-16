@@ -3,7 +3,7 @@ import { getAiClient, scenarioFromRequest } from "@/server/ai-client";
 import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
 import { PlacementTest } from "@/modules/placement-test/placement-test";
-import { setLevel } from "@/modules/cefr-tracker/db-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { PlacementPostBody } from "@/contracts/api";
 import { parseRequestBody } from "@/lib/http";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
   const result = await placementTest.submitWriting(body.writing);
 
   if (result.type === "complete") {
-    await setLevel(result.finalLevel, "manual");
+    await setLevel(result.finalLevel, "placement");
     return NextResponse.json({
       type: "complete",
       finalLevel: result.finalLevel,

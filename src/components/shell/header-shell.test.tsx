@@ -56,7 +56,7 @@ describe("HeaderShell quota fetch", () => {
     fetchMock.mockImplementation((input: RequestInfo | URL) => {
       const url = fetchUrl(input);
       if (url.includes("/api/level")) {
-        return jsonResponse({ level: "B1", history: [] });
+        return jsonResponse({ level: "B1", history: [], streak: 0 });
       }
       if (url.includes("/api/quota")) {
         quotaCalls += 1;
@@ -113,7 +113,9 @@ describe("HeaderShell quota fetch", () => {
     fetchMock.mockImplementation((input: RequestInfo | URL) => {
       const url = fetchUrl(input);
       if (url.includes("/api/level")) {
-        return levelGate.then(() => jsonResponse({ level: null, history: [] }));
+        return levelGate.then(() =>
+          jsonResponse({ level: null, history: [], streak: 0 }),
+        );
       }
       if (url.includes("/api/quota")) {
         return jsonResponse({

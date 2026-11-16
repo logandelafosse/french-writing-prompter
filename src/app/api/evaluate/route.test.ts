@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { parseJson } from "@/lib/json";
 import { saveSession, getSession } from "@/modules/history-store/history-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { readResponseJson } from "@/test/read-response-json";
@@ -37,6 +38,7 @@ describe("POST /api/evaluate", () => {
   });
 
   it("returns 502 and leaves evaluation_json null when the model output is invalid", async () => {
+    await setLevel("A2", "manual");
     const session = await saveSession({
       promptText: "Écrivez sur la Louisiane.",
       promptConstraints: JSON.stringify({

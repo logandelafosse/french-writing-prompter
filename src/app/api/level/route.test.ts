@@ -104,5 +104,6 @@ describe("GET /api/level", () => {
     const body = await readResponseJson(response, LevelGetResponse);
     expect(body.level).toBe("A2");
     expect(body.history).toHaveLength(1);
+    expect(body.streak).toBe(0);
   });
 });
