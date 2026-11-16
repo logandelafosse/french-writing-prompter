@@ -40,14 +40,11 @@ export function QuotaNotice({
 
   useEffect(() => {
     nowRef.current = now;
-  }, [now]);
-
-  useEffect(() => {
     const id = setInterval(() => {
       setClock(nowRef.current().getTime());
     }, 60_000);
     return () => clearInterval(id);
-  }, []);
+  }, [now]);
 
   const countdown = formatCountdown(new Date(resetsAt), new Date(clock));
 

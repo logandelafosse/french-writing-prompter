@@ -16,10 +16,7 @@ import { localDateKey, todayLocalDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { parseRequestBody } from "@/lib/http";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
-import { PromptPostBody } from "@/contracts/api";
-import type { z } from "zod";
-
-type PromptPostBodyValue = z.infer<typeof PromptPostBody>;
+import { PromptPostBody, type PromptPostBodyValue } from "@/contracts/api";
 
 let quotaPromptChain = Promise.resolve();
 

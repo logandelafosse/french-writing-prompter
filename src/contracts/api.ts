@@ -58,6 +58,7 @@ export const PromptPostBody = z.strictObject({
   replaceSessionId: z.number().int().positive().optional(),
   confirmAbandon: z.boolean().optional(),
 });
+export type PromptPostBodyValue = z.infer<typeof PromptPostBody>;
 
 export const DraftWouldBeAbandonedResponse = z.strictObject({
   error: z.literal("DRAFT_WOULD_BE_ABANDONED"),
