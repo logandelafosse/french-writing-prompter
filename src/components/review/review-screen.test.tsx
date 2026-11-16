@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Correction } from "@/contracts/correction";
 import { homeCopy } from "@/copy/fr";
@@ -27,9 +27,49 @@ function mistake(
   });
 }
 
+function jsonResponse(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function stubAckFetch(handler: (url: string) => Response) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((input: RequestInfo | URL) => {
+      const url =
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
+      return Promise.resolve(handler(url));
+    }),
+  );
+}
+
 describe("ReviewScreen", () => {
+  const originalFetch = globalThis.fetch;
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.unstubAllGlobals();
+  });
+
   it("Compris moves focus to the next open mistake card", async () => {
     const user = userEvent.setup();
+    stubAckFetch((url) => {
+      const id = url.split("/").at(-1) ?? "c1";
+      return jsonResponse({
+        correction: mistake({
+          id,
+          ordinal: id === "c2" ? 2 : 1,
+          quote: id === "c2" ? "joue" : "Les enfant",
+          suggestion: id === "c2" ? "jouent" : "Les enfants",
+        }),
+      });
+    });
     render(
       <ReviewScreen
         promptText="Écris."
@@ -68,14 +108,26 @@ describe("ReviewScreen", () => {
     await user.click(
       within(first).getByRole("button", { name: reviewCopy.actionAck }),
     );
-    expect(
-      within(first).queryByRole("button", { name: reviewCopy.actionAck }),
-    ).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        within(first).queryByRole("button", { name: reviewCopy.actionAck }),
+      ).not.toBeInTheDocument();
+    });
     expect(next).toHaveFocus();
   });
 
   it("Compris on the last open mistake keeps focus on the collapsed card", async () => {
     const user = userEvent.setup();
+    stubAckFetch(() =>
+      jsonResponse({
+        correction: mistake({
+          id: "c1",
+          ordinal: 1,
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+        }),
+      }),
+    );
     render(
       <ReviewScreen
         promptText="Écris."
@@ -99,8 +151,67 @@ describe("ReviewScreen", () => {
     await user.click(
       within(card).getByRole("button", { name: reviewCopy.actionAck }),
     );
-    expect(card).toHaveFocus();
+    await waitFor(() => {
+      expect(card).toHaveFocus();
+    });
     expect(document.body).not.toHaveFocus();
+  });
+
+  it("keeps the card open and alerts when Compris PATCH fails, then clears the error on retry", async () => {
+    const user = userEvent.setup();
+    let attempts = 0;
+    const item = mistake({
+      id: "c1",
+      ordinal: 1,
+      quote: "Les enfant",
+      suggestion: "Les enfants",
+    });
+    stubAckFetch(() => {
+      attempts += 1;
+      if (attempts === 1) {
+        return jsonResponse(
+          { error: { code: "CONFLICT", message: "fail" } },
+          409,
+        );
+      }
+      return jsonResponse({
+        correction: { ...item, status: "acknowledged" },
+      });
+    });
+
+    render(
+      <ReviewScreen
+        promptText="Écris."
+        promptMeta={null}
+        writingText="Les enfant joue."
+        corrections={[item]}
+        quotaRemaining={2}
+        generating={false}
+        onNextPrompt={() => undefined}
+      />,
+    );
+
+    const card = screen.getByRole("article");
+    await user.click(
+      within(card).getByRole("button", { name: reviewCopy.actionAck }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toHaveTextContent(homeCopy.loadError);
+    });
+    expect(
+      within(card).getByRole("button", { name: reviewCopy.actionAck }),
+    ).toBeVisible();
+
+    await user.click(
+      within(card).getByRole("button", { name: reviewCopy.actionAck }),
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+    expect(
+      within(card).queryByRole("button", { name: reviewCopy.actionAck }),
+    ).not.toBeInTheDocument();
   });
 
   it("disables the next-prompt CTA at quota 0", () => {

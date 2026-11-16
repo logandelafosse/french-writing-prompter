@@ -15,6 +15,7 @@ function bootstrap(
     },
     focus: [],
     activeSession: null,
+    reviewSession: null,
     advancement: null,
     ...overrides,
   };
@@ -59,5 +60,31 @@ describe("resolveHomePhase", () => {
     expect(
       resolveHomePhase(bootstrap({ level: "A2", activeSession: null })),
     ).toEqual({ kind: "A-ready" });
+  });
+
+  it("maps a reviewSession to C-review", () => {
+    expect(
+      resolveHomePhase(
+        bootstrap({
+          level: "B1",
+          reviewSession: {
+            id: 7,
+            prompt: "Écris.",
+            promptMeta: null,
+            writingText: "Les enfant jouent.",
+            evaluation: null,
+            corrections: [],
+          },
+        }),
+      ),
+    ).toEqual({
+      kind: "C-review",
+      sessionId: 7,
+      promptText: "Écris.",
+      promptMeta: null,
+      writingText: "Les enfant jouent.",
+      evaluation: null,
+      corrections: [],
+    });
   });
 });

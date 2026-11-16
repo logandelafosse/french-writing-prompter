@@ -34,6 +34,7 @@ const todayFirstRun = {
   },
   focus: [],
   activeSession: null,
+  reviewSession: null,
   advancement: null,
 };
 
@@ -110,6 +111,7 @@ describe("HomePage first-run generate", () => {
               promptMeta: null,
               draft: null,
             },
+            reviewSession: null,
             advancement: null,
           }),
         );
@@ -313,6 +315,7 @@ const todayWriting = {
     },
     draft: null,
   },
+  reviewSession: null,
   advancement: null,
 };
 

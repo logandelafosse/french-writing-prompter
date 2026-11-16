@@ -1,9 +1,10 @@
+import { z } from "zod";
 import { db } from "@/db";
 import { corrections, sessions } from "@/db/schema";
 import { localDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
-import type { Correction } from "@/contracts/correction";
+import { Correction, type CorrectionStatus } from "@/contracts/correction";
 import {
   parseStoredEvaluation,
   toPlaceholderEvaluation,
@@ -193,6 +194,82 @@ export async function saveCorrections(
       resolvedAt: null,
     })),
   );
+}
+
+const ResourceIdsJson = z.array(z.string());
+
+function correctionFromRow(
+  row: typeof corrections.$inferSelect,
+): Correction | null {
+  const resourceIds = parseJson(ResourceIdsJson, row.resourceIdsJson);
+  const span =
+    row.spanStart !== null &&
+    row.spanEnd !== null &&
+    row.spanEnd > row.spanStart
+      ? { start: row.spanStart, end: row.spanEnd }
+      : null;
+  const dlf =
+    row.dlfEntryId !== null && row.dlfHeadword !== null
+      ? { entryId: row.dlfEntryId, headword: row.dlfHeadword }
+      : null;
+  const parsed = Correction.safeParse({
+    id: row.id,
+    sessionId: row.sessionId,
+    ordinal: row.ordinal,
+    kind: row.kind,
+    quote: row.quote,
+    span,
+    anchor: row.anchor,
+    suggestion: row.suggestion,
+    explanation: row.explanation,
+    question: row.question,
+    ruleIfDialect: row.ruleIfDialect,
+    category: row.category,
+    dlf,
+    resourceIds: resourceIds.ok ? resourceIds.value : [],
+    status: row.status,
+    dialectNoteId: row.dialectNoteId,
+    isFocus: false,
+  });
+  return parsed.success ? parsed.data : null;
+}
+
+export async function getCorrection(id: string): Promise<Correction | null> {
+  const rows = await db
+    .select()
+    .from(corrections)
+    .where(eq(corrections.id, id))
+    .limit(1);
+  if (rows.length === 0) return null;
+  return correctionFromRow(first(rows, `correction ${id}`));
+}
+
+export async function listCorrectionsForSession(
+  sessionId: number,
+): Promise<Correction[]> {
+  const rows = await db
+    .select()
+    .from(corrections)
+    .where(eq(corrections.sessionId, sessionId))
+    .orderBy(corrections.ordinal);
+  const items: Correction[] = [];
+  for (const row of rows) {
+    const parsed = correctionFromRow(row);
+    if (parsed) items.push(parsed);
+  }
+  return items;
+}
+
+export async function setCorrectionStatus(
+  id: string,
+  status: CorrectionStatus,
+  now: () => Date,
+): Promise<Correction | null> {
+  await db
+    .update(corrections)
+    .set({ status, resolvedAt: now().toISOString() })
+    .where(eq(corrections.id, id));
+  return getCorrection(id);
 }
 
 export async function saveActiveDraft(

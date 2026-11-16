@@ -10,6 +10,7 @@ import {
   LevelUndoResponse,
   PromptPostResponse,
 } from "@/contracts/api";
+import type { EvaluationV2 } from "@/contracts/evaluation";
 import {
   TodayGetResponse,
   resolveHomePhase,
@@ -215,9 +216,10 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     bootstrap.kind === "ready" ? bootstrap.actionFailure : null;
   const loadFailure =
     bootstrap.kind === "initial-error" ? bootstrap.failure : null;
-  const writing =
-    bootstrap.kind === "ready" &&
-    resolveHomePhase(bootstrap.data).kind === "B-writing";
+  const phase =
+    bootstrap.kind === "ready" ? resolveHomePhase(bootstrap.data) : null;
+  const writing = phase?.kind === "B-writing";
+  const inReview = reviewing || phase?.kind === "C-review";
   const showOffline =
     (offline || loadFailure === "offline" || generateFailure === "offline") &&
     !writing;
@@ -240,7 +242,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     <main
       className={cn(
         "mx-auto flex w-full flex-col gap-5 px-5 py-5 pb-20 sm:gap-[22px] sm:px-6 sm:pt-5",
-        reviewing ? "max-w-review" : "max-w-home",
+        inReview ? "max-w-review" : "max-w-home",
       )}
     >
       {bootstrap.kind === "loading" && !showOffline ? (
@@ -279,7 +281,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
           onGenerate={(level) => void runGenerate(level)}
           onSwap={(body) => runSwap(body)}
           onFreshPrompt={() => void runFreshPrompt()}
-          reviewing={reviewing}
+          reviewing={inReview}
           onReviewingChange={setReviewing}
           now={now}
         />
@@ -346,7 +348,18 @@ function HomeBody({
           now={now}
         />
       ) : null}
-      {phase.kind === "B-writing" ? (
+      {phase.kind === "C-review" ? (
+        <ReviewScreen
+          promptText={phase.promptText}
+          promptMeta={phase.promptMeta}
+          writingText={phase.writingText}
+          corrections={phase.corrections}
+          evaluation={phase.evaluation}
+          quotaRemaining={bootstrap.data.quota.remaining}
+          generating={generating}
+          onNextPrompt={onFreshPrompt}
+        />
+      ) : phase.kind === "B-writing" ? (
         <WritingInterim
           key={`${phase.sessionId}-${phase.promptText}`}
           sessionId={phase.sessionId}
@@ -419,6 +432,7 @@ function WritingInterim({
   const [review, setReview] = useState<{
     writingText: string;
     corrections: Correction[];
+    evaluation: EvaluationV2;
   } | null>(null);
   const [submitFailure, setSubmitFailure] =
     useState<ClassifiedFetchFailure | null>(null);
@@ -480,6 +494,7 @@ function WritingInterim({
     setReview({
       writingText: result.value.session.writingText ?? writing.trim(),
       corrections: result.value.corrections,
+      evaluation: result.value.evaluation,
     });
     onReviewingChange(true);
     onAfterEvaluate(result.value.advancement);
@@ -527,6 +542,7 @@ function WritingInterim({
           promptMeta={promptMeta}
           writingText={review.writingText}
           corrections={review.corrections}
+          evaluation={review.evaluation}
           quotaRemaining={quotaRemaining}
           generating={generating}
           onNextPrompt={onFreshPrompt}
