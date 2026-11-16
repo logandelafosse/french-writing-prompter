@@ -4,6 +4,7 @@ import { LevelChangeDto, QuotaGetResponse } from "./api";
 import { Correction } from "./correction";
 import { EvaluationV2 } from "./evaluation";
 import { PromptMeta } from "./prompt-meta";
+import { FocusItem } from "./focus";
 import { SavedDraft } from "./session";
 
 export const TodayActiveSession = z.object({
@@ -30,7 +31,7 @@ export const TodayGetResponse = z.strictObject({
   level: CefrLevel.nullable(),
   levelName: z.string().nullable(),
   quota: QuotaGetResponse,
-  focus: z.array(z.string()),
+  focus: z.array(FocusItem),
   activeSession: TodayActiveSession.nullable(),
   reviewSession: TodayReviewSession.nullable(),
   advancement: LevelChangeDto.nullable(),

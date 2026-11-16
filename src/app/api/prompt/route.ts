@@ -12,8 +12,12 @@ import { getCurrentLevel } from "@/modules/cefr-tracker/level-store";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { elicitFocus } from "@/modules/dialect/taxonomy";
+import { computeFocus } from "@/modules/weakness-service/compute-focus";
+import { listRankedWeaknesses } from "@/modules/weakness-service/weakness-store";
 import { localDateKey, todayLocalDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
+import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { parseRequestBody } from "@/lib/http";
 import { PromptPostBody, type PromptPostBodyValue } from "@/contracts/api";
 import { withErrors } from "@/server/with-errors";
@@ -40,6 +44,21 @@ async function readPromptBody(request: Request) {
     }),
     PromptPostBody,
   );
+}
+
+async function recentTopics(): Promise<string[]> {
+  const rows = await db
+    .select({ promptMetaJson: sessions.promptMetaJson })
+    .from(sessions)
+    .orderBy(desc(sessions.createdAt))
+    .limit(10);
+  const topics: string[] = [];
+  for (const row of rows) {
+    const meta = parseStoredPromptMeta(row.promptMetaJson);
+    if (meta === null) continue;
+    topics.push(meta.topic, ...meta.topicTags);
+  }
+  return topics;
 }
 
 async function todayActiveSessions() {
@@ -104,7 +123,12 @@ export const POST = withErrors(async function postPrompt(request: Request) {
         getAiClient(scenarioFromRequest(request)),
       );
 
-      const prompt = await promptGenerator.generate(level, DEFAULT_DIALECT);
+      const ranked = await listRankedWeaknesses();
+      const focusIds = computeFocus(ranked, null);
+      const prompt = await promptGenerator.generate(level, DEFAULT_DIALECT, {
+        focus: elicitFocus(focusIds),
+        recentTopics: await recentTopics(),
+      });
 
       activeRows = await todayActiveSessions();
       blocked = draftAbandonBlocked(activeRows, body);
@@ -136,6 +160,7 @@ export const POST = withErrors(async function postPrompt(request: Request) {
         createdAt: now,
         kind: "daily",
         localDate,
+        focusJson: JSON.stringify(focusIds),
       });
       const sessionId = Number(inserted.lastInsertRowid);
       await db.run(sql`commit`);

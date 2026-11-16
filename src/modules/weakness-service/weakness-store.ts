@@ -3,10 +3,13 @@ import { db } from "@/db";
 import { corrections, sessions } from "@/db/schema";
 import { CorrectionKind, CorrectionStatus } from "@/contracts/correction";
 import { MistakeCategory } from "@/contracts/mistake-category";
-import type { Weakness } from "@/contracts/weakness";
-import { aggregateWeaknesses, type WeaknessSession } from "./aggregate";
+import {
+  aggregateWeaknesses,
+  type RankedWeakness,
+  type WeaknessSession,
+} from "./aggregate";
 
-export async function listWeaknesses(): Promise<Weakness[]> {
+export async function listRankedWeaknesses(): Promise<RankedWeakness[]> {
   const sessionRows = await db
     .select({
       id: sessions.id,

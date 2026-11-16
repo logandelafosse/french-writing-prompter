@@ -3,6 +3,7 @@ import { CefrLevel, LevelSource } from "./cefr";
 import { Evaluation, EvaluationV2 } from "./evaluation";
 import { Correction } from "./correction";
 import { DialectNote, DialectNoteScope } from "./dialect-note";
+import { FocusItem } from "./focus";
 import { Weakness } from "./weakness";
 import {
   DIALECT_NOTE_EXAMPLE_MAX,
@@ -122,6 +123,7 @@ export type DialectNotePatchResponse = z.infer<typeof DialectNotePatchResponse>;
 
 export const WeaknessesGetResponse = z.strictObject({
   weaknesses: z.array(Weakness),
+  focus: z.array(FocusItem),
 });
 export type WeaknessesGetResponse = z.infer<typeof WeaknessesGetResponse>;
 

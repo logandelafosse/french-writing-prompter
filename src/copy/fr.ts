@@ -48,4 +48,8 @@ export const homeCopy = {
   advanceBody: (from: string) =>
     `Tes dernières évaluations étaient au-dessus de ${from}, ça fait que les consignes vont monter d'un cran.`,
   advanceUndo: (from: string) => `Rester en ${from}`,
+  focusLabel: "Focus du jour",
+  focusReasonAuto:
+    "C'est ce qui est revenu le plus dans tes dernières évaluations. La consigne va t'y faire travailler.",
+  focusChange: "Changer de focus dans le Carnet",
 } as const;

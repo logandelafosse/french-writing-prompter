@@ -36,6 +36,7 @@ export interface Session {
   promptText: string;
   promptConstraints: string;
   promptMetaJson: string | null;
+  focusJson: string | null;
   writingText: string | null;
   evaluationJson: string | null;
   cefrLevel: string | null;
@@ -106,6 +107,7 @@ export async function saveSession(data: SessionData): Promise<Session> {
     promptText: data.promptText,
     promptConstraints: data.promptConstraints,
     promptMetaJson: null,
+    focusJson: null,
     writingText: data.writingText,
     evaluationJson: data.evaluationJson,
     cefrLevel: data.cefrLevel,
@@ -157,6 +159,7 @@ function rowToSession(row: typeof sessions.$inferSelect): Session {
     promptText: row.promptText,
     promptConstraints: row.promptConstraints,
     promptMetaJson: row.promptMetaJson,
+    focusJson: row.focusJson,
     writingText: row.writingText,
     evaluationJson: row.evaluationJson,
     cefrLevel: row.cefrLevel,

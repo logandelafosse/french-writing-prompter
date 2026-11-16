@@ -578,3 +578,64 @@ describe("HomePage review generate error", () => {
     expect(screen.getByText("Le Mardi Gras")).toBeInTheDocument();
   });
 });
+
+describe("HomePage FocusLine", () => {
+  const originalFetch = globalThis.fetch;
+  const fixedNow = () => new Date("2026-11-14T12:00:00-06:00");
+
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    vi.unstubAllGlobals();
+  });
+
+  it("shows Focus names on A-ready", async () => {
+    const fetchMock = vi.mocked(globalThis.fetch);
+    const withFocus = {
+      ...todayFirstRun,
+      level: "B1" as const,
+      levelName: "Seuil",
+      focus: [
+        {
+          id: "infinitif_participe",
+          name: "Infinitif ou participe (\u2011er / \u2011é)",
+          inlineName: "infinitif ou participe (\u2011er / \u2011é)",
+          historyName: "Infinitif ou participe",
+          shortName: "\u2011er / \u2011é",
+        },
+      ],
+    };
+    fetchMock.mockImplementation((input) => {
+      const url =
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
+      if (url.includes("/api/today")) {
+        return Promise.resolve(jsonResponse(withFocus));
+      }
+      if (url.includes("/api/quota")) {
+        return Promise.resolve(jsonResponse(withFocus.quota));
+      }
+      if (url.includes("/api/level")) {
+        return Promise.resolve(
+          jsonResponse({
+            level: "B1",
+            history: [],
+            streak: 0,
+          }),
+        );
+      }
+      return Promise.reject(new Error(`unexpected ${url}`));
+    });
+
+    renderHome(<HomePage now={fixedNow} />);
+    expect(
+      await screen.findByRole("region", { name: homeCopy.focusLabel }),
+    ).toHaveTextContent("infinitif ou participe (\u2011er / \u2011é)");
+  });
+});

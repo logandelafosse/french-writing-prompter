@@ -95,6 +95,42 @@ describe("PromptGenerator", () => {
     expect(content).toMatch(/indiquer clairement dans le texte le registre/i);
   });
 
+  it("generator prompt includes Focus elicit hints and avoids recent topics", async () => {
+    const mockClient: OpenAiClientLike = {
+      chatCompletionJSON: vi.fn().mockResolvedValue(validModelOutput),
+    };
+    const generator = new PromptGenerator(mockClient);
+    await generator.generate("B1", DEFAULT_DIALECT, {
+      focus: [
+        {
+          id: "imparfait_pc",
+          label: "imparfait ou passé composé",
+          elicitHint: "un récit au passé avec décor et événements",
+        },
+        {
+          id: "infinitif_participe",
+          label: "infinitif ou participe",
+          elicitHint:
+            "un but ou un souvenir qui oppose un verbe et un résultat",
+        },
+      ],
+      recentTopics: ["boucherie", "carnaval"],
+    });
+    const callArgs = vi.mocked(mockClient.chatCompletionJSON).mock.calls[0];
+    const systemMessage = callArgs?.[1].messages.find(
+      (m) => m.role === "system",
+    );
+    const content = systemMessage?.content ?? "";
+    expect(content).toContain("un récit au passé avec décor et événements");
+    expect(content).toContain(
+      "un but ou un souvenir qui oppose un verbe et un résultat",
+    );
+    expect(content).toContain("boucherie");
+    expect(content).toContain("carnaval");
+    expect(content).toMatch(/sans nommer de termes de grammaire/i);
+    expect(content).toMatch(/Ne jamais exiger le subjonctif/i);
+  });
+
   it("generator schema requires registre formel|familier|mixt", () => {
     for (const registre of ["formel", "familier", "mixt"] as const) {
       const parsed = GeneratorModelOutput.safeParse({

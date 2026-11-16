@@ -349,4 +349,46 @@ describe("postProcessEvaluation", () => {
     expect(result.corrections).toHaveLength(1);
     expect(result.corrections[0]?.quote).toBe("a tombé");
   });
+
+  it("sets isFocus only on Mistakes whose category is in the session snapshot", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "mistake",
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+          category: "accord",
+        }),
+        correction({
+          kind: "mistake",
+          quote: "je vas",
+          suggestion: "je vais",
+          category: "conjugaison",
+        }),
+        correction({
+          kind: "standard",
+          quote: "Maintenant",
+          suggestion: "Asteur",
+          category: null,
+        }),
+      ]),
+      {
+        text: writing,
+        sessionId: 1,
+        now,
+        createId: ids(),
+        focusCategories: ["accord"],
+      },
+    );
+    expect(result.corrections).toHaveLength(3);
+    expect(
+      result.corrections.find((row) => row.category === "accord")?.isFocus,
+    ).toBe(true);
+    expect(
+      result.corrections.find((row) => row.category === "conjugaison")?.isFocus,
+    ).toBe(false);
+    expect(
+      result.corrections.find((row) => row.kind === "standard")?.isFocus,
+    ).toBe(false);
+  });
 });

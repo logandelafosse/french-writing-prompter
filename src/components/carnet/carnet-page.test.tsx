@@ -57,7 +57,7 @@ function mockCarnet(
 ): void {
   vi.mocked(globalThis.fetch).mockImplementation((input) => {
     if (fetchUrl(input).includes("/api/weaknesses")) {
-      return Promise.resolve(jsonResponse({ weaknesses }));
+      return Promise.resolve(jsonResponse({ weaknesses, focus: [] }));
     }
     return Promise.resolve(jsonResponse({ notes }));
   });
@@ -151,7 +151,7 @@ describe("CarnetPage", () => {
         return Promise.resolve(new Response(null, { status: 204 }));
       }
       if (fetchUrl(input).includes("/api/weaknesses")) {
-        return Promise.resolve(jsonResponse({ weaknesses: [] }));
+        return Promise.resolve(jsonResponse({ weaknesses: [], focus: [] }));
       }
       return Promise.resolve(
         jsonResponse({ notes: deleted ? [] : [sessionNote] }),

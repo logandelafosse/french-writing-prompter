@@ -18,6 +18,7 @@ import { EvaluatePostBody, EvaluatePostResponse } from "@/contracts/api";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
+import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { postProcessEvaluation } from "@/modules/writing-evaluator/post-process";
 import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
@@ -111,6 +112,7 @@ export const POST = withErrors(async function postEvaluate(request: Request) {
     createId: () => crypto.randomUUID(),
     lookupDlf: (word) => dlf.lookup(word),
     dialectNotes,
+    focusCategories: parseStoredFocus(session.focusJson) ?? [],
   });
 
   await saveSession({
