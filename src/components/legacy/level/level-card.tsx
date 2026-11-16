@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { LevelBadge, LevelSelector, type CefrLevel } from "./level-components";
 import { LevelGetResponse, LevelPutResponse } from "@/contracts/api";
 import { useHeaderShell } from "@/components/shell/header-shell";
@@ -23,6 +23,7 @@ export function LevelCard() {
   const [data, setData] = useState<LevelData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [pendingLevel, setPendingLevel] = useState<CefrLevel | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -43,35 +44,81 @@ export function LevelCard() {
     };
   }, []);
 
-  async function fetchLevel() {
-    setLoading(true);
-    setError(null);
-    const result = await fetchJson("/api/level", LevelGetResponse);
-    if (!result.ok) {
-      setError(messageFromFetchError(result.error, LOAD_ERROR));
-      setLoading(false);
+  useEffect(() => {
+    if (pendingLevel !== null) {
       return;
     }
-    setData(result.value);
-    setLoading(false);
+    if (shellLevel === null || data === null) {
+      return;
+    }
+    if (data.level === shellLevel) {
+      return;
+    }
+    let cancelled = false;
+    async function syncFromShell() {
+      const result = await fetchJson("/api/level", LevelGetResponse);
+      if (cancelled || !result.ok) {
+        return;
+      }
+      setData(result.value);
+    }
+    void syncFromShell();
+    return () => {
+      cancelled = true;
+    };
+  }, [shellLevel, data, pendingLevel]);
+
+  async function refetchLevelQuiet() {
+    const result = await fetchJson("/api/level", LevelGetResponse);
+    if (result.ok) {
+      setData(result.value);
+    }
   }
 
   const handleSelectLevel = async (level: CefrLevel) => {
     setError(null);
+    setPendingLevel(level);
     const result = await fetchJson("/api/level", LevelPutResponse, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ level }),
     });
     if (!result.ok) {
+      setPendingLevel(null);
       setError(messageFromFetchError(result.error, LOAD_ERROR));
       return;
     }
-    await fetchLevel();
-    await refreshShell();
+    setData((prev) => ({
+      level,
+      history: prev
+        ? [result.value.change, ...prev.history]
+        : [result.value.change],
+    }));
+    await refetchLevelQuiet();
+    try {
+      await refreshShell(level);
+    } catch {
+      // Keep optimistic card level when shell refresh fails after a good PUT.
+    }
+    setPendingLevel(null);
   };
 
-  const displayLevel = shellLevel ?? data?.level ?? null;
+  const displayLevel = useMemo((): CefrLevel | null => {
+    if (pendingLevel !== null) {
+      return pendingLevel;
+    }
+    const dataLevel = data?.level ?? null;
+    if (dataLevel === null) {
+      return shellLevel;
+    }
+    if (shellLevel === null) {
+      return dataLevel;
+    }
+    if (dataLevel === shellLevel) {
+      return dataLevel;
+    }
+    return shellLevel;
+  }, [pendingLevel, data?.level, shellLevel]);
 
   if (loading) {
     return (

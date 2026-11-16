@@ -1,8 +1,35 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export function visibleHeaderQuota(page: Page, text: string) {
   return page.getByRole("banner").getByText(text).filter({ visible: true });
+}
+
+export async function expectTwoMobileHeaderRows(page: Page) {
+  const banner = page.getByRole("banner");
+  await expect(async () => {
+    const rowCount = await banner.evaluate((el) => el.children.length);
+    expect(rowCount).toBe(2);
+  }).toPass();
+
+  const wordmark = banner.getByRole("heading", { level: 1 });
+  const chip = banner.getByRole("button", { name: /Niveau CECR/ });
+  const nav = banner.getByRole("link", { name: "Historique" });
+  const quota = banner.getByText(/Reste \d sur 3/).filter({ visible: true });
+
+  const boxY = async (locator: Locator) => {
+    const box = await locator.boundingBox();
+    return box?.y ?? 0;
+  };
+
+  const row1Y = Math.min(await boxY(wordmark), await boxY(chip));
+  const row2Y = Math.min(await boxY(nav), await boxY(quota));
+
+  expect(Math.abs((await boxY(wordmark)) - (await boxY(chip)))).toBeLessThan(
+    12,
+  );
+  expect(Math.abs((await boxY(nav)) - (await boxY(quota)))).toBeLessThan(20);
+  expect(row2Y).toBeGreaterThan(row1Y + 8);
 }
 
 export async function setLevelB1(page: Page) {
