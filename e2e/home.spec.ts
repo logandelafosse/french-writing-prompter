@@ -2,7 +2,10 @@ import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations, LEGACY_AXE_DISABLED } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
-import { PROMPT_FIXTURE_LAFAYETTE } from "./support/prompt-helpers";
+import {
+  PROMPT_FIXTURE_LAFAYETTE,
+  mainContent,
+} from "./support/prompt-helpers";
 
 const PROMPT_SNIPPET = PROMPT_FIXTURE_LAFAYETTE;
 const HAPPY_WRITING =
@@ -54,7 +57,7 @@ test("malformed AI output shows an error and retry recovers", async ({
 
   await scenario("malformed");
   await page.getByRole("button", { name: "Corrige-moi" }).click();
-  await expect(page.getByRole("alert")).toContainText(
+  await expect(mainContent(page).getByRole("alert")).toContainText(
     "J'ai pas pu lire ton texte ce coup-ci.",
   );
   await expect(page.getByText("Unhandled Runtime Error")).toHaveCount(0);
@@ -63,6 +66,8 @@ test("malformed AI output shows an error and retry recovers", async ({
   ).toHaveCount(0);
 
   await scenario("happy");
-  await page.getByRole("button", { name: "Essayer encore" }).click();
+  await mainContent(page)
+    .getByRole("button", { name: "Essayer encore" })
+    .click();
   await expectEvaluationWithScores(page);
 });
