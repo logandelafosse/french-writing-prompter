@@ -4,13 +4,11 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T27 done; T28 ready).
+Last updated: 2026-11-16 by coordinator (T28 in review on PR #81).
 
 ## Ready
 
-| ID  | Ticket                                    | Why                                                                |
-| --- | ----------------------------------------- | ------------------------------------------------------------------ |
-| T28 | Weakness memory and Carnet "À travailler" | T22 + T26 done; spec `T28-weakness-memory-carnet-a-travailler.md`. |
+_None._
 
 ## In progress
 
@@ -18,7 +16,9 @@ _None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                    | Why                                                                                                                 |
+| --- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| T28 | Weakness memory and Carnet "À travailler" | [PR #81](https://github.com/logandelafosse/french-writing-prompter/pull/81) `43dcc39`; `pr:size` 305; `Closes #30`. |
 
 ## Blocked
 
@@ -74,13 +74,13 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T25 | Dialect checks, pushback, Add Dialect Note sheet | AFK  | T22        | **Done** — T25a [PR #77](https://github.com/logandelafosse/french-writing-prompter/pull/77) + T25b [PR #78](https://github.com/logandelafosse/french-writing-prompter/pull/78); closed #27. |
 | T26 | Carnet page with Dialect Notes list              | AFK  | T25        | **Done** — merged [PR #79](https://github.com/logandelafosse/french-writing-prompter/pull/79) `f112ee2`; e2e fix `a55d444`; closed #28.                                                     |
 | T27 | Dialect Notes markdown export                    | AFK  | T26        | **Done** — merged [PR #80](https://github.com/logandelafosse/french-writing-prompter/pull/80) `40fc315`; fix `48751ca`; closed #29; TOOL-PR80-* backlog.                                    |
-| T28 | Weakness memory and Carnet "À travailler"        | AFK  | T22, T26   | **Ready** — on board Ready column.                                                                                                                                                          |
+| T28 | Weakness memory and Carnet "À travailler"        | AFK  | T22, T26   | **In review** — [PR #81](https://github.com/logandelafosse/french-writing-prompter/pull/81) `43dcc39`.                                                                                      |
 
 ### Phase 3 — Memory
 
 | ID  | Ticket                                        | Type | Blocked by | Why not ready                                                                                                           |
 | --- | --------------------------------------------- | ---- | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| T28 | Weakness memory and Carnet "À travailler"     | AFK  | T22, T26   | **Ready** — on board Ready column.                                                                                      |
+| T28 | Weakness memory and Carnet "À travailler"     | AFK  | T22, T26   | **In review** — [PR #81](https://github.com/logandelafosse/french-writing-prompter/pull/81).                            |
 | T29 | Focus du jour driving prompts; "Pratiquer ça" | AFK  | T15, T28   | Needs Weaknesses and generator v2. ~420 lines: split into T29a (Focus) / T29b (Pratiquer ça) is pre-approved, see spec. |
 | T30 | Resource catalog and links                    | AFK  | T28        | Needs Weakness categories. Q7: general French starter catalog; LA CI later.                                             |
 
