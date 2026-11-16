@@ -4,23 +4,21 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T22a PR #73; closed duplicate #72).
+Last updated: 2026-11-16 by coordinator (T22a done; T22b ready).
 
 ## Ready
 
-_None._
+| ID   | Ticket                                                                                                             | Why                                                                                                                                  |
+| ---- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| T22b | Scores, Compris, today Phase C (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24)) | T22a merged [PR #73](https://github.com/logandelafosse/french-writing-prompter/pull/73) `394cf0e`; `T22-review-screen.md` remainder. |
 
 ## In progress
 
-| ID   | Ticket                                                                                                             | Why                                                        |
-| ---- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
-| T22b | Scores, Compris, today Phase C (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24)) | After **T22a** merge; remainder of `T22-review-screen.md`. |
+_None._
 
 ## In review
 
-| ID   | Ticket                                                                                                                  | Why                                                                                                                         |
-| ---- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| T22a | Phase C marked text + Mistake cards (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24)) | [PR #73](https://github.com/logandelafosse/french-writing-prompter/pull/73) `f7e7e313`; `pr:size` 405; `docs/evidence/24/`. |
+_None._
 
 ## Blocked
 
@@ -65,7 +63,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T21  | Evaluator v2: Corrections, quote location, French output            | AFK  | T06, T17   | **Done** — T21a + T21b merged; closed #23.                                                                                                                                        |
 | T21a | Corrections table, EvaluationV2 contracts, parser                   | AFK  | T06, T17   | **Done** — [PR #70](https://github.com/logandelafosse/french-writing-prompter/pull/70) `b075e4e`.                                                                                 |
 | T21b | Evaluator v2 runtime                                                | AFK  | T21a       | **Done** — [PR #71](https://github.com/logandelafosse/french-writing-prompter/pull/71) `525c748`.                                                                                 |
-| T22  | Review screen: marked text, Mistake cards, Scores                   | AFK  | T16, T21   | **Split** — T22a [PR #73](https://github.com/logandelafosse/french-writing-prompter/pull/73) in review; T22b after merge.                                                         |
+| T22  | Review screen: marked text, Mistake cards, Scores                   | AFK  | T16, T21   | **Split** — T22a done; **T22b** Ready. Closes #24 when T22b merges.                                                                                                               |
 
 ### Phase 2 — Dialect
 
@@ -131,3 +129,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T20  | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22))          | Merged [PR #69](https://github.com/logandelafosse/french-writing-prompter/pull/69) `acc40f8` 2026-11-16; evidence `docs/evidence/22/`; post-review evaluate bootstrap + `pr:size` trim; TOOL-PR69-* backlog. T21 ready.                                                    |
 | T21a | Corrections table, EvaluationV2 contracts, parser (parent [#23](https://github.com/logandelafosse/french-writing-prompter/issues/23))            | Merged [PR #70](https://github.com/logandelafosse/french-writing-prompter/pull/70) `b075e4e` 2026-11-16; server-only; three reviews clear; TOOL-PR70-* backlog. T21b ready.                                                                                                |
 | T21b | Evaluator v2 runtime ([#23](https://github.com/logandelafosse/french-writing-prompter/issues/23))                                                | Merged [PR #71](https://github.com/logandelafosse/french-writing-prompter/pull/71) `525c748` 2026-11-16; `pr:size` 494; placeholder Evaluation card; review fixes `d6b6697`; TOOL-PR71-* backlog. Closed #23. T22 ready.                                                   |
+| T22a | Phase C marked text + Mistake cards (parent [#24](https://github.com/logandelafosse/french-writing-prompter/issues/24))                          | Merged [PR #73](https://github.com/logandelafosse/french-writing-prompter/pull/73) `394cf0e` 2026-11-16; evidence `docs/evidence/24/`; `pr:size` 405; review fixes `99f51a8` + `3a77cf4`; TOOL-PR73-* backlog. T22b ready. Does not close #24.                             |
