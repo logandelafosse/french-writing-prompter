@@ -66,7 +66,33 @@ describe("level-store integration", () => {
     expect(await getStreakCount()).toBe(0);
   });
 
-  it("recordEvaluation promotes one level at three and never demotes", async () => {
+  it("recordEvaluation at C2 is a no-op", async () => {
+    await setLevel("C2", "manual");
+    await insertEvaluatedSession(
+      "C2",
+      "2026-01-01T12:00:00.000Z",
+      "2026-01-01T12:00:00.000Z",
+    );
+    await insertEvaluatedSession(
+      "C2",
+      "2026-01-02T12:00:00.000Z",
+      "2026-01-02T12:00:00.000Z",
+    );
+    await insertEvaluatedSession(
+      "C2",
+      "2026-01-03T12:00:00.000Z",
+      "2026-01-03T12:00:00.000Z",
+    );
+
+    const result = await recordEvaluation("C2");
+    expect(result).toBeNull();
+
+    const rows = await db.select().from(levelChanges);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.toLevel).toBe("C2");
+  });
+
+  it("C1 plus three B1 recordEvaluation stays at C1", async () => {
     await setLevel("C1", "manual");
     await insertEvaluatedSession(
       "B1",
@@ -83,6 +109,7 @@ describe("level-store integration", () => {
 
     const rows = await db.select().from(levelChanges);
     expect(rows).toHaveLength(1);
+    expect(rows[0]?.toLevel).toBe("C1");
   });
 
   it("undo reverts only the latest auto change", async () => {
@@ -94,6 +121,7 @@ describe("level-store integration", () => {
     expect(undone.source).toBe("undo");
     expect(undone.toLevel).toBe("B1");
     expect(undone.revertsChangeId).toBe(auto.id);
+    expect(await getStreakCount()).toBe(0);
 
     await expect(undoAutoAdvancement(auto.id)).rejects.toBeInstanceOf(
       UndoLevelError,

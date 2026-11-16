@@ -74,7 +74,7 @@ test.describe("level advancement banner", () => {
     await expect(banner).toBeVisible();
 
     await mainContent(page)
-      .getByRole("button", { name: /Une autre consigne · reste/ })
+      .getByRole("button", { name: "Donne-moi une consigne" })
       .click();
     await expect(banner).toHaveCount(0);
 
