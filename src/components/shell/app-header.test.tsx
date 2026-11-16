@@ -1,6 +1,34 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { AppHeader } from "./header-shell";
+
+const defaultQuota = {
+  remaining: 3,
+  used: 0,
+  max: 3,
+  resetsAt: "2099-01-01T06:00:00.000Z",
+};
+
+describe("AppHeader full variant mobile rows", () => {
+  it("renders wordmark and level chip in the header", () => {
+    render(
+      <AppHeader
+        variant="full"
+        level="B1"
+        quota={defaultQuota}
+        levelReady
+        quotaReady
+        onLevelChange={async () => {}}
+      />,
+    );
+
+    const header = within(screen.getByRole("banner"));
+    expect(header.getByRole("link", { name: /^Consigne/ })).toBeInTheDocument();
+    expect(
+      header.getByRole("button", { name: "Niveau CECR B1, changer" }),
+    ).toBeInTheDocument();
+  });
+});
 
 describe("AppHeader placement variant", () => {
   it("renders wordmark and placement link without nav, quota or chip", () => {
@@ -18,7 +46,7 @@ describe("AppHeader placement variant", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: "Consigne." })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Consigne/ })).toBeInTheDocument();
     expect(
       screen.getByRole("link", { name: "Je connais mon niveau" }),
     ).toBeInTheDocument();

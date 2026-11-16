@@ -1,6 +1,10 @@
 import { test, expect } from "./support/fixtures";
 import { captureEvidence } from "./support/evidence";
-import { setLevelB1, visibleHeaderQuota } from "./support/header-helpers";
+import {
+  expectTwoMobileHeaderRows,
+  setLevelB1,
+  visibleHeaderQuota,
+} from "./support/header-helpers";
 
 test.describe("mobile header", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true });
@@ -17,6 +21,8 @@ test.describe("mobile header", () => {
       page.getByText("atelier d'écriture · français louisianais"),
     ).toBeHidden();
     await expect(visibleHeaderQuota(page, "Reste 3 sur 3")).toBeVisible();
+    await expect(page.getByText("Reste 3 consignes sur 3")).toBeHidden();
+    await expectTwoMobileHeaderRows(page);
     await captureEvidence(page, testInfo, "header-mobile");
   });
 });

@@ -191,21 +191,23 @@ export function AppHeader({
 
   return (
     <header className="border-line/0 flex flex-col gap-0.5 px-5 pt-3.5 pb-1.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-6 sm:gap-y-2 sm:px-10 sm:py-[18px]">
-      <Link
-        href="/"
-        className="text-wordmark-sm sm:text-wordmark min-h-touch text-ink inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-bold tracking-[-0.03em] no-underline"
-      >
-        <h1 className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
-          {APP_WORDMARK}
-          <span className="text-mistake">.</span>
-        </h1>
-        <span className="text-muted hidden text-[13px] font-normal sm:inline">
-          {APP_TAGLINE}
-        </span>
-      </Link>
-      {level && onLevelChange ? (
-        <LevelMenu level={level} onChange={onLevelChange} />
-      ) : null}
+      <div className="min-h-touch flex items-center justify-between gap-3 sm:contents">
+        <Link
+          href="/"
+          className="text-wordmark-sm sm:text-wordmark text-ink inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-bold tracking-[-0.03em] no-underline"
+        >
+          <h1 className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
+            {APP_WORDMARK}
+            <span className="text-mistake">.</span>
+          </h1>
+          <span className="text-muted hidden text-[13px] font-normal sm:inline">
+            {APP_TAGLINE}
+          </span>
+        </Link>
+        {level && onLevelChange ? (
+          <LevelMenu level={level} onChange={onLevelChange} />
+        ) : null}
+      </div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:contents">
         <nav
           aria-label="Navigation"
@@ -242,7 +244,7 @@ export function AppHeader({
 type HeaderContextValue = {
   level: CefrLevel | null;
   refreshQuota: () => Promise<void>;
-  refreshShell: () => Promise<void>;
+  refreshShell: (optimisticLevel?: CefrLevel) => Promise<void>;
 };
 
 const HeaderContext = createContext<HeaderContextValue | null>(null);
@@ -279,16 +281,23 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     await fetchQuota();
   }, [fetchQuota]);
 
-  const refreshShell = useCallback(async () => {
-    const [levelRes] = await Promise.all([
-      fetchJson("/api/level", LevelGetResponse),
-      fetchQuota(),
-    ]);
-    if (levelRes.ok) {
-      setLevel(levelRes.value.level);
-      setLevelReady(true);
-    }
-  }, [fetchQuota]);
+  const refreshShell = useCallback(
+    async (optimisticLevel?: CefrLevel) => {
+      if (optimisticLevel !== undefined) {
+        setLevel(optimisticLevel);
+        setLevelReady(true);
+      }
+      const [levelRes] = await Promise.all([
+        fetchJson("/api/level", LevelGetResponse),
+        fetchQuota(),
+      ]);
+      if (levelRes.ok) {
+        setLevel(levelRes.value.level);
+        setLevelReady(true);
+      }
+    },
+    [fetchQuota],
+  );
 
   useEffect(() => {
     let cancelled = false;
