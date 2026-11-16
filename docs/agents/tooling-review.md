@@ -1049,3 +1049,15 @@ Non-blocking for T17 merge. Prioritize TOOL-PR66-6 before T18. Full proposals: [
 | TOOL-PR66-6 | `no-parse-failure-default` + `prompt-level-is-cefr`               | `sessionStatus` defaults failed parse to `active` — land before T18     |
 | TOOL-PR66-7 | `no-swallowed-fetch-in-components`                                | Autosave ignores `!result.ok`; land before T19                          |
 | —           | Fold TOOL-PR57-1, TOOL-PR54-5 / TOOL-PR62-7                       | `boundingBox` in draft e2e; extra `test.use` viewports in `drafts.spec` |
+
+### Backlog from PR #67 tooling review (2026-11-16)
+
+Non-blocking for T18 merge. Prioritize TOOL-PR67-3 before T19. Full proposals: [T18 tooling review PR #67](5e42a007-12ee-4797-94e8-834ce82cedca).
+
+| ID (draft)  | Rule / change                                                                 | Notes                                                                 |
+| ----------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| TOOL-PR67-1 | `drizzle-orm` banned in route files; `no-raw-sql-transaction`                 | Prompt route opens transactions and re-queries active sessions        |
+| TOOL-PR67-2 | `no-request-text-in-routes`                                                   | Empty POST bodies via `request.text()` + cloned `Request`             |
+| TOOL-PR67-3 | `prompt-post-body-single-source`, `no-unparsed-error-code`, fetch error codes | `PromptPostBody` / `DraftWouldBeAbandonedResponse` duplicated on Home |
+| TOOL-PR67-4 | `countdown-tick-single-source`, `no-silent-invalid-countdown`                 | `60_000` copied in notice, formatter, tests                           |
+| —           | Folds TOOL-PR62-2, TOOL-PR63-15, TOOL-PR62-1, TOOL-PR54-5, TOOL-PR66-5/7      | Quota literals, bracket radii, e2e viewports, autosave `saveNow`      |
