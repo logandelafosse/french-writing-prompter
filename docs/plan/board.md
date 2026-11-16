@@ -4,18 +4,19 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T17 merged PR #66).
+Last updated: 2026-11-16 by coordinator (T18 dispatched).
 
 ## Ready
 
-| ID  | Ticket                                                                                                                                  | Why                                                               |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| T18 | Quota exhausted, swap confirm, session statuses ([#20](https://github.com/logandelafosse/french-writing-prompter/issues/20))            | T17 merged; critical path; not alongside T19.                     |
-| T20 | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22)) | T14 merged; optional parallel; not alongside T18 (evaluate seam). |
+| ID  | Ticket                                                                                                                                  | Why                                   |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| T20 | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22)) | T14 merged; held while T18 in flight. |
 
 ## In progress
 
-_None._
+| ID  | Ticket                                                                                                                       | Why                                                                                  |
+| --- | ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| T18 | Quota exhausted, swap confirm, session statuses ([#20](https://github.com/logandelafosse/french-writing-prompter/issues/20)) | Branch `ticket/t18-quota-swap`; [implementer](0a51f803-df4b-4cea-b8e5-613e025ab67c). |
 
 ## In review
 
@@ -58,7 +59,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | **Done** — merged [PR #63](https://github.com/logandelafosse/french-writing-prompter/pull/63).                                                                                    |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | **Done** — merged [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65) 2026-11-16; TOOL-PR65-* backlog.                                                    |
 | T17  | Session lifecycle and draft autosave                                | AFK  | T16        | **Done** — merged [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66) 2026-11-16; TOOL-PR66-* backlog.                                                    |
-| T18  | Quota exhausted, swap confirm, session statuses                     | AFK  | T17        | **Ready** — see Ready column. Not alongside T19.                                                                                                                                  |
+| T18  | Quota exhausted, swap confirm, session statuses                     | AFK  | T17        | **In progress** — `ticket/t18-quota-swap`.                                                                                                                                        |
 | T19  | Error and offline states                                            | AFK  | T17        | Needs local draft copy. Builds the shared `withErrors` route wrapper.                                                                                                             |
 | T20  | Level service with durable streak and undoable advancement          | AFK  | T14        | **Ready** — see Ready column. Not alongside T17 or T21.                                                                                                                           |
 | T21  | Evaluator v2: Corrections, quote location, French output            | AFK  | T06, T17   | Needs dialect module and sessions. Q4 answered: taxonomy §1.1 as-is. ~480 lines: if over, split out the corrections table + stored-evaluation parser first.                       |
