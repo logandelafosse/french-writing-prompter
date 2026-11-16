@@ -18,10 +18,14 @@ import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { homeCopy } from "@/copy/fr";
 import { Button } from "@/components/ui/button";
-import { Field } from "@/components/ui/field";
 import { Surface } from "@/components/ui/surface";
-import { Textarea } from "@/components/ui/textarea";
 import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
+import { RuledTextarea } from "@/components/writing/ruled-textarea";
+import { WritingFooter } from "@/components/writing/writing-footer";
+import { GenerateButton } from "@/components/writing/generate-button";
+import { countWords } from "@/lib/count-words";
+import { shouldShowWordNudge } from "@/lib/word-meter-math";
+import { cn } from "@/lib/utils";
 import type { Evaluation } from "@/contracts/evaluation";
 import { HomeDateTitle, HomePhaseA } from "./home-phase-a";
 
@@ -205,6 +209,7 @@ function HomeBody({
           promptText={phase.promptText}
           promptMeta={phase.promptMeta}
           generating={generating}
+          quotaRemaining={bootstrap.data.quota.remaining}
           onSwap={onSwap}
         />
       ) : (
@@ -230,12 +235,14 @@ function WritingInterim({
   promptText,
   promptMeta,
   generating,
+  quotaRemaining,
   onSwap,
 }: {
   sessionId: number;
   promptText: string;
   promptMeta: PromptMeta | null;
   generating: boolean;
+  quotaRemaining: number;
   onSwap: () => void;
 }) {
   const [writing, setWriting] = useState("");
@@ -275,23 +282,41 @@ function WritingInterim({
     }
   }, [promptText, generating]);
 
-  return (
-    <div className="flex flex-col gap-5">
-      <div
-        ref={promptRegionRef}
-        tabIndex={-1}
-        aria-live="polite"
-        className="outline-none"
-      >
-        <PromptSheet
-          promptText={promptText}
-          meta={promptMeta}
-          animateKey={`${sessionId}-${promptText}`}
-          generateBusy={generating}
-          swap={{ onSwap }}
-        />
-      </div>
-      {submitUi === "review" && evaluation ? (
+  const wordTarget = promptMeta?.wordTarget ?? null;
+  const evaluating = submitUi === "evaluating";
+  const showNudge =
+    submitUi === "idle" &&
+    wordTarget !== null &&
+    shouldShowWordNudge(countWords(writing), wordTarget);
+
+  const runSubmitFromShortcut = () => {
+    if (!evaluating && writing.trim().length > 0) {
+      void submit();
+    }
+  };
+
+  if (submitUi === "review" && evaluation) {
+    return (
+      <div className="flex flex-col gap-5">
+        <Surface
+          padding="home"
+          className="flex flex-col gap-4 max-sm:p-[22px_18px]"
+        >
+          <PromptSheet
+            embedded
+            promptText={promptText}
+            meta={promptMeta}
+            animateKey={`${sessionId}-${promptText}`}
+            generateBusy={generating}
+            swap={{ onSwap, disabled: true }}
+          />
+          <RuledTextarea
+            label={homeCopy.writingLabel}
+            value={writing}
+            onChange={() => undefined}
+            readOnly
+          />
+        </Surface>
         <section
           ref={resultsRef}
           tabIndex={-1}
@@ -301,35 +326,77 @@ function WritingInterim({
         >
           <EvaluationCard evaluation={evaluation} />
         </section>
-      ) : (
-        <Surface padding="home" className="flex flex-col gap-4">
-          <Field label={homeCopy.writingLabel}>
-            <Textarea
-              lang="fr"
-              value={writing}
-              rows={8}
-              onChange={(e) => setWriting(e.target.value)}
+        <GenerateButton
+          busy={generating}
+          disabled={generating}
+          onClick={onSwap}
+          label={homeCopy.reviewNextPrompt(quotaRemaining)}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div
+        ref={promptRegionRef}
+        tabIndex={-1}
+        aria-live="polite"
+        className="outline-none"
+      >
+        <Surface
+          padding="home"
+          className={cn(
+            "flex flex-col gap-4 max-sm:gap-3.5 max-sm:p-[22px_18px]",
+            "focus-within:border-primary focus-within:border-l-primary focus-within:border-l-2",
+          )}
+        >
+          <PromptSheet
+            embedded
+            promptText={promptText}
+            meta={promptMeta}
+            animateKey={`${sessionId}-${promptText}`}
+            generateBusy={generating}
+            swap={{ onSwap }}
+          />
+          <RuledTextarea
+            label={homeCopy.writingLabel}
+            value={writing}
+            onChange={setWriting}
+            readOnly={evaluating}
+            onSubmitShortcut={runSubmitFromShortcut}
+            minRows={8}
+          />
+          <div className="max-sm:hidden">
+            <WritingFooter
+              text={writing}
+              target={wordTarget}
+              layout="desktop"
+              submitBusy={evaluating}
+              onSubmit={() => void submit()}
             />
-          </Field>
-          {error ? (
-            <p role="alert" className="text-mistake text-sm">
-              {error}
-            </p>
-          ) : null}
-          <Button
-            size="lg"
-            busy={submitUi === "evaluating"}
-            disabled={!writing.trim() || submitUi === "evaluating"}
-            onClick={() => void submit()}
-          >
-            {submitUi === "evaluating"
-              ? homeCopy.submitBusy
-              : error
-                ? homeCopy.retry
-                : homeCopy.submit}
-          </Button>
+          </div>
         </Surface>
-      )}
+        <div className="sm:hidden">
+          <WritingFooter
+            text={writing}
+            target={wordTarget}
+            layout="mobile"
+            submitBusy={evaluating}
+            onSubmit={() => void submit()}
+          />
+        </div>
+        {showNudge ? (
+          <p className="text-muted px-2 text-sm max-sm:px-2 sm:px-0">
+            {homeCopy.wordNudge}
+          </p>
+        ) : null}
+        {error ? (
+          <p role="alert" className="text-mistake text-sm">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </div>
   );
 }

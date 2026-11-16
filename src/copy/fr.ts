@@ -17,4 +17,8 @@ export const homeCopy = {
   loadError: "Une erreur s'est produite. Réessaie.",
   evalError: "Une erreur s'est produite pendant l'évaluation.",
   retry: "Réessayer",
+  wordNudge:
+    "Encore une cinquantaine de mots, si le cœur t'en dit. Tu peux envoyer n'importe quand.",
+  reviewNextPrompt: (remaining: number) =>
+    `Une autre consigne · reste ${remaining}`,
 } as const;
