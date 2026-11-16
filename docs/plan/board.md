@@ -4,13 +4,11 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T24 done; T25a ready).
+Last updated: 2026-11-16 by coordinator (T25a in review on PR #77).
 
 ## Ready
 
-| ID   | Ticket                                                 | Why                                                                                                                                                                |
-| ---- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| T25a | Dialect checks — server schema, PATCH, evaluator (T25) | T23 + T24 merged; T22 review screen done. Split per spec ~480 prod lines; ship server/PATCH slice first under `T25-dialect-checks-pushback-dialect-note-sheet.md`. |
+_None._
 
 ## In progress
 
@@ -18,7 +16,9 @@ _None._
 
 ## In review
 
-_None._
+| ID   | Ticket                                                 | Why                                                                                                           |
+| ---- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| T25a | Dialect checks — server schema, PATCH, evaluator (T25) | [PR #77](https://github.com/logandelafosse/french-writing-prompter/pull/77) `334ac23`; blocking fixes pushed. |
 
 ## Blocked
 
