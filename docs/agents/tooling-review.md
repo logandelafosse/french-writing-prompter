@@ -970,3 +970,17 @@ Not in T13c scope; file as separate tooling tickets when convenient.
 | TOOL-PR52-3 | `no-hardcoded-daily-quota`, `no-new-date-in-components`, `no-window-event-bus`                | Header quota copy and `HEADER_SHELL_REFRESH_EVENT`               |
 | TOOL-PR52-4 | `no-arbitrary-token-length`, `no-e2e-viewport-override`                                       | Tokens vs `rounded-[22px]`; viewport in `playwright.config` only |
 | TOOL-PR52-5 | `no-mocking-own-modules`                                                                      | `layout.test.tsx` mocks `HeaderShell`                            |
+
+### Backlog from PR #54 tooling review (2026-11-15)
+
+| ID (draft)  | Rule / change                                                                  | Notes                                                     |
+| ----------- | ------------------------------------------------------------------------------ | --------------------------------------------------------- |
+| TOOL-PR54-1 | Widen `no-boolean-loading-state` to `*Ready`                                   | `levelReady` / `quotaReady`; failed fetch leaves blank UI |
+| TOOL-PR54-2 | `no-wall-clock-sleep-in-tests`                                                 | `header-shell.test.tsx` setTimeout race                   |
+| TOOL-PR54-3 | `no-e2e-evaluate`                                                              | `header-helpers.ts` `data-highlighted` poll               |
+| TOOL-PR54-4 | `cefr-count-single-source`                                                     | `CEFR_LEVELS_IN_MENU = 6` in e2e                          |
+| TOOL-PR54-5 | `no-e2e-viewport-override`                                                     | duplicate `test.use` viewports in one spec                |
+| TOOL-PR54-6 | `no-hardcoded-daily-quota`                                                     | `sur 3` in `quotaMessage` strings                         |
+| TOOL-PR54-7 | ESLint `allowTypeImports` negation for `*-store` + `quota-state-single-source` | hand-written `QuotaState` in store                        |
+| TOOL-PR54-8 | `no-arbitrary-chip-radius`                                                     | `rounded-[22px]` vs `rounded-chip`                        |
+| TOOL-PR54-9 | Unit test: stale `GET /api/level` vs `onLevelChange`                           | no generation guard on level fetch                        |
