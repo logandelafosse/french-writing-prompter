@@ -60,7 +60,7 @@ test.describe("level advancement banner", () => {
     await captureEvidence(page, testInfo, "advancement-1280-undo");
   });
 
-  test("banner clears after Donne-moi une consigne and stays gone after reload", async ({
+  test("banner clears after the next consigne and stays gone after reload", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -74,7 +74,7 @@ test.describe("level advancement banner", () => {
     await expect(banner).toBeVisible();
 
     await mainContent(page)
-      .getByRole("button", { name: "Donne-moi une consigne" })
+      .getByRole("button", { name: "Une autre consigne · reste 2" })
       .click();
     await expect(banner).toHaveCount(0);
 

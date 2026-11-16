@@ -1,7 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CefrLevel } from "@/contracts/cefr";
+import { CEFR_UI_LABELS, type CefrLevel } from "@/contracts/cefr";
+import type { LevelChangeDto } from "@/contracts/api";
 import type { PromptMeta } from "@/contracts/prompt-meta";
 import {
   EvaluatePostResponse,
@@ -169,6 +170,28 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     return result;
   };
 
+  const handleAfterEvaluate = useCallback(
+    (advancement: LevelChangeDto | null | undefined) => {
+      setBootstrap((prev) => {
+        if (prev.kind !== "ready") return prev;
+        const data = { ...prev.data };
+        if (advancement !== undefined) {
+          data.advancement = advancement ?? null;
+        }
+        if (advancement) {
+          data.level = advancement.toLevel;
+          data.levelName = CEFR_UI_LABELS[advancement.toLevel];
+        }
+        syncFromToday(data);
+        return { ...prev, data };
+      });
+      if (advancement?.toLevel) {
+        void refreshShell(advancement.toLevel);
+      }
+    },
+    [refreshShell, syncFromToday],
+  );
+
   const undoAdvancement = useCallback(async () => {
     const changeId =
       bootstrap.kind === "ready" ? bootstrap.data.advancement?.id : undefined;
@@ -244,7 +267,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
           undoBusy={undoBusy}
           onRetryGenerate={retryHome}
           onUndoAdvancement={() => void undoAdvancement()}
-          onAfterEvaluate={() => void loadToday()}
+          onAfterEvaluate={handleAfterEvaluate}
           onSelectLevel={(level) =>
             setBootstrap((prev) =>
               prev.kind === "ready" ? { ...prev, selectedLevel: level } : prev,
@@ -282,7 +305,7 @@ function HomeBody({
   undoBusy: boolean;
   onRetryGenerate: () => void;
   onUndoAdvancement: () => void;
-  onAfterEvaluate: () => void;
+  onAfterEvaluate: (advancement: LevelChangeDto | null | undefined) => void;
   onSelectLevel: (level: CefrLevel) => void;
   onGenerate: (level: CefrLevel) => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
@@ -371,7 +394,7 @@ function WritingInterim({
   onRetryGenerate: () => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
-  onAfterEvaluate: () => void;
+  onAfterEvaluate: (advancement: LevelChangeDto | null | undefined) => void;
 }) {
   const autosave = useDraftAutosave(sessionId, draft);
   const writing = autosave.text;
@@ -439,7 +462,7 @@ function WritingInterim({
     }
     setSubmitUi("review");
     setEvaluation(result.value.evaluation);
-    onAfterEvaluate();
+    onAfterEvaluate(result.value.advancement);
   };
 
   useEffect(() => {
