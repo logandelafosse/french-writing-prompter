@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classifyFetchFailure } from "./classify-fetch-failure";
+import { classifyFetchFailure } from "./fetch-json";
 
 describe("classifyFetchFailure distinguishes offline, AI failure and generic errors", () => {
   it("maps TypeError to offline", () => {

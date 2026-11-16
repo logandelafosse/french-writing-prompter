@@ -10,9 +10,7 @@ export default function PlacementPage() {
   const router = useRouter();
   useEffect(() => {
     let alive = true;
-    void fetchJson("/api/today", TodayGetResponse, {
-      loadingTimeout: true,
-    }).then((result) => {
+    void fetchJson("/api/today", TodayGetResponse).then((result) => {
       if (!alive || !result.ok) return;
       if (result.value.level !== null) router.replace("/");
     });

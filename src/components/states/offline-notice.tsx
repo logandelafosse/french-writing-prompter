@@ -4,23 +4,17 @@ import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { homeCopy } from "@/copy/fr";
 
-function subscribeNavigatorOnline(onStoreChange: () => void): () => void {
-  window.addEventListener("online", onStoreChange);
-  window.addEventListener("offline", onStoreChange);
-  return () => {
-    window.removeEventListener("online", onStoreChange);
-    window.removeEventListener("offline", onStoreChange);
-  };
-}
-
-function navigatorOfflineClient(): boolean {
-  return !navigator.onLine;
-}
-
 export function useOffline(): boolean {
   return useSyncExternalStore(
-    subscribeNavigatorOnline,
-    navigatorOfflineClient,
+    (onChange) => {
+      window.addEventListener("online", onChange);
+      window.addEventListener("offline", onChange);
+      return () => {
+        window.removeEventListener("online", onChange);
+        window.removeEventListener("offline", onChange);
+      };
+    },
+    () => !navigator.onLine,
     () => false,
   );
 }

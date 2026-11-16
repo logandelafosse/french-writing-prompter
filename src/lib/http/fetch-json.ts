@@ -1,4 +1,5 @@
 import { z, type ZodType } from "zod";
+import type { ClassifiedFetchFailure } from "@/contracts/errors";
 import { FETCH_TIMEOUT_MS } from "@/config/limits";
 import { parseJson } from "@/lib/json";
 
@@ -32,6 +33,33 @@ export type FetchJsonInit = RequestInit & {
   loadingTimeout?: boolean;
 };
 
+const LooseErrorEnvelope = z.strictObject({
+  error: z.strictObject({ code: z.string(), message: z.string() }),
+});
+
+export function classifyFetchFailure(
+  thrown?: unknown,
+  bodyText?: string,
+): ClassifiedFetchFailure {
+  if (thrown instanceof TypeError) return "offline";
+  if (
+    thrown instanceof Error &&
+    (thrown.name === "AbortError" || thrown.name === "TimeoutError")
+  ) {
+    return "offline";
+  }
+  if (bodyText === undefined) return "generic";
+  const parsed = parseJson(LooseErrorEnvelope, bodyText);
+  if (!parsed.ok) return "generic";
+  return parsed.value.error.code.startsWith("AI_") ? "ai" : "generic";
+}
+
+export function classifyFetchError(error: FetchError): ClassifiedFetchFailure {
+  if (error.kind === "network") return "offline";
+  if (error.kind === "http" && error.code?.startsWith("AI_")) return "ai";
+  return "generic";
+}
+
 export type { ParseRequestBodyResult } from "./parse-request-body";
 export { parseRequestBody } from "./parse-request-body";
 
@@ -57,20 +85,13 @@ function errorFieldsFromBody(
   };
 }
 
-function withoutLoadingTimeout(init: FetchJsonInit): RequestInit {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- strip before fetch()
-  const { loadingTimeout, ...requestInit } = init;
-  return requestInit;
-}
-
 function requestSignal(
   init: FetchJsonInit | undefined,
 ): AbortSignal | undefined {
-  const userSignal = init?.signal ?? undefined;
-  if (!init?.loadingTimeout) return userSignal;
+  const user = init?.signal ?? undefined;
+  if (!init?.loadingTimeout) return user;
   const timeout = AbortSignal.timeout(FETCH_TIMEOUT_MS);
-  if (userSignal === undefined) return timeout;
-  return AbortSignal.any([userSignal, timeout]);
+  return user === undefined ? timeout : AbortSignal.any([user, timeout]);
 }
 
 export async function fetchJson<S extends ZodType>(
@@ -78,7 +99,10 @@ export async function fetchJson<S extends ZodType>(
   schema: S,
   init?: FetchJsonInit,
 ): Promise<FetchJsonResult<z.infer<S>>> {
-  const requestInit: RequestInit = init ? withoutLoadingTimeout(init) : {};
+  const requestInit: RequestInit = init
+    ? // eslint-disable-next-line @typescript-eslint/no-unused-vars -- strip client option
+      (({ loadingTimeout, ...rest }) => rest)(init)
+    : {};
   const signal = requestSignal(init);
   let response: Response;
   try {

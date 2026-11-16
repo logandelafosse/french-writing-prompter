@@ -45,25 +45,19 @@ type SwapBody = {
   confirmAbandon?: boolean;
 };
 
-type ActionFailure = {
-  surface: "generate" | "load";
-  failure: ClassifiedFetchFailure;
-};
-
 // prettier-ignore
 type BootstrapState =
   | { kind: "loading" }
   | { kind: "initial-error"; failure: ClassifiedFetchFailure }
-  | { kind: "ready"; data: TodayGetDto; selectedLevel: CefrLevel | null; actionFailure: ActionFailure | null };
+  | { kind: "ready"; data: TodayGetDto; selectedLevel: CefrLevel | null; actionFailure: ClassifiedFetchFailure | null };
 
 function failBootstrap(
   prev: BootstrapState,
   error: FetchError,
-  surface: "generate" | "load",
 ): BootstrapState {
   const failure = classifyFetchError(error);
   return prev.kind === "ready"
-    ? { ...prev, actionFailure: { surface, failure } }
+    ? { ...prev, actionFailure: failure }
     : { kind: "initial-error", failure };
 }
 
@@ -98,7 +92,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
       loadingTimeout: true,
     });
     if (!result.ok) {
-      setBootstrap((prev) => failBootstrap(prev, result.error, "load"));
+      setBootstrap((prev) => failBootstrap(prev, result.error));
       return;
     }
     setBootstrap((prev) => applyToday(result.value, prev, syncFromToday));
@@ -135,7 +129,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
       ) {
         return { ok: false, reason: "draft", wordCount: error.wordCount };
       }
-      setBootstrap((prev) => failBootstrap(prev, error, "generate"));
+      setBootstrap((prev) => failBootstrap(prev, error));
       return { ok: false, reason: "failed" };
     }
     await refreshQuota();
@@ -152,9 +146,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     });
     if (!levelResult.ok) {
       setGenerateUi("idle");
-      setBootstrap((prev) =>
-        failBootstrap(prev, levelResult.error, "generate"),
-      );
+      setBootstrap((prev) => failBootstrap(prev, levelResult.error));
       return;
     }
     await postPrompt();
@@ -182,9 +174,7 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     bootstrap.kind === "ready" &&
     resolveHomePhase(bootstrap.data).kind === "B-writing";
   const showOffline =
-    (offline ||
-      loadFailure === "offline" ||
-      generateFailure?.failure === "offline") &&
+    (offline || loadFailure === "offline" || generateFailure === "offline") &&
     !writing;
 
   const retryHome = () => {
@@ -216,8 +206,9 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
         />
       ) : null}
       {!showOffline &&
+      !writing &&
       generateFailure !== null &&
-      generateFailure.failure !== "offline" ? (
+      generateFailure !== "offline" ? (
         <ErrorAlert lead={homeCopy.errorGenerateLead} onRetry={retryHome} />
       ) : null}
       {bootstrap.kind === "ready" ? (
@@ -291,11 +282,7 @@ function HomeBody({
           generating={generating}
           quotaRemaining={bootstrap.data.quota.remaining}
           offline={offline}
-          generateFailure={
-            bootstrap.actionFailure?.surface === "generate"
-              ? bootstrap.actionFailure
-              : null
-          }
+          generateFailure={bootstrap.actionFailure}
           onRetryGenerate={onRetryGenerate}
           onSwap={onSwap}
           onFreshPrompt={onFreshPrompt}
@@ -338,7 +325,7 @@ function WritingInterim({
   generating: boolean;
   quotaRemaining: number;
   offline: boolean;
-  generateFailure: ActionFailure | null;
+  generateFailure: ClassifiedFetchFailure | null;
   onRetryGenerate: () => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
@@ -570,7 +557,7 @@ function WritingInterim({
           />
         ) : null}
         {generateFailure !== null &&
-        !(generateFailure.failure === "offline" && offline) ? (
+        !(generateFailure === "offline" && offline) ? (
           <ErrorAlert
             lead={homeCopy.errorGenerateLead}
             onRetry={onRetryGenerate}

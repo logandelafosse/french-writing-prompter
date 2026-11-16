@@ -291,7 +291,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
         setLevelReady(true);
       }
       const [levelRes] = await Promise.all([
-        fetchJson("/api/level", LevelGetResponse, { loadingTimeout: true }),
+        fetchJson("/api/level", LevelGetResponse),
         fetchQuota(),
       ]);
       if (levelRes.ok) {
@@ -317,9 +317,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     }
     let cancelled = false;
     async function loadAll() {
-      const levelRes = await fetchJson("/api/level", LevelGetResponse, {
-        loadingTimeout: true,
-      });
+      const levelRes = await fetchJson("/api/level", LevelGetResponse);
       if (cancelled) return;
       if (levelRes.ok) {
         setLevel(levelRes.value.level);

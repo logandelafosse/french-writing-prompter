@@ -17,6 +17,11 @@ function mapThrownError(error: unknown): {
   }
   const name = error instanceof Error ? error.name : "";
   const message = error instanceof Error ? error.message : "";
+  let status: number | null = null;
+  if (typeof error === "object" && error !== null && "status" in error) {
+    const candidate = error.status;
+    if (typeof candidate === "number") status = candidate;
+  }
   if (
     name === "TimeoutError" ||
     name === "AbortError" ||
@@ -25,13 +30,6 @@ function mapThrownError(error: unknown): {
   ) {
     return { status: 504, code: "AI_TIMEOUT" };
   }
-  const status =
-    typeof error === "object" &&
-    error !== null &&
-    "status" in error &&
-    typeof error.status === "number"
-      ? error.status
-      : null;
   if (
     message === "AI service error" ||
     name === "APIConnectionError" ||
