@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T16 adversarial fix `4488ea4`).
+Last updated: 2026-11-16 by coordinator (T16 re-test fix `a22f315`).
 
 ## Ready
 
@@ -18,9 +18,9 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                              | Why                                                                                                                                                                                         |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T16 | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65); adversarial B1/B2 fixed `4488ea4`; [adversarial re-review](7be1b98e-e5db-47cf-92f4-419b46c819b5) + CI pending. |
+| ID  | Ticket                                                                                                                              | Why                                                                                                                                    |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| T16 | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65); re-test #5 `a22f315`; adversarial re-review + CI pending. |
 
 ## Blocked
 
