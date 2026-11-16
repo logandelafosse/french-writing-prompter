@@ -107,7 +107,7 @@ describe("HomePage first-run generate", () => {
             activeSession: {
               id: 9,
               prompt: "Lafayette",
-              meta: null,
+              promptMeta: null,
               draft: null,
             },
             advancement: null,

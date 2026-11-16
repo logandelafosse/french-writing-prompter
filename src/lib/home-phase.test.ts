@@ -41,7 +41,7 @@ describe("resolveHomePhase", () => {
           activeSession: {
             id: 42,
             prompt: "Écrivez sur la Nouvelle-Orléans.",
-            meta: null,
+            promptMeta: null,
             draft: null,
           },
         }),

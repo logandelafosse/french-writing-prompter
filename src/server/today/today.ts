@@ -32,7 +32,7 @@ async function getTodayActiveSession(): Promise<TodayActiveSession | null> {
   return {
     id: row.id,
     prompt: row.promptText,
-    meta: parseStoredPromptMeta(row.promptMetaJson),
+    promptMeta: parseStoredPromptMeta(row.promptMetaJson),
     draft: null,
   };
 }

@@ -6,6 +6,7 @@ import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { PromptPostResponse } from "@/contracts/api";
+import { TodayGetResponse } from "@/contracts/today";
 import { z } from "zod";
 import { readResponseJson } from "@/test/read-response-json";
 import { POST } from "./route";
@@ -104,13 +105,29 @@ describe("POST /api/prompt quota", { concurrent: false }, () => {
 
     const { GET } = await import("../today/route");
     const today = await GET();
-    const TodayGetResponse = (await import("@/contracts/today"))
-      .TodayGetResponse;
     const body = await readResponseJson(today, TodayGetResponse);
     expect(body.activeSession).toEqual({
       id: saved.id,
       prompt: "legacy",
-      meta: null,
+      promptMeta: null,
+      draft: null,
+    });
+  });
+
+  it("GET /api/today returns promptMeta after POST /api/prompt", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/prompt", { method: "POST" }),
+    );
+    expect(response.status).toBe(200);
+    const posted = await readResponseJson(response, PromptPostResponse);
+
+    const { GET } = await import("../today/route");
+    const today = await GET();
+    const body = await readResponseJson(today, TodayGetResponse);
+    expect(body.activeSession).toMatchObject({
+      id: posted.session.id,
+      prompt: posted.session.promptText,
+      promptMeta: posted.session.promptMeta,
       draft: null,
     });
   });

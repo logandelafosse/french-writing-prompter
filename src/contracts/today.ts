@@ -6,7 +6,7 @@ import { PromptMeta } from "./prompt-meta";
 export const TodayActiveSession = z.object({
   id: z.number(),
   prompt: z.string(),
-  meta: PromptMeta.nullable(),
+  promptMeta: PromptMeta.nullable(),
   draft: z.null(),
 });
 
@@ -42,7 +42,7 @@ export function resolveHomePhase(bootstrap: TodayGetDto): ResolvedHomePhase {
       kind: "B-writing",
       sessionId: bootstrap.activeSession.id,
       promptText: bootstrap.activeSession.prompt,
-      promptMeta: bootstrap.activeSession.meta,
+      promptMeta: bootstrap.activeSession.promptMeta,
     };
   }
   return { kind: "A-ready" };
