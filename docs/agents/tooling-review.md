@@ -1024,3 +1024,13 @@ Non-blocking for T15 merge; prioritize before T16+ writing surface. Full table: 
 | TOOL-PR63-8  | `ai-fixture-schema-ratchet`                             | fixture test filter split                |
 | TOOL-PR63-9  | ESLint `no-magic-numbers` on contracts (TOOL-8)         | 150, 1500, quota in tests                |
 | TOOL-PR63-15 | Quota literals in tests (fold TOOL-PR62-2, TOOL-PR54-6) | `DAILY_PROMPT_QUOTA` in tests            |
+
+### Backlog from PR #65 tooling review (2026-11-16)
+
+Non-blocking for T16 merge. Full proposals: [T16 tooling review PR #65](afb4227e-4d38-428b-9abe-b2219b5fd51d).
+
+| ID (draft)  | Rule / change                                                                        | Notes                                                                                         |
+| ----------- | ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
+| TOOL-PR65-1 | `interactive-allowlist` ratchet test + drop knip ignore for `ui/textarea.tsx`        | PR adds `ruled-textarea` to `no-raw-interactive-element` ignores; prefer `src/components/ui/` |
+| TOOL-PR65-2 | `no-shared-writing-busy` (ast-grep)                                                  | Same `$FLAG` on `GenerateButton` and `SubmitButton` / `WritingFooter.submitBusy`              |
+| TOOL-PR65-3 | `word-count-single-source` + `word-band-numeric-single-source`; fold TOOL-PR63-1 e2e | `countWords` only; nudge `20/30/80` → `WORD_TARGET_BY_LEVEL`; extend e2e meter regex rule     |

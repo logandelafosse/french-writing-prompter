@@ -18,9 +18,9 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                              | Why                                                                                                                        |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| T16 | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65); adversarial + test + tooling reviews running. |
+| ID  | Ticket                                                                                                                              | Why                                                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| T16 | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65); tooling clear (TOOL-PR65-*); adversarial + test pending. |
 
 ## Blocked
 
