@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T21 split; T21a in progress).
+Last updated: 2026-11-16 by coordinator (T21a PR #70 in review).
 
 ## Ready
 
@@ -12,13 +12,13 @@ _None._
 
 ## In progress
 
-| ID   | Ticket                                                                                                                                | Why                                                                                                                                                                     |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T21a | Corrections table, EvaluationV2 contracts, parser ([#23](https://github.com/logandelafosse/french-writing-prompter/issues/23) parent) | Full T21 WIP ~840 prod lines; split per spec. Branch `ticket/t21a-corrections-parser`; reuse uncommitted files on `ticket/t21-evaluator-v2`; target `pr:size` &lt; 500. |
+_None._
 
 ## In review
 
-_None._
+| ID   | Ticket                                                                                                                                | Why                                                                                                      |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| T21a | Corrections table, EvaluationV2 contracts, parser ([#23](https://github.com/logandelafosse/french-writing-prompter/issues/23) parent) | [PR #70](https://github.com/logandelafosse/french-writing-prompter/pull/70); `pr:size` 246; CI pending. |
 
 ## Blocked
 
@@ -63,7 +63,7 @@ _None._
 | T19  | Error and offline states                                            | AFK  | T17        | **Done** — [PR #68](https://github.com/logandelafosse/french-writing-prompter/pull/68) `8206cb8`; evidence `docs/evidence/21/`; TOOL-PR68-* backlog.                              |
 | T20  | Level service with durable streak and undoable advancement          | AFK  | T14        | **Done** — [PR #69](https://github.com/logandelafosse/french-writing-prompter/pull/69) `acc40f8`; evidence `docs/evidence/22/`; TOOL-PR69-* backlog.                              |
 | T21  | Evaluator v2: Corrections, quote location, French output            | AFK  | T06, T17   | **Split** — WIP on `ticket/t21-evaluator-v2` (~840 prod lines); **T21a** + **T21b** specs; #23 closes on T21b only.                                                               |
-| T21a | Corrections table, EvaluationV2 contracts, parser                   | AFK  | T06, T17   | **In progress** — `docs/plan/tickets/T21a-corrections-table-parser.md`; branch `ticket/t21a-corrections-parser`.                                                                  |
+| T21a | Corrections table, EvaluationV2 contracts, parser                   | AFK  | T06, T17   | **In review** — [PR #70](https://github.com/logandelafosse/french-writing-prompter/pull/70).                                                                                       |
 | T21b | Evaluator v2 runtime                                                | AFK  | T21a       | **Blocked** — `docs/plan/tickets/T21b-evaluator-v2-runtime.md`; routes, fixtures, post-processing.                                                                                |
 | T22  | Review screen: marked text, Mistake cards, Scores                   | AFK  | T16, T21   | Needs Corrections. Q5 answered: CECR chips + hover Pour monter. ~500 lines: split into T22a / T22b is pre-approved, see spec.                                                     |
 
