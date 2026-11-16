@@ -101,6 +101,24 @@ export type DialectNoteCreateResponse = z.infer<
   typeof DialectNoteCreateResponse
 >;
 
+export const DialectNoteListResponse = z.strictObject({
+  notes: z.array(DialectNote),
+});
+export type DialectNoteListResponse = z.infer<typeof DialectNoteListResponse>;
+
+export const DialectNotePatchBody = z.strictObject({
+  rule: z.string().optional(),
+  example: z.string().max(DIALECT_NOTE_EXAMPLE_MAX).nullable().optional(),
+  scope: DialectNoteScope.optional(),
+  form: z.string().min(1).max(DIALECT_NOTE_FORM_MAX).optional(),
+});
+export type DialectNotePatchBody = z.infer<typeof DialectNotePatchBody>;
+
+export const DialectNotePatchResponse = z.strictObject({
+  note: DialectNote,
+});
+export type DialectNotePatchResponse = z.infer<typeof DialectNotePatchResponse>;
+
 export const QuotaGetResponse = z.strictObject({
   used: z.number(),
   remaining: z.number(),

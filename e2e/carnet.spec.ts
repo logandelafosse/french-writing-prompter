@@ -1,0 +1,139 @@
+import { test, expect } from "./support/fixtures";
+import { expectNoAxeViolations } from "./support/axe";
+import { captureEvidence } from "./support/evidence";
+import { expectEvaluationWithScores } from "./support/home-helpers";
+import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
+
+const writing = "Mon petit cousin a tombé dans la boue. Les enfant jouent.";
+const savedRule =
+  "Avec « tomber », on prend l'auxiliaire « avoir » : il a tombé.";
+const savedExample = "Mon petit cousin a tombé dans la boue.";
+
+async function saveReviewNote(page: import("@playwright/test").Page) {
+  await generateFirstPrompt(page);
+  const main = mainContent(page);
+  await main.getByLabel("Ton texte").fill(writing);
+  await main.getByRole("button", { name: "Corrige-moi" }).click();
+  await expectEvaluationWithScores(page);
+  await page.getByRole("button", { name: "Oui, c'est à nous-autres" }).click();
+  const dialog = page.getByRole("dialog", {
+    name: "Ajouter une note de dialecte",
+  });
+  await dialog.getByRole("button", { name: "Sauver la note" }).click();
+  await expect(page.getByText("Note de dialecte sauvée")).toBeVisible();
+}
+
+test("a note saved from a review appears in the Carnet with nouvelle", async ({
+  page,
+  scenario,
+}, testInfo) => {
+  await scenario("dialect");
+  await saveReviewNote(page);
+  await page.goto("/carnet");
+  const main = mainContent(page);
+  await expect(main.getByRole("heading", { name: "Carnet" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Carnet" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+  await expect(main.getByText(savedRule)).toBeVisible();
+  await expect(main.getByText(savedExample)).toBeVisible();
+  await expect(main.getByText("nouvelle")).toBeVisible();
+  await captureEvidence(page, testInfo, "saved-note");
+});
+
+test("Ajouter une note opens the sheet without T'as écrit and saving omits the source", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/carnet");
+  const main = mainContent(page);
+  await main.getByRole("button", { name: "Ajouter une note" }).click();
+  const dialog = page.getByRole("dialog", {
+    name: "Ajouter une note de dialecte",
+  });
+  await expect(dialog.getByText("T'as écrit")).toHaveCount(0);
+  await dialog.getByLabel("Le mot ou la tournure").fill("icitte");
+  await dialog.getByLabel(/La règle/).fill("On dit icitte pour ici.");
+  await dialog.getByLabel("Un exemple").fill("Viens icitte.");
+  await dialog.getByRole("button", { name: "Sauver la note" }).click();
+  await expect(main.getByText("On dit icitte pour ici.")).toBeVisible();
+  await expect(main.getByText("Viens icitte.")).toBeVisible();
+  await expect(main.getByText(/séance/)).toHaveCount(0);
+  await captureEvidence(page, testInfo, "manual-note");
+});
+
+test("Modifier opens the sheet pre-filled and saving updates the row", async ({
+  page,
+}) => {
+  await page.goto("/carnet");
+  const main = mainContent(page);
+  await main.getByRole("button", { name: "Ajouter une note" }).click();
+  const dialog = page.getByRole("dialog", {
+    name: "Ajouter une note de dialecte",
+  });
+  await dialog.getByLabel("Le mot ou la tournure").fill("icitte");
+  await dialog.getByLabel(/La règle/).fill("On dit icitte pour ici.");
+  await dialog.getByLabel("Un exemple").fill("Viens icitte.");
+  await dialog.getByRole("button", { name: "Sauver la note" }).click();
+  await expect(main.getByText("On dit icitte pour ici.")).toBeVisible();
+
+  await main.getByRole("button", { name: "Modifier" }).click();
+  const edit = page.getByRole("dialog", { name: "Modifier la note" });
+  await expect(edit.getByLabel(/La règle/)).toHaveValue(
+    "On dit icitte pour ici.",
+  );
+  await edit.getByLabel(/La règle/).fill("On écrit icitte, pas ici.");
+  await edit.getByRole("button", { name: "Sauver la note" }).click();
+  await expect(main.getByText("On écrit icitte, pas ici.")).toBeVisible();
+  await expect(main.getByText("On dit icitte pour ici.")).toHaveCount(0);
+});
+
+test("Supprimer asks with focus on Garder; Escape keeps; confirm removes after reload", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/carnet");
+  const main = mainContent(page);
+  await main.getByRole("button", { name: "Ajouter une note" }).click();
+  const sheet = page.getByRole("dialog", {
+    name: "Ajouter une note de dialecte",
+  });
+  await sheet.getByLabel("Le mot ou la tournure").fill("icitte");
+  await sheet.getByLabel(/La règle/).fill("On dit icitte pour ici.");
+  await sheet.getByLabel("Un exemple").fill("Viens icitte.");
+  await sheet.getByRole("button", { name: "Sauver la note" }).click();
+  await expect(main.getByText("On dit icitte pour ici.")).toBeVisible();
+
+  await main.getByRole("button", { name: "Supprimer" }).click();
+  const confirm = main.getByRole("alertdialog", {
+    name: "Supprimer cette note",
+  });
+  await expect(confirm.getByRole("button", { name: "Garder" })).toBeFocused();
+  await captureEvidence(page, testInfo, "delete-confirm");
+  await page.keyboard.press("Escape");
+  await expect(confirm).toHaveCount(0);
+  await expect(main.getByText("On dit icitte pour ici.")).toBeVisible();
+
+  await main.getByRole("button", { name: "Supprimer" }).click();
+  await main
+    .getByRole("alertdialog")
+    .getByRole("button", { name: "Supprimer" })
+    .click();
+  await expect(main.getByText("On dit icitte pour ici.")).toHaveCount(0);
+  await page.reload();
+  await expect(main.getByText("On dit icitte pour ici.")).toHaveCount(0);
+  await expect(main.getByText(/Pas encore de notes/)).toBeVisible();
+});
+
+test("empty Carnet shows the empty-state line and has no axe violations", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/carnet");
+  const main = mainContent(page);
+  await expect(
+    main.getByText(
+      "Pas encore de notes. Quand le tuteur te demande « Ça se dit comme ça ? », ta réponse vient icitte.",
+    ),
+  ).toBeVisible();
+  await captureEvidence(page, testInfo, "empty");
+  await expectNoAxeViolations(page);
+});

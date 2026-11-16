@@ -1,11 +1,14 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { db } from "@/db";
 import { corrections, dialectNotes } from "@/db/schema";
 import { DIALECT_NOTE_RULE_MAX, DIALECT_NOTE_RULE_MIN } from "@/config/limits";
 import { DialectNote } from "@/contracts/dialect-note";
 import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import type { Correction } from "@/contracts/correction";
-import type { DialectNoteCreateBody } from "@/contracts/api";
+import type {
+  DialectNoteCreateBody,
+  DialectNotePatchBody,
+} from "@/contracts/api";
 import { statusAfterDialectNote } from "@/modules/correction-service/correction-service";
 import { getCorrection } from "@/modules/history-store/history-store";
 import { first } from "@/lib/first";
@@ -38,6 +41,59 @@ export async function listActiveNotes(): Promise<LearnerDialectNote[]> {
     rule: row.rule,
     deletedAt: null,
   }));
+}
+
+export async function listDialectNotes(): Promise<DialectNote[]> {
+  const rows = await db
+    .select()
+    .from(dialectNotes)
+    .where(isNull(dialectNotes.deletedAt))
+    .orderBy(desc(dialectNotes.createdAt), desc(dialectNotes.id));
+  return rows.map(noteFromRow);
+}
+
+type NoteWriteResult =
+  | { ok: true; note: DialectNote }
+  | { ok: false; code: "NOT_FOUND" | "VALIDATION" };
+
+export async function updateDialectNote(
+  id: number,
+  patch: DialectNotePatchBody,
+  now: () => Date,
+): Promise<NoteWriteResult> {
+  const rule = patch.rule?.trim();
+  if (
+    rule !== undefined &&
+    (rule.length < DIALECT_NOTE_RULE_MIN || rule.length > DIALECT_NOTE_RULE_MAX)
+  ) {
+    return { ok: false, code: "VALIDATION" };
+  }
+  const updated = await db
+    .update(dialectNotes)
+    .set({
+      ...(rule === undefined ? {} : { rule }),
+      ...(patch.example === undefined ? {} : { example: patch.example }),
+      ...(patch.scope === undefined ? {} : { scope: patch.scope }),
+      ...(patch.form === undefined ? {} : { form: patch.form }),
+      updatedAt: now().toISOString(),
+    })
+    .where(and(eq(dialectNotes.id, id), isNull(dialectNotes.deletedAt)));
+  if (updated.rowsAffected === 0) return { ok: false, code: "NOT_FOUND" };
+  // prettier-ignore
+  const rows = await db.select().from(dialectNotes).where(eq(dialectNotes.id, id)).limit(1);
+  return { ok: true, note: noteFromRow(first(rows, `dialect note ${id}`)) };
+}
+
+export async function deleteDialectNote(
+  id: number,
+  now: () => Date,
+): Promise<{ ok: true } | { ok: false; code: "NOT_FOUND" }> {
+  const deleted = await db
+    .update(dialectNotes)
+    .set({ deletedAt: now().toISOString() })
+    .where(and(eq(dialectNotes.id, id), isNull(dialectNotes.deletedAt)));
+  // prettier-ignore
+  return deleted.rowsAffected === 0 ? { ok: false, code: "NOT_FOUND" } : { ok: true };
 }
 
 class DialectNoteConflictError extends Error {

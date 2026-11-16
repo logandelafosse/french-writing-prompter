@@ -114,4 +114,14 @@ describe("fetchJson", () => {
     const result = await fetchJson("/api/test", TestSchema);
     expect(result).toEqual({ ok: true, value: { value: "ok" } });
   });
+
+  it("parses an empty 204 body as undefined", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() => Promise.resolve(new Response(null, { status: 204 }))),
+    );
+
+    const result = await fetchJson("/api/test", z.undefined());
+    expect(result).toEqual({ ok: true, value: undefined });
+  });
 });

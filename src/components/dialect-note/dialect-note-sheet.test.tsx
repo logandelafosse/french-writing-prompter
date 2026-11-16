@@ -26,7 +26,9 @@ async function openSheet(
       {...props}
     />,
   );
-  return screen.findByRole("dialog", { name: "Ajouter une note de dialecte" });
+  const title =
+    props.mode === "edit" ? "Modifier la note" : "Ajouter une note de dialecte";
+  return screen.findByRole("dialog", { name: title });
 }
 
 describe("DialectNoteSheet", () => {
@@ -89,5 +91,43 @@ describe("DialectNoteSheet", () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
     await user.click(screen.getByRole("button", { name: "Annuler" }));
     expect(onOpenChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("new mode hides the comparison row and uses generic scope labels", async () => {
+    await openSheet({
+      mode: "new",
+      written: "",
+      tutorProposed: "",
+      draft: { lemma: "", example: "", pattern: null, rule: "" },
+    });
+    expect(screen.queryByText("T'as écrit")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Le mot ou la tournure")).toBeVisible();
+    expect(
+      screen.getByRole("radio", { name: "Ce mot seulement" }),
+    ).toBeChecked();
+    expect(
+      screen.getByRole("radio", { name: "Toute la famille" }),
+    ).toBeVisible();
+  });
+
+  it("edit mode is titled Modifier la note and is pre-filled", async () => {
+    await openSheet({
+      mode: "edit",
+      written: "",
+      tutorProposed: "",
+      draft: {
+        lemma: "tomber",
+        example: "Il a tombé.",
+        pattern: null,
+        rule: "On dit a tombé.",
+        scope: "word",
+      },
+    });
+    expect(screen.queryByText("T'as écrit")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Le mot ou la tournure")).toHaveValue(
+      "tomber",
+    );
+    expect(screen.getByLabelText(/La règle/)).toHaveValue("On dit a tombé.");
+    expect(screen.getByLabelText("Un exemple")).toHaveValue("Il a tombé.");
   });
 });

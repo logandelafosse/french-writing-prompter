@@ -24,6 +24,9 @@ export const DIALECT_NOTE_RULE_MAX = 500;
 export const DIALECT_NOTE_EXAMPLE_MAX = 300;
 export const DIALECT_NOTE_FORM_MAX = 80;
 
+/** Carnet `nouvelle` tag window. */
+export const DIALECT_NOTE_NEW_MS = 24 * 60 * 60 * 1000;
+
 /** Content words shorter than this are skipped for DLF prompt cards. */
 export const DLF_HINT_MIN_LETTERS = 4;
 

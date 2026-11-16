@@ -152,7 +152,7 @@ export type AppHeaderProps = {
     href: string;
     label: "Je connais mon niveau" | "Finir plus tard";
   } | null;
-  current?: "historique" | undefined;
+  current?: "carnet" | "historique" | undefined;
   onLevelChange?: (level: CefrLevel) => Promise<void>;
 };
 
@@ -214,6 +214,18 @@ export function AppHeader({
           aria-label="Navigation"
           className="flex flex-wrap items-center gap-x-5 text-[15px] font-medium sm:gap-x-[22px]"
         >
+          <TextLink
+            href="/carnet"
+            className={cn(
+              "min-h-touch",
+              current === "carnet"
+                ? "font-semibold underline decoration-2 underline-offset-[6px]"
+                : "no-underline",
+            )}
+            aria-current={current === "carnet" ? "page" : undefined}
+          >
+            Carnet
+          </TextLink>
           <TextLink
             href="/history"
             className={cn(
@@ -347,9 +359,11 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     [refreshQuota],
   );
 
-  const current = pathname.startsWith("/history")
-    ? ("historique" as const)
-    : undefined;
+  const current = pathname.startsWith("/carnet")
+    ? ("carnet" as const)
+    : pathname.startsWith("/history")
+      ? ("historique" as const)
+      : undefined;
 
   const contextValue = useMemo(
     () => ({ level, refreshQuota, refreshShell, syncFromToday }),

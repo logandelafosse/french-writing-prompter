@@ -137,6 +137,12 @@ export async function fetchJson<S extends ZodType>(
     };
   }
 
+  if (text.length === 0) {
+    const empty = schema.safeParse(undefined);
+    if (!empty.success) return { ok: false, error: { kind: "invalid" } };
+    return { ok: true, value: empty.data };
+  }
+
   const parsed = parseJson(schema, text);
   if (!parsed.ok) {
     return { ok: false, error: { kind: "invalid" } };

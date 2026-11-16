@@ -2,10 +2,19 @@ import { NextResponse } from "next/server";
 import {
   DialectNoteCreateBody,
   DialectNoteCreateResponse,
+  DialectNoteListResponse,
 } from "@/contracts/api";
 import { parseRequestBody } from "@/lib/http";
-import { createDialectNote } from "@/modules/dialect/dialect-notes-store";
+import {
+  createDialectNote,
+  listDialectNotes,
+} from "@/modules/dialect/dialect-notes-store";
 import { withErrors } from "@/server/with-errors";
+
+export const GET = withErrors(async function getDialectNotes() {
+  const notes = await listDialectNotes();
+  return NextResponse.json(DialectNoteListResponse.parse({ notes }));
+});
 
 function noteError(code: "NOT_FOUND" | "CONFLICT" | "VALIDATION") {
   const status = code === "NOT_FOUND" ? 404 : code === "CONFLICT" ? 409 : 422;

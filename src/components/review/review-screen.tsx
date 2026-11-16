@@ -15,7 +15,10 @@ import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { Surface } from "@/components/ui/surface";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { GenerateButton } from "@/components/writing/generate-button";
-import { DialectNoteSheet } from "@/components/dialect-note/dialect-note-sheet";
+import {
+  DialectNoteSheet,
+  type DialectNoteSheetSave,
+} from "@/components/dialect-note/dialect-note-sheet";
 import { dialectSheetDraft } from "@/components/dialect-note/sheet-draft";
 import { CorrectionCard } from "./correction-card";
 import { MarkedText } from "./marked-text";
@@ -112,11 +115,10 @@ export function ReviewScreen({
   };
 
   const saveNote = async (
-    note: { rule: string; example: string; scope: "word" | "pattern" },
+    note: DialectNoteSheetSave,
     signal: AbortSignal,
   ): Promise<string | null> => {
     if (sheetFor === null) return homeCopy.loadError;
-    const draft = dialectSheetDraft(sheetFor, writingText);
     const result = await fetchJson(
       "/api/dialect-notes",
       DialectNoteCreateResponse,
@@ -128,7 +130,7 @@ export function ReviewScreen({
           rule: note.rule,
           example: note.example,
           scope: note.scope,
-          form: draft.lemma,
+          form: note.form,
           learnerForm: sheetFor.quote,
           tutorSuggestion: sheetFor.suggestion,
           fromCorrectionId: sheetFor.id,
