@@ -205,6 +205,7 @@ function HomeBody({
       <HomeDateTitle at={titleDate} />
       {phase.kind === "B-writing" ? (
         <WritingInterim
+          key={`${phase.sessionId}-${phase.promptText}`}
           sessionId={phase.sessionId}
           promptText={phase.promptText}
           promptMeta={phase.promptMeta}
@@ -308,7 +309,7 @@ function WritingInterim({
             meta={promptMeta}
             animateKey={`${sessionId}-${promptText}`}
             generateBusy={generating}
-            swap={{ onSwap, disabled: true }}
+            swap={{ onSwap }}
           />
           <RuledTextarea
             label={homeCopy.writingLabel}
@@ -338,12 +339,7 @@ function WritingInterim({
 
   return (
     <div className="flex flex-col gap-4">
-      <div
-        ref={promptRegionRef}
-        tabIndex={-1}
-        aria-live="polite"
-        className="outline-none"
-      >
+      <div ref={promptRegionRef} tabIndex={-1} className="outline-none">
         <Surface
           padding="home"
           className={cn(

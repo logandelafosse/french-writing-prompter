@@ -6,6 +6,7 @@ import {
   generateFirstPrompt,
   expectNoHorizontalOverflow,
   mainContent,
+  PROMPT_FIXTURE_SWAP_NO,
 } from "./support/prompt-helpers";
 import { setLevelA1 } from "./support/header-helpers";
 import { expectMobileWritingFooterBelowSheet } from "./support/writing-helpers";
@@ -56,6 +57,21 @@ test.describe("writing surface @1280", () => {
     await expectEvaluationWithScores(page);
     await expect(area).toHaveValue(twelveWords);
     await captureEvidence(page, testInfo, "desktop-writing-submit");
+    await main
+      .getByRole("button", { name: /Une autre consigne · reste/ })
+      .click();
+    await expect(main.getByText(PROMPT_FIXTURE_SWAP_NO)).toBeVisible();
+    const freshArea = main.getByLabel("Ton texte");
+    await expect(freshArea).toBeEditable();
+    await expect(freshArea).toHaveValue("");
+    await expect(
+      main
+        .getByRole("button", { name: "Corrige-moi" })
+        .filter({ visible: true }),
+    ).toBeVisible();
+    await expect(main.getByRole("heading", { name: "Évaluation" })).toHaveCount(
+      0,
+    );
   });
 });
 
