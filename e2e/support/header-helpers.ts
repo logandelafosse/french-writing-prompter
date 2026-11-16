@@ -1,7 +1,7 @@
 import type { Locator, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
-export function visibleHeaderQuota(page: Page, text: string) {
+export function visibleHeaderQuota(page: Page, text: string | RegExp) {
   return page.getByRole("banner").getByText(text).filter({ visible: true });
 }
 
@@ -33,8 +33,20 @@ export async function expectTwoMobileHeaderRows(page: Page) {
 }
 
 export async function setLevelB1(page: Page) {
-  await page.getByRole("button", { name: "Select your level" }).click();
-  await page.getByRole("button", { name: "B1 Seuil" }).click();
+  const chip = page.getByRole("button", { name: "Niveau CECR B1, changer" });
+  if ((await chip.count()) > 0) {
+    await expect(chip).toBeVisible();
+    return;
+  }
+
+  await page.request.put("/api/level", {
+    headers: {
+      "Content-Type": "application/json",
+      "x-e2e-scenario": "happy",
+    },
+    data: { level: "B1" },
+  });
+  await page.reload();
   await expect(
     page.getByRole("button", { name: "Niveau CECR B1, changer" }),
   ).toBeVisible();

@@ -48,7 +48,6 @@ export function nextLocalMidnightIso(
   return new Date(hi).toISOString();
 }
 
-/** e.g. « samedi 14 novembre » (lowercase weekday and month). */
 export function formatFrenchDate(date: Date, timeZone?: string): string {
   const tz = resolvedTimeZone(timeZone);
   const parts = new Intl.DateTimeFormat("fr-FR", {

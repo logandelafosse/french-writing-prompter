@@ -50,7 +50,7 @@ test.describe("desktop header", () => {
     ).toBeVisible();
     await captureEvidence(page, testInfo, "header-ready");
 
-    await page.getByRole("button", { name: "Generate a prompt" }).click();
+    await page.getByRole("button", { name: "Donne-moi une consigne" }).click();
     await expect(
       visibleHeaderQuota(page, "Reste 2 consignes sur 3"),
     ).toBeVisible();
@@ -60,6 +60,7 @@ test.describe("desktop header", () => {
 
 test("first run shows intro quota and no level chip", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByText(/Bienvenue\. Icitte/)).toBeVisible();
   await expect(
     visibleHeaderQuota(page, "3 consignes aujourd'hui"),
   ).toBeVisible();

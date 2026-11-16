@@ -24,6 +24,7 @@ import {
   QuotaGetResponse,
   type QuotaGetDto,
 } from "@/contracts/api";
+import type { TodayGetDto } from "@/contracts/today";
 import { fetchJson } from "@/lib/http";
 import { cn } from "@/lib/utils";
 
@@ -245,6 +246,7 @@ type HeaderContextValue = {
   level: CefrLevel | null;
   refreshQuota: () => Promise<void>;
   refreshShell: (optimisticLevel?: CefrLevel) => Promise<void>;
+  syncFromToday: (payload: TodayGetDto) => void;
 };
 
 const HeaderContext = createContext<HeaderContextValue | null>(null);
@@ -259,6 +261,7 @@ export function useHeaderShell(): HeaderContextValue {
 
 export function HeaderShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const placementPath = pathname.startsWith("/placement");
   const [level, setLevel] = useState<CefrLevel | null>(null);
   const [quota, setQuota] = useState<QuotaGetDto | null>(null);
   const [levelReady, setLevelReady] = useState(false);
@@ -299,7 +302,19 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     [fetchQuota],
   );
 
+  const syncFromToday = useCallback((p: TodayGetDto) => {
+    setLevel(p.level);
+    setLevelReady(true);
+    setQuota(p.quota);
+    setQuotaReady(true);
+  }, []);
+
+  const skipHeaderFetch = pathname === "/" || placementPath;
+
   useEffect(() => {
+    if (skipHeaderFetch) {
+      return;
+    }
     let cancelled = false;
     async function loadAll() {
       const levelRes = await fetchJson("/api/level", LevelGetResponse);
@@ -314,7 +329,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [fetchQuota]);
+  }, [fetchQuota, skipHeaderFetch]);
 
   const onLevelChange = useCallback(
     async (next: CefrLevel) => {
@@ -337,18 +352,23 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     : undefined;
 
   const contextValue = useMemo(
-    () => ({ level, refreshQuota, refreshShell }),
-    [level, refreshQuota, refreshShell],
+    () => ({ level, refreshQuota, refreshShell, syncFromToday }),
+    [level, refreshQuota, refreshShell, syncFromToday],
   );
 
   return (
     <HeaderContext.Provider value={contextValue}>
       <AppHeader
-        variant="full"
+        variant={placementPath ? "placement" : "full"}
         level={level}
         quota={quota}
         levelReady={levelReady}
         quotaReady={quotaReady}
+        placementLink={
+          placementPath
+            ? { href: "/", label: "Je connais mon niveau" as const }
+            : null
+        }
         current={current}
         onLevelChange={onLevelChange}
       />
