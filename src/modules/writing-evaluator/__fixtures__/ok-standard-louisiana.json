@@ -1,0 +1,40 @@
+{
+  "dimensions": {
+    "grammatical_accuracy": {
+      "score": 4,
+      "comment": "Quelques accords à revoir."
+    },
+    "vocabulary": { "score": 3, "comment": "Vocabulaire suffisant." },
+    "coherence": { "score": 4, "comment": "Le récit se suit." },
+    "register_style": { "score": 3, "comment": "Registre familier respecté." }
+  },
+  "overall_cefr": "B1",
+  "summary": "Texte clair, avec une forme louisianaise à proposer.",
+  "next_level_tip": "Pour atteindre B2, varie tes connecteurs.",
+  "corrections": [
+    {
+      "kind": "standard",
+      "quote": "ma voiture",
+      "occurrence": 1,
+      "suggestion": "mon char",
+      "explanation": "« Voiture », c'est correct. Par icitte, on dit plus souvent « char ».",
+      "category": null,
+      "question": null,
+      "rule_if_dialect": null,
+      "dlf_headword": "char",
+      "resource_ids": []
+    },
+    {
+      "kind": "mistake",
+      "quote": "Les enfant",
+      "occurrence": 1,
+      "suggestion": "Les enfants",
+      "explanation": "L'accord du nom au pluriel manque.",
+      "category": "accord",
+      "question": null,
+      "rule_if_dialect": null,
+      "dlf_headword": null,
+      "resource_ids": []
+    }
+  ]
+}

@@ -16,14 +16,17 @@ import { CorrectionCard } from "./correction-card";
 import { MarkedText } from "./marked-text";
 import { ScoresDisclosure } from "./scores-disclosure";
 
-function nextOpenMistake(items: Correction[], fromOrdinal: number) {
+function isOpenCard(item: Correction) {
   return (
-    items.find(
-      (item) =>
-        item.kind === "mistake" &&
-        item.status === "open" &&
-        item.ordinal > fromOrdinal,
-    ) ?? items.find((item) => item.kind === "mistake" && item.status === "open")
+    (item.kind === "mistake" || item.kind === "standard") &&
+    item.status === "open"
+  );
+}
+
+function nextOpenCard(items: Correction[], fromOrdinal: number) {
+  return (
+    items.find((item) => isOpenCard(item) && item.ordinal > fromOrdinal) ??
+    items.find(isOpenCard)
   );
 }
 
@@ -98,7 +101,7 @@ export function ReviewScreen({
         ? { ...item, status: "acknowledged" as const }
         : item,
     );
-    const next = nextOpenMistake(nextItems, target.ordinal);
+    const next = nextOpenCard(nextItems, target.ordinal);
     const focusId = `correction-${(next ?? target).ordinal}`;
     document.getElementById(focusId)?.focus();
   };

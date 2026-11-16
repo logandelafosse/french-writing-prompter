@@ -2,9 +2,30 @@ import type { ReactNode } from "react";
 import type { Correction } from "@/contracts/correction";
 import { reviewCopy } from "@/copy/review";
 
+type MarkedKind = "mistake" | "standard";
+
 type Mark = Pick<Correction, "id" | "ordinal"> & {
+  kind: MarkedKind;
   span: { start: number; end: number };
 };
+
+function isMarkedKind(kind: Correction["kind"]): kind is MarkedKind {
+  return kind === "mistake" || kind === "standard";
+}
+
+function markClass(kind: Mark["kind"]) {
+  if (kind === "standard") {
+    return "border-b-standard border-b-2 border-dashed bg-transparent py-px text-inherit";
+  }
+  return "bg-mistake-tint border-b-mistake border-b-2 px-0.5 py-px text-inherit";
+}
+
+function markerClass(kind: Mark["kind"]) {
+  if (kind === "standard") {
+    return "rounded-marker border-standard text-marker border bg-white px-[5px] font-sans font-bold text-standard no-underline";
+  }
+  return "rounded-marker bg-mistake text-marker px-1.5 py-px font-sans font-bold text-white no-underline";
+}
 
 function paragraphRanges(text: string): { start: number; end: number }[] {
   const ranges: { start: number; end: number }[] = [];
@@ -27,23 +48,20 @@ function renderRange(text: string, start: number, end: number, marks: Mark[]) {
     const to = Math.min(item.span.end, end);
     if (from > cursor) nodes.push(text.slice(cursor, from));
     nodes.push(
-      <mark
-        key={item.id}
-        className="bg-mistake-tint border-b-mistake border-b-2 px-0.5 py-px text-inherit"
-      >
+      <mark key={item.id} className={markClass(item.kind)}>
         {text.slice(from, to)}
       </mark>,
       <sup key={`${item.id}-n`} className="ml-[3px]">
         <a
           href={`#correction-${item.ordinal}`}
-          aria-label={reviewCopy.srMark(item.ordinal)}
-          className="rounded-marker bg-mistake text-marker px-1.5 py-px font-sans font-bold text-white no-underline"
+          aria-label={reviewCopy.srMark(item.kind, item.ordinal)}
+          className={markerClass(item.kind)}
         >
           {item.ordinal}
         </a>
       </sup>,
       <span key={`${item.id}-sr`} className="sr-only">
-        ({reviewCopy.srMark(item.ordinal)})
+        ({reviewCopy.srMark(item.kind, item.ordinal)})
       </span>,
     );
     cursor = to;
@@ -63,8 +81,15 @@ export function MarkedText({
   >[];
 }) {
   const marks = corrections.flatMap((item) =>
-    item.kind === "mistake" && item.span !== null
-      ? [{ id: item.id, ordinal: item.ordinal, span: item.span }]
+    isMarkedKind(item.kind) && item.span !== null
+      ? [
+          {
+            id: item.id,
+            ordinal: item.ordinal,
+            kind: item.kind,
+            span: item.span,
+          },
+        ]
       : [],
   );
   marks.sort((a, b) => a.span.start - b.span.start);

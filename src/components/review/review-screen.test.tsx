@@ -27,6 +27,27 @@ function mistake(
   });
 }
 
+function standard(
+  partial: Pick<Correction, "id" | "ordinal" | "quote" | "suggestion">,
+): Correction {
+  return Correction.parse({
+    sessionId: 1,
+    kind: "standard",
+    span: { start: 0, end: 10 },
+    anchor: "exact",
+    explanation: "Forme louisianaise.",
+    question: null,
+    ruleIfDialect: null,
+    category: null,
+    dlf: null,
+    resourceIds: [],
+    status: "open",
+    dialectNoteId: null,
+    isFocus: false,
+    ...partial,
+  });
+}
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -55,6 +76,61 @@ describe("ReviewScreen", () => {
   afterEach(() => {
     globalThis.fetch = originalFetch;
     vi.unstubAllGlobals();
+  });
+
+  it("Compris on a standard card moves focus to the next open card", async () => {
+    const user = userEvent.setup();
+    stubAckFetch(() =>
+      jsonResponse({
+        correction: standard({
+          id: "s1",
+          ordinal: 1,
+          quote: "ma voiture",
+          suggestion: "mon char",
+        }),
+      }),
+    );
+    render(
+      <ReviewScreen
+        promptText="Écris."
+        promptMeta={null}
+        writingText="J'arrive avec ma voiture. Maintenant je pars."
+        corrections={[
+          standard({
+            id: "s1",
+            ordinal: 1,
+            quote: "ma voiture",
+            suggestion: "mon char",
+          }),
+          standard({
+            id: "s2",
+            ordinal: 2,
+            quote: "Maintenant",
+            suggestion: "Asteur",
+          }),
+        ]}
+        quotaRemaining={2}
+        generating={false}
+        onNextPrompt={() => undefined}
+      />,
+    );
+
+    const cards = screen.getAllByRole("article");
+    const first = cards[0];
+    const next = cards[1];
+    if (first === undefined || next === undefined) {
+      throw new Error("expected two standard cards");
+    }
+
+    await user.click(
+      within(first).getByRole("button", { name: reviewCopy.actionAck }),
+    );
+    await waitFor(() => {
+      expect(
+        within(first).queryByRole("button", { name: reviewCopy.actionAck }),
+      ).not.toBeInTheDocument();
+    });
+    expect(next).toHaveFocus();
   });
 
   it("Compris moves focus to the next open mistake card", async () => {

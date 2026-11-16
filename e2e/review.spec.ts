@@ -81,7 +81,9 @@ test.describe("review @1280", () => {
     await expect(card.getByRole("button", { name: "Compris" })).toHaveCount(0);
     await expect(card).toContainText("Les enfant");
     await expect(page.getByRole("link", { name: "faute 3" })).toBeVisible();
-    await expect(card).toBeFocused();
+    await expect(
+      page.getByRole("article").filter({ hasText: "Maintenant" }),
+    ).toBeFocused();
 
     await page.reload();
     await expectEvaluationWithScores(page);
