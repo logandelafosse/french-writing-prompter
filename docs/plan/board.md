@@ -4,13 +4,11 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T22/T22b done; T23 ready).
+Last updated: 2026-11-16 by coordinator (T23 in review on PR #75).
 
 ## Ready
 
-| ID  | Ticket                         | Why                                                                                                                                             |
-| --- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| T23 | Standard→Louisiana suggestions | T22 merged [PR #74](https://github.com/logandelafosse/french-writing-prompter/pull/74) `90b084a`; spec `T23-standard-louisiana-suggestions.md`. |
+_None._
 
 ## In progress
 
@@ -18,7 +16,9 @@ _None._
 
 ## In review
 
-_None._
+| ID  | Ticket                         | Why                                                                                                                                             |
+| --- | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| T23 | Standard→Louisiana suggestions | [PR #75](https://github.com/logandelafosse/french-writing-prompter/pull/75) `3699fa5`; `pr:size` 120; Closes #25; evidence `docs/evidence/25/`. |
 
 ## Blocked
 
@@ -69,7 +69,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 | ID  | Ticket                                           | Type | Blocked by | Why not ready                                                                                                                                             |
 | --- | ------------------------------------------------ | ---- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T23 | Standard→Louisiana suggestions                   | AFK  | T22        | **Ready** — on board Ready column; T22 `90b084a`.                                                                                                         |
+| T23 | Standard→Louisiana suggestions                   | AFK  | T22        | **In review** — [PR #75](https://github.com/logandelafosse/french-writing-prompter/pull/75) `3699fa5`.                                                    |
 | T24 | DLF lexicon, grader context, and attribution     | AFK  | T23        | Needs `standard` kind. Q6: versioned lexicon artifact from DLF-extract (definitions + examples).                                                          |
 | T25 | Dialect checks, pushback, Add Dialect Note sheet | AFK  | T22        | Run after T23, not alongside it: both edit `CorrectionCard` and `MarkedText`. ~480 lines: split into T25a (server) / T25b (UI) is pre-approved, see spec. |
 | T26 | Carnet page with Dialect Notes list              | AFK  | T25        | Needs notes to exist                                                                                                                                      |
