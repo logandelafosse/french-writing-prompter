@@ -1398,3 +1398,17 @@ ignores: ["src/components/ui/**"]
 ```
 
 **Already enforced / positive:** `CorrectionPatchBody` / `CorrectionPatchResponse` `z.strictObject`; `parseRequestBody` + `withErrors`; `DIMENSION_IDS` drives score rows; `reviewCopy` for Q5 labels / `Pour monter`; `parseStoredEvaluation` on `/api/today` restore; `Correction.safeParse` on read; `acknowledgeCorrection` kind/status gate; UI evidence blob URLs on the PR branch.
+
+### PR #75 (T23 — Standard→Louisiana suggestions)
+
+Non-blocking for T23 merge. Land **TOOL-PR75-1** and **TOOL-PR75-2** before T25.
+
+| ID (draft)  | Rule / change                           | Notes                                                                                                                                                                                   |
+| ----------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TOOL-PR75-1 | `no-correction-kind-if`                 | `markClass` / `markerClass` fall through to Faute styles; `CorrectionCard` special-cases `standard` then treats other kinds as `<div>`; summary `else` counts unknown kinds as dialect. |
+| TOOL-PR75-2 | `no-parallel-marked-kind`               | `type MarkedKind = "mistake" \| "standard"` beside `CorrectionKind`.                                                                                                                    |
+| TOOL-PR75-3 | `no-strike-in-standard-arm`             | `<s>` only inside `case "standard"` (ships with 75-1 when switch exists).                                                                                                               |
+| TOOL-PR75-4 | `review-copy-single-source` (fold 73-6) | `français standard`, summary line, `Compris` retyped in copy tests and e2e; keep `review.test.ts` golden.                                                                               |
+| TOOL-PR75-5 | Review `no-arbitrary-tailwind-bracket`  | Outlined marker `px-[5px]` / card pill `px-[7px]`; delete slice when TOOL-PR73-4 lands.                                                                                                 |
+
+**Folds:** `E2eScenario` `"standard"` duplicated in `ai-client.ts` and `e2e/support/fixtures.ts` (TOOL-PR69-1, open).
