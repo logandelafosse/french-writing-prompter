@@ -1,3 +1,4 @@
+import type { ReactElement } from "react";
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -9,14 +10,12 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
-vi.mock("@/components/shell/header-shell", () => ({
-  useHeaderShell: () => ({
-    syncFromToday: vi.fn(),
-    refreshQuota: vi.fn(),
-  }),
-}));
-
+import { HeaderShell } from "@/components/shell/header-shell";
 import { HomePage } from "./home-page";
+
+function renderHome(ui: ReactElement) {
+  return render(<HeaderShell>{ui}</HeaderShell>);
+}
 
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -24,6 +23,20 @@ function jsonResponse(body: unknown, status = 200): Response {
     headers: { "Content-Type": "application/json" },
   });
 }
+
+const todayFirstRun = {
+  level: null,
+  levelName: null,
+  quota: {
+    used: 0,
+    remaining: 3,
+    max: 3,
+    resetsAt: "2026-11-16T06:00:00.000Z",
+  },
+  focus: [],
+  activeSession: null,
+  advancement: null,
+};
 
 describe("FirstRunIntro level selection", () => {
   it("enables generate after a level is chosen", async () => {
@@ -79,21 +92,7 @@ describe("HomePage first-run generate", () => {
             : input.url;
       if (url.includes("/api/today")) {
         if (!promptCreated) {
-          return Promise.resolve(
-            jsonResponse({
-              level: null,
-              levelName: null,
-              quota: {
-                used: 0,
-                remaining: 3,
-                max: 3,
-                resetsAt: "2026-11-16T06:00:00.000Z",
-              },
-              focus: [],
-              activeSession: null,
-              advancement: null,
-            }),
-          );
+          return Promise.resolve(jsonResponse(todayFirstRun));
         }
         return Promise.resolve(
           jsonResponse({
@@ -152,7 +151,7 @@ describe("HomePage first-run generate", () => {
       return Promise.reject(new Error(`unexpected ${url}`));
     });
 
-    render(<HomePage now={fixedNow} />);
+    renderHome(<HomePage now={fixedNow} />);
 
     await waitFor(() => {
       expect(screen.getByText(/Bienvenue\. Icitte/)).toBeInTheDocument();
@@ -172,5 +171,95 @@ describe("HomePage first-run generate", () => {
     await waitFor(() => {
       expect(screen.getByText("La Nouvelle-Orléans")).toBeInTheDocument();
     });
+  });
+
+  it("clears generate error when learner retries", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.mocked(globalThis.fetch);
+    let promptAttempts = 0;
+
+    fetchMock.mockImplementation((input, init) => {
+      const url =
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
+      if (url.includes("/api/today")) {
+        return Promise.resolve(jsonResponse(todayFirstRun));
+      }
+      if (url.includes("/api/level") && init?.method === "PUT") {
+        return Promise.resolve(
+          jsonResponse({
+            change: {
+              fromLevel: null,
+              toLevel: "B1",
+              source: "manual",
+              createdAt: "2026-11-14T18:00:00.000Z",
+            },
+          }),
+        );
+      }
+      if (url.includes("/api/prompt") && init?.method === "POST") {
+        promptAttempts += 1;
+        if (promptAttempts === 1) {
+          return Promise.resolve(
+            jsonResponse(
+              {
+                error: {
+                  code: "AI_UNAVAILABLE",
+                  message: "fail",
+                },
+              },
+              502,
+            ),
+          );
+        }
+        return Promise.resolve(
+          jsonResponse({
+            sessionId: 9,
+            prompt: {
+              text: "La Nouvelle-Orléans",
+              constraints: {
+                cefrLevel: "B1",
+                dialect: DEFAULT_DIALECT,
+              },
+            },
+          }),
+        );
+      }
+      if (url.includes("/api/quota")) {
+        return Promise.resolve(
+          jsonResponse({
+            used: 1,
+            remaining: 2,
+            max: 3,
+            resetsAt: "2026-11-16T06:00:00.000Z",
+          }),
+        );
+      }
+      return Promise.reject(new Error(`unexpected ${url}`));
+    });
+
+    renderHome(<HomePage now={fixedNow} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Bienvenue\. Icitte/)).toBeInTheDocument();
+    });
+
+    await user.click(screen.getByRole("button", { name: /B1Seuil/i }));
+    await user.click(screen.getByRole("button", { name: homeCopy.generate }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("alert")).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Bienvenue\. Icitte/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: homeCopy.retry }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText(/Bienvenue\. Icitte/)).toBeInTheDocument();
   });
 });

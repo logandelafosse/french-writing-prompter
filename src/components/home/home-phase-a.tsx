@@ -8,21 +8,15 @@ import { SectionLabel } from "@/components/ui/section-label";
 import { Surface } from "@/components/ui/surface";
 import { TextLink } from "@/components/ui/text-link";
 import { homeCopy } from "@/copy/fr";
-import { appTimeZone, homeDateTitleParts } from "@/lib/dates";
+import { appTimeZone, formatFrenchDate } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 
 export function HomeDateTitle({ at }: { at: Date }) {
-  const parts = homeDateTitleParts(at, appTimeZone());
-  return (
-    <PageTitle>
-      <span className="sm:hidden">
-        {parts.weekday}
-        <br />
-        {parts.dayMonth}
-      </span>
-      <span className="hidden sm:inline">{parts.desktop}</span>
-    </PageTitle>
-  );
+  const lower = formatFrenchDate(at, appTimeZone());
+  const title = lower
+    ? `${lower.charAt(0).toUpperCase()}${lower.slice(1)}`
+    : lower;
+  return <PageTitle>{title}</PageTitle>;
 }
 
 export function LevelPicker({
@@ -82,7 +76,6 @@ export function HomePhaseA({
   quotaRemaining: number;
 }) {
   const exhausted = variant === "ready" && quotaRemaining === 0;
-
   return (
     <Surface padding="intro" className="flex flex-col gap-[26px]">
       {variant === "first-run" ? (

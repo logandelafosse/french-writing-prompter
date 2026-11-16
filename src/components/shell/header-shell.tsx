@@ -261,6 +261,7 @@ export function useHeaderShell(): HeaderContextValue {
 
 export function HeaderShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const placementPath = pathname.startsWith("/placement");
   const [level, setLevel] = useState<CefrLevel | null>(null);
   const [quota, setQuota] = useState<QuotaGetDto | null>(null);
   const [levelReady, setLevelReady] = useState(false);
@@ -301,14 +302,14 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     [fetchQuota],
   );
 
-  const syncFromToday = useCallback((payload: TodayGetDto) => {
-    setLevel(payload.level);
+  const syncFromToday = useCallback((p: TodayGetDto) => {
+    setLevel(p.level);
     setLevelReady(true);
-    setQuota(payload.quota);
+    setQuota(p.quota);
     setQuotaReady(true);
   }, []);
 
-  const skipHeaderFetch = pathname === "/" || pathname.startsWith("/placement");
+  const skipHeaderFetch = pathname === "/" || placementPath;
 
   useEffect(() => {
     if (skipHeaderFetch) {
@@ -355,23 +356,19 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     [level, refreshQuota, refreshShell, syncFromToday],
   );
 
-  const headerVariant = pathname.startsWith("/placement")
-    ? ("placement" as const)
-    : ("full" as const);
-
-  const placementLink = pathname.startsWith("/placement")
-    ? { href: "/", label: "Je connais mon niveau" as const }
-    : null;
-
   return (
     <HeaderContext.Provider value={contextValue}>
       <AppHeader
-        variant={headerVariant}
+        variant={placementPath ? "placement" : "full"}
         level={level}
         quota={quota}
         levelReady={levelReady}
         quotaReady={quotaReady}
-        placementLink={placementLink}
+        placementLink={
+          placementPath
+            ? { href: "/", label: "Je connais mon niveau" as const }
+            : null
+        }
         current={current}
         onLevelChange={onLevelChange}
       />

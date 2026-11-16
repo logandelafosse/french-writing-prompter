@@ -26,7 +26,7 @@ export function EvaluationCard({ evaluation }: { evaluation: Evaluation }) {
   return (
     <div className="space-y-4 rounded-lg border border-emerald-200 bg-emerald-50/50 p-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-medium text-emerald-800">Evaluation</h3>
+        <h3 className="text-sm font-medium text-emerald-800">Évaluation</h3>
         <LevelBadge level={evaluation.overall_cefr} />
       </div>
 

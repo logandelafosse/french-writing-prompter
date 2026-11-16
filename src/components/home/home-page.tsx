@@ -7,9 +7,12 @@ import {
   LevelPutResponse,
   PromptPostResponse,
 } from "@/contracts/api";
-import { TodayGetResponse, type TodayGetDto } from "@/contracts/today";
+import {
+  TodayGetResponse,
+  resolveHomePhase,
+  type TodayGetDto,
+} from "@/contracts/today";
 import { useHeaderShell } from "@/components/shell/header-shell";
-import { resolveHomePhase } from "@/contracts/today";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { homeCopy } from "@/copy/fr";
 import { Button } from "@/components/ui/button";
@@ -20,10 +23,17 @@ import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
 import type { Evaluation } from "@/contracts/evaluation";
 import { HomeDateTitle, HomePhaseA } from "./home-phase-a";
 
+// prettier-ignore
 type BootstrapState =
   | { kind: "loading" }
-  | { kind: "error"; message: string }
-  | { kind: "ready"; data: TodayGetDto; selectedLevel: CefrLevel | null };
+  | { kind: "initial-error"; message: string }
+  | { kind: "ready"; data: TodayGetDto; selectedLevel: CefrLevel | null; actionError: string | null };
+
+function failBootstrap(prev: BootstrapState, message: string): BootstrapState {
+  return prev.kind === "ready"
+    ? { ...prev, actionError: message }
+    : { kind: "initial-error", message };
+}
 
 function applyToday(
   value: TodayGetDto,
@@ -38,6 +48,7 @@ function applyToday(
       prev.kind === "ready" && prev.selectedLevel !== null
         ? prev.selectedLevel
         : value.level,
+    actionError: null,
   };
 }
 
@@ -48,38 +59,25 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     kind: "loading",
   });
   const [generateUi, setGenerateUi] = useState<"idle" | "generating">("idle");
-  const loadAlive = useRef(true);
 
   const loadToday = useCallback(async () => {
     const result = await fetchJson("/api/today", TodayGetResponse);
     if (!result.ok) {
-      setBootstrap({
-        kind: "error",
-        message: messageFromFetchError(result.error, homeCopy.loadError),
-      });
+      setBootstrap((prev) =>
+        failBootstrap(
+          prev,
+          messageFromFetchError(result.error, homeCopy.loadError),
+        ),
+      );
       return;
     }
     setBootstrap((prev) => applyToday(result.value, prev, syncFromToday));
   }, [syncFromToday]);
 
   useEffect(() => {
-    loadAlive.current = true;
-    void (async () => {
-      const result = await fetchJson("/api/today", TodayGetResponse);
-      if (!loadAlive.current) return;
-      if (!result.ok) {
-        setBootstrap({
-          kind: "error",
-          message: messageFromFetchError(result.error, homeCopy.loadError),
-        });
-        return;
-      }
-      setBootstrap((prev) => applyToday(result.value, prev, syncFromToday));
-    })();
-    return () => {
-      loadAlive.current = false;
-    };
-  }, [syncFromToday]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial bootstrap load
+    void loadToday();
+  }, [loadToday]);
 
   const runGenerate = async (level: CefrLevel) => {
     setGenerateUi("generating");
@@ -90,10 +88,12 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     });
     if (!levelResult.ok) {
       setGenerateUi("idle");
-      setBootstrap({
-        kind: "error",
-        message: messageFromFetchError(levelResult.error, homeCopy.loadError),
-      });
+      setBootstrap((prev) =>
+        failBootstrap(
+          prev,
+          messageFromFetchError(levelResult.error, homeCopy.loadError),
+        ),
+      );
       return;
     }
     const promptResult = await fetchJson("/api/prompt", PromptPostResponse, {
@@ -101,10 +101,12 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     });
     setGenerateUi("idle");
     if (!promptResult.ok) {
-      setBootstrap({
-        kind: "error",
-        message: messageFromFetchError(promptResult.error, homeCopy.loadError),
-      });
+      setBootstrap((prev) =>
+        failBootstrap(
+          prev,
+          messageFromFetchError(promptResult.error, homeCopy.loadError),
+        ),
+      );
       return;
     }
     await refreshQuota();
@@ -118,10 +120,30 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
           Chargement…
         </p>
       ) : null}
-      {bootstrap.kind === "error" ? (
-        <p role="alert" className="text-mistake text-sm">
-          {bootstrap.message}
-        </p>
+      {bootstrap.kind === "initial-error" ||
+      (bootstrap.kind === "ready" && bootstrap.actionError) ? (
+        <div className="flex flex-col gap-2">
+          <p role="alert" className="text-mistake text-sm">
+            {bootstrap.kind === "initial-error"
+              ? bootstrap.message
+              : bootstrap.actionError}
+          </p>
+          <Button
+            variant="secondary-strong"
+            size="lg"
+            className="min-h-touch"
+            onClick={() => {
+              if (bootstrap.kind === "initial-error") void loadToday();
+              else {
+                const level = bootstrap.selectedLevel ?? bootstrap.data.level;
+                if (level) void runGenerate(level);
+                else void loadToday();
+              }
+            }}
+          >
+            {homeCopy.retry}
+          </Button>
+        </div>
       ) : null}
       {bootstrap.kind === "ready" ? (
         <HomeBody
@@ -154,16 +176,19 @@ function HomeBody({
   onGenerate: (level: CefrLevel) => void;
 }) {
   const phase = resolveHomePhase(bootstrap.data);
-  const isPhaseA = phase.kind === "A0-first-run" || phase.kind === "A-ready";
   const phaseLevel =
     phase.kind === "A0-first-run"
       ? bootstrap.selectedLevel
       : bootstrap.data.level;
-
   return (
     <>
       <HomeDateTitle at={titleDate} />
-      {isPhaseA ? (
+      {phase.kind === "B-writing" ? (
+        <WritingInterim
+          sessionId={phase.sessionId}
+          promptText={phase.promptText}
+        />
+      ) : (
         <HomePhaseA
           variant={phase.kind === "A0-first-run" ? "first-run" : "ready"}
           selectedLevel={phaseLevel}
@@ -175,11 +200,6 @@ function HomeBody({
           }}
           generating={generating}
           quotaRemaining={bootstrap.data.quota.remaining}
-        />
-      ) : (
-        <WritingInterim
-          sessionId={phase.sessionId}
-          promptText={phase.promptText}
         />
       )}
     </>
@@ -199,6 +219,7 @@ function WritingInterim({
   >("idle");
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const resultsRef = useRef<HTMLElement | null>(null);
 
   const submit = async () => {
     if (!writing.trim()) return;
@@ -218,6 +239,10 @@ function WritingInterim({
     setEvaluation(result.value.evaluation);
   };
 
+  useEffect(() => {
+    if (submitUi === "review" && evaluation) resultsRef.current?.focus();
+  }, [submitUi, evaluation]);
+
   return (
     <div className="flex flex-col gap-5">
       <Surface padding="home">
@@ -226,7 +251,15 @@ function WritingInterim({
         </p>
       </Surface>
       {submitUi === "review" && evaluation ? (
-        <EvaluationCard evaluation={evaluation} />
+        <section
+          ref={resultsRef}
+          tabIndex={-1}
+          aria-live="polite"
+          lang="fr"
+          className="outline-none"
+        >
+          <EvaluationCard evaluation={evaluation} />
+        </section>
       ) : (
         <Surface padding="home" className="flex flex-col gap-4">
           <Field label={homeCopy.writingLabel}>

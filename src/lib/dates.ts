@@ -48,26 +48,6 @@ export function nextLocalMidnightIso(
   return new Date(hi).toISOString();
 }
 
-export function homeDateTitleParts(
-  date: Date,
-  timeZone?: string,
-): { weekday: string; dayMonth: string; desktop: string } {
-  const lower = formatFrenchDate(date, timeZone);
-  const parts = lower.split(" ");
-  const weekdayRaw = parts[0] ?? "";
-  const weekday =
-    weekdayRaw.length > 0
-      ? `${weekdayRaw.charAt(0).toUpperCase()}${weekdayRaw.slice(1)}`
-      : "";
-  const dayMonth = parts.slice(1).join(" ");
-  const desktop =
-    lower.length > 0
-      ? `${lower.charAt(0).toUpperCase()}${lower.slice(1)}`
-      : lower;
-
-  return { weekday, dayMonth, desktop };
-}
-
 export function formatFrenchDate(date: Date, timeZone?: string): string {
   const tz = resolvedTimeZone(timeZone);
   const parts = new Intl.DateTimeFormat("fr-FR", {

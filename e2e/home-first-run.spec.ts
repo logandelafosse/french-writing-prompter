@@ -1,7 +1,7 @@
 import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
-import { visibleHeaderQuota } from "./support/header-helpers";
+import { setLevelB1, visibleHeaderQuota } from "./support/header-helpers";
 import { expectLevelPickerSixButtons } from "./support/home-helpers";
 
 const PROMPT_SNIPPET = "La Nouvelle-Orléans";
@@ -73,6 +73,17 @@ test.describe("home first run @390", () => {
     await captureEvidence(page, testInfo, "b1-mobile");
     await expectNoAxeViolations(page);
   });
+});
+
+test("placement redirects home when level is already set", async ({
+  page,
+  scenario,
+}) => {
+  await scenario("happy");
+  await page.goto("/");
+  await setLevelB1(page);
+  await page.goto("/placement");
+  await expect(page).toHaveURL(/\/$/);
 });
 
 test("placement link opens reduced header", async ({ page, scenario }) => {
