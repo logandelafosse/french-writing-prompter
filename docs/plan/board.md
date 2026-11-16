@@ -16,8 +16,8 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                    | Why                                                                                                                                                                                                                                             |
-| --- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ID  | Ticket                                                                                                                    | Why                                                                                                                                                                                       |
+| --- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | T13 | App header, level menu, local-midnight quota ([#15](https://github.com/logandelafosse/french-writing-prompter/issues/15)) | T13a merged [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51); header UI [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52) in review. |
 
 ## Blocked
@@ -45,7 +45,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 | ID  | Ticket                                                              | Type | Blocked by | Why not ready                                                                                                                                               |
 | --- | ------------------------------------------------------------------- | ---- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **In review** — T13b [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52); T13a merged #51.                                                                                                            |
+| T13 | App header, level menu, local-midnight quota                        | AFK  | —          | **In review** — T13b [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52); T13a merged #51.                                          |
 | T14 | Home first run and `/api/today` bootstrap                           | AFK  | T13        | Needs the header                                                                                                                                            |
 | T15 | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300.                                                                                                  |
 | T16 | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                      |
@@ -76,9 +76,9 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 5 — Host (planned, not on board DAG yet)
 
-| ID / draft | Ticket                         | Type | Blocked by | Why not ready                                                                                           |
-| ---------- | ------------------------------ | ---- | ---------- | ------------------------------------------------------------------------------------------------------- |
-| T36–T39    | Vercel + Turso hosting         | AFK  | Logan Qs   | Spec [`docs/plan/vercel-deployment.md`](vercel-deployment.md); coordinator files tickets after §7 HITL. |
+| ID / draft | Ticket                 | Type | Blocked by | Why not ready                                                                                           |
+| ---------- | ---------------------- | ---- | ---------- | ------------------------------------------------------------------------------------------------------- |
+| T36–T39    | Vercel + Turso hosting | AFK  | Logan Qs   | Spec [`docs/plan/vercel-deployment.md`](vercel-deployment.md); coordinator files tickets after §7 HITL. |
 
 ### Phase 4 — Archive and polish
 
