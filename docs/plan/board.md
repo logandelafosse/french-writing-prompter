@@ -4,11 +4,13 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T20 PR #69 in review).
+Last updated: 2026-11-16 by coordinator (T20 done; T21 ready).
 
 ## Ready
 
-_None._
+| ID  | Ticket                                                                                                                                | Why                                                                                                                            |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| T21 | Evaluator v2: Corrections, quote location, French output ([#23](https://github.com/logandelafosse/french-writing-prompter/issues/23)) | T06 + T17 done; dialect module and session lifecycle in place. Q4 answered; see spec for split if `pr:size` exceeds 500 lines. |
 
 ## In progress
 
@@ -16,9 +18,7 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                                                  | Why                                                                                                                                                    |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| T20 | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22)) | [PR #69](https://github.com/logandelafosse/french-writing-prompter/pull/69); ~490 prod lines; evidence `docs/evidence/22/`; CI + Grok reviews pending. |
+_None._
 
 ## Blocked
 
@@ -59,8 +59,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T17  | Session lifecycle and draft autosave                                | AFK  | T16        | **Done** — merged [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66) 2026-11-16; TOOL-PR66-* backlog.                                                    |
 | T18  | Quota exhausted, swap confirm, session statuses                     | AFK  | T17        | **Done** — merged [PR #67](https://github.com/logandelafosse/french-writing-prompter/pull/67) 2026-11-16; TOOL-PR67-* backlog; evidence `docs/evidence/20/`.                      |
 | T19  | Error and offline states                                            | AFK  | T17        | **Done** — [PR #68](https://github.com/logandelafosse/french-writing-prompter/pull/68) `8206cb8`; evidence `docs/evidence/21/`; TOOL-PR68-* backlog.                              |
-| T20  | Level service with durable streak and undoable advancement          | AFK  | T14        | **In review** — [PR #69](https://github.com/logandelafosse/french-writing-prompter/pull/69).                                                                                      |
-| T21  | Evaluator v2: Corrections, quote location, French output            | AFK  | T06, T17   | Needs dialect module and sessions. Q4 answered: taxonomy §1.1 as-is. ~480 lines: if over, split out the corrections table + stored-evaluation parser first.                       |
+| T20  | Level service with durable streak and undoable advancement          | AFK  | T14        | **Done** — [PR #69](https://github.com/logandelafosse/french-writing-prompter/pull/69) `acc40f8`; evidence `docs/evidence/22/`; TOOL-PR69-* backlog.                              |
+| T21  | Evaluator v2: Corrections, quote location, French output            | AFK  | T06, T17   | **Ready** — on board; dispatch implementer. Q4 answered: taxonomy §1.1 as-is. ~480 lines: if over, split out the corrections table + stored-evaluation parser first.              |
 | T22  | Review screen: marked text, Mistake cards, Scores                   | AFK  | T16, T21   | Needs Corrections. Q5 answered: CECR chips + hover Pour monter. ~500 lines: split into T22a / T22b is pre-approved, see spec.                                                     |
 
 ### Phase 2 — Dialect
@@ -124,3 +124,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T17  | Session lifecycle and draft autosave ([#19](https://github.com/logandelafosse/french-writing-prompter/issues/19))                                | Merged [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66) 2026-11-16; evidence `docs/evidence/19/`; TOOL-PR66-* backlog.                                                                                                                          |
 | T18  | Quota exhausted, swap confirm, session statuses ([#20](https://github.com/logandelafosse/french-writing-prompter/issues/20))                     | Merged [PR #67](https://github.com/logandelafosse/french-writing-prompter/pull/67) 2026-11-16; evidence `docs/evidence/20/`; adversarial race fix post-review; TOOL-PR67-* backlog.                                                                                        |
 | T19  | Error and offline states ([#21](https://github.com/logandelafosse/french-writing-prompter/issues/21))                                            | Merged [PR #68](https://github.com/logandelafosse/french-writing-prompter/pull/68) 2026-11-16; evidence `docs/evidence/21/`; SSR offline + scoped `loadingTimeout`; TOOL-PR68-* backlog.                                                                                   |
+| T20  | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22))          | Merged [PR #69](https://github.com/logandelafosse/french-writing-prompter/pull/69) `acc40f8` 2026-11-16; evidence `docs/evidence/22/`; post-review evaluate bootstrap + `pr:size` trim; TOOL-PR69-* backlog. T21 ready.                                                    |
