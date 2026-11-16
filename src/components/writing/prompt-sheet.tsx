@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode, Ref } from "react";
 import type { PromptMeta } from "@/contracts/prompt-meta";
 import { formatPromptMeta } from "@/lib/format-prompt-meta";
 import { homeCopy } from "@/copy/fr";
@@ -12,22 +13,39 @@ export function PromptSheet({
   promptText,
   meta,
   animateKey,
+  label,
   swap,
+  swapButtonRef,
+  belowMeta,
   generateBusy,
   embedded = false,
 }: {
   promptText: string;
   meta: PromptMeta | null;
   animateKey: string;
-  swap?: { onSwap: () => void; disabled?: boolean } | undefined;
+  label?: string | undefined;
+  swap?:
+    | {
+        onSwap: () => void;
+        disabled?: boolean;
+        label?: string;
+      }
+    | undefined;
+  swapButtonRef?: Ref<HTMLButtonElement> | undefined;
+  belowMeta?: ReactNode;
   generateBusy?: boolean | undefined;
   embedded?: boolean | undefined;
 }) {
   const metaLine = meta ? formatPromptMeta(meta) : null;
+  const swapDisabled = swap?.disabled === true;
+  const swapLabel = swap?.label ?? homeCopy.swapPrompt;
+  const onSwap = swap?.onSwap;
 
   const body = (
     <>
-      <SectionLabel tone="primary">{homeCopy.promptLabel}</SectionLabel>
+      <SectionLabel tone="primary">
+        {label ?? homeCopy.promptLabel}
+      </SectionLabel>
       <p
         key={animateKey}
         lang="fr"
@@ -47,19 +65,23 @@ export function PromptSheet({
           ) : (
             <span className="hidden sm:block" />
           )}
-          {swap ? (
+          {onSwap ? (
             <Button
+              ref={swapButtonRef}
               variant="text"
               className="max-sm:self-start max-sm:p-0 max-sm:pb-1.5"
-              disabled={swap.disabled === true || generateBusy === true}
-              busy={generateBusy === true}
-              onClick={swap.onSwap}
+              disabled={swapDisabled || generateBusy === true}
+              busy={generateBusy === true && !swapDisabled}
+              onClick={onSwap}
             >
-              {generateBusy ? homeCopy.generateBusy : homeCopy.swapPrompt}
+              {generateBusy && !swapDisabled
+                ? homeCopy.generateBusy
+                : swapLabel}
             </Button>
           ) : null}
         </div>
       ) : null}
+      {belowMeta}
     </>
   );
   if (embedded) return body;

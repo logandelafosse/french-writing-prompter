@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { getAiClient, scenarioFromRequest } from "@/server/ai-client";
 import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import {
@@ -11,8 +12,11 @@ import { getCurrentLevel } from "@/modules/cefr-tracker/db-store";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
-import { localDateKey } from "@/lib/dates";
+import { localDateKey, todayLocalDateKey } from "@/lib/dates";
+import { countWords } from "@/lib/count-words";
+import { parseRequestBody } from "@/lib/http";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
+import { PromptPostBody, type PromptPostBodyValue } from "@/contracts/api";
 
 let quotaPromptChain = Promise.resolve();
 
@@ -25,6 +29,55 @@ function withQuotaPromptLock<T>(fn: () => Promise<T>): Promise<T> {
   return run;
 }
 
+async function readPromptBody(request: Request) {
+  const text = await request.text();
+  const json = text.trim().length === 0 ? "{}" : text;
+  return parseRequestBody(
+    new Request(request.url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: json,
+    }),
+    PromptPostBody,
+  );
+}
+
+async function todayActiveSessions() {
+  const today = todayLocalDateKey(quotaTimeZone());
+  return db
+    .select()
+    .from(sessions)
+    .where(
+      and(
+        eq(sessions.kind, "daily"),
+        eq(sessions.localDate, today),
+        eq(sessions.status, "active"),
+      ),
+    )
+    .orderBy(desc(sessions.createdAt));
+}
+
+function draftAbandonBlocked(
+  activeRows: Awaited<ReturnType<typeof todayActiveSessions>>,
+  body: PromptPostBodyValue,
+): NextResponse | null {
+  const withWords = activeRows.filter(
+    (row) => countWords(row.writingText ?? "") > 0,
+  );
+  const draft =
+    withWords.find((row) => row.id === body.replaceSessionId) ?? withWords[0];
+  if (draft && body.confirmAbandon !== true) {
+    return NextResponse.json(
+      {
+        error: "DRAFT_WOULD_BE_ABANDONED" as const,
+        wordCount: countWords(draft.writingText ?? ""),
+      },
+      { status: 409 },
+    );
+  }
+  return null;
+}
+
 export async function POST(request: Request) {
   const level = await getCurrentLevel();
   if (!level) {
@@ -34,8 +87,17 @@ export async function POST(request: Request) {
     );
   }
 
+  const parsed = await readPromptBody(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.value;
+  const transaction = { open: false };
+
   try {
     return await withQuotaPromptLock(async () => {
+      let activeRows = await todayActiveSessions();
+      let blocked = draftAbandonBlocked(activeRows, body);
+      if (blocked) return blocked;
+
       await assertQuotaAvailable();
 
       const promptGenerator = new PromptGenerator(
@@ -58,8 +120,23 @@ export async function POST(request: Request) {
         );
       }
 
+      activeRows = await todayActiveSessions();
+      blocked = draftAbandonBlocked(activeRows, body);
+      if (blocked) return blocked;
+
       const now = new Date().toISOString();
       const localDate = localDateKey(new Date(now), quotaTimeZone());
+      const activeIds = activeRows.map((row) => row.id);
+      await db.run(sql`begin immediate`);
+      transaction.open = true;
+      if (activeIds.length > 0) {
+        await db
+          .update(sessions)
+          .set({ status: "abandoned", abandonedAt: now })
+          .where(
+            and(inArray(sessions.id, activeIds), eq(sessions.status, "active")),
+          );
+      }
 
       const inserted = await db.insert(sessions).values({
         promptText: prompt.text,
@@ -75,6 +152,8 @@ export async function POST(request: Request) {
         localDate,
       });
       const sessionId = Number(inserted.lastInsertRowid);
+      await db.run(sql`commit`);
+      transaction.open = false;
       const quota = await getQuotaState();
 
       return NextResponse.json({
@@ -87,6 +166,9 @@ export async function POST(request: Request) {
       });
     });
   } catch (error) {
+    if (transaction.open) {
+      await db.run(sql`rollback`);
+    }
     if (error instanceof QuotaExhaustedError) {
       return NextResponse.json(
         {

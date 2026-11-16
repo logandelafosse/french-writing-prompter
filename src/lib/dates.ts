@@ -64,6 +64,16 @@ export function formatFrenchDate(date: Date, timeZone?: string): string {
   return `${weekday} ${day} ${month}`.toLowerCase();
 }
 
+/** Hours and zero-padded minutes until `resetsAt`, e.g. « 1 h 46 », « 0 h 05 ». */
+export function formatCountdown(resetsAt: Date, now: Date): string {
+  const remainingMs = resetsAt.getTime() - now.getTime();
+  if (!Number.isFinite(remainingMs)) return "0 h 00";
+  const totalMinutes = Math.max(0, Math.floor(remainingMs / 60_000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours} h ${String(minutes).padStart(2, "0")}`;
+}
+
 /** e.g. « 21 h 42 ». */
 export function formatFrenchTime(date: Date, timeZone?: string): string {
   const tz = resolvedTimeZone(timeZone);

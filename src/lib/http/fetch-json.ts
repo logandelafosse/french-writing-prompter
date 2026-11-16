@@ -4,11 +4,17 @@ import { parseJson } from "@/lib/json";
 const ErrorBodySchema = z.object({
   error: z.string().optional(),
   message: z.string().optional(),
+  wordCount: z.number().int().nonnegative().optional(),
 });
 
 export type FetchError =
   | { kind: "network" }
-  | { kind: "http"; status: number; message: string }
+  | {
+      kind: "http";
+      status: number;
+      message: string;
+      wordCount?: number;
+    }
   | { kind: "invalid" };
 
 export type FetchJsonResult<T> =
@@ -17,12 +23,15 @@ export type FetchJsonResult<T> =
 export type { ParseRequestBodyResult } from "./parse-request-body";
 export { parseRequestBody } from "./parse-request-body";
 
-function errorMessageFromBody(text: string, fallback: string): string {
+function errorFieldsFromBody(
+  text: string,
+  fallback: string,
+): { message: string; wordCount?: number } {
   const parsed = parseJson(ErrorBodySchema, text);
-  if (!parsed.ok) {
-    return fallback;
-  }
-  return parsed.value.error ?? parsed.value.message ?? fallback;
+  if (!parsed.ok) return { message: fallback };
+  const message = parsed.value.error ?? parsed.value.message ?? fallback;
+  if (parsed.value.wordCount === undefined) return { message };
+  return { message, wordCount: parsed.value.wordCount };
 }
 
 export async function fetchJson<S extends ZodType>(
@@ -45,12 +54,16 @@ export async function fetchJson<S extends ZodType>(
   }
 
   if (!response.ok) {
+    const fields = errorFieldsFromBody(text, response.statusText);
     return {
       ok: false,
       error: {
         kind: "http",
         status: response.status,
-        message: errorMessageFromBody(text, response.statusText),
+        message: fields.message,
+        ...(fields.wordCount === undefined
+          ? {}
+          : { wordCount: fields.wordCount }),
       },
     };
   }

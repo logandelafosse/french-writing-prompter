@@ -8,7 +8,20 @@ export const homeCopy = {
   generate: "Donne-moi une consigne",
   generateBusy: "Je cherche une consigne…",
   promptLabel: "Consigne d'écriture",
+  promptLabelWithIndex: "Consigne d'écriture · 3 sur 3",
   swapPrompt: "↻ Une autre consigne",
+  swapPromptDisabled: "↻ Une autre consigne · à minuit",
+  quotaNoticeTitle: "T'as pris tes trois consignes pour aujourd'hui.",
+  quotaNoticeCountdown: (countdown: string) =>
+    `La prochaine arrive à minuit, dans ${countdown}.`,
+  quotaNoticeDraft:
+    "Ton brouillon reste icitte : tu peux le finir et l'envoyer quand tu veux.",
+  swapDialogLabel: "Changer de consigne",
+  swapDialogLead: "Changer de consigne ?",
+  swapDialogBody: (wordCount: number) =>
+    `Ton brouillon de ${wordCount} mots va rester dans l'Historique.`,
+  swapKeep: "Garder celle-là",
+  swapConfirm: "Changer",
   placementLink: "Pas sûr ? Fais le test de placement (3 consignes)",
   aReadyLead: "Prêt pour ta consigne du jour ?",
   writingLabel: "Ton texte",

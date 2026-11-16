@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  formatCountdown,
   formatFrenchDate,
   formatFrenchTime,
   localDateKey,
@@ -54,5 +55,17 @@ describe("French date and time formatters", () => {
       "samedi 14 novembre",
     );
     expect(formatFrenchTime(when, "America/Chicago")).toBe("21 h 42");
+  });
+});
+
+describe("formatCountdown", () => {
+  it("renders hours and zero-padded minutes", () => {
+    const resetsAt = new Date("2026-11-15T06:00:00.000Z");
+    expect(
+      formatCountdown(resetsAt, new Date("2026-11-15T04:14:00.000Z")),
+    ).toBe("1 h 46");
+    expect(
+      formatCountdown(resetsAt, new Date("2026-11-15T05:55:00.000Z")),
+    ).toBe("0 h 05");
   });
 });

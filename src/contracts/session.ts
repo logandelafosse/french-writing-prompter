@@ -5,6 +5,14 @@ import { Evaluation } from "./evaluation";
 export const SessionStatus = z.enum(["active", "evaluated", "abandoned"]);
 export type SessionStatus = z.infer<typeof SessionStatus>;
 
+export const SessionDisplayStatus = z.enum([
+  "in_progress",
+  "evaluated",
+  "draft_abandoned",
+  "prompt_unused",
+]);
+export type SessionDisplayStatus = z.infer<typeof SessionDisplayStatus>;
+
 export const SavedDraft = z.object({
   text: z.string(),
   savedAt: z.string(),
