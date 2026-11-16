@@ -1034,3 +1034,18 @@ Non-blocking for T16 merge. Full proposals: [T16 tooling review PR #65](afb4227e
 | TOOL-PR65-1 | `interactive-allowlist` ratchet test + drop knip ignore for `ui/textarea.tsx`        | PR adds `ruled-textarea` to `no-raw-interactive-element` ignores; prefer `src/components/ui/` |
 | TOOL-PR65-2 | `no-shared-writing-busy` (ast-grep)                                                  | Same `$FLAG` on `GenerateButton` and `SubmitButton` / `WritingFooter.submitBusy`              |
 | TOOL-PR65-3 | `word-count-single-source` + `word-band-numeric-single-source`; fold TOOL-PR63-1 e2e | `countWords` only; nudge `20/30/80` → `WORD_TARGET_BY_LEVEL`; extend e2e meter regex rule     |
+
+### Backlog from PR #66 tooling review (2026-11-16)
+
+Non-blocking for T17 merge. Prioritize TOOL-PR66-6 before T18. Full proposals: [T17 tooling review PR #66](4c1e91c3-026f-400a-98aa-afde4de90d8d).
+
+| ID (draft)  | Rule / change                                                     | Notes                                                                   |
+| ----------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| TOOL-PR66-1 | `saved-draft-single-source`                                       | Duplicate `{ text, savedAt }` vs `SavedDraft`                           |
+| TOOL-PR66-2 | ESLint: no `zod` in `src/app/api/**/route.ts`                     | `DraftPutBody` in draft route                                           |
+| TOOL-PR66-3 | `no-inline-test-response-schema`                                  | Draft route test shadows `DraftPutResponse`                             |
+| TOOL-PR66-4 | `api-learner-copy-single-source` + `draft-text-max-single-source` | French errors in route; `20_001` vs `DRAFT_TEXT_MAX`                    |
+| TOOL-PR66-5 | `no-zero-arg-date-in-components` + `timing-limits-single-source`  | `new Date()` / `LOCAL_MIRROR_MS` in autosave hook (TOOL-PR52-3)         |
+| TOOL-PR66-6 | `no-parse-failure-default` + `prompt-level-is-cefr`               | `sessionStatus` defaults failed parse to `active` — land before T18     |
+| TOOL-PR66-7 | `no-swallowed-fetch-in-components`                                | Autosave ignores `!result.ok`; land before T19                          |
+| —           | Fold TOOL-PR57-1, TOOL-PR54-5 / TOOL-PR62-7                       | `boundingBox` in draft e2e; extra `test.use` viewports in `drafts.spec` |

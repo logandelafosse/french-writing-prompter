@@ -18,9 +18,9 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                            | Why                                                                                                                                              |
-| --- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| T17 | Session lifecycle and draft autosave ([#19](https://github.com/logandelafosse/french-writing-prompter/issues/19)) | [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66); adversarial + test + tooling reviews; evidence `docs/evidence/19/`. |
+| ID  | Ticket                                                                                                            | Why                                                                                                                                   |
+| --- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| T17 | Session lifecycle and draft autosave ([#19](https://github.com/logandelafosse/french-writing-prompter/issues/19)) | [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66); tooling clear (TOOL-PR66-*); adversarial + test pending. |
 
 ## Blocked
 
