@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T15 dispatched).
+Last updated: 2026-11-15 by coordinator (T15 PR #63 in review).
 
 ## Ready
 
@@ -15,13 +15,13 @@ Last updated: 2026-11-15 by coordinator (T15 dispatched).
 
 ## In progress
 
-| ID  | Ticket                                                                                                                              | Why                                                          |
-| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| T15 | Generator v2 with structured prompt meta; prompt sheet ([#17](https://github.com/logandelafosse/french-writing-prompter/issues/17)) | Branch `ticket/t15-generator-prompt-sheet`; implementer T15. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                                                                                                                              | Why                                                                                          |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| T15 | Generator v2 with structured prompt meta; prompt sheet ([#17](https://github.com/logandelafosse/french-writing-prompter/issues/17)) | [PR #63](https://github.com/logandelafosse/french-writing-prompter/pull/63); 342 prod lines. |
 
 ## Blocked
 
@@ -57,7 +57,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **Done** — [PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61) + [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62); closed #60. |
 | T14a | `GET /api/today` + phase resolver                                   | AFK  | —          | **Done** — merged [PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61).                                                                                    |
 | T14b | Home phases UI + placement                                          | AFK  | T14a       | **Done** — merged [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62).                                                                                    |
-| T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | **In progress** — branch `ticket/t15-generator-prompt-sheet`. Q8 word targets.                                                                                                    |
+| T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | **In review** — [PR #63](https://github.com/logandelafosse/french-writing-prompter/pull/63); 342 prod lines.                                                                      |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                                            |
 | T17  | Session lifecycle and draft autosave                                | AFK  | T16        | Needs the writing surface. Not alongside T20 (both edit the evaluate route and `/api/today`).                                                                                     |
 | T18  | Quota exhausted, swap confirm, session statuses                     | AFK  | T17        | Needs sessions with drafts. Q8: swap uses a daily slot. Not alongside T19 (both edit `POST /api/prompt` and Phase B).                                                             |
