@@ -386,7 +386,9 @@ function HomeBody({
         />
       ) : phase.kind === "B-writing" ? (
         <>
-          <FocusLine focus={focus} variant={desktop ? "inline" : "stacked"} />
+          {!reviewing ? (
+            <FocusLine focus={focus} variant={desktop ? "inline" : "stacked"} />
+          ) : null}
           <WritingInterim
             key={`${phase.sessionId}-${phase.promptText}`}
             sessionId={phase.sessionId}

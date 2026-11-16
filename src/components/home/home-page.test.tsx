@@ -638,4 +638,59 @@ describe("HomePage FocusLine", () => {
       await screen.findByRole("region", { name: homeCopy.focusLabel }),
     ).toHaveTextContent("infinitif ou participe (\u2011er / \u2011é)");
   });
+
+  it("shows one Focus line on desktop after evaluation starts", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.mocked(globalThis.fetch);
+    const focusItem = {
+      id: "infinitif_participe",
+      name: "Infinitif ou participe (\u2011er / \u2011é)",
+      inlineName: "infinitif ou participe (\u2011er / \u2011é)",
+      historyName: "Infinitif ou participe",
+      shortName: "\u2011er / \u2011é",
+    };
+    const withFocus = {
+      ...todayWriting,
+      focus: [focusItem],
+    };
+
+    fetchMock.mockImplementation((input, init) => {
+      const url =
+        typeof input === "string"
+          ? input
+          : input instanceof URL
+            ? input.href
+            : input.url;
+      if (url.includes("/api/today")) {
+        return Promise.resolve(jsonResponse(withFocus));
+      }
+      if (url.includes("/api/sessions/9/draft")) {
+        return Promise.resolve(
+          jsonResponse({ savedAt: "2026-11-14T18:00:00.000Z", wordCount: 6 }),
+        );
+      }
+      if (url.includes("/api/evaluate") && init?.method === "POST") {
+        return Promise.resolve(jsonResponse(evaluateOkResponse));
+      }
+      if (url.includes("/api/quota")) {
+        return Promise.resolve(jsonResponse(withFocus.quota));
+      }
+      return Promise.reject(new Error(`unexpected ${url}`));
+    });
+
+    renderHome(<HomePage now={fixedNow} />);
+    const area = await screen.findByLabelText(homeCopy.writingLabel);
+    await user.type(area, "Le bayou est calme ce matin.");
+    await user.click(
+      screen.getAllByRole("button", { name: homeCopy.submit })[0]!,
+    );
+    await waitFor(() => {
+      expect(
+        screen.getByRole("heading", { name: "Évaluation" }),
+      ).toBeInTheDocument();
+    });
+    expect(
+      screen.getAllByRole("region", { name: homeCopy.focusLabel }),
+    ).toHaveLength(1);
+  });
 });
