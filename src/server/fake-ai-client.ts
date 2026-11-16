@@ -5,6 +5,8 @@ import type { z } from "zod";
 import { parseJson } from "@/lib/json";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import type { ChatCompletionParams } from "@/modules/openai-client/openai-client";
+import { db } from "@/db";
+import { sessions } from "@/db/schema";
 import type { E2eScenario } from "./ai-client";
 
 const FIXTURES_DIR = path.join(process.cwd(), "src/test/fixtures/ai");
@@ -23,19 +25,31 @@ export class FakeAiClient {
     return Promise.resolve(readFixtureText("prompt.valid.txt").trim());
   }
 
-  chatCompletionJSON<S extends z.ZodType>(
+  async chatCompletionJSON<S extends z.ZodType>(
     schema: S,
     _params: Omit<ChatCompletionParams, "response_format">,
-    _schemaName?: string,
+    schemaName?: string,
   ): Promise<z.infer<S>> {
     if (this.scenario === "failure") {
       return Promise.reject(new Error("AI service error"));
     }
 
+    const generatorFixture =
+      schemaName === "generator"
+        ? this.scenario === "malformed"
+          ? "prompt-generator.invalid.json"
+          : (await db.select({ id: sessions.id }).from(sessions)).length % 2 ===
+              0
+            ? "prompt-generator.valid.json"
+            : "prompt-generator.swap.json"
+        : null;
+
     const fixtureName =
-      this.scenario === "malformed"
-        ? "evaluation.invalid.json"
-        : "evaluation.valid.json";
+      generatorFixture !== null
+        ? generatorFixture
+        : this.scenario === "malformed"
+          ? "evaluation.invalid.json"
+          : "evaluation.valid.json";
     const text = readFixtureText(fixtureName);
     const result = parseJson(schema, text);
     if (result.ok) {

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { CefrLevel, LevelSource } from "./cefr";
 import { Evaluation } from "./evaluation";
 import { PromptConstraints } from "./prompt";
+import { PromptMeta } from "./prompt-meta";
 import { SessionView } from "./session";
 
 export const LevelChangeDto = z.object({
@@ -34,21 +35,28 @@ export const EvaluatePostResponse = z.strictObject({
   advancement: LevelChangeDto.nullable().optional(),
 });
 
-export const WritingPromptDto = z.object({
-  text: z.string(),
-  constraints: PromptConstraints,
-});
-
-export const PromptPostResponse = z.strictObject({
-  prompt: WritingPromptDto,
-  sessionId: z.number(),
-});
-
 export const QuotaGetResponse = z.strictObject({
   used: z.number(),
   remaining: z.number(),
   max: z.number(),
   resetsAt: z.string(),
+});
+
+export const WritingPromptDto = z.object({
+  text: z.string(),
+  meta: PromptMeta,
+  constraints: PromptConstraints,
+});
+
+export const PromptSessionDto = z.strictObject({
+  id: z.number(),
+  promptText: z.string(),
+  promptMeta: PromptMeta,
+});
+
+export const PromptPostResponse = z.strictObject({
+  session: PromptSessionDto,
+  quota: QuotaGetResponse,
 });
 
 export type QuotaGetDto = z.infer<typeof QuotaGetResponse>;

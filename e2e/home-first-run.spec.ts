@@ -3,8 +3,9 @@ import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { setLevelB1, visibleHeaderQuota } from "./support/header-helpers";
 import { expectLevelPickerSixButtons } from "./support/home-helpers";
+import { PROMPT_FIXTURE_LAFAYETTE } from "./support/prompt-helpers";
 
-const PROMPT_SNIPPET = "La Nouvelle-Orléans";
+const PROMPT_SNIPPET = PROMPT_FIXTURE_LAFAYETTE;
 
 test.describe("home first run @1280", () => {
   test.use({ viewport: { width: 1280, height: 860 } });

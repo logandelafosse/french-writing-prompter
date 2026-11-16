@@ -6,8 +6,9 @@ import {
   expectEvaluationWithScores,
   expectFrenchHomeDateTitle,
 } from "./support/home-helpers";
+import { PROMPT_FIXTURE_LAFAYETTE } from "./support/prompt-helpers";
 
-const PROMPT_SNIPPET = "La Nouvelle-Orléans";
+const PROMPT_SNIPPET = PROMPT_FIXTURE_LAFAYETTE;
 const HAPPY_WRITING =
   "Hier, je me suis promené dans mon quartier. J'ai vu des voisins et nous avons parlé du carnaval.";
 

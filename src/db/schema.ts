@@ -13,6 +13,7 @@ export const sessions = sqliteTable(
   {
     id: integer("id").primaryKey({ autoIncrement: true }),
     promptText: text("prompt_text").notNull(),
+    promptMetaJson: text("prompt_meta_json"),
     promptConstraints: text("prompt_constraints").notNull(),
     writingText: text("writing_text"),
     evaluationJson: text("evaluation_json"),

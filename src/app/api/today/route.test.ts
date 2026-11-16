@@ -60,7 +60,7 @@ describe("GET /api/today", () => {
     expect(body.activeSession).toEqual({
       id: saved.id,
       prompt: "Consigne du jour",
-      meta: null,
+      promptMeta: null,
       draft: null,
     });
   });

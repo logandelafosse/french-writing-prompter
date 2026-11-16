@@ -1,0 +1,1 @@
+ALTER TABLE `sessions` ADD `prompt_meta_json` text;

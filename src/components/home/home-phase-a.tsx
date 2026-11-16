@@ -3,6 +3,7 @@
 import type { CefrLevel } from "@/contracts/cefr";
 import { CEFR_LEVELS, CEFR_UI_LABELS } from "@/contracts/cefr";
 import { Button } from "@/components/ui/button";
+import { GenerateButton } from "@/components/writing/generate-button";
 import { PageTitle } from "@/components/ui/page-title";
 import { SectionLabel } from "@/components/ui/section-label";
 import { Surface } from "@/components/ui/surface";
@@ -92,17 +93,14 @@ export function HomePhaseA({
         <p className="text-muted text-base/[1.5]">{homeCopy.aReadyLead}</p>
       )}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
-        <Button
-          size="lg"
-          className="min-h-[54px] w-full sm:min-h-12 sm:w-auto"
+        <GenerateButton
           disabled={
             exhausted || (variant === "first-run" && selectedLevel === null)
           }
           busy={generating}
           onClick={onGenerate}
-        >
-          {generating ? homeCopy.generateBusy : homeCopy.generate}
-        </Button>
+          label={homeCopy.generate}
+        />
         {variant === "first-run" ? (
           <TextLink href="/placement" className="min-h-touch">
             {homeCopy.placementLink}

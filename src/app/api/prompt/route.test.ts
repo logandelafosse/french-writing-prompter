@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { PromptPostResponse } from "@/contracts/api";
+import { TodayGetResponse } from "@/contracts/today";
 import { z } from "zod";
 import { readResponseJson } from "@/test/read-response-json";
 import { POST } from "./route";
@@ -66,7 +68,68 @@ describe("POST /api/prompt quota", { concurrent: false }, () => {
     );
     expect(response.status).toBe(200);
     const body = await readResponseJson(response, PromptPostResponse);
-    expect(body.sessionId).toBeGreaterThan(0);
+    expect(body.session.id).toBeGreaterThan(0);
+    expect(body.quota.remaining).toBeGreaterThanOrEqual(0);
+  });
+
+  it("persists prompt_meta_json and returns promptMeta", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/prompt", { method: "POST" }),
+    );
+    expect(response.status).toBe(200);
+    const body = await readResponseJson(response, PromptPostResponse);
+    expect(body.session.promptMeta.registre).toMatch(
+      /^(formel|familier|mixt)$/,
+    );
+    expect(body.session.promptMeta.wordTarget).toEqual({ min: 250, max: 300 });
+
+    const rows = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, body.session.id));
+    expect(rows[0]?.promptMetaJson).toBeTruthy();
+  });
+
+  it("returns promptMeta null for a legacy row without throwing", async () => {
+    const saved = await saveSession({
+      promptText: "legacy",
+      promptConstraints: JSON.stringify({
+        cefrLevel: "B1",
+        dialect: DEFAULT_DIALECT,
+      }),
+      writingText: null,
+      evaluationJson: null,
+      cefrLevel: "B1",
+      localDate: "2026-11-14",
+    });
+
+    const { GET } = await import("../today/route");
+    const today = await GET();
+    const body = await readResponseJson(today, TodayGetResponse);
+    expect(body.activeSession).toEqual({
+      id: saved.id,
+      prompt: "legacy",
+      promptMeta: null,
+      draft: null,
+    });
+  });
+
+  it("GET /api/today returns promptMeta after POST /api/prompt", async () => {
+    const response = await POST(
+      new Request("http://localhost/api/prompt", { method: "POST" }),
+    );
+    expect(response.status).toBe(200);
+    const posted = await readResponseJson(response, PromptPostResponse);
+
+    const { GET } = await import("../today/route");
+    const today = await GET();
+    const body = await readResponseJson(today, TodayGetResponse);
+    expect(body.activeSession).toMatchObject({
+      id: posted.session.id,
+      prompt: posted.session.promptText,
+      promptMeta: posted.session.promptMeta,
+      draft: null,
+    });
   });
 
   it("never exceeds the daily max under concurrent requests", async () => {

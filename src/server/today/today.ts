@@ -9,6 +9,7 @@ import {
   quotaTimeZone,
 } from "@/modules/quota-manager/quota-store";
 import { first } from "@/lib/first";
+import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { and, desc, eq, isNull } from "drizzle-orm";
 
 async function getTodayActiveSession(): Promise<TodayActiveSession | null> {
@@ -28,7 +29,12 @@ async function getTodayActiveSession(): Promise<TodayActiveSession | null> {
 
   if (rows.length === 0) return null;
   const row = first(rows, `active session for ${today}`);
-  return { id: row.id, prompt: row.promptText, meta: null, draft: null };
+  return {
+    id: row.id,
+    prompt: row.promptText,
+    promptMeta: parseStoredPromptMeta(row.promptMetaJson),
+    draft: null,
+  };
 }
 
 export async function buildTodayResponse(): Promise<TodayGetDto> {
