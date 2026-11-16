@@ -46,6 +46,8 @@
 
 [PR #60](https://github.com/logandelafosse/french-writing-prompter/pull/60) exceeded 500 prod lines. Deliver as **[PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61) T14a** (API) then **T14b** (Home UI).
 
+- Tooling: **TOOL-PR62-*** in `docs/agents/tooling-review.md` §15 (PR #62 review; non-blocking).
+
 ## Out of scope
 
 - PromptSheet, meta line, generate busy label, fade-up (T15).

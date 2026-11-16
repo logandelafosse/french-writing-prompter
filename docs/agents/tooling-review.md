@@ -993,3 +993,18 @@ Not in T13c scope; file as separate tooling tickets when convenient.
 | TOOL-PR57-2 | `no-display-contents`        | `sm:contents` on header row wrappers                             |
 | TOOL-PR57-3 | `no-effect-writes-own-dep`   | `syncFromShell` + `setData` retriggers effect                    |
 | TOOL-PR57-4 | `level-get-needs-generation` | implement `levelFetchGen` (TOOLS-PR54-9 product fix → **T13f**)  |
+
+### Backlog from PR #62 tooling review (2026-11-15)
+
+Non-blocking for T14b merge; prioritize before T15+ Home work.
+
+| ID (draft)  | Rule / change                                                              | Notes                                                            |
+| ----------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| TOOL-PR62-1 | `no-arbitrary-tailwind-bracket` + HANDOFF Home typography ratchet          | `text-[26px]` etc. vs `text-wordmark-sm`; extend `theme.test.ts` |
+| TOOL-PR62-2 | Quota & placement counts in copy (`DAILY_PROMPT_QUOTA`, `PLACEMENT_STEPS`) | `(3 consignes)` / `sur 3` literals in `src/copy` and e2e         |
+| TOOL-PR62-3 | `ui-copy-single-source` (ast-grep)                                         | `Chargement…`, placement header label → `src/copy`               |
+| TOOL-PR62-4 | `no-redesign-legacy-import` from `home/` / `app/`                          | `EvaluationCard` bridge until T16/T21                            |
+| TOOL-PR62-5 | Land `no-mocking-own-modules` + refactor `home-page.test`                  | See TOOL-PR52-5                                                  |
+| TOOL-PR62-6 | `allowDefaultProject` production denylist test in `eslint-config.test.ts`  | Regress allowlist on real `src/components/*`                     |
+| TOOL-PR62-7 | E2e hygiene bundle (fold TOOL-PR54-4/5/6)                                  | CEFR count + quota constants + viewport fixtures                 |
+| T14b-tests  | Error-state clears on retry (product)                                      | AGENTS.md UI state; optional Vitest, not new lint                |
