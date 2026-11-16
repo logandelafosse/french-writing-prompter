@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { ErrorEnvelope } from "@/contracts/errors";
-import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { getQuotaState } from "@/modules/quota-manager/quota-store";
 import { readResponseJson } from "@/test/read-response-json";
 import { POST } from "./route";
@@ -14,7 +14,7 @@ describe(
     beforeEach(async () => {
       vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
       await db.delete(sessions).execute();
-      await setTrackerLevel("B1", "manual");
+      await setLevel("B1", "manual");
     });
 
     afterEach(() => {

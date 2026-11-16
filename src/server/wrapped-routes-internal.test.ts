@@ -5,7 +5,8 @@ import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { readResponseJson } from "@/test/read-response-json";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
-import * as cefrStore from "@/modules/cefr-tracker/db-store";
+import * as levelService from "@/modules/cefr-tracker/level-store";
+import { setLevel } from "@/modules/cefr-tracker/level-store";
 import * as historyStore from "@/modules/history-store/history-store";
 import * as quotaStore from "@/modules/quota-manager/quota-store";
 import * as todayServer from "@/server/today/today";
@@ -45,7 +46,7 @@ describe("wrapped API routes return INTERNAL JSON on unexpected errors", () => {
       "INTERNAL",
     );
 
-    vi.spyOn(cefrStore, "getCurrentLevel").mockRejectedValueOnce(
+    vi.spyOn(levelService, "getCurrentLevel").mockRejectedValueOnce(
       new Error("boom"),
     );
     response = await getLevel();
@@ -64,7 +65,7 @@ describe("wrapped API routes return INTERNAL JSON on unexpected errors", () => {
     );
 
     vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
-    vi.spyOn(cefrStore, "getCurrentLevel").mockResolvedValueOnce("B1");
+    vi.spyOn(levelService, "getCurrentLevel").mockResolvedValueOnce("B1");
     vi.spyOn(quotaStore, "assertQuotaAvailable").mockRejectedValueOnce(
       new Error("boom"),
     );
@@ -77,6 +78,7 @@ describe("wrapped API routes return INTERNAL JSON on unexpected errors", () => {
     );
     vi.useRealTimers();
 
+    await setLevel("B1", "manual");
     const session = await saveSession({
       promptText: "Consigne",
       promptConstraints: JSON.stringify({

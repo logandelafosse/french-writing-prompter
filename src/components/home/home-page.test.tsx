@@ -119,6 +119,7 @@ describe("HomePage first-run generate", () => {
         return Promise.resolve(
           jsonResponse({
             change: {
+              id: 1,
               fromLevel: null,
               toLevel: "B1",
               source: "manual",
@@ -202,6 +203,7 @@ describe("HomePage first-run generate", () => {
         return Promise.resolve(
           jsonResponse({
             change: {
+              id: 1,
               fromLevel: null,
               toLevel: "B1",
               source: "manual",

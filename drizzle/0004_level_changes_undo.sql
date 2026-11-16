@@ -1,0 +1,1 @@
+ALTER TABLE `level_changes` ADD COLUMN `reverts_change_id` integer;

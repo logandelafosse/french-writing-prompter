@@ -6,11 +6,14 @@ import { PromptMeta } from "./prompt-meta";
 import { SessionView } from "./session";
 
 export const LevelChangeDto = z.object({
+  id: z.number().int().positive(),
   fromLevel: CefrLevel.nullable(),
   toLevel: CefrLevel,
   source: LevelSource,
   createdAt: z.string(),
+  revertsChangeId: z.number().int().positive().optional(),
 });
+export type LevelChangeDto = z.infer<typeof LevelChangeDto>;
 
 export const LevelPutBody = z.strictObject({
   level: CefrLevel,
@@ -19,7 +22,19 @@ export const LevelPutBody = z.strictObject({
 export const LevelGetResponse = z.strictObject({
   level: CefrLevel.nullable(),
   history: z.array(LevelChangeDto),
+  streak: z.number().int().nonnegative(),
 });
+
+export const LevelUndoBody = z.strictObject({
+  changeId: z.number().int().positive(),
+});
+
+export const LevelUndoResponse = z.strictObject({
+  change: LevelChangeDto,
+});
+export type LevelUndoResponse = z.infer<typeof LevelUndoResponse>;
+
+export type LevelGetDto = z.infer<typeof LevelGetResponse>;
 
 export const LevelPutResponse = z.strictObject({
   change: LevelChangeDto,

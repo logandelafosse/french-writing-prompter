@@ -5,7 +5,7 @@ export const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"] as const;
 export const CefrLevel = z.enum(CEFR_LEVELS);
 export type CefrLevel = z.infer<typeof CefrLevel>;
 
-export const LevelSource = z.enum(["auto", "manual"]);
+export const LevelSource = z.enum(["auto", "manual", "placement", "undo"]);
 export type LevelSource = z.infer<typeof LevelSource>;
 
 export const CEFR_ORDER: Record<CefrLevel, number> = Object.fromEntries(

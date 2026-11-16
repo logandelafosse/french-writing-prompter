@@ -49,7 +49,9 @@ export class FakeAiClient {
         ? generatorFixture
         : this.scenario === "malformed"
           ? "evaluation.invalid.json"
-          : "evaluation.valid.json";
+          : this.scenario === "advance"
+            ? "evaluation.b2.json"
+            : "evaluation.valid.json";
     const text = readFixtureText(fixtureName);
     const result = parseJson(schema, text);
     if (result.ok) {

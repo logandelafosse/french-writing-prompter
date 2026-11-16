@@ -2,19 +2,15 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { LevelBadge, LevelSelector, type CefrLevel } from "./level-components";
-import { LevelGetResponse, LevelPutResponse } from "@/contracts/api";
+import {
+  LevelGetResponse,
+  LevelPutResponse,
+  type LevelGetDto,
+} from "@/contracts/api";
 import { useHeaderShell } from "@/components/shell/header-shell";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 
-type LevelData = {
-  level: CefrLevel | null;
-  history: Array<{
-    fromLevel: CefrLevel | null;
-    toLevel: CefrLevel;
-    source: "auto" | "manual";
-    createdAt: string;
-  }>;
-};
+type LevelData = LevelGetDto;
 
 const LOAD_ERROR = "An error occurred. Please try again.";
 
@@ -90,6 +86,7 @@ export function LevelCard() {
     }
     setData((prev) => ({
       level,
+      streak: 0,
       history: prev
         ? [result.value.change, ...prev.history]
         : [result.value.change],

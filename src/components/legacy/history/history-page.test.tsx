@@ -67,9 +67,12 @@ describe("HistoryPage", () => {
         }
         if (url.endsWith("/api/level")) {
           return Promise.resolve(
-            new Response(JSON.stringify({ level: null, history: [] }), {
-              status: 200,
-            }),
+            new Response(
+              JSON.stringify({ level: null, history: [], streak: 0 }),
+              {
+                status: 200,
+              },
+            ),
           );
         }
         return Promise.reject(new Error(`unexpected fetch ${url}`));
