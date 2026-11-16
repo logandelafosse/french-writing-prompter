@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T16 + T13g dispatched).
+Last updated: 2026-11-16 by coordinator (T13g merged PR #64).
 
 ## Ready
 
@@ -14,16 +14,13 @@ Last updated: 2026-11-15 by coordinator (T16 + T13g dispatched).
 
 ## In progress
 
-| ID   | Ticket                                                                                                                              | Why                                                         |
-| ---- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| T13g | Wordmark 44px touch ([#59](https://github.com/logandelafosse/french-writing-prompter/issues/59))                                    | Branch `ticket/t13g-wordmark-touch`.                        |
-| T16  | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | Branch `ticket/t16-writing-surface`; critical path Phase 1. |
+| ID  | Ticket                                                                                                                              | Why                                                         |
+| --- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| T16 | Writing surface: ruled textarea, word meter, shortcuts ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | Branch `ticket/t16-writing-surface`; critical path Phase 1. |
 
 ## In review
 
-| ID   | Ticket                                                                                           | Why                                                                                             |
-| ---- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| T13g | Wordmark 44px touch ([#59](https://github.com/logandelafosse/french-writing-prompter/issues/59)) | [PR #64](https://github.com/logandelafosse/french-writing-prompter/pull/64); touch target only. |
+_None._
 
 ## Blocked
 
@@ -55,7 +52,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T13d | T13c e2e acceptance hardening                                       | AFK  | T13c       | **Backlog** — [#55](https://github.com/logandelafosse/french-writing-prompter/issues/55); PR #54 test gaps; does not block T14.                                                   |
 | T13e | Mobile header rows + level card sync                                | AFK  | T13c       | **Done** — [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57); mobile OK; **T13f** for stale level GET.                                                  |
 | T13f | Level card vs stale GET /api/level                                  | AFK  | T13e       | **Backlog** — [#58](https://github.com/logandelafosse/french-writing-prompter/issues/58).                                                                                         |
-| T13g | Wordmark 44px touch target                                          | AFK  | T13e       | **In review** — [PR #64](https://github.com/logandelafosse/french-writing-prompter/pull/64).                                                                                      |
+| T13g | Wordmark 44px touch target                                          | AFK  | T13e       | **Done** — merged [PR #64](https://github.com/logandelafosse/french-writing-prompter/pull/64) 2026-11-16.                                                                         |
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **Done** — [PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61) + [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62); closed #60. |
 | T14a | `GET /api/today` + phase resolver                                   | AFK  | —          | **Done** — merged [PR #61](https://github.com/logandelafosse/french-writing-prompter/pull/61).                                                                                    |
 | T14b | Home phases UI + placement                                          | AFK  | T14a       | **Done** — merged [PR #62](https://github.com/logandelafosse/french-writing-prompter/pull/62).                                                                                    |
