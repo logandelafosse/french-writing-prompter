@@ -7,6 +7,7 @@ import {
 import type { z } from "zod";
 import { AI_MODEL } from "@/config/ai";
 import { emptyDlfIndex, type DlfIndex } from "@/modules/dlf/lookup";
+import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import { buildEvaluatorPrompt } from "./build-evaluator-prompt";
 
 export type { Evaluation } from "@/contracts/evaluation";
@@ -32,6 +33,7 @@ export class WritingEvaluator {
     writing: string,
     prompt: WritingPrompt,
     dialect: FrenchDialect,
+    dialectNotes: readonly LearnerDialectNote[] = [],
   ): Promise<EvaluatorOutput> {
     const built = buildEvaluatorPrompt({
       writing,
@@ -39,6 +41,7 @@ export class WritingEvaluator {
       registre: prompt.meta?.registre ?? null,
       dialect,
       dlfCards: this.dlf.cardsForText(writing),
+      dialectNotes,
     });
 
     return this.openai.chatCompletionJSON(

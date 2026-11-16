@@ -3,6 +3,8 @@ import type { Registre } from "@/contracts/prompt-meta";
 import { MISTAKE_CATEGORY_IDS } from "@/contracts/mistake-category";
 import { EVALUATION_SCORE_MAX } from "@/config/limits";
 import { renderForEvaluator } from "@/modules/dialect/render";
+import { renderActiveLearnerNotes } from "@/modules/dialect/learner-notes";
+import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import { formatDlfHintSection, type DlfHintCard } from "@/modules/dlf/lookup";
 import { EVALUATOR_PROMPT_VERSION } from "./post-process";
 
@@ -12,11 +14,14 @@ export type EvaluatorPromptInput = {
   registre: Registre | null;
   dialect: FrenchDialect;
   dlfCards?: DlfHintCard[];
+  dialectNotes?: readonly LearnerDialectNote[];
 };
 
 const TEMPLATE = `Tu es un tuteur de français louisianais. Écris toutes tes explications, questions, résumé et conseils en français. Le français louisianais est préféré. Le français standard est acceptable. Ne réponds jamais en anglais.
 
 {{dialect}}
+
+{{notes}}
 
 {{registre}}
 
@@ -50,6 +55,7 @@ export function buildEvaluatorPrompt(input: EvaluatorPromptInput): {
     "{{dialect}}",
     renderForEvaluator(input.dialect),
   )
+    .replace("{{notes}}", renderActiveLearnerNotes(input.dialectNotes ?? []))
     .replace("{{registre}}", registre)
     .replace(
       "{{categories}}",

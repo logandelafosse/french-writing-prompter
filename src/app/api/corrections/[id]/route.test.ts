@@ -101,4 +101,30 @@ describe("PATCH /api/corrections/:id", () => {
     const conflict = await readResponseJson(forbidden, ErrorEnvelope);
     expect(conflict.error.code).toBe("CONFLICT");
   });
+
+  it("reject_dialect turns an open dialect_check into confirmed_mistake", async () => {
+    const session = await seedSession();
+    const check = Correction.parse({
+      ...mistake(session.id, "c-check"),
+      kind: "dialect_check",
+      question: "Ça se dit ?",
+    });
+    await saveCorrections([check], () => new Date());
+
+    const response = await patch("c-check", "reject_dialect");
+    expect(response.status).toBe(200);
+    const body = await readResponseJson(response, CorrectionPatchResponse);
+    expect(body.correction.status).toBe("confirmed_mistake");
+    expect(body.correction.kind).toBe("dialect_check");
+  });
+
+  it("returns 409 when reject_dialect is applied to a mistake", async () => {
+    const session = await seedSession();
+    await saveCorrections([mistake(session.id)], () => new Date());
+
+    const response = await patch("c-open", "reject_dialect");
+    expect(response.status).toBe(409);
+    const conflict = await readResponseJson(response, ErrorEnvelope);
+    expect(conflict.error.code).toBe("CONFLICT");
+  });
 });

@@ -57,9 +57,28 @@ export const corrections = sqliteTable(
     dialectNoteId: integer("dialect_note_id"),
     createdAt: text("created_at").notNull(),
     resolvedAt: text("resolved_at"),
+    contextQuote: text("context_quote"),
+    dialectExample: text("dialect_example"),
+    dialectLemma: text("dialect_lemma"),
+    dialectPattern: text("dialect_pattern"),
   },
   (t) => [
     index("corrections_session_idx").on(t.sessionId),
     index("corrections_cat_idx").on(t.category, t.kind, t.status),
   ],
 );
+
+export const dialectNotes = sqliteTable("dialect_notes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  rule: text("rule").notNull(),
+  example: text("example"),
+  scope: text("scope").notNull(),
+  form: text("form").notNull(),
+  learnerForm: text("learner_form"),
+  tutorSuggestion: text("tutor_suggestion"),
+  sourceSessionId: integer("source_session_id"),
+  sourceCorrectionId: text("source_correction_id"),
+  createdAt: text("created_at").notNull(),
+  updatedAt: text("updated_at").notNull(),
+  deletedAt: text("deleted_at"),
+});

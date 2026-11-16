@@ -167,4 +167,42 @@ describe("WritingEvaluator", () => {
     });
     expect(built.system).toContain(cards[0]?.headword);
   });
+
+  it("lists active notes and omits deleted notes", () => {
+    const built = buildEvaluatorPrompt({
+      writing: "On a pris une barbotte.",
+      promptText: "Consigne.",
+      registre: "familier",
+      dialect: DEFAULT_DIALECT,
+      dialectNotes: [
+        {
+          scope: "word",
+          form: "barbotte",
+          learnerForm: "barbotte",
+          rule: "On dit barbotte.",
+          deletedAt: null,
+        },
+        {
+          scope: "pattern",
+          form: "avoir-mouvement",
+          learnerForm: null,
+          rule: "Avoir avec les verbes de mouvement.",
+          deletedAt: null,
+        },
+        {
+          scope: "word",
+          form: "icitte",
+          learnerForm: "icitte",
+          rule: "On dit icitte.",
+          deletedAt: "2026-11-01T00:00:00.000Z",
+        },
+      ],
+    });
+    expect(built.system).toContain(
+      "Formes confirmées par l'apprenant — ne les signale JAMAIS",
+    );
+    expect(built.system).toContain("barbotte");
+    expect(built.system).toContain("Avoir avec les verbes de mouvement.");
+    expect(built.system).not.toContain("icitte");
+  });
 });

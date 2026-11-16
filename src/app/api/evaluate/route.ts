@@ -20,6 +20,7 @@ import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { postProcessEvaluation } from "@/modules/writing-evaluator/post-process";
+import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
 import { getDlfIndex } from "@/modules/dlf/load";
 import { DRAFT_TEXT_MAX } from "@/config/limits";
 
@@ -93,12 +94,14 @@ export const POST = withErrors(async function postEvaluate(request: Request) {
       };
 
   const promptMeta = parseStoredPromptMeta(session.promptMetaJson);
+  const dialectNotes = await listActiveNotes();
   const raw = await evaluator.evaluate(
     text,
     promptMeta
       ? { text: session.promptText, meta: promptMeta, constraints }
       : { text: session.promptText, constraints },
     DEFAULT_DIALECT,
+    dialectNotes,
   );
   const now = new Date();
   const processed = postProcessEvaluation(raw, {
@@ -107,6 +110,7 @@ export const POST = withErrors(async function postEvaluate(request: Request) {
     now: () => now,
     createId: () => crypto.randomUUID(),
     lookupDlf: (word) => dlf.lookup(word),
+    dialectNotes,
   });
 
   await saveSession({
