@@ -4,13 +4,13 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T26 done; T27 ready).
+Last updated: 2026-11-16 by coordinator (T27 done; T28 ready).
 
 ## Ready
 
-| ID  | Ticket                        | Why                                                                                                                                       |
-| --- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| T27 | Dialect Notes markdown export | T26 merged [PR #79](https://github.com/logandelafosse/french-writing-prompter/pull/79) `f112ee2`; `T27-dialect-notes-markdown-export.md`. |
+| ID  | Ticket                                    | Why                                                                |
+| --- | ----------------------------------------- | ------------------------------------------------------------------ |
+| T28 | Weakness memory and Carnet "À travailler" | T22 + T26 done; spec `T28-weakness-memory-carnet-a-travailler.md`. |
 
 ## In progress
 
@@ -73,13 +73,14 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T24 | DLF lexicon, grader context, and attribution     | AFK  | T23        | **Done** — merged [PR #76](https://github.com/logandelafosse/french-writing-prompter/pull/76) `88907ea`; fix `4a589f0`; closed #26; TOOL-PR76-* backlog.                                    |
 | T25 | Dialect checks, pushback, Add Dialect Note sheet | AFK  | T22        | **Done** — T25a [PR #77](https://github.com/logandelafosse/french-writing-prompter/pull/77) + T25b [PR #78](https://github.com/logandelafosse/french-writing-prompter/pull/78); closed #27. |
 | T26 | Carnet page with Dialect Notes list              | AFK  | T25        | **Done** — merged [PR #79](https://github.com/logandelafosse/french-writing-prompter/pull/79) `f112ee2`; e2e fix `a55d444`; closed #28.                                                     |
-| T27 | Dialect Notes markdown export                    | AFK  | T26        | **Ready** — on board Ready column.                                                                                                                                                          |
+| T27 | Dialect Notes markdown export                    | AFK  | T26        | **Done** — merged [PR #80](https://github.com/logandelafosse/french-writing-prompter/pull/80) `40fc315`; fix `48751ca`; closed #29; TOOL-PR80-* backlog.                                    |
+| T28 | Weakness memory and Carnet "À travailler"        | AFK  | T22, T26   | **Ready** — on board Ready column.                                                                                                                                                          |
 
 ### Phase 3 — Memory
 
 | ID  | Ticket                                        | Type | Blocked by | Why not ready                                                                                                           |
 | --- | --------------------------------------------- | ---- | ---------- | ----------------------------------------------------------------------------------------------------------------------- |
-| T28 | Weakness memory and Carnet "À travailler"     | AFK  | T22, T26   | Needs Mistakes and the Carnet page                                                                                      |
+| T28 | Weakness memory and Carnet "À travailler"     | AFK  | T22, T26   | **Ready** — on board Ready column.                                                                                      |
 | T29 | Focus du jour driving prompts; "Pratiquer ça" | AFK  | T15, T28   | Needs Weaknesses and generator v2. ~420 lines: split into T29a (Focus) / T29b (Pratiquer ça) is pre-approved, see spec. |
 | T30 | Resource catalog and links                    | AFK  | T28        | Needs Weakness categories. Q7: general French starter catalog; LA CI later.                                             |
 
@@ -137,3 +138,5 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T25a | Dialect checks server slice (parent [#27](https://github.com/logandelafosse/french-writing-prompter/issues/27))                                  | Merged [PR #77](https://github.com/logandelafosse/french-writing-prompter/pull/77) `11b559b` 2026-11-16; `pr:size` 409; fixes `334ac23`; TOOL-PR77-* backlog.                                                                                                                                            |
 | T25b | Dialect checks review UI (parent [#27](https://github.com/logandelafosse/french-writing-prompter/issues/27))                                     | Merged [PR #78](https://github.com/logandelafosse/french-writing-prompter/pull/78) `9e4fa9a` 2026-11-16; `pr:size` 495 after fixes `d66ed56`; evidence `docs/evidence/27/`; TOOL-PR78-* backlog. Closed #27. T26 ready.                                                                                  |
 | T25  | Dialect checks, pushback, Add Dialect Note sheet (parent [#27](https://github.com/logandelafosse/french-writing-prompter/issues/27))             | Parent done via T25a + T25b; closed #27 2026-11-16.                                                                                                                                                                                                                                                      |
+| T26  | Carnet page with Dialect Notes list ([#28](https://github.com/logandelafosse/french-writing-prompter/issues/28))                                 | Merged [PR #79](https://github.com/logandelafosse/french-writing-prompter/pull/79) `f112ee2`; evidence `docs/evidence/28/`; closed #28. T27 ready.                                                                                                                                                       |
+| T27  | Dialect Notes markdown export ([#29](https://github.com/logandelafosse/french-writing-prompter/issues/29))                                       | Merged [PR #80](https://github.com/logandelafosse/french-writing-prompter/pull/80) `40fc315`; fix `48751ca`; `pr:size` 148; TOOL-PR80-* backlog. Closed #29. T28 ready.                                                                                                                                  |
