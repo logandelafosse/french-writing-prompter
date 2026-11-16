@@ -4,13 +4,13 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T19 PR #68 in review).
+Last updated: 2026-11-16 by coordinator (T19 merged `8206cb8`).
 
 ## Ready
 
-| ID  | Ticket                                                                                                                                  | Why                       |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| T20 | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22)) | Held while T19 in review. |
+| ID  | Ticket                                                                                                                                  | Why                            |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| T20 | Level service with durable streak and undoable advancement ([#22](https://github.com/logandelafosse/french-writing-prompter/issues/22)) | T19 done; next Phase 1 ticket. |
 
 ## In progress
 
@@ -18,9 +18,7 @@ _None._
 
 ## In review
 
-| ID  | Ticket                                                                                                | Why                                                                                                                                                       |
-| --- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T19 | Error and offline states ([#21](https://github.com/logandelafosse/french-writing-prompter/issues/21)) | [PR #68](https://github.com/logandelafosse/french-writing-prompter/pull/68); adversarial + test + tooling; evidence `docs/evidence/21/`; ~462 prod lines. |
+_None._
 
 ## Blocked
 
@@ -60,8 +58,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | **Done** — merged [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65) 2026-11-16; TOOL-PR65-* backlog.                                                    |
 | T17  | Session lifecycle and draft autosave                                | AFK  | T16        | **Done** — merged [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66) 2026-11-16; TOOL-PR66-* backlog.                                                    |
 | T18  | Quota exhausted, swap confirm, session statuses                     | AFK  | T17        | **Done** — merged [PR #67](https://github.com/logandelafosse/french-writing-prompter/pull/67) 2026-11-16; TOOL-PR67-* backlog; evidence `docs/evidence/20/`.                      |
-| T19  | Error and offline states                                            | AFK  | T17        | **In review** — [PR #68](https://github.com/logandelafosse/french-writing-prompter/pull/68).                                                                                      |
-| T20  | Level service with durable streak and undoable advancement          | AFK  | T14        | **Ready** — held while T19 in flight.                                                                                                                                             |
+| T19  | Error and offline states                                            | AFK  | T17        | **Done** — [PR #68](https://github.com/logandelafosse/french-writing-prompter/pull/68) `8206cb8`; evidence `docs/evidence/21/`; TOOL-PR68-* backlog.                              |
+| T20  | Level service with durable streak and undoable advancement          | AFK  | T14        | **Ready** — dispatch next.                                                                                                                                                        |
 | T21  | Evaluator v2: Corrections, quote location, French output            | AFK  | T06, T17   | Needs dialect module and sessions. Q4 answered: taxonomy §1.1 as-is. ~480 lines: if over, split out the corrections table + stored-evaluation parser first.                       |
 | T22  | Review screen: marked text, Mistake cards, Scores                   | AFK  | T16, T21   | Needs Corrections. Q5 answered: CECR chips + hover Pour monter. ~500 lines: split into T22a / T22b is pre-approved, see spec.                                                     |
 
@@ -125,3 +123,4 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels ([#18](https://github.com/logandelafosse/french-writing-prompter/issues/18)) | Merged [PR #65](https://github.com/logandelafosse/french-writing-prompter/pull/65) 2026-11-16; evidence `docs/evidence/18/`; TOOL-PR65-* backlog.                                                                                                                          |
 | T17  | Session lifecycle and draft autosave ([#19](https://github.com/logandelafosse/french-writing-prompter/issues/19))                                | Merged [PR #66](https://github.com/logandelafosse/french-writing-prompter/pull/66) 2026-11-16; evidence `docs/evidence/19/`; TOOL-PR66-* backlog.                                                                                                                          |
 | T18  | Quota exhausted, swap confirm, session statuses ([#20](https://github.com/logandelafosse/french-writing-prompter/issues/20))                     | Merged [PR #67](https://github.com/logandelafosse/french-writing-prompter/pull/67) 2026-11-16; evidence `docs/evidence/20/`; adversarial race fix post-review; TOOL-PR67-* backlog.                                                                                        |
+| T19  | Error and offline states ([#21](https://github.com/logandelafosse/french-writing-prompter/issues/21))                                            | Merged [PR #68](https://github.com/logandelafosse/french-writing-prompter/pull/68) 2026-11-16; evidence `docs/evidence/21/`; SSR offline + scoped `loadingTimeout`; TOOL-PR68-* backlog.                                                                                   |
