@@ -1013,14 +1013,14 @@ Non-blocking for T14b merge; prioritize before T15+ Home work.
 
 Non-blocking for T15 merge; prioritize before T16+ writing surface. Full table: [T15 tooling review PR63](410db1e9-fbdb-4fff-af2c-e08e9cfe0a33).
 
-| ID (draft)  | Rule / change                                                     | Notes                                                |
-| ----------- | ----------------------------------------------------------------- | ---------------------------------------------------- |
-| TOOL-PR63-1 | Extend `word-target-single-source` + e2e                          | `250–300 mots` in `prompt-sheet.spec.ts`             |
-| TOOL-PR63-2 | `generator-text-bounds-single-source`                             | 150/1500 in schema + system prompt                   |
-| TOOL-PR63-3 | `registre-enum-single-source`                                     | `mixte` vs `mixt`                                    |
-| TOOL-PR63-4 | `no-arbitrary-tailwind-bracket`                                   | `min-h-[54px]` (extends TOOL-PR62-1)                 |
-| TOOL-PR63-5 | E2e geometry + style probes (TOOL-PR57-1)                         | `boundingBox`, opacity CSS                           |
-| TOOL-PR63-7 | `fake-ai-client-no-db`                                            | swap fixture via session count                       |
-| TOOL-PR63-8 | `ai-fixture-schema-ratchet`                                       | fixture test filter split                            |
-| TOOL-PR63-9 | ESLint `no-magic-numbers` on contracts (TOOL-8)                   | 150, 1500, quota in tests                            |
-| TOOL-PR63-15| Quota literals in tests (fold TOOL-PR62-2, TOOL-PR54-6)           | `DAILY_PROMPT_QUOTA` in tests                        |
+| ID (draft)   | Rule / change                                           | Notes                                    |
+| ------------ | ------------------------------------------------------- | ---------------------------------------- |
+| TOOL-PR63-1  | Extend `word-target-single-source` + e2e                | `250–300 mots` in `prompt-sheet.spec.ts` |
+| TOOL-PR63-2  | `generator-text-bounds-single-source`                   | 150/1500 in schema + system prompt       |
+| TOOL-PR63-3  | `registre-enum-single-source`                           | `mixte` vs `mixt`                        |
+| TOOL-PR63-4  | `no-arbitrary-tailwind-bracket`                         | `min-h-[54px]` (extends TOOL-PR62-1)     |
+| TOOL-PR63-5  | E2e geometry + style probes (TOOL-PR57-1)               | `boundingBox`, opacity CSS               |
+| TOOL-PR63-7  | `fake-ai-client-no-db`                                  | swap fixture via session count           |
+| TOOL-PR63-8  | `ai-fixture-schema-ratchet`                             | fixture test filter split                |
+| TOOL-PR63-9  | ESLint `no-magic-numbers` on contracts (TOOL-8)         | 150, 1500, quota in tests                |
+| TOOL-PR63-15 | Quota literals in tests (fold TOOL-PR62-2, TOOL-PR54-6) | `DAILY_PROMPT_QUOTA` in tests            |
