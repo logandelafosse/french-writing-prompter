@@ -17,6 +17,9 @@ import { countWords } from "@/lib/count-words";
 import { parseRequestBody } from "@/lib/http";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { PromptPostBody } from "@/contracts/api";
+import type { z } from "zod";
+
+type PromptPostBodyValue = z.infer<typeof PromptPostBody>;
 
 let quotaPromptChain = Promise.resolve();
 
@@ -57,6 +60,27 @@ async function todayActiveSessions() {
     .orderBy(desc(sessions.createdAt));
 }
 
+function draftAbandonBlocked(
+  activeRows: Awaited<ReturnType<typeof todayActiveSessions>>,
+  body: PromptPostBodyValue,
+): NextResponse | null {
+  const withWords = activeRows.filter(
+    (row) => countWords(row.writingText ?? "") > 0,
+  );
+  const draft =
+    withWords.find((row) => row.id === body.replaceSessionId) ?? withWords[0];
+  if (draft && body.confirmAbandon !== true) {
+    return NextResponse.json(
+      {
+        error: "DRAFT_WOULD_BE_ABANDONED" as const,
+        wordCount: countWords(draft.writingText ?? ""),
+      },
+      { status: 409 },
+    );
+  }
+  return null;
+}
+
 export async function POST(request: Request) {
   const level = await getCurrentLevel();
   if (!level) {
@@ -73,22 +97,9 @@ export async function POST(request: Request) {
 
   try {
     return await withQuotaPromptLock(async () => {
-      const activeRows = await todayActiveSessions();
-      const withWords = activeRows.filter(
-        (row) => countWords(row.writingText ?? "") > 0,
-      );
-      const draft =
-        withWords.find((row) => row.id === body.replaceSessionId) ??
-        withWords[0];
-      if (draft && body.confirmAbandon !== true) {
-        return NextResponse.json(
-          {
-            error: "DRAFT_WOULD_BE_ABANDONED" as const,
-            wordCount: countWords(draft.writingText ?? ""),
-          },
-          { status: 409 },
-        );
-      }
+      let activeRows = await todayActiveSessions();
+      let blocked = draftAbandonBlocked(activeRows, body);
+      if (blocked) return blocked;
 
       await assertQuotaAvailable();
 
@@ -112,6 +123,10 @@ export async function POST(request: Request) {
         );
       }
 
+      activeRows = await todayActiveSessions();
+      blocked = draftAbandonBlocked(activeRows, body);
+      if (blocked) return blocked;
+
       const now = new Date().toISOString();
       const localDate = localDateKey(new Date(now), quotaTimeZone());
       const activeIds = activeRows.map((row) => row.id);
@@ -121,7 +136,9 @@ export async function POST(request: Request) {
         await db
           .update(sessions)
           .set({ status: "abandoned", abandonedAt: now })
-          .where(inArray(sessions.id, activeIds));
+          .where(
+            and(inArray(sessions.id, activeIds), eq(sessions.status, "active")),
+          );
       }
 
       const inserted = await db.insert(sessions).values({

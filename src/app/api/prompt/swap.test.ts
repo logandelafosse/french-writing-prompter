@@ -10,9 +10,11 @@ import { SessionStatus } from "@/contracts/session";
 import { deriveDisplayStatus } from "@/lib/display-status";
 import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
 import { saveSession } from "@/modules/history-store/history-store";
+import { PromptGenerator } from "@/modules/prompt-generator/prompt-generator";
 import { getQuotaState } from "@/modules/quota-manager/quota-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { readResponseJson } from "@/test/read-response-json";
+import { getAiClient } from "@/server/ai-client";
 import { POST } from "./route";
 
 const today = "2026-11-14";
@@ -100,6 +102,65 @@ describe("POST /api/prompt swap", { concurrent: false }, () => {
       .from(sessions)
       .where(eq(sessions.id, body.session.id));
     expect(created[0]?.status).toBe("active");
+  });
+
+  it("returns 409 when the draft gains text during prompt generation", async () => {
+    const active = await seedActive(null);
+    const generate = PromptGenerator.prototype.generate;
+    const generateSpy = vi
+      .spyOn(PromptGenerator.prototype, "generate")
+      .mockImplementation(async (level, dialect) => {
+        await db
+          .update(sessions)
+          .set({ writingText: "un deux trois quatre" })
+          .where(eq(sessions.id, active.id));
+        return generate.call(
+          new PromptGenerator(getAiClient()),
+          level,
+          dialect,
+        );
+      });
+
+    const response = await POST(promptRequest({ replaceSessionId: active.id }));
+
+    expect(response.status).toBe(409);
+    const rows = await db.select().from(sessions);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.status).toBe("active");
+    expect(rows[0]?.id).toBe(active.id);
+    generateSpy.mockRestore();
+  });
+
+  it("does not abandon a session that became evaluated during generation", async () => {
+    const active = await seedActive(null);
+    const generate = PromptGenerator.prototype.generate;
+    const generateSpy = vi
+      .spyOn(PromptGenerator.prototype, "generate")
+      .mockImplementation(async (level, dialect) => {
+        await db
+          .update(sessions)
+          .set({
+            status: "evaluated",
+            evaluationJson: JSON.stringify({ score: 5 }),
+            cefrLevel: "B1",
+          })
+          .where(eq(sessions.id, active.id));
+        return generate.call(
+          new PromptGenerator(getAiClient()),
+          level,
+          dialect,
+        );
+      });
+
+    const response = await POST(promptRequest());
+
+    expect(response.status).toBe(200);
+    const rows = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, active.id));
+    expect(rows[0]?.status).toBe("evaluated");
+    generateSpy.mockRestore();
   });
 
   it("abandons an empty prompt without confirmation", async () => {
