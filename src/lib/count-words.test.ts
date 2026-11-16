@@ -6,5 +6,7 @@ describe("countWords", () => {
     expect(countWords("l'école")).toBe(1);
     expect(countWords("bien-aimé")).toBe(1);
     expect(countWords("a  b\tc")).toBe(3);
+    expect(countWords("a\n\nb")).toBe(2);
+    expect(countWords(" \n\t ")).toBe(0);
   });
 });
