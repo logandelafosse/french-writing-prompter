@@ -23,7 +23,9 @@ describe("AppHeader full variant mobile rows", () => {
     );
 
     const header = within(screen.getByRole("banner"));
-    expect(header.getByRole("link", { name: /^Consigne/ })).toBeInTheDocument();
+    const wordmark = header.getByRole("link", { name: /^Consigne/ });
+    expect(wordmark).toBeInTheDocument();
+    expect(wordmark).toHaveClass("min-h-touch");
     expect(
       header.getByRole("button", { name: "Niveau CECR B1, changer" }),
     ).toBeInTheDocument();
@@ -46,7 +48,9 @@ describe("AppHeader placement variant", () => {
       />,
     );
 
-    expect(screen.getByRole("link", { name: /Consigne/ })).toBeInTheDocument();
+    const wordmark = screen.getByRole("link", { name: /Consigne/ });
+    expect(wordmark).toBeInTheDocument();
+    expect(wordmark).toHaveClass("min-h-touch");
     expect(
       screen.getByRole("link", { name: "Je connais mon niveau" }),
     ).toBeInTheDocument();

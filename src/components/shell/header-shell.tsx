@@ -171,7 +171,7 @@ export function AppHeader({
       <header className="flex flex-wrap items-center justify-between gap-2 px-5 py-3.5 sm:px-10 sm:py-[18px]">
         <Link
           href="/"
-          className="text-wordmark-sm sm:text-wordmark text-ink font-bold tracking-[-0.03em] no-underline"
+          className="text-wordmark-sm sm:text-wordmark text-ink min-h-touch inline-flex items-center font-bold tracking-[-0.03em] no-underline"
         >
           <h1 className="font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
             {APP_WORDMARK}
@@ -195,7 +195,7 @@ export function AppHeader({
       <div className="min-h-touch flex items-center justify-between gap-3 sm:contents">
         <Link
           href="/"
-          className="text-wordmark-sm sm:text-wordmark text-ink inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-bold tracking-[-0.03em] no-underline"
+          className="text-wordmark-sm sm:text-wordmark text-ink min-h-touch inline-flex flex-wrap items-center gap-x-3 gap-y-0 font-bold tracking-[-0.03em] no-underline sm:items-baseline"
         >
           <h1 className="inline-flex flex-wrap items-baseline gap-x-3 gap-y-0 font-[inherit] text-[length:inherit] leading-[inherit] tracking-[inherit]">
             {APP_WORDMARK}
