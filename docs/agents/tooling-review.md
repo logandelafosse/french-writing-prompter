@@ -1444,3 +1444,19 @@ Non-blocking for T25a merge. Land **TOOL-PR77-1**–**77-4** before T25b.
 | TOOL-PR77-5 | `quote-normalize-single-source`           | Duplicate NFC/normalize beside `locate-quote`.                              |
 | TOOL-PR77-6 | `no-default-null-on-dialect-fields`       | Evaluator keys vs T25b pattern radio.                                       |
 | TOOL-PR77-7 | `correction-patch-action-single-source`   | Exhaustive switch on `CorrectionPatchAction`.                               |
+
+### PR #78 (T25b — dialect review UI)
+
+Non-blocking for T25b merge. Prioritize **TOOL-PR78-1** and **TOOL-PR78-2** before T26.
+
+| ID (draft)  | Rule / change                           | Notes                                                                |
+| ----------- | --------------------------------------- | -------------------------------------------------------------------- |
+| TOOL-PR78-1 | `async-ui-error-payload`                | In-sheet errors after `d66ed56`; ratchet bare `{ status: "error" }`. |
+| TOOL-PR78-2 | `no-raw-fetch-body`                     | Raw `JSON.stringify` on dialect-note and PATCH bodies.               |
+| TOOL-PR78-3 | `dialect-note-from-correction-response` | Optional `correction` on create response.                            |
+| TOOL-PR78-4 | `fake-ai-fixture-map`                   | Scenario + SQL fixture picking in fake AI client.                    |
+| TOOL-PR78-5 | `e2e-reset-table-coverage`              | `dialect_notes` DELETE in reset-db.                                  |
+| TOOL-PR78-6 | `review-copy-literal-ratchet`           | Hardcoded French in e2e/sheet tests.                                 |
+| TOOL-PR78-7 | `evaluator-fixture-directory-ratchet`   | New `ok-dialect-*.json` fixtures.                                    |
+| TOOL-PR78-8 | `dialog-close-uses-button`              | Native `Dialog.Close`.                                               |
+| TOOL-PR78-9 | `correction-card-actions-required`      | Optional action callbacks on cards.                                  |
