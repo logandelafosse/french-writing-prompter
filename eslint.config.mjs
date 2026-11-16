@@ -30,7 +30,7 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
         projectService: {
           allowDefaultProject: [
-            "src/components/home/*",
+            "src/components/home/__lint-fixtures__/*",
             "src/modules/lint-probe/*",
             "src/test/lint-fixtures/misc/*",
             "src/test/lint-fixtures/components/home/*",

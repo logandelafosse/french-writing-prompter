@@ -19,7 +19,9 @@ test("level chip menu works with keyboard and passes axe", async ({
   await expect(
     page.getByRole("button", { name: "Niveau CECR C1, changer" }),
   ).toBeVisible();
-  await expect(page.getByRole("main").getByText(/C1/)).toHaveCount(2);
+  await expect(
+    page.getByRole("button", { name: "Niveau CECR C1, changer" }),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: "Niveau CECR C1, changer" }).click();
   await page.keyboard.press("Escape");

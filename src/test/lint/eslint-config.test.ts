@@ -45,7 +45,7 @@ describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
   it("blocks @/db import from component layer", async () => {
     const messages = await lintFixtureAs(
       "src/test/lint-fixtures/components/home/db-import.tsx",
-      "src/components/home/db-import.tsx",
+      "src/components/home/__lint-fixtures__/db-import.tsx",
     );
     expect(ruleIds(messages)).toContain(
       "@typescript-eslint/no-restricted-imports",
@@ -93,7 +93,7 @@ describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
   it("fails no-misused-promises on async onClick", async () => {
     const messages = await lintFixtureAs(
       "src/test/lint-fixtures/components/home/async-onclick.tsx",
-      "src/components/home/async-onclick.tsx",
+      "src/components/home/__lint-fixtures__/async-onclick.tsx",
     );
     expect(ruleIds(messages)).toContain(
       "@typescript-eslint/no-misused-promises",
@@ -111,7 +111,7 @@ describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
   it("fails jsx-a11y on clickable div outside legacy", async () => {
     const messages = await lintFixtureAs(
       "src/test/lint-fixtures/components/home/clickable-div.tsx",
-      "src/components/home/clickable-div.tsx",
+      "src/components/home/__lint-fixtures__/clickable-div.tsx",
     );
     expect(ruleIds(messages).some((id) => id.startsWith("jsx-a11y/"))).toBe(
       true,
@@ -121,7 +121,7 @@ describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
   it("allows French apostrophe in JSX text", async () => {
     const messages = await lintFixtureAs(
       "src/test/lint-fixtures/components/home/french-apostrophe.tsx",
-      "src/components/home/french-apostrophe.tsx",
+      "src/components/home/__lint-fixtures__/french-apostrophe.tsx",
     );
     expect(ruleIds(messages)).not.toContain("react/no-unescaped-entities");
   });
@@ -145,7 +145,10 @@ describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
   it("configures react/no-unescaped-entities to forbid > in JSX text", async () => {
     const eslint = createEslint();
     const config = await eslint.calculateConfigForFile(
-      path.join(root, "src/components/home/jsx-greater-than.tsx"),
+      path.join(
+        root,
+        "src/components/home/__lint-fixtures__/jsx-greater-than.tsx",
+      ),
     );
     const rule = config.rules?.["react/no-unescaped-entities"];
     expect(rule?.[1]).toEqual({ forbid: [">", "}"] });

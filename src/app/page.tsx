@@ -1,5 +1,5 @@
-import { LegacyHome } from "@/components/legacy/legacy-home";
+import { HomePage } from "@/components/home/home-page";
 
 export default function Home() {
-  return <LegacyHome />;
+  return <HomePage />;
 }
