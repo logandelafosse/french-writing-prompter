@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { listNotesForMarkdown } from "../src/modules/dialect/dialect-notes-store";
 import { renderDialectMarkdown } from "../src/modules/dialect/export-markdown";
 import { LOUISIANA_RULES } from "../src/modules/dialect/louisiana-rules";
+import { quotaTimeZone } from "../src/modules/quota-manager/quota-store";
 
 const DEFAULT_OUTPUT_PATH = "docs/dialect/louisiana-french.md";
 
@@ -11,7 +12,11 @@ export async function exportDialectMarkdownToPath(
   outputPath: string,
 ): Promise<void> {
   const notes = await listNotesForMarkdown();
-  const markdown = renderDialectMarkdown(LOUISIANA_RULES, notes);
+  const markdown = renderDialectMarkdown(
+    LOUISIANA_RULES,
+    notes,
+    quotaTimeZone(),
+  );
   await mkdir(path.dirname(outputPath), { recursive: true });
   await writeFile(outputPath, markdown, "utf8");
 }

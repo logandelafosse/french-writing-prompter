@@ -6,6 +6,8 @@ import type { LouisianaRule } from "./louisiana-rules";
 const HEADER =
   "GÉNÉRÉ — modifier dans l'app (notes) ou dans src/modules/dialect/louisiana-rules.ts (règles de base)";
 
+const CHICAGO = "America/Chicago";
+
 const BASE_RULE: LouisianaRule = {
   id: "progressive",
   rule_fr: "Progressif : être après + infinitif.",
@@ -50,6 +52,7 @@ describe("renderDialectMarkdown", () => {
           form: "asteur",
         }),
       ],
+      CHICAGO,
     );
 
     expect(markdown.startsWith(HEADER)).toBe(true);
@@ -82,6 +85,7 @@ describe("renderDialectMarkdown", () => {
           deletedAt: "2026-11-16T19:00:00.000Z",
         }),
       ],
+      CHICAGO,
     );
 
     expect(markdown).toContain("Active note.");
@@ -93,11 +97,11 @@ describe("renderDialectMarkdown", () => {
     const b = note({ id: 1, scope: "word", rule: "Word A." });
     const c = note({ id: 2, scope: "word", rule: "Word B." });
 
-    const first = renderDialectMarkdown([BASE_RULE], [a, b, c]);
-    const second = renderDialectMarkdown([BASE_RULE], [c, a, b]);
+    const first = renderDialectMarkdown([BASE_RULE], [a, b, c], CHICAGO);
+    const second = renderDialectMarkdown([BASE_RULE], [c, a, b], CHICAGO);
 
     expect(first).toBe(second);
-    expect(renderDialectMarkdown([BASE_RULE], [a, b, c])).toBe(first);
+    expect(renderDialectMarkdown([BASE_RULE], [a, b, c], CHICAGO)).toBe(first);
   });
 
   it("omits the comparison line when learnerForm or tutorSuggestion is missing", () => {
@@ -112,6 +116,7 @@ describe("renderDialectMarkdown", () => {
           tutorSuggestion: "ici",
         }),
       ],
+      CHICAGO,
     );
     const manual = renderDialectMarkdown(
       [BASE_RULE],
@@ -124,10 +129,28 @@ describe("renderDialectMarkdown", () => {
           tutorSuggestion: null,
         }),
       ],
+      CHICAGO,
     );
 
     expect(withPair).toContain("icitte → ici");
     expect(manual).toContain("Manual note.");
     expect(manual).not.toContain("→");
+  });
+
+  it("renders the source date line in the given timezone", () => {
+    const createdAt = "2026-11-16T04:00:00.000Z";
+    const dated = note({
+      id: 1,
+      scope: "word",
+      rule: "Date line.",
+      createdAt,
+    });
+
+    const chicago = renderDialectMarkdown([BASE_RULE], [dated], CHICAGO);
+    const utc = renderDialectMarkdown([BASE_RULE], [dated], "UTC");
+
+    expect(chicago).toContain("2026-11-15");
+    expect(utc).toContain("2026-11-16");
+    expect(chicago).not.toContain("2026-11-16");
   });
 });

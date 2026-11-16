@@ -22,7 +22,7 @@ function renderRule(rule: LouisianaRule): string {
   return `### ${rule.id}\n\n${rule.rule_fr}\n\n${examples}`;
 }
 
-function renderNote(note: DialectMarkdownNote): string {
+function renderNote(note: DialectMarkdownNote, timeZone: string): string {
   const lines = [`### note-${note.id}`, "", note.rule];
   if (note.example !== null && note.example.length > 0) {
     lines.push("", `*${note.example}*`);
@@ -35,23 +35,25 @@ function renderNote(note: DialectMarkdownNote): string {
   ) {
     lines.push("", `${note.learnerForm} → ${note.tutorSuggestion}`);
   }
-  lines.push("", localDateKey(new Date(note.createdAt)));
+  lines.push("", localDateKey(new Date(note.createdAt), timeZone));
   return lines.join("\n");
 }
 
 function renderNoteSection(
   heading: string,
   notes: readonly DialectMarkdownNote[],
+  timeZone: string,
 ): string {
   if (notes.length === 0) {
     return `## ${heading}`;
   }
-  return `## ${heading}\n\n${notes.map(renderNote).join("\n\n")}`;
+  return `## ${heading}\n\n${notes.map((item) => renderNote(item, timeZone)).join("\n\n")}`;
 }
 
 export function renderDialectMarkdown(
   baseRules: readonly LouisianaRule[],
   notes: readonly DialectMarkdownNote[],
+  timeZone: string,
 ): string {
   const active = notes
     .filter((note) => note.deletedAt === null)
@@ -74,9 +76,9 @@ export function renderDialectMarkdown(
     "",
     vocab,
     "",
-    renderNoteSection(WORD_SCOPE_HEADING, wordNotes),
+    renderNoteSection(WORD_SCOPE_HEADING, wordNotes, timeZone),
     "",
-    renderNoteSection(PATTERN_SCOPE_HEADING, patternNotes),
+    renderNoteSection(PATTERN_SCOPE_HEADING, patternNotes, timeZone),
     "",
   ].join("\n");
 }

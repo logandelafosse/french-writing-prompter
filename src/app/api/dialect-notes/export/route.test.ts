@@ -4,6 +4,7 @@ import { corrections, dialectNotes, sessions } from "@/db/schema";
 import { listNotesForMarkdown } from "@/modules/dialect/dialect-notes-store";
 import { renderDialectMarkdown } from "@/modules/dialect/export-markdown";
 import { LOUISIANA_RULES } from "@/modules/dialect/louisiana-rules";
+import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
 import { GET } from "./route";
 
 describe("GET /api/dialect-notes/export", () => {
@@ -51,7 +52,15 @@ describe("GET /api/dialect-notes/export", () => {
     expect(response.headers.get("content-type")).toMatch(/text\/markdown/);
 
     const notes = await listNotesForMarkdown();
-    const expected = renderDialectMarkdown(LOUISIANA_RULES, notes);
-    expect(await response.text()).toBe(expected);
+    const expected = renderDialectMarkdown(
+      LOUISIANA_RULES,
+      notes,
+      quotaTimeZone(),
+    );
+    const body = await response.text();
+    expect(body).toBe(expected);
+    expect(body).toContain("On dit asteur.");
+    expect(body).toContain("Avoir avec les verbes de mouvement.");
+    expect(body).not.toContain("Note effacée.");
   });
 });
