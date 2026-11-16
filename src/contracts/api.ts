@@ -51,6 +51,8 @@ export const QuotaGetResponse = z.strictObject({
   resetsAt: z.string(),
 });
 
+export type QuotaGetDto = z.infer<typeof QuotaGetResponse>;
+
 export const SessionsGetResponse = z.strictObject({
   sessions: z.array(SessionView),
 });

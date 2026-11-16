@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { LevelBadge, LevelSelector, type CefrLevel } from "./level-components";
 import { LevelGetResponse, LevelPutResponse } from "@/contracts/api";
-import { HEADER_SHELL_REFRESH_EVENT } from "@/components/shell/header-shell";
+import { useHeaderShell } from "@/components/shell/header-shell";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 
 type LevelData = {
@@ -19,6 +19,7 @@ type LevelData = {
 const LOAD_ERROR = "An error occurred. Please try again.";
 
 export function LevelCard() {
+  const { level: shellLevel, refreshShell } = useHeaderShell();
   const [data, setData] = useState<LevelData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,8 +68,10 @@ export function LevelCard() {
       return;
     }
     await fetchLevel();
-    window.dispatchEvent(new Event(HEADER_SHELL_REFRESH_EVENT));
+    await refreshShell();
   };
+
+  const displayLevel = shellLevel ?? data?.level ?? null;
 
   if (loading) {
     return (
@@ -94,11 +97,11 @@ export function LevelCard() {
       </h2>
 
       <div className="mt-3">
-        {data?.level ? (
+        {displayLevel ? (
           <div className="flex items-center gap-4">
-            <LevelBadge level={data.level} />
+            <LevelBadge level={displayLevel} />
             <LevelSelector
-              currentLevel={data.level}
+              currentLevel={displayLevel}
               onSelect={(level) => {
                 void handleSelectLevel(level);
               }}

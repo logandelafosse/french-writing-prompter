@@ -1,7 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { LevelMenu } from "./header-shell";
+import { LevelMenu, nextLevelFromMenuValue } from "./header-shell";
+
+describe("nextLevelFromMenuValue", () => {
+  it("rejects invalid levels and unchanged selection", () => {
+    expect(nextLevelFromMenuValue("Z9", "B1")).toBeNull();
+    expect(nextLevelFromMenuValue("B1", "B1")).toBeNull();
+    expect(nextLevelFromMenuValue("C1", "B1")).toBe("C1");
+  });
+});
 
 describe("LevelMenu", () => {
   it("selects a level with the keyboard and restores focus on Escape", async () => {
@@ -18,9 +26,8 @@ describe("LevelMenu", () => {
     const menu = await screen.findByRole("menu");
     expect(menu).toBeInTheDocument();
 
-    await user.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}");
-    const c1 = screen.getByRole("menuitemradio", { name: /C1/ });
-    await user.click(c1);
+    await user.keyboard("{ArrowUp}{ArrowUp}");
+    await user.keyboard("{Enter}");
     expect(onChange).toHaveBeenCalledWith("C1");
 
     await user.click(chip);

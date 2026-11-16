@@ -22,7 +22,6 @@ export default defineConfig({
     },
     {
       name: "mobile",
-      testIgnore: "**/header-quota-desktop.spec.ts",
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },
