@@ -38,6 +38,7 @@ export function WordMeter({
   const track = target ? (
     <div
       aria-hidden
+      data-testid="word-meter-track"
       className={cn(
         "bg-rule rounded-radius-meter relative h-1.5",
         layout === "desktop" ? "w-60" : "w-full",

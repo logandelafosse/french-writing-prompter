@@ -13,6 +13,7 @@ describe("WordMeter", () => {
     ).toBeInTheDocument();
     expect(screen.queryByText(/\d+–\d+ mots/)).not.toBeInTheDocument();
     expect(screen.queryByText(/\//)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("word-meter-track")).not.toBeInTheDocument();
   });
 
   it("renders a track when target is set", () => {
@@ -20,5 +21,9 @@ describe("WordMeter", () => {
       <WordMeter text="un" layout="mobile" target={{ min: 10, max: 20 }} />,
     );
     expect(screen.getByText(/\/ 10–20 mots/)).toBeInTheDocument();
+    expect(screen.getByTestId("word-meter-track")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
   });
 });
