@@ -24,6 +24,8 @@ import { RuledTextarea } from "@/components/writing/ruled-textarea";
 import { WritingFooter } from "@/components/writing/writing-footer";
 import { GenerateButton } from "@/components/writing/generate-button";
 import { countWords } from "@/lib/count-words";
+import { removeInactiveDrafts } from "@/lib/draft-storage";
+import { useDraftAutosave } from "@/components/writing/use-draft-autosave";
 import { shouldShowWordNudge } from "@/lib/word-meter-math";
 import { cn } from "@/lib/utils";
 import type { Evaluation } from "@/contracts/evaluation";
@@ -84,6 +86,11 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial bootstrap load
     void loadToday();
   }, [loadToday]);
+
+  useEffect(() => {
+    if (bootstrap.kind !== "ready") return;
+    removeInactiveDrafts(bootstrap.data.activeSession?.id ?? null);
+  }, [bootstrap]);
 
   const postPrompt = async (): Promise<boolean> => {
     const promptResult = await fetchJson("/api/prompt", PromptPostResponse, {
@@ -209,6 +216,7 @@ function HomeBody({
           sessionId={phase.sessionId}
           promptText={phase.promptText}
           promptMeta={phase.promptMeta}
+          draft={phase.draft}
           generating={generating}
           quotaRemaining={bootstrap.data.quota.remaining}
           onSwap={onSwap}
@@ -235,6 +243,7 @@ function WritingInterim({
   sessionId,
   promptText,
   promptMeta,
+  draft,
   generating,
   quotaRemaining,
   onSwap,
@@ -242,11 +251,13 @@ function WritingInterim({
   sessionId: number;
   promptText: string;
   promptMeta: PromptMeta | null;
+  draft: { text: string; savedAt: string } | null;
   generating: boolean;
   quotaRemaining: number;
   onSwap: () => void;
 }) {
-  const [writing, setWriting] = useState("");
+  const autosave = useDraftAutosave(sessionId, draft);
+  const writing = autosave.text;
   const [submitUi, setSubmitUi] = useState<
     "idle" | "evaluating" | "review" | "error"
   >("idle");
@@ -314,7 +325,7 @@ function WritingInterim({
           <RuledTextarea
             label={homeCopy.writingLabel}
             value={writing}
-            onChange={() => undefined}
+            onChange={autosave.onTextChange}
             readOnly
           />
         </Surface>
@@ -358,7 +369,7 @@ function WritingInterim({
           <RuledTextarea
             label={homeCopy.writingLabel}
             value={writing}
-            onChange={setWriting}
+            onChange={autosave.onTextChange}
             readOnly={evaluating}
             onSubmitShortcut={runSubmitFromShortcut}
             minRows={8}
@@ -370,6 +381,7 @@ function WritingInterim({
               layout="desktop"
               submitBusy={evaluating}
               submitRetry={submitUi === "error"}
+              savedAt={autosave.savedAt}
               onSubmit={() => void submit()}
             />
           </div>
@@ -381,6 +393,7 @@ function WritingInterim({
             layout="mobile"
             submitBusy={evaluating}
             submitRetry={submitUi === "error"}
+            savedAt={autosave.savedAt}
             onSubmit={() => void submit()}
           />
         </div>

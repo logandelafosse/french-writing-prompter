@@ -59,6 +59,11 @@ export const PromptPostResponse = z.strictObject({
   quota: QuotaGetResponse,
 });
 
+export const DraftPutResponse = z.strictObject({
+  savedAt: z.string(),
+  wordCount: z.number().int(),
+});
+
 export type QuotaGetDto = z.infer<typeof QuotaGetResponse>;
 
 export const SessionsGetResponse = z.strictObject({

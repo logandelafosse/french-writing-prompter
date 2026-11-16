@@ -1,5 +1,6 @@
 "use client";
 import { KbdHint } from "@/components/ui/kbd-hint";
+import { DraftStatus } from "./draft-status";
 import { WordMeter } from "./word-meter";
 import { SubmitButton, isSubmitDisabled } from "./submit-button";
 import { cn } from "@/lib/utils";
@@ -9,6 +10,7 @@ export function WritingFooter({
   layout,
   submitBusy,
   submitRetry,
+  savedAt,
   onSubmit,
 }: {
   text: string;
@@ -16,8 +18,10 @@ export function WritingFooter({
   layout: "desktop" | "mobile";
   submitBusy: boolean;
   submitRetry?: boolean | undefined;
+  savedAt?: string | null | undefined;
   onSubmit: () => void;
 }) {
+  const draftStatus = savedAt ? <DraftStatus savedAt={savedAt} /> : null;
   const disabled = isSubmitDisabled(text, submitBusy);
   if (layout === "mobile")
     return (
@@ -26,6 +30,7 @@ export function WritingFooter({
           text={text}
           target={target}
           layout="mobile"
+          draftStatus={draftStatus}
           compactActions={
             <SubmitButton
               busy={submitBusy}
@@ -43,7 +48,12 @@ export function WritingFooter({
         "flex flex-wrap items-center justify-between gap-x-6 gap-y-3.5 pt-1.5",
       )}
     >
-      <WordMeter text={text} target={target} layout="desktop" />
+      <WordMeter
+        text={text}
+        target={target}
+        layout="desktop"
+        draftStatus={draftStatus}
+      />
       <div className="flex items-center gap-3.5">
         <KbdHint />
         <SubmitButton
