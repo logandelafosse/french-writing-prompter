@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T13e dispatch).
+Last updated: 2026-11-15 by coordinator (T13e PR #57 in review).
 
 ## Ready
 
@@ -14,13 +14,13 @@ Last updated: 2026-11-15 by coordinator (T13e dispatch).
 
 ## In progress
 
-| ID   | Ticket                                                                                                            | Why                                     |
-| ---- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| T13e | Mobile header rows + level card sync ([#56](https://github.com/logandelafosse/french-writing-prompter/issues/56)) | `ticket/t13e-header-mobile-level-card`. |
+_None._
 
 ## In review
 
-_None._
+| ID   | Ticket                                                                                                            | Why                                                                                                      |
+| ---- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| T13e | Mobile header rows + level card sync ([#56](https://github.com/logandelafosse/french-writing-prompter/issues/56)) | [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57); ~95 prod lines; CI pending. |
 
 ## Blocked
 
@@ -50,7 +50,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T13  | App header, level menu, local-midnight quota                        | AFK  | —          | **Done** — [PR #51](https://github.com/logandelafosse/french-writing-prompter/pull/51) + [PR #52](https://github.com/logandelafosse/french-writing-prompter/pull/52) 2026-11-15. |
 | T13c | Header PR #52 review fixes                                          | AFK  | T13        | **Done** — merged [PR #54](https://github.com/logandelafosse/french-writing-prompter/pull/54) 2026-11-15.                                                                        |
 | T13d | T13c e2e acceptance hardening                                       | AFK  | T13c       | **Backlog** — [#55](https://github.com/logandelafosse/french-writing-prompter/issues/55); PR #54 test gaps; does not block T14.                                                  |
-| T13e | Mobile header rows + level card sync                                | AFK  | T13c       | **In progress** — [#56](https://github.com/logandelafosse/french-writing-prompter/issues/56); `ticket/t13e-header-mobile-level-card`.                                            |
+| T13e | Mobile header rows + level card sync                                | AFK  | T13c       | **In review** — [PR #57](https://github.com/logandelafosse/french-writing-prompter/pull/57).                                                                                     |
 | T14  | Home first run and `/api/today` bootstrap                           | AFK  | —          | **Ready** — T13c done.                                                                                                                                                           |
 | T15  | Generator v2 with structured prompt meta; prompt sheet              | AFK  | T14        | Needs Home phases. Q8: A1 10–20 / A2 80–120 / B1+ 250–300.                                                                                                                       |
 | T16  | Writing surface: ruled textarea, word meter, shortcuts, busy labels | AFK  | T15        | Needs the prompt sheet                                                                                                                                                           |
