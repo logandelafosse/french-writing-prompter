@@ -6,6 +6,7 @@ import { levelChanges, sessions } from "@/db/schema";
 import { clearEnvCache } from "@/server/env";
 import { setTrackerLevel } from "@/modules/cefr-tracker/tracker-store";
 import { saveSession } from "@/modules/history-store/history-store";
+import { getQuotaState } from "@/modules/quota-manager/quota-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { PromptPostResponse } from "@/contracts/api";
 import { readResponseJson } from "@/test/read-response-json";
@@ -102,6 +103,52 @@ describe("evaluate session lifecycle", () => {
       .where(eq(sessions.id, sessionId));
     expect(rows[0]?.promptLevel).toBe("A2");
     expect(rows[0]?.cefrLevel).toBe("B1");
+  });
+
+  it("is allowed when quota is exhausted", async () => {
+    const session = await saveSession({
+      promptText: "Troisième consigne",
+      promptConstraints: constraints,
+      writingText: "Mon brouillon.",
+      evaluationJson: null,
+      cefrLevel: "A2",
+      localDate: "2026-11-16",
+      status: "active",
+      promptLevel: "A2",
+    });
+    await saveSession({
+      promptText: "Première",
+      promptConstraints: constraints,
+      writingText: null,
+      evaluationJson: null,
+      cefrLevel: "A2",
+      localDate: "2026-11-16",
+      status: "abandoned",
+    });
+    await saveSession({
+      promptText: "Deuxième",
+      promptConstraints: constraints,
+      writingText: null,
+      evaluationJson: null,
+      cefrLevel: "A2",
+      localDate: "2026-11-16",
+      status: "abandoned",
+    });
+    expect((await getQuotaState()).remaining).toBe(0);
+
+    const { POST } = await import("./route");
+    const response = await POST(
+      new Request("http://localhost/api/evaluate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          writing: "Mon brouillon reste.",
+          sessionId: session.id,
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    expect((await getQuotaState()).remaining).toBe(0);
   });
 
   it("returns 409 ALREADY_EVALUATED on a second evaluate", async () => {

@@ -29,7 +29,19 @@ import { useDraftAutosave } from "@/components/writing/use-draft-autosave";
 import { shouldShowWordNudge } from "@/lib/word-meter-math";
 import { cn } from "@/lib/utils";
 import type { Evaluation } from "@/contracts/evaluation";
+import { ConfirmSwapDialog } from "@/components/states/confirm-swap-dialog";
+import { QuotaNotice } from "@/components/states/notice";
 import { HomeDateTitle, HomePhaseA } from "./home-phase-a";
+
+type PromptAttempt =
+  | { ok: true }
+  | { ok: false; reason: "draft"; wordCount: number }
+  | { ok: false; reason: "failed" };
+
+type SwapBody = {
+  replaceSessionId: number;
+  confirmAbandon?: boolean;
+};
 
 // prettier-ignore
 type BootstrapState =
@@ -92,22 +104,35 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     removeInactiveDrafts(bootstrap.data.activeSession?.id ?? null);
   }, [bootstrap]);
 
-  const postPrompt = async (): Promise<boolean> => {
+  const postPrompt = async (
+    body: {
+      replaceSessionId?: number;
+      confirmAbandon?: boolean;
+    } = {},
+  ): Promise<PromptAttempt> => {
     const promptResult = await fetchJson("/api/prompt", PromptPostResponse, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
     });
     if (!promptResult.ok) {
+      const error = promptResult.error;
+      if (
+        error.kind === "http" &&
+        error.status === 409 &&
+        error.message === "DRAFT_WOULD_BE_ABANDONED" &&
+        error.wordCount !== undefined
+      ) {
+        return { ok: false, reason: "draft", wordCount: error.wordCount };
+      }
       setBootstrap((prev) =>
-        failBootstrap(
-          prev,
-          messageFromFetchError(promptResult.error, homeCopy.loadError),
-        ),
+        failBootstrap(prev, messageFromFetchError(error, homeCopy.loadError)),
       );
-      return false;
+      return { ok: false, reason: "failed" };
     }
     await refreshQuota();
     await loadToday();
-    return true;
+    return { ok: true };
   };
 
   const runGenerate = async (level: CefrLevel) => {
@@ -131,10 +156,17 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
     setGenerateUi("idle");
   };
 
-  const runSwap = async () => {
+  const runFreshPrompt = async () => {
     setGenerateUi("generating");
     await postPrompt();
     setGenerateUi("idle");
+  };
+
+  const runSwap = async (body: SwapBody): Promise<PromptAttempt> => {
+    setGenerateUi("generating");
+    const result = await postPrompt(body);
+    setGenerateUi("idle");
+    return result;
   };
 
   return (
@@ -180,7 +212,9 @@ export function HomePage({ now = () => new Date() }: { now?: () => Date }) {
             )
           }
           onGenerate={(level) => void runGenerate(level)}
-          onSwap={() => void runSwap()}
+          onSwap={(body) => runSwap(body)}
+          onFreshPrompt={() => void runFreshPrompt()}
+          now={now}
         />
       ) : null}
     </main>
@@ -194,22 +228,34 @@ function HomeBody({
   onSelectLevel,
   onGenerate,
   onSwap,
+  onFreshPrompt,
+  now,
 }: {
   bootstrap: Extract<BootstrapState, { kind: "ready" }>;
   titleDate: Date;
   generating: boolean;
   onSelectLevel: (level: CefrLevel) => void;
   onGenerate: (level: CefrLevel) => void;
-  onSwap: () => void;
+  onSwap: (body: SwapBody) => Promise<PromptAttempt>;
+  onFreshPrompt: () => void;
+  now: () => Date;
 }) {
   const phase = resolveHomePhase(bootstrap.data);
   const phaseLevel =
     phase.kind === "A0-first-run"
       ? bootstrap.selectedLevel
       : bootstrap.data.level;
+  const quotaExhausted = bootstrap.data.quota.remaining === 0;
   return (
     <>
       <HomeDateTitle at={titleDate} />
+      {quotaExhausted && phase.kind !== "A0-first-run" ? (
+        <QuotaNotice
+          resetsAt={bootstrap.data.quota.resetsAt}
+          hasActiveSession={phase.kind === "B-writing"}
+          now={now}
+        />
+      ) : null}
       {phase.kind === "B-writing" ? (
         <WritingInterim
           key={`${phase.sessionId}-${phase.promptText}`}
@@ -220,6 +266,7 @@ function HomeBody({
           generating={generating}
           quotaRemaining={bootstrap.data.quota.remaining}
           onSwap={onSwap}
+          onFreshPrompt={onFreshPrompt}
         />
       ) : (
         <HomePhaseA
@@ -247,6 +294,7 @@ function WritingInterim({
   generating,
   quotaRemaining,
   onSwap,
+  onFreshPrompt,
 }: {
   sessionId: number;
   promptText: string;
@@ -254,7 +302,8 @@ function WritingInterim({
   draft: { text: string; savedAt: string } | null;
   generating: boolean;
   quotaRemaining: number;
-  onSwap: () => void;
+  onSwap: (body: SwapBody) => Promise<PromptAttempt>;
+  onFreshPrompt: () => void;
 }) {
   const autosave = useDraftAutosave(sessionId, draft);
   const writing = autosave.text;
@@ -263,8 +312,45 @@ function WritingInterim({
   >("idle");
   const [evaluation, setEvaluation] = useState<Evaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [swapConfirm, setSwapConfirm] = useState<{ wordCount: number } | null>(
+    null,
+  );
   const resultsRef = useRef<HTMLElement | null>(null);
   const promptRegionRef = useRef<HTMLDivElement | null>(null);
+  const swapRef = useRef<HTMLButtonElement>(null);
+  const swapOpen = useRef(false);
+  const quotaExhausted = quotaRemaining === 0;
+  const promptLabel = quotaExhausted
+    ? homeCopy.promptLabelWithIndex
+    : homeCopy.promptLabel;
+  const swapLabel = quotaExhausted
+    ? homeCopy.swapPromptDisabled
+    : homeCopy.swapPrompt;
+
+  const requestSwap = async () => {
+    await autosave.saveNow();
+    const words = countWords(writing);
+    if (words >= 1) {
+      setSwapConfirm({ wordCount: words });
+      return;
+    }
+    const result = await onSwap({ replaceSessionId: sessionId });
+    if (!result.ok && result.reason === "draft") {
+      setSwapConfirm({ wordCount: result.wordCount });
+    }
+  };
+
+  const confirmSwap = async () => {
+    setSwapConfirm(null);
+    await autosave.saveNow();
+    const result = await onSwap({
+      replaceSessionId: sessionId,
+      confirmAbandon: true,
+    });
+    if (!result.ok && result.reason === "draft") {
+      setSwapConfirm({ wordCount: result.wordCount });
+    }
+  };
 
   const submit = async () => {
     if (!writing.trim()) return;
@@ -289,9 +375,12 @@ function WritingInterim({
   }, [submitUi, evaluation]);
 
   useEffect(() => {
-    if (!generating && promptRegionRef.current) {
-      promptRegionRef.current.focus();
-    }
+    swapOpen.current = swapConfirm !== null;
+  }, [swapConfirm]);
+
+  useEffect(() => {
+    if (generating || swapOpen.current) return;
+    promptRegionRef.current?.focus();
   }, [promptText, generating]);
 
   const wordTarget = promptMeta?.wordTarget ?? null;
@@ -318,9 +407,14 @@ function WritingInterim({
             embedded
             promptText={promptText}
             meta={promptMeta}
+            label={promptLabel}
             animateKey={`${sessionId}-${promptText}`}
             generateBusy={generating}
-            swap={{ onSwap }}
+            swap={{
+              onSwap: onFreshPrompt,
+              disabled: quotaExhausted,
+              label: swapLabel,
+            }}
           />
           <RuledTextarea
             label={homeCopy.writingLabel}
@@ -341,7 +435,7 @@ function WritingInterim({
         <GenerateButton
           busy={generating}
           disabled={generating}
-          onClick={onSwap}
+          onClick={onFreshPrompt}
           label={homeCopy.reviewNextPrompt(quotaRemaining)}
         />
       </div>
@@ -362,9 +456,25 @@ function WritingInterim({
             embedded
             promptText={promptText}
             meta={promptMeta}
+            label={promptLabel}
             animateKey={`${sessionId}-${promptText}`}
             generateBusy={generating}
-            swap={{ onSwap }}
+            belowMeta={
+              swapConfirm ? (
+                <ConfirmSwapDialog
+                  wordCount={swapConfirm.wordCount}
+                  returnFocusRef={swapRef}
+                  onKeep={() => setSwapConfirm(null)}
+                  onConfirm={() => void confirmSwap()}
+                />
+              ) : null
+            }
+            swapButtonRef={swapRef}
+            swap={{
+              onSwap: () => void requestSwap(),
+              disabled: quotaExhausted,
+              label: swapLabel,
+            }}
           />
           <RuledTextarea
             label={homeCopy.writingLabel}

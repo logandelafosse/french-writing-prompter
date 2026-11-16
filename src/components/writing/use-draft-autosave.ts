@@ -33,18 +33,23 @@ export function useDraftAutosave(
   const pushOnMount = useRef(draft.updateServer);
   const serverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const localTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingSave = useRef<Promise<void>>(Promise.resolve());
 
   const push = useCallback(
-    (text: string) => {
+    (text: string): Promise<void> => {
       const seq = seqRef.current + 1;
       seqRef.current = seq;
       if (textRef.current === text) dirtyRef.current = false;
-      void fetchJson(`/api/sessions/${sessionId}/draft`, DraftPutResponse, {
-        method: "PUT",
-        keepalive: true,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      }).then((result) => {
+      const task = fetchJson(
+        `/api/sessions/${sessionId}/draft`,
+        DraftPutResponse,
+        {
+          method: "PUT",
+          keepalive: true,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        },
+      ).then((result) => {
         if (seq !== seqRef.current || !result.ok) return;
         if (textRef.current !== text) return;
         writeLocalDraft(sessionId, { text, savedAt: result.value.savedAt });
@@ -54,35 +59,40 @@ export function useDraftAutosave(
           updateServer: false,
         }));
       });
+      pendingSave.current = task;
+      return task;
     },
     [sessionId],
   );
 
-  const flush = useCallback(() => {
+  const saveNow = useCallback((): Promise<void> => {
     clearTimer(serverTimer);
     clearTimer(localTimer);
-    if (!dirtyRef.current) return;
+    if (!dirtyRef.current) return pendingSave.current;
     const text = textRef.current;
     writeLocalDraft(sessionId, { text, savedAt: new Date().toISOString() });
-    push(text);
+    return push(text);
   }, [push, sessionId]);
 
   useEffect(() => {
     if (pushOnMount.current) {
       pushOnMount.current = false;
-      push(textRef.current);
+      void push(textRef.current);
     }
-    const onVisibility = () => {
-      if (document.visibilityState === "hidden") flush();
+    const onHide = () => {
+      void saveNow();
     };
-    window.addEventListener("pagehide", flush);
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") onHide();
+    };
+    window.addEventListener("pagehide", onHide);
     document.addEventListener("visibilitychange", onVisibility);
     return () => {
-      window.removeEventListener("pagehide", flush);
+      window.removeEventListener("pagehide", onHide);
       document.removeEventListener("visibilitychange", onVisibility);
-      flush();
+      onHide();
     };
-  }, [flush, push]);
+  }, [saveNow, push]);
 
   const onTextChange = useCallback(
     (next: string) => {
@@ -97,13 +107,12 @@ export function useDraftAutosave(
         });
       }, LOCAL_MIRROR_MS);
       clearTimer(serverTimer);
-      serverTimer.current = setTimeout(
-        () => push(textRef.current),
-        DRAFT_AUTOSAVE_MS,
-      );
+      serverTimer.current = setTimeout(() => {
+        void push(textRef.current);
+      }, DRAFT_AUTOSAVE_MS);
     },
     [push, sessionId],
   );
 
-  return { text: draft.text, savedAt: draft.savedAt, onTextChange };
+  return { text: draft.text, savedAt: draft.savedAt, onTextChange, saveNow };
 }

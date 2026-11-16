@@ -54,6 +54,16 @@ export const PromptSessionDto = z.strictObject({
   promptMeta: PromptMeta,
 });
 
+export const PromptPostBody = z.strictObject({
+  replaceSessionId: z.number().int().positive().optional(),
+  confirmAbandon: z.boolean().optional(),
+});
+
+export const DraftWouldBeAbandonedResponse = z.strictObject({
+  error: z.literal("DRAFT_WOULD_BE_ABANDONED"),
+  wordCount: z.number().int().nonnegative(),
+});
+
 export const PromptPostResponse = z.strictObject({
   session: PromptSessionDto,
   quota: QuotaGetResponse,
