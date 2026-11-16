@@ -7,12 +7,14 @@ import {
 } from "@/contracts/api";
 import type { Correction } from "@/contracts/correction";
 import type { EvaluationV2 } from "@/contracts/evaluation";
+import type { FocusItem } from "@/contracts/focus";
 import type { PromptMeta } from "@/contracts/prompt-meta";
 import { formatEvaluationSummary, reviewCopy } from "@/copy/review";
 import { homeCopy } from "@/copy/fr";
 import { countWords } from "@/lib/count-words";
 import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { Surface } from "@/components/ui/surface";
+import { TextLink } from "@/components/ui/text-link";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { GenerateButton } from "@/components/writing/generate-button";
 import {
@@ -41,6 +43,7 @@ export function ReviewScreen({
   writingText,
   corrections,
   evaluation = null,
+  focus = [],
   quotaRemaining,
   generating,
   onNextPrompt,
@@ -50,10 +53,12 @@ export function ReviewScreen({
   writingText: string;
   corrections: Correction[];
   evaluation?: EvaluationV2 | null;
+  focus?: readonly FocusItem[];
   quotaRemaining: number;
   generating: boolean;
   onNextPrompt: () => void;
 }) {
+  const carnetFocus = focus[0];
   const headingRef = useRef<HTMLHeadingElement>(null);
   const mobileTitleRef = useRef<HTMLHeadingElement>(null);
   const [resolved, setResolved] = useState<Record<string, Correction>>({});
@@ -233,7 +238,7 @@ export function ReviewScreen({
               onSave={saveNote}
             />
           ) : null}
-          <div className="flex flex-wrap items-center gap-2 gap-x-[22px] pt-2.5">
+          <div className="flex flex-wrap items-center gap-2 gap-x-[22px] pt-2.5 max-sm:flex-col max-sm:gap-1">
             <GenerateButton
               busy={generating}
               disabled={quotaRemaining === 0}
@@ -244,6 +249,14 @@ export function ReviewScreen({
                   : homeCopy.reviewNextPrompt(quotaRemaining)
               }
             />
+            {carnetFocus ? (
+              <TextLink
+                href={`/carnet#weakness-${carnetFocus.id}`}
+                className="max-sm:w-full max-sm:justify-center"
+              >
+                {reviewCopy.carnetCta(carnetFocus.shortName)}
+              </TextLink>
+            ) : null}
           </div>
         </section>
       </div>

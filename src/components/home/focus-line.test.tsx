@@ -63,4 +63,9 @@ describe("FocusLine", () => {
       screen.getByRole("link", { name: homeCopy.focusChange }),
     ).toHaveAttribute("href", "/carnet");
   });
+
+  it("uses the pinned reason when source is practice", () => {
+    render(<FocusLine focus={focus} variant="hero" source="practice" />);
+    expect(screen.getByText(homeCopy.focusReasonPinned)).toBeInTheDocument();
+  });
 });

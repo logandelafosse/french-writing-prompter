@@ -1,7 +1,7 @@
 import { PLACEMENT_FEEDS_WEAKNESS_MEMORY } from "@/config/limits";
 import { countsAsMistake, type Correction } from "@/contracts/correction";
-import { MistakeCategory } from "@/contracts/mistake-category";
-import type { Weakness } from "@/contracts/weakness";
+import type { MistakeCategory } from "@/contracts/mistake-category";
+import type { Weakness, WeaknessTrend } from "@/contracts/weakness";
 import { mistakeCategoryLabels } from "@/copy/carnet";
 import { computeTrend } from "./compute-trend";
 
@@ -28,18 +28,29 @@ type Bucket = {
   windowCount: number;
 };
 
-export type RankedWeakness = Weakness & {
+export type RankedWeakness = {
+  category: MistakeCategory;
+  label: string;
+  count: number;
+  lastSeenAt: string;
+  trend: WeaknessTrend;
   s: number;
   windowCount: number;
 };
 
-export function toWeaknessDto(row: RankedWeakness): Weakness {
+export function toWeaknessDto(
+  row: RankedWeakness,
+  pin: MistakeCategory | null,
+  focusIds: ReadonlySet<MistakeCategory>,
+): Weakness {
   return {
     category: row.category,
     label: row.label,
     count: row.count,
     lastSeenAt: row.lastSeenAt,
     trend: row.trend,
+    isFocus: focusIds.has(row.category),
+    pinned: pin === row.category,
   };
 }
 

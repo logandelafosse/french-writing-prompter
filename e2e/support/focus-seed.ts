@@ -3,7 +3,9 @@ import { appTimeZone, localDateKey } from "../../src/lib/dates";
 import { assertE2eDatabaseUrl } from "../../src/server/e2e-database";
 
 /** Two prior evaluated sessions with actif infinitif_participe and imparfait_pc. */
-export async function seedFocusWeaknesses(): Promise<void> {
+export async function seedFocusWeaknesses(
+  extra: readonly string[] = [],
+): Promise<void> {
   const databaseUrl = process.env.DATABASE_URL ?? "file:./.e2e/e2e.db";
   assertE2eDatabaseUrl(databaseUrl);
   const client = createClient({ url: databaseUrl });
@@ -34,7 +36,11 @@ export async function seedFocusWeaknesses(): Promise<void> {
       });
       const sessionId = Number(inserted.lastInsertRowid);
       let ordinal = 1;
-      for (const category of ["infinitif_participe", "imparfait_pc"]) {
+      for (const category of [
+        "infinitif_participe",
+        "imparfait_pc",
+        ...extra,
+      ]) {
         await client.execute({
           sql: `INSERT INTO corrections (
             id, session_id, ordinal, kind, category, quote, span_start, span_end,

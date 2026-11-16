@@ -32,11 +32,24 @@ export class FakeAiClient {
 
   async chatCompletionJSON<S extends z.ZodType>(
     schema: S,
-    _params: Omit<ChatCompletionParams, "response_format">,
+    params: Omit<ChatCompletionParams, "response_format">,
     schemaName?: string,
   ): Promise<z.infer<S>> {
     if (this.scenario === "failure") {
       return Promise.reject(new Error("AI service error"));
+    }
+
+    if (schemaName === "generator") {
+      const e2eDir = path.join(process.cwd(), ".e2e");
+      if (fs.existsSync(e2eDir)) {
+        const system =
+          params.messages.find((message) => message.role === "system")
+            ?.content ?? "";
+        fs.writeFileSync(
+          path.join(e2eDir, "last-generator-prompt.txt"),
+          system,
+        );
+      }
     }
 
     const generatorFixture =
@@ -85,9 +98,11 @@ export class FakeAiClient {
                 ? weaknessEvaluated === 0
                   ? "evaluation.weakness.json"
                   : "evaluation.weakness-repeat.json"
-                : dialectFixture !== null
-                  ? dialectFixture
-                  : "ok-mixed-kinds.json";
+                : this.scenario === "focus"
+                  ? "evaluation.focus.json"
+                  : dialectFixture !== null
+                    ? dialectFixture
+                    : "ok-mixed-kinds.json";
     const dir = fixtureName.startsWith("ok-")
       ? EVALUATOR_FIXTURES_DIR
       : FIXTURES_DIR;

@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { db } from "@/db";
-import { corrections, levelChanges, sessions } from "@/db/schema";
+import {
+  corrections,
+  levelChanges,
+  practiceRequests,
+  sessions,
+} from "@/db/schema";
 import { Correction } from "@/contracts/correction";
 import { TodayGetResponse } from "@/contracts/today";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
@@ -20,6 +25,7 @@ const constraints = JSON.stringify({
 describe("GET /api/today", () => {
   beforeEach(async () => {
     vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
+    await db.delete(practiceRequests).execute();
     await db.delete(corrections).execute();
     await db.delete(sessions).execute();
     await db.delete(levelChanges).execute();

@@ -53,6 +53,7 @@ describe("AI fixtures", () => {
     for (const file of [
       "evaluation.weakness.json",
       "evaluation.weakness-repeat.json",
+      "evaluation.focus.json",
     ]) {
       const text = fs.readFileSync(path.join(FIXTURES_DIR, file), "utf8");
       const parsed = parseJson(EvaluatorOutputSchema, text);

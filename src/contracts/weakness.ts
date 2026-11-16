@@ -10,5 +10,7 @@ export const Weakness = z.strictObject({
   count: z.number().int().positive(),
   lastSeenAt: z.string(),
   trend: WeaknessTrend,
+  isFocus: z.boolean(),
+  pinned: z.boolean(),
 });
 export type Weakness = z.infer<typeof Weakness>;

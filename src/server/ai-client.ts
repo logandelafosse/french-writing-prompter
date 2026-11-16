@@ -9,7 +9,8 @@ export type E2eScenario =
   | "advance"
   | "standard"
   | "dialect"
-  | "weakness";
+  | "weakness"
+  | "focus";
 
 const SCENARIO_HEADER = "x-e2e-scenario";
 
@@ -20,7 +21,8 @@ export function parseE2eScenario(raw: string | null): E2eScenario {
     raw === "advance" ||
     raw === "standard" ||
     raw === "dialect" ||
-    raw === "weakness"
+    raw === "weakness" ||
+    raw === "focus"
   ) {
     return raw;
   }

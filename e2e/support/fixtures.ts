@@ -8,7 +8,8 @@ type E2eScenario =
   | "advance"
   | "standard"
   | "dialect"
-  | "weakness";
+  | "weakness"
+  | "focus";
 
 type E2eFixtures = {
   resetDb: void;

@@ -331,6 +331,7 @@ function HomeBody({
       : bootstrap.data.level;
   const quotaExhausted = bootstrap.data.quota.remaining === 0;
   const focus = bootstrap.data.focus;
+  const focusSource = bootstrap.data.pin === null ? "auto" : "practice";
   const [desktop, setDesktop] = useState(true);
   useEffect(() => {
     if (typeof window.matchMedia !== "function") return;
@@ -356,7 +357,7 @@ function HomeBody({
       >
         <HomeDateTitle at={titleDate} />
         {reviewing && desktop ? (
-          <FocusLine focus={focus} variant="inline" />
+          <FocusLine focus={focus} variant="inline" source={focusSource} />
         ) : null}
       </div>
       {bootstrap.data.advancement !== null ? (
@@ -380,6 +381,7 @@ function HomeBody({
           writingText={phase.writingText}
           corrections={phase.corrections}
           evaluation={phase.evaluation}
+          focus={focus}
           quotaRemaining={bootstrap.data.quota.remaining}
           generating={generating}
           onNextPrompt={onFreshPrompt}
@@ -387,7 +389,11 @@ function HomeBody({
       ) : phase.kind === "B-writing" ? (
         <>
           {!reviewing ? (
-            <FocusLine focus={focus} variant={desktop ? "inline" : "stacked"} />
+            <FocusLine
+              focus={focus}
+              variant={desktop ? "inline" : "stacked"}
+              source={focusSource}
+            />
           ) : null}
           <WritingInterim
             key={`${phase.sessionId}-${phase.promptText}`}
@@ -399,6 +405,7 @@ function HomeBody({
             quotaRemaining={bootstrap.data.quota.remaining}
             offline={offline}
             generateFailure={bootstrap.actionFailure}
+            focus={focus}
             onRetryGenerate={onRetryGenerate}
             onSwap={onSwap}
             onFreshPrompt={onFreshPrompt}
@@ -410,6 +417,7 @@ function HomeBody({
         <FocusLine
           focus={focus}
           variant="hero"
+          source={focusSource}
           generate={{
             onGenerate: runGenerate,
             generating,
@@ -419,7 +427,7 @@ function HomeBody({
       ) : (
         <>
           {phase.kind === "A-ready" ? (
-            <FocusLine focus={focus} variant="inline" />
+            <FocusLine focus={focus} variant="inline" source={focusSource} />
           ) : null}
           <HomePhaseA
             variant={phase.kind === "A0-first-run" ? "first-run" : "ready"}
@@ -446,6 +454,7 @@ function WritingInterim({
   quotaRemaining,
   offline,
   generateFailure,
+  focus,
   onRetryGenerate,
   onSwap,
   onFreshPrompt,
@@ -460,6 +469,7 @@ function WritingInterim({
   quotaRemaining: number;
   offline: boolean;
   generateFailure: ClassifiedFetchFailure | null;
+  focus: TodayGetDto["focus"];
   onRetryGenerate: () => void;
   onSwap: (body: SwapBody) => Promise<PromptAttempt>;
   onFreshPrompt: () => void;
@@ -586,6 +596,7 @@ function WritingInterim({
           writingText={review.writingText}
           corrections={review.corrections}
           evaluation={review.evaluation}
+          focus={focus}
           quotaRemaining={quotaRemaining}
           generating={generating}
           onNextPrompt={onFreshPrompt}

@@ -322,6 +322,64 @@ describe("ReviewScreen", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("links the first Focus Weakness to the Carnet and hides the CTA when Focus is empty", () => {
+    const focus = [
+      {
+        id: "infinitif_participe" as const,
+        name: "Infinitif ou participe (\u2011er / \u2011é)",
+        inlineName: "infinitif ou participe (\u2011er / \u2011é)",
+        historyName: "Infinitif ou participe",
+        shortName: "\u2011er / \u2011é",
+      },
+    ];
+    const { rerender } = render(
+      <ReviewScreen
+        promptText="Écris."
+        promptMeta={null}
+        writingText="Les enfant joue."
+        corrections={[
+          mistake({
+            id: "c1",
+            ordinal: 1,
+            quote: "Les enfant",
+            suggestion: "Les enfants",
+          }),
+        ]}
+        focus={focus}
+        quotaRemaining={2}
+        generating={false}
+        onNextPrompt={() => undefined}
+      />,
+    );
+    expect(
+      screen.getByRole("link", {
+        name: reviewCopy.carnetCta("\u2011er / \u2011é"),
+      }),
+    ).toHaveAttribute("href", "/carnet#weakness-infinitif_participe");
+
+    rerender(
+      <ReviewScreen
+        promptText="Écris."
+        promptMeta={null}
+        writingText="Les enfant joue."
+        corrections={[
+          mistake({
+            id: "c1",
+            ordinal: 1,
+            quote: "Les enfant",
+            suggestion: "Les enfants",
+          }),
+        ]}
+        quotaRemaining={2}
+        generating={false}
+        onNextPrompt={() => undefined}
+      />,
+    );
+    expect(
+      screen.queryByRole("link", { name: /dans le Carnet/ }),
+    ).not.toBeInTheDocument();
+  });
+
   function dialect(
     partial: Pick<Correction, "id" | "ordinal" | "quote" | "suggestion"> &
       Partial<Correction>,

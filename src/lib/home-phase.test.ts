@@ -14,6 +14,7 @@ function bootstrap(
       resetsAt: "2026-11-16T06:00:00.000Z",
     },
     focus: [],
+    pin: null,
     activeSession: null,
     reviewSession: null,
     advancement: null,

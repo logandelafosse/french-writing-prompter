@@ -33,6 +33,7 @@ const todayFirstRun = {
     resetsAt: "2026-11-16T06:00:00.000Z",
   },
   focus: [],
+  pin: null,
   activeSession: null,
   reviewSession: null,
   advancement: null,
@@ -105,6 +106,7 @@ describe("HomePage first-run generate", () => {
               resetsAt: "2026-11-16T06:00:00.000Z",
             },
             focus: [],
+            pin: null,
             activeSession: {
               id: 9,
               prompt: "Lafayette",
@@ -301,6 +303,7 @@ const todayWriting = {
     resetsAt: "2026-11-16T06:00:00.000Z",
   },
   focus: [],
+  pin: null,
   activeSession: {
     id: 9,
     prompt: "Lafayette",

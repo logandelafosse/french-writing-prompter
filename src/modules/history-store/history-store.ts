@@ -15,6 +15,7 @@ import { PromptConstraints } from "@/contracts/prompt";
 import { SessionStatus, type SessionView } from "@/contracts/session";
 import { first } from "@/lib/first";
 import { parseJson } from "@/lib/json";
+import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { eq, desc, sql } from "drizzle-orm";
 
 export interface SessionData {
@@ -209,6 +210,7 @@ const ResourceIdsJson = z.array(z.string());
 
 function correctionFromRow(
   row: typeof corrections.$inferSelect,
+  focusIds: ReadonlySet<string> = new Set(),
 ): Correction | null {
   const resourceIds = parseJson(ResourceIdsJson, row.resourceIdsJson);
   const span =
@@ -238,7 +240,10 @@ function correctionFromRow(
     resourceIds: resourceIds.ok ? resourceIds.value : [],
     status: row.status,
     dialectNoteId: row.dialectNoteId,
-    isFocus: false,
+    isFocus:
+      row.kind === "mistake" &&
+      row.category !== null &&
+      focusIds.has(row.category),
     contextQuote: row.contextQuote,
     dialectExample: row.dialectExample,
     dialectLemma: row.dialectLemma,
@@ -259,12 +264,27 @@ export async function getCorrection(
     .where(eq(corrections.id, id))
     .limit(1);
   if (rows.length === 0) return null;
-  return correctionFromRow(first(rows, `correction ${id}`));
+  const row = first(rows, `correction ${id}`);
+  const sessionRows = await database
+    .select({ focusJson: sessions.focusJson })
+    .from(sessions)
+    .where(eq(sessions.id, row.sessionId))
+    .limit(1);
+  return correctionFromRow(
+    row,
+    new Set(parseStoredFocus(sessionRows[0]?.focusJson) ?? []),
+  );
 }
 
 export async function listCorrectionsForSession(
   sessionId: number,
 ): Promise<Correction[]> {
+  const sessionRows = await db
+    .select({ focusJson: sessions.focusJson })
+    .from(sessions)
+    .where(eq(sessions.id, sessionId))
+    .limit(1);
+  const focusIds = new Set(parseStoredFocus(sessionRows[0]?.focusJson) ?? []);
   const rows = await db
     .select()
     .from(corrections)
@@ -272,7 +292,7 @@ export async function listCorrectionsForSession(
     .orderBy(corrections.ordinal);
   const items: Correction[] = [];
   for (const row of rows) {
-    const parsed = correctionFromRow(row);
+    const parsed = correctionFromRow(row, focusIds);
     if (parsed) items.push(parsed);
   }
   return items;

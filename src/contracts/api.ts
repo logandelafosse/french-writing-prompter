@@ -127,6 +127,11 @@ export const WeaknessesGetResponse = z.strictObject({
 });
 export type WeaknessesGetResponse = z.infer<typeof WeaknessesGetResponse>;
 
+export const PracticePinResponse = z.strictObject({
+  pinned: z.boolean(),
+});
+export type PracticePinResponse = z.infer<typeof PracticePinResponse>;
+
 export const QuotaGetResponse = z.strictObject({
   used: z.number(),
   remaining: z.number(),

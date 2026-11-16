@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { corrections, dialectNotes, sessions } from "@/db/schema";
+import {
+  corrections,
+  dialectNotes,
+  practiceRequests,
+  sessions,
+} from "@/db/schema";
 import { Correction } from "@/contracts/correction";
 import { WeaknessesGetResponse } from "@/contracts/api";
 import {
@@ -63,6 +68,7 @@ async function seedEvaluated(
 
 describe("GET /api/weaknesses", () => {
   beforeEach(async () => {
+    await db.delete(practiceRequests).execute();
     await db.delete(dialectNotes).execute();
     await db.delete(corrections).execute();
     await db.delete(sessions).execute();
