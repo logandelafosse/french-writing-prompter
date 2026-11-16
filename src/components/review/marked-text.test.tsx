@@ -19,7 +19,7 @@ function correction(
 
 describe("MarkedText", () => {
   it("marked text wraps mistake spans and skips unanchored corrections", () => {
-    render(
+    const { container } = render(
       <MarkedText
         text={text}
         corrections={[
@@ -49,16 +49,21 @@ describe("MarkedText", () => {
       />,
     );
 
-    const mark = screen.getByText("Les enfant");
-    expect(mark).toHaveClass("bg-mistake-tint");
-    expect(mark).toHaveTextContent("Les enfant");
-    expect(screen.getByText("Bonjour.")).toBeVisible();
-    expect(screen.getAllByRole("link", { name: /faute/ })).toHaveLength(1);
+    const quote = screen.getByText("Les enfant");
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> and <p> have no role; paragraph split is the contract */
+    expect(quote.closest("mark")).not.toBeNull();
+    expect(container.querySelectorAll("mark")).toHaveLength(1);
+    const paragraphs = container.querySelectorAll("p");
+    expect(paragraphs).toHaveLength(2);
+    expect(paragraphs[0]).toHaveTextContent("Bonjour.");
+    expect(paragraphs[1]).toHaveTextContent(/Les enfant/);
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark/paragraph DOM asserts */
 
     const hidden = screen.getByText("(faute 1)");
     expect(hidden).toHaveClass("sr-only");
 
     const link = screen.getByRole("link", { name: "faute 1" });
     expect(link).toHaveAttribute("href", "#correction-1");
+    expect(screen.getAllByRole("link", { name: /faute/ })).toHaveLength(1);
   });
 });

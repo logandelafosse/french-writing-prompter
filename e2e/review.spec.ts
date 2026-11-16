@@ -63,6 +63,7 @@ test.describe("review @1280", () => {
     await submitWriting(page, mixedWriting);
 
     await page.getByRole("link", { name: "faute 3" }).click();
+    await expect(page).toHaveURL(/#correction-3$/);
     const card = page.getByRole("article").filter({ hasText: "Les enfant" });
     await expect(card).toBeVisible();
 
