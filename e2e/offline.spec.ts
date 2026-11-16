@@ -9,11 +9,14 @@ import {
   mainContent,
 } from "./support/prompt-helpers";
 
-const writing = "Le bayou au matin est calme.";
+import { FETCH_TIMEOUT_MS } from "../src/config/limits";
 
-async function holdThenAbort(route: Route): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 11_000));
-  await route.abort("timedout").catch(() => undefined);
+const writing = "Le bayou au matin est calme.";
+const hungFetchNoticeMs = FETCH_TIMEOUT_MS + 3_000;
+
+async function holdIndefinitely(route: Route): Promise<void> {
+  void route;
+  await new Promise(() => undefined);
 }
 
 async function expectTouchTarget(locator: {
@@ -100,17 +103,26 @@ test.describe("hung fetches", () => {
   }) => {
     test.setTimeout(60_000);
     await scenario("happy");
-    await page.route("**/api/today", holdThenAbort);
-    await page.route("**/api/sessions", holdThenAbort);
+    await page.route("**/api/today", holdIndefinitely);
+    await page.route("**/api/sessions", holdIndefinitely);
     await page.goto("/");
-    const retry = page.getByRole("button", { name: "Réessayer" });
-    await expect(retry).toBeVisible({ timeout: 15_000 });
+    const notice = page.getByRole("status");
+    await expect(notice).toContainText("Pas de connexion.", {
+      timeout: hungFetchNoticeMs,
+    });
+    await expect(
+      notice.getByRole("button", { name: "Réessayer" }),
+    ).toBeVisible();
     await expect(page.getByText("Chargement…")).toHaveCount(0);
 
     await page.goto("/history");
-    await expect(page.getByRole("button", { name: "Réessayer" })).toBeVisible({
-      timeout: 15_000,
+    const historyNotice = page.getByRole("status");
+    await expect(historyNotice).toContainText("Pas de connexion.", {
+      timeout: hungFetchNoticeMs,
     });
+    await expect(
+      historyNotice.getByRole("button", { name: "Réessayer" }),
+    ).toBeVisible();
     await expect(page.getByText("Chargement…")).toHaveCount(0);
     await page.unrouteAll({ behavior: "ignoreErrors" });
   });
