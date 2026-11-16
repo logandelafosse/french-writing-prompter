@@ -52,6 +52,22 @@ The coordinator keeps at most three tickets `In progress` at once, and never two
 
 **Tooling reviewer.** For every finding from the other two reviewers and every fix commit, ask whether a lint rule, ast-grep rule, stricter type, Zod schema, or script would have caught it. Output concrete rules (YAML or config snippet) and file them as tooling tickets in the Backlog.
 
+## Session efficiency retro (every five merges)
+
+Every **five tickets merged to `main`**, the coordinator runs a **session efficiency reviewer** (same model family as adversarial: Grok 4.7 high). It does not re-review product code; it reviews **how agents worked**: duplicated context, wrong worktree, CI/docs toil, review-token waste, and fix-commit patterns.
+
+Output: append to `docs/agents/session-retro.md` (dated section + **TOOL-SESSION-N** backlog). Mirror P0–P1 session items into `docs/agents/tooling-review.md`. Update the retro footer: **next retro after ticket X**.
+
+**Counter:** last retro after **T27** (2026-11-16). **Next:** after **T32** merges (or when Logan asks).
+
+Coordinator habits from the first retro (see `session-retro.md`):
+
+- Read the board only from `origin/main` (`git show origin/main:docs/plan/board.md`).
+- Dispatch implementers from a **fresh worktree** off `main`, not from a dirty primary checkout.
+- Prefer **docs-only** board pushes with CI/lefthook that skip full gates when the diff is only `docs/**` (once TOOL-SESSION-2/5 land).
+- Do not use `LEFTHOOK=0` except emergencies; never for mixed `src/` commits.
+- Post **blocking** review summaries as a **GitHub PR comment** so fix commits are traceable without the chat transcript.
+
 ## Definition of done
 
 - [ ] Every acceptance criterion has a passing unit/integration test and, if learner-visible, a passing Playwright spec
