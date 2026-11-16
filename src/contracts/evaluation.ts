@@ -14,18 +14,8 @@ export const DIMENSION_IDS = [
   "coherence",
   "register_style",
 ] as const;
-
 export const Dimension = z.enum(DIMENSION_IDS);
 export type Dimension = z.infer<typeof Dimension>;
-
-function requiredDimensions<T extends z.ZodType>(value: T) {
-  return z.strictObject({
-    grammatical_accuracy: value,
-    vocabulary: value,
-    coherence: value,
-    register_style: value,
-  } satisfies Record<Dimension, T>);
-}
 
 const LegacyDimensionScore = z.object({
   score: z.number(),
@@ -33,10 +23,20 @@ const LegacyDimensionScore = z.object({
   comment: z.string(),
 });
 
-const EvaluationDimensions = requiredDimensions(LegacyDimensionScore);
+const EvaluationDimensions = z.object({
+  grammatical_accuracy: LegacyDimensionScore,
+  vocabulary: LegacyDimensionScore,
+  coherence: LegacyDimensionScore,
+  register_style: LegacyDimensionScore,
+});
 
 const EvaluationTips = z.object({
-  per_dimension: requiredDimensions(z.string()),
+  per_dimension: z.object({
+    grammatical_accuracy: z.string(),
+    vocabulary: z.string(),
+    coherence: z.string(),
+    register_style: z.string(),
+  }),
   holistic: z.string(),
 });
 
@@ -56,41 +56,25 @@ const OutputDimensionScore = z.strictObject({
   comment: z.string(),
 });
 
-const OutputDimensions = requiredDimensions(OutputDimensionScore);
+const OutputDimensions = z.strictObject({
+  grammatical_accuracy: OutputDimensionScore,
+  vocabulary: OutputDimensionScore,
+  coherence: OutputDimensionScore,
+  register_style: OutputDimensionScore,
+} satisfies Record<Dimension, typeof OutputDimensionScore>);
 
-const evaluatorCorrectionFields = {
+export const EvaluatorOutputCorrectionSchema = z.strictObject({
   kind: CorrectionKind,
   quote: z.string(),
   occurrence: z.number().int(),
   suggestion: z.string(),
   explanation: z.string(),
+  category: MistakeCategory.nullable(),
   question: z.string().nullable(),
   rule_if_dialect: z.string().nullable(),
   dlf_headword: z.string().nullable(),
   resource_ids: z.array(z.string()),
-};
-
-/** Defensive post-process input: category may be an invented ID. */
-export const EvaluatorOutputCorrectionDraftSchema = z.strictObject({
-  ...evaluatorCorrectionFields,
-  category: z.string().nullable(),
 });
-
-export const EvaluatorOutputCorrectionSchema = z.strictObject({
-  ...evaluatorCorrectionFields,
-  category: MistakeCategory.nullable(),
-});
-
-export const EvaluatorOutputDraftSchema = z.strictObject({
-  dimensions: OutputDimensions,
-  overall_cefr: CefrLevel,
-  summary: z.string(),
-  next_level_tip: z.string(),
-  corrections: z
-    .array(EvaluatorOutputCorrectionDraftSchema)
-    .max(EVALUATOR_CORRECTIONS_MAX),
-});
-export type EvaluatorOutputDraft = z.infer<typeof EvaluatorOutputDraftSchema>;
 
 export const EvaluatorOutputSchema = z.strictObject({
   dimensions: OutputDimensions,
@@ -102,6 +86,13 @@ export const EvaluatorOutputSchema = z.strictObject({
     .max(EVALUATOR_CORRECTIONS_MAX),
 });
 export type EvaluatorOutput = z.infer<typeof EvaluatorOutputSchema>;
+export type EvaluatorOutputDraft = Omit<EvaluatorOutput, "corrections"> & {
+  corrections: Array<
+    Omit<EvaluatorOutput["corrections"][number], "category"> & {
+      category: string | null;
+    }
+  >;
+};
 
 export const EvaluationV2 = z.strictObject({
   version: z.literal(2),

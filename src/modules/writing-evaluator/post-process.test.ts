@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  EvaluatorOutputDraftSchema,
-  type EvaluatorOutputDraft,
-} from "@/contracts/evaluation";
+import { type EvaluatorOutputDraft } from "@/contracts/evaluation";
 import { dialectCheckQuestion, postProcessEvaluation } from "./post-process";
 
 const writing =
@@ -20,7 +17,7 @@ function now() {
 function baseOutput(
   corrections: EvaluatorOutputDraft["corrections"],
 ): EvaluatorOutputDraft {
-  return EvaluatorOutputDraftSchema.parse({
+  return {
     dimensions: {
       grammatical_accuracy: { score: 4, comment: "ok" },
       vocabulary: { score: 3, comment: "ok" },
@@ -31,7 +28,7 @@ function baseOutput(
     summary: "Résumé.",
     next_level_tip: "Pour atteindre B2, continue.",
     corrections,
-  });
+  };
 }
 
 function correction(

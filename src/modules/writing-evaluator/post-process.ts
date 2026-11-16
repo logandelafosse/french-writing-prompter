@@ -1,13 +1,8 @@
 import { AI_MODEL } from "@/config/ai";
+import { Correction, type Span } from "@/contracts/correction";
 import {
-  Correction,
-  type CorrectionAnchor,
-  type Span,
-} from "@/contracts/correction";
-import {
-  EvaluationV2,
-  EvaluatorOutputDraftSchema,
   parseCorrectionCategory,
+  type EvaluationV2,
   type EvaluatorOutputDraft,
 } from "@/contracts/evaluation";
 import { locateQuote, spansOverlap } from "./locate-quote";
@@ -25,16 +20,11 @@ export type PostProcessContext = {
   createId: () => string;
 };
 
-function overlapsAccepted(span: Span, accepted: Span[]): boolean {
-  return accepted.some((other) => spansOverlap(span, other));
-}
-
 export function postProcessEvaluation(
   raw: EvaluatorOutputDraft,
   ctx: PostProcessContext,
 ): { evaluation: EvaluationV2; corrections: Correction[] } {
-  const parsed = EvaluatorOutputDraftSchema.parse(raw);
-  const kept = parsed.corrections.filter(
+  const kept = raw.corrections.filter(
     (item) =>
       item.quote.length > 0 &&
       !(item.kind === "standard" && item.suggestion === item.quote),
@@ -44,7 +34,8 @@ export function postProcessEvaluation(
   const accepted: Span[] = [];
   const located = kept.map((item, originalIndex) => {
     let found = locateQuote(ctx.text, item.quote, item.occurrence, cursor);
-    if (found.span && overlapsAccepted(found.span, accepted)) {
+    const span = found.span;
+    if (span && accepted.some((other) => spansOverlap(span, other))) {
       found = { span: null, anchor: "none" };
     }
     if (found.span) {
@@ -65,47 +56,46 @@ export function postProcessEvaluation(
   );
 
   const createdAt = ctx.now().toISOString();
-  const corrections: Correction[] = ranked.map((row, index) => {
-    const category =
-      row.item.kind === "standard"
-        ? null
-        : (parseCorrectionCategory(row.item.category) ?? "autre");
-    const question =
-      row.item.kind === "dialect_check" &&
-      (row.item.question === null || row.item.question.length === 0)
-        ? dialectCheckQuestion(row.item.quote)
-        : row.item.question;
-    return Correction.parse({
+  const corrections = ranked.map((row, index) =>
+    Correction.parse({
       id: ctx.createId(),
       sessionId: ctx.sessionId,
       ordinal: index + 1,
       kind: row.item.kind,
       quote: row.item.quote,
       span: row.found.span,
-      anchor: row.found.anchor satisfies CorrectionAnchor,
+      anchor: row.found.anchor,
       suggestion: row.item.suggestion,
       explanation: row.item.explanation,
-      question,
+      question:
+        row.item.kind === "dialect_check" &&
+        (row.item.question === null || row.item.question.length === 0)
+          ? dialectCheckQuestion(row.item.quote)
+          : row.item.question,
       ruleIfDialect: row.item.rule_if_dialect,
-      category,
+      category:
+        row.item.kind === "standard"
+          ? null
+          : (parseCorrectionCategory(row.item.category) ?? "autre"),
       dlf: null,
       resourceIds: [],
       status: "open",
       dialectNoteId: null,
       isFocus: false,
-    });
-  });
+    }),
+  );
 
-  const evaluation: EvaluationV2 = {
-    version: 2,
-    dimensions: parsed.dimensions,
-    overallCefr: parsed.overall_cefr,
-    summary: parsed.summary,
-    nextLevelTip: parsed.next_level_tip,
-    model: AI_MODEL,
-    promptVersion: EVALUATOR_PROMPT_VERSION,
-    evaluatedAt: createdAt,
+  return {
+    evaluation: {
+      version: 2,
+      dimensions: raw.dimensions,
+      overallCefr: raw.overall_cefr,
+      summary: raw.summary,
+      nextLevelTip: raw.next_level_tip,
+      model: AI_MODEL,
+      promptVersion: EVALUATOR_PROMPT_VERSION,
+      evaluatedAt: createdAt,
+    },
+    corrections,
   };
-
-  return { evaluation, corrections };
 }

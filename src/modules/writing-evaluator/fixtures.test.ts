@@ -3,8 +3,10 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { parseJson } from "@/lib/json";
+import { z } from "zod";
+import { EVALUATOR_CORRECTIONS_MAX } from "@/config/limits";
+import { CorrectionKind } from "@/contracts/correction";
 import {
-  EvaluatorOutputDraftSchema,
   EvaluatorOutputSchema,
   type EvaluatorOutputDraft,
 } from "@/contracts/evaluation";
@@ -18,11 +20,30 @@ function load(name: string): string {
   return fs.readFileSync(path.join(DIR, name), "utf8");
 }
 
+const FixtureOutputSchema = EvaluatorOutputSchema.extend({
+  corrections: z
+    .array(
+      z.strictObject({
+        kind: CorrectionKind,
+        quote: z.string(),
+        occurrence: z.number().int(),
+        suggestion: z.string(),
+        explanation: z.string(),
+        category: z.string().nullable(),
+        question: z.string().nullable(),
+        rule_if_dialect: z.string().nullable(),
+        dlf_headword: z.string().nullable(),
+        resource_ids: z.array(z.string()),
+      }),
+    )
+    .max(EVALUATOR_CORRECTIONS_MAX),
+});
+
 function throughChatCompletionJSON(text: string): EvaluatorOutputDraft {
   const strict = parseJson(EvaluatorOutputSchema, text);
   if (strict.ok) return strict.value;
-  const draft = parseJson(EvaluatorOutputDraftSchema, text);
-  if (draft.ok) return draft.value;
+  const fixture = parseJson(FixtureOutputSchema, text);
+  if (fixture.ok) return fixture.value;
   if (strict.reason === "invalid_json") {
     throw new AiOutputError(
       "invalid_json",
