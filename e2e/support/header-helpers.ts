@@ -32,6 +32,22 @@ export async function expectTwoMobileHeaderRows(page: Page) {
   expect(row2Y).toBeGreaterThan(row1Y + 8);
 }
 
+export async function setLevelA1(page: Page) {
+  const chip = page.getByRole("button", { name: "Niveau CECR A1, changer" });
+  if ((await chip.count()) > 0) {
+    await expect(chip).toBeVisible();
+    return;
+  }
+  await page.request.put("/api/level", {
+    headers: { "Content-Type": "application/json", "x-e2e-scenario": "happy" },
+    data: { level: "A1" },
+  });
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Niveau CECR A1, changer" }),
+  ).toBeVisible();
+}
+
 export async function setLevelB1(page: Page) {
   const chip = page.getByRole("button", { name: "Niveau CECR B1, changer" });
   if ((await chip.count()) > 0) {

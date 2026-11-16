@@ -14,17 +14,19 @@ export function PromptSheet({
   animateKey,
   swap,
   generateBusy,
+  embedded = false,
 }: {
   promptText: string;
   meta: PromptMeta | null;
   animateKey: string;
   swap?: { onSwap: () => void; disabled?: boolean } | undefined;
   generateBusy?: boolean | undefined;
+  embedded?: boolean | undefined;
 }) {
   const metaLine = meta ? formatPromptMeta(meta) : null;
 
-  return (
-    <Surface padding="home" className="flex flex-col gap-2.5">
+  const body = (
+    <>
       <SectionLabel tone="primary">{homeCopy.promptLabel}</SectionLabel>
       <p
         key={animateKey}
@@ -58,6 +60,12 @@ export function PromptSheet({
           ) : null}
         </div>
       ) : null}
+    </>
+  );
+  if (embedded) return body;
+  return (
+    <Surface padding="home" className="flex flex-col gap-2.5">
+      {body}
     </Surface>
   );
 }

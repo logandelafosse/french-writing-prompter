@@ -14,5 +14,6 @@ ignores:
   [
     "src/components/ui/**",
     "src/components/legacy/**",
+    "src/components/writing/ruled-textarea.tsx",
     "src/test/lint-fixtures/**",
   ]

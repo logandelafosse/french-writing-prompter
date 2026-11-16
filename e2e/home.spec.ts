@@ -23,7 +23,7 @@ test("learner generates a prompt, writes, and sees the Evaluation and the Histor
   await expectNoAxeViolations(page, LEGACY_AXE_DISABLED);
   await captureEvidence(page, testInfo, "generated-prompt");
 
-  await page.getByRole("textbox").fill(HAPPY_WRITING);
+  await page.getByLabel("Ton texte").fill(HAPPY_WRITING);
   await page.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
   await captureEvidence(page, testInfo, "evaluation");
@@ -50,7 +50,7 @@ test("malformed AI output shows an error and retry recovers", async ({
   await page.getByRole("button", { name: /A2/i }).click();
   await page.getByRole("button", { name: "Donne-moi une consigne" }).click();
   await expect(page.getByText(PROMPT_SNIPPET)).toBeVisible();
-  await page.getByRole("textbox").fill(HAPPY_WRITING);
+  await page.getByLabel("Ton texte").fill(HAPPY_WRITING);
 
   await scenario("malformed");
   await page.getByRole("button", { name: "Corrige-moi" }).click();
@@ -61,6 +61,9 @@ test("malformed AI output shows an error and retry recovers", async ({
   ).toHaveCount(0);
 
   await scenario("happy");
-  await page.getByRole("button", { name: "Réessayer" }).click();
+  await page
+    .getByRole("button", { name: "Réessayer" })
+    .filter({ visible: true })
+    .click();
   await expectEvaluationWithScores(page);
 });
