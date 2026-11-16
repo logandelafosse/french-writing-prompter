@@ -36,6 +36,13 @@
       "when": 1794755432315,
       "tag": "0004_level_changes_undo",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1794755432316,
+      "tag": "0005_corrections",
+      "breakpoints": true
     }
   ]
 }

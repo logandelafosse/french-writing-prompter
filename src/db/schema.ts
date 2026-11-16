@@ -27,6 +27,39 @@ export const sessions = sqliteTable(
     writingSavedAt: text("writing_saved_at"),
     evaluatedAt: text("evaluated_at"),
     abandonedAt: text("abandoned_at"),
+    evaluationRaw: text("evaluation_raw"),
   },
   (table) => [index("sessions_quota_idx").on(table.kind, table.localDate)],
+);
+
+export const corrections = sqliteTable(
+  "corrections",
+  {
+    id: text("id").primaryKey(),
+    sessionId: integer("session_id")
+      .notNull()
+      .references(() => sessions.id, { onDelete: "cascade" }),
+    ordinal: integer("ordinal").notNull(),
+    kind: text("kind").notNull(),
+    category: text("category"),
+    quote: text("quote").notNull(),
+    spanStart: integer("span_start"),
+    spanEnd: integer("span_end"),
+    anchor: text("anchor").notNull(),
+    suggestion: text("suggestion").notNull(),
+    explanation: text("explanation").notNull(),
+    question: text("question"),
+    ruleIfDialect: text("rule_if_dialect"),
+    dlfEntryId: text("dlf_entry_id"),
+    dlfHeadword: text("dlf_headword"),
+    resourceIdsJson: text("resource_ids_json").notNull().default("[]"),
+    status: text("status").notNull().default("open"),
+    dialectNoteId: integer("dialect_note_id"),
+    createdAt: text("created_at").notNull(),
+    resolvedAt: text("resolved_at"),
+  },
+  (t) => [
+    index("corrections_session_idx").on(t.sessionId),
+    index("corrections_cat_idx").on(t.category, t.kind, t.status),
+  ],
 );

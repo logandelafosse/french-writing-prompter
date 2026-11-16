@@ -3,7 +3,10 @@ import { sessions } from "@/db/schema";
 import { localDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
-import { Evaluation } from "@/contracts/evaluation";
+import {
+  parseStoredEvaluation,
+  toPlaceholderEvaluation,
+} from "@/contracts/evaluation";
 import { PromptConstraints } from "@/contracts/prompt";
 import { SessionStatus, type SessionView } from "@/contracts/session";
 import { first } from "@/lib/first";
@@ -194,11 +197,13 @@ function rowToSessionView(row: typeof sessions.$inferSelect): SessionView {
   const promptLevel = constraints.ok ? constraints.value.cefrLevel : null;
 
   let evaluation: SessionView["evaluation"] = null;
-  if (row.evaluationJson !== null) {
-    const parsed = parseJson(Evaluation, row.evaluationJson);
-    evaluation = parsed.ok
-      ? { ok: true, value: parsed.value }
-      : { ok: false, reason: "unreadable" };
+  const stored = parseStoredEvaluation(row.evaluationJson);
+  if (stored.status === "v1") {
+    evaluation = { ok: true, value: stored.value };
+  } else if (stored.status === "v2") {
+    evaluation = { ok: true, value: toPlaceholderEvaluation(stored.value) };
+  } else if (stored.status === "malformed") {
+    evaluation = { ok: false, reason: "unreadable" };
   }
 
   return {
