@@ -4,18 +4,19 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-15 by coordinator (T13e #56 ready; T14 ready).
+Last updated: 2026-11-15 by coordinator (T13e dispatch).
 
 ## Ready
 
-| ID   | Ticket                                                                                                                 | Why                                    |
-| ---- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| T13e | Mobile header rows + level card sync ([#56](https://github.com/logandelafosse/french-writing-prompter/issues/56))      | Adversarial blockers on merged PR #54. |
-| T14  | Home first run and `/api/today` bootstrap ([#16](https://github.com/logandelafosse/french-writing-prompter/issues/16)) | May parallel T13e (different seams).   |
+| ID  | Ticket                                                                                                                 | Why               |
+| --- | ---------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| T14 | Home first run and `/api/today` bootstrap ([#16](https://github.com/logandelafosse/french-writing-prompter/issues/16)) | Queue after T13e. |
 
 ## In progress
 
-_None._
+| ID   | Ticket                                                                                                            | Why                                     |
+| ---- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| T13e | Mobile header rows + level card sync ([#56](https://github.com/logandelafosse/french-writing-prompter/issues/56)) | `ticket/t13e-header-mobile-level-card`. |
 
 ## In review
 
