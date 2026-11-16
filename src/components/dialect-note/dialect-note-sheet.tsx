@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
 import type { DialectNoteScope } from "@/contracts/dialect-note";
 import { reviewCopy } from "@/copy/review";
@@ -16,6 +16,9 @@ export type DialectNoteSheetSave = {
   scope: DialectNoteScope;
 };
 
+// prettier-ignore
+type SaveUi = { status: "idle" } | { status: "saving" } | { status: "error"; message: string };
+
 export function DialectNoteSheet({
   open,
   onOpenChange,
@@ -29,19 +32,30 @@ export function DialectNoteSheet({
   written: string;
   tutorProposed: string;
   draft: DialectSheetDraft;
-  onSave: (note: DialectNoteSheetSave) => Promise<boolean>;
+  // prettier-ignore
+  onSave: (note: DialectNoteSheetSave, signal: AbortSignal) => Promise<string | null>;
 }) {
   const [rule, setRule] = useState(draft.rule);
   const [example, setExample] = useState(draft.example);
   const [scope, setScope] = useState<DialectNoteScope>("word");
-  const [saveUi, setSaveUi] = useState<"idle" | "saving">("idle");
+  const [saveUi, setSaveUi] = useState<SaveUi>({ status: "idle" });
+  const [entered, setEntered] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(() => setEntered(true));
+    return () => {
+      window.clearTimeout(id);
+      abortRef.current?.abort();
+    };
+  }, [open]);
 
   return (
     <Dialog.Root
-      open={open}
-      onOpenChange={(next) => {
-        onOpenChange(next);
-      }}
+      open={open && entered}
+      // prettier-ignore
+      onOpenChange={(next) => { if (!next) abortRef.current?.abort(); onOpenChange(next); }}
     >
       <Dialog.Portal>
         <Dialog.Backdrop className="bg-scrim fixed inset-0 z-40" />
@@ -62,18 +76,8 @@ export function DialectNoteSheet({
               aria-label={reviewCopy.sheetClose}
               className="rounded-chip text-ink flex size-11 cursor-pointer items-center justify-center border-0 bg-transparent"
             >
-              <svg
-                aria-hidden="true"
-                width="18"
-                height="18"
-                viewBox="0 0 18 18"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <path d="M3 3l12 12M15 3L3 15" />
-              </svg>
+              {/* prettier-ignore */}
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 3l12 12M15 3L3 15" /></svg>
             </Dialog.Close>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto">
@@ -101,12 +105,17 @@ export function DialectNoteSheet({
               className="mt-4 flex flex-col gap-4"
               onSubmit={(event) => {
                 event.preventDefault();
-                if (saveUi === "saving") return;
-                setSaveUi("saving");
-                void onSave({ rule, example, scope }).then((ok) => {
-                  setSaveUi("idle");
-                  if (ok) onOpenChange(false);
-                });
+                if (saveUi.status === "saving") return;
+                abortRef.current?.abort();
+                const controller = new AbortController();
+                abortRef.current = controller;
+                setSaveUi({ status: "saving" });
+                void onSave({ rule, example, scope }, controller.signal).then(
+                  (message) => {
+                    if (controller.signal.aborted || message === null) return;
+                    setSaveUi({ status: "error", message });
+                  },
+                );
               }}
             >
               <Field
@@ -132,20 +141,14 @@ export function DialectNoteSheet({
                   {reviewCopy.sheetScope}
                 </legend>
                 <label className="min-h-touch flex items-center gap-3 text-base">
-                  <Radio
-                    name="portee"
-                    checked={scope === "word"}
-                    onChange={() => setScope("word")}
-                  />
+                  {/* prettier-ignore */}
+                  <Radio name="portee" checked={scope === "word"} onChange={() => setScope("word")} />
                   <span>{reviewCopy.sheetScopeWord(draft.lemma)}</span>
                 </label>
                 {draft.pattern !== null ? (
                   <label className="min-h-touch flex items-center gap-3 text-base">
-                    <Radio
-                      name="portee"
-                      checked={scope === "pattern"}
-                      onChange={() => setScope("pattern")}
-                    />
+                    {/* prettier-ignore */}
+                    <Radio name="portee" checked={scope === "pattern"} onChange={() => setScope("pattern")} />
                     <span>{reviewCopy.sheetScopePattern(draft.pattern)}</span>
                   </label>
                 ) : null}
@@ -154,6 +157,10 @@ export function DialectNoteSheet({
                 <p className="text-muted m-0 text-sm leading-normal">
                   {reviewCopy.sheetFooter}
                 </p>
+                {saveUi.status === "error" ? (
+                  // prettier-ignore
+                  <p role="alert" lang="fr" className="text-mistake m-0 text-sm">{saveUi.message}</p>
+                ) : null}
                 <div className="flex flex-wrap items-center justify-end gap-2.5">
                   <span className="text-muted mr-auto hidden text-[13px] sm:inline">
                     {reviewCopy.sheetEsc}
@@ -166,13 +173,8 @@ export function DialectNoteSheet({
                   >
                     {reviewCopy.sheetCancel}
                   </Button>
-                  <Button
-                    type="submit"
-                    variant="dialect"
-                    size="lg"
-                    busy={saveUi === "saving"}
-                    className="px-6"
-                  >
+                  {/* prettier-ignore */}
+                  <Button type="submit" variant="dialect" size="lg" busy={saveUi.status === "saving"} className="px-6">
                     {reviewCopy.sheetSave}
                   </Button>
                 </div>

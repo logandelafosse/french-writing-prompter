@@ -32,11 +32,6 @@ export function Input({ className, ...props }: InputProps) {
 }
 
 export function Radio({ className, ...props }: RadioProps) {
-  return (
-    <input
-      type="radio"
-      className={cn("accent-dialect m-0 size-5", className)}
-      {...props}
-    />
-  );
+  // prettier-ignore
+  return <input type="radio" className={cn("accent-dialect m-0 size-5", className)} {...props} />;
 }

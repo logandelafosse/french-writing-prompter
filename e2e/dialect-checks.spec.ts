@@ -23,6 +23,16 @@ async function openDialectSheet(page: import("@playwright/test").Page) {
   return page.getByRole("dialog", { name: "Ajouter une note de dialecte" });
 }
 
+function requireBottomSheetLayout(
+  viewport: { width: number; height: number } | null,
+  box: { x: number; y: number; width: number; height: number } | null,
+) {
+  if (viewport === null || box === null) {
+    throw new Error("expected a full-width bottom sheet");
+  }
+  return { viewport, box };
+}
+
 test.describe("dialect checks @1280", () => {
   test.use({ viewport: { width: 1280, height: 900 } });
 
@@ -225,9 +235,20 @@ test.describe("dialect checks @390", () => {
       name: "Ajouter une note de dialecte",
     });
     await expect(dialog).toBeVisible();
-    const box = await dialog.boundingBox();
-    expect(box?.width ?? 0).toBeGreaterThan(370);
-    expect((box?.y ?? 0) + (box?.height ?? 0)).toBeGreaterThan(700);
+    await expect(dialog).not.toHaveAttribute("data-starting-style");
+    await expect(async () => {
+      const layout = requireBottomSheetLayout(
+        page.viewportSize(),
+        await dialog.boundingBox(),
+      );
+      expect(
+        Math.abs(layout.box.width - layout.viewport.width),
+      ).toBeLessThanOrEqual(2);
+      expect(layout.box.x).toBeLessThanOrEqual(2);
+      expect(
+        Math.abs(layout.box.y + layout.box.height - layout.viewport.height),
+      ).toBeLessThanOrEqual(2);
+    }).toPass();
     const duration = await dialog.evaluate(
       (node) => getComputedStyle(node).transitionDuration,
     );

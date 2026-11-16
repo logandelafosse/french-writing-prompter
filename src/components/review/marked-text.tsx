@@ -13,9 +13,8 @@ function markKind(
   item: Pick<Correction, "kind" | "status" | "span">,
 ): MarkedKind | null {
   if (item.span === null) return null;
-  if (item.status === "confirmed_dialect" || item.status === "overturned") {
+  if (item.status === "confirmed_dialect" || item.status === "overturned")
     return null;
-  }
   if (item.kind === "dialect_check" && item.status === "confirmed_mistake") {
     return "mistake";
   }

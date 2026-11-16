@@ -11,7 +11,7 @@ import type { PromptMeta } from "@/contracts/prompt-meta";
 import { formatEvaluationSummary, reviewCopy } from "@/copy/review";
 import { homeCopy } from "@/copy/fr";
 import { countWords } from "@/lib/count-words";
-import { fetchJson } from "@/lib/http";
+import { fetchJson, messageFromFetchError } from "@/lib/http";
 import { Surface } from "@/components/ui/surface";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { GenerateButton } from "@/components/writing/generate-button";
@@ -111,20 +111,19 @@ export function ReviewScreen({
     );
   };
 
-  const saveNote = async (note: {
-    rule: string;
-    example: string;
-    scope: "word" | "pattern";
-  }): Promise<boolean> => {
-    if (sheetFor === null) return false;
+  const saveNote = async (
+    note: { rule: string; example: string; scope: "word" | "pattern" },
+    signal: AbortSignal,
+  ): Promise<string | null> => {
+    if (sheetFor === null) return homeCopy.loadError;
     const draft = dialectSheetDraft(sheetFor, writingText);
-    setAckUi({ status: "saving" });
     const result = await fetchJson(
       "/api/dialect-notes",
       DialectNoteCreateResponse,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal,
         body: JSON.stringify({
           rule: note.rule,
           example: note.example,
@@ -136,14 +135,15 @@ export function ReviewScreen({
         }),
       },
     );
+    if (signal.aborted) return homeCopy.loadError;
     if (!result.ok || result.value.correction === undefined) {
-      setAckUi({ status: "error" });
-      return false;
+      return result.ok
+        ? homeCopy.loadError
+        : messageFromFetchError(result.error, homeCopy.loadError);
     }
-    setAckUi({ status: "idle" });
     setSheetFor(null);
     applyResolved(result.value.correction);
-    return true;
+    return null;
   };
 
   return (
@@ -223,9 +223,8 @@ export function ReviewScreen({
             <DialectNoteSheet
               key={sheetFor.id}
               open
-              onOpenChange={(open) => {
-                if (!open) setSheetFor(null);
-              }}
+              // prettier-ignore
+              onOpenChange={(next) => { if (!next) setSheetFor(null); }}
               written={sheetFor.quote}
               tutorProposed={sheetFor.suggestion}
               draft={sheetDraft}

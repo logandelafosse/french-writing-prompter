@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -11,8 +12,25 @@ const draft: DialectSheetDraft = {
   rule: "On dit a tombé.",
 };
 
+async function openSheet(
+  props: Partial<ComponentProps<typeof DialectNoteSheet>> = {},
+) {
+  render(
+    <DialectNoteSheet
+      open
+      onOpenChange={() => undefined}
+      written="a tombé"
+      tutorProposed="est tombé"
+      draft={draft}
+      onSave={() => Promise.resolve(null)}
+      {...props}
+    />,
+  );
+  return screen.findByRole("dialog", { name: "Ajouter une note de dialecte" });
+}
+
 describe("DialectNoteSheet", () => {
-  it("opens a labelled dialog with quote fallbacks and hides the pattern radio", () => {
+  it("opens after a mount tick so the slide-in starting style can apply", async () => {
     render(
       <DialectNoteSheet
         open
@@ -20,13 +38,19 @@ describe("DialectNoteSheet", () => {
         written="a tombé"
         tutorProposed="est tombé"
         draft={draft}
-        onSave={() => Promise.resolve(true)}
+        onSave={() => Promise.resolve(null)}
       />,
     );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(
+      await screen.findByRole("dialog", {
+        name: "Ajouter une note de dialecte",
+      }),
+    ).toBeVisible();
+  });
 
-    const dialog = screen.getByRole("dialog", {
-      name: "Ajouter une note de dialecte",
-    });
+  it("opens a labelled dialog with quote fallbacks and hides the pattern radio", async () => {
+    const dialog = await openSheet();
     expect(dialog).toHaveAttribute("aria-modal", "true");
     expect(screen.getByText("T'as écrit")).toBeVisible();
     expect(screen.getByText("a tombé")).toBeVisible();
@@ -43,20 +67,13 @@ describe("DialectNoteSheet", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("shows the pattern radio when a pattern is present", () => {
-    render(
-      <DialectNoteSheet
-        open
-        onOpenChange={() => undefined}
-        written="a tombé"
-        tutorProposed="est tombé"
-        draft={{
-          ...draft,
-          pattern: "« avoir » avec les verbes de mouvement",
-        }}
-        onSave={() => Promise.resolve(true)}
-      />,
-    );
+  it("shows the pattern radio when a pattern is present", async () => {
+    await openSheet({
+      draft: {
+        ...draft,
+        pattern: "« avoir » avec les verbes de mouvement",
+      },
+    });
     expect(
       screen.getByRole("radio", {
         name: /Toute la famille : « avoir » avec les verbes de mouvement/,
@@ -67,16 +84,7 @@ describe("DialectNoteSheet", () => {
   it("Fermer and Annuler dismiss the sheet", async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();
-    render(
-      <DialectNoteSheet
-        open
-        onOpenChange={onOpenChange}
-        written="a tombé"
-        tutorProposed="est tombé"
-        draft={draft}
-        onSave={() => Promise.resolve(true)}
-      />,
-    );
+    await openSheet({ onOpenChange });
     await user.click(screen.getByRole("button", { name: "Fermer" }));
     expect(onOpenChange).toHaveBeenCalledWith(false);
     await user.click(screen.getByRole("button", { name: "Annuler" }));
