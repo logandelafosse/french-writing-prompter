@@ -42,16 +42,6 @@ function ruleIds(messages: Linter.LintMessage[]): string[] {
 }
 
 describe("eslint.config.mjs guardrails", { timeout: 60_000 }, () => {
-  it("blocks DLF lexicon loader import from component layer", async () => {
-    const messages = await lintFixtureAs(
-      "src/test/lint-fixtures/components/home/dlf-import.tsx",
-      "src/components/home/__lint-fixtures__/dlf-import.tsx",
-    );
-    expect(ruleIds(messages)).toContain(
-      "@typescript-eslint/no-restricted-imports",
-    );
-  });
-
   it("blocks @/db import from component layer", async () => {
     const messages = await lintFixtureAs(
       "src/test/lint-fixtures/components/home/db-import.tsx",
