@@ -1,5 +1,6 @@
 import { AI_MODEL } from "@/config/ai";
 import { Correction, type Span } from "@/contracts/correction";
+import type { MistakeCategory } from "@/contracts/mistake-category";
 import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import {
   parseCorrectionCategory,
@@ -23,6 +24,7 @@ export type PostProcessContext = {
   createId: () => string;
   lookupDlf?: (word: string) => DlfHit | null;
   dialectNotes?: readonly LearnerDialectNote[];
+  focusCategories?: readonly MistakeCategory[];
 };
 
 function nonEmpty(value: string | null): string | null {
@@ -125,8 +127,13 @@ export function postProcessEvaluation(
   );
 
   const createdAt = ctx.now().toISOString();
-  const corrections = ranked.map((row, index) =>
-    Correction.parse({
+  const focusSet = new Set(ctx.focusCategories ?? []);
+  const corrections = ranked.map((row, index) => {
+    const category =
+      row.item.kind === "standard"
+        ? null
+        : (parseCorrectionCategory(row.item.category) ?? "autre");
+    return Correction.parse({
       id: ctx.createId(),
       sessionId: ctx.sessionId,
       ordinal: index + 1,
@@ -142,10 +149,7 @@ export function postProcessEvaluation(
           ? dialectCheckQuestion(row.item.quote)
           : row.item.question,
       ruleIfDialect: row.item.rule_if_dialect,
-      category:
-        row.item.kind === "standard"
-          ? null
-          : (parseCorrectionCategory(row.item.category) ?? "autre"),
+      category,
       dlf:
         row.item.kind === "standard"
           ? attributeStandard({
@@ -156,10 +160,13 @@ export function postProcessEvaluation(
       resourceIds: [],
       status: "open",
       dialectNoteId: null,
-      isFocus: false,
+      isFocus:
+        row.item.kind === "mistake" &&
+        category !== null &&
+        focusSet.has(category),
       ...dialectFields(row.item, ctx.text, row.found.span),
-    }),
-  );
+    });
+  });
 
   return {
     evaluation: {

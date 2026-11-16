@@ -36,6 +36,7 @@ import { ErrorAlert } from "@/components/states/error-alert";
 import { QuotaNotice } from "@/components/states/notice";
 import { OfflineNotice, useOffline } from "@/components/states/offline-notice";
 import { HomeDateTitle, HomePhaseA } from "./home-phase-a";
+import { FocusLine } from "./focus-line";
 import { AdvancementBanner } from "@/components/states/advancement-banner";
 
 type PromptAttempt =
@@ -329,10 +330,34 @@ function HomeBody({
       ? bootstrap.selectedLevel
       : bootstrap.data.level;
   const quotaExhausted = bootstrap.data.quota.remaining === 0;
+  const focus = bootstrap.data.focus;
+  const [desktop, setDesktop] = useState(true);
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const media = window.matchMedia("(min-width: 640px)");
+    const sync = () => setDesktop(media.matches);
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
+  }, []);
+  const aReadyHero = phase.kind === "A-ready" && !desktop && focus.length > 0;
+  const runGenerate = () => {
+    if (phaseLevel) onGenerate(phaseLevel);
+  };
   return (
     <>
-      <div className={reviewing ? "max-sm:hidden" : undefined}>
+      <div
+        className={cn(
+          reviewing && "max-sm:hidden",
+          reviewing &&
+            desktop &&
+            "flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2",
+        )}
+      >
         <HomeDateTitle at={titleDate} />
+        {reviewing && desktop ? (
+          <FocusLine focus={focus} variant="inline" />
+        ) : null}
       </div>
       {bootstrap.data.advancement !== null ? (
         <AdvancementBanner
@@ -360,35 +385,53 @@ function HomeBody({
           onNextPrompt={onFreshPrompt}
         />
       ) : phase.kind === "B-writing" ? (
-        <WritingInterim
-          key={`${phase.sessionId}-${phase.promptText}`}
-          sessionId={phase.sessionId}
-          promptText={phase.promptText}
-          promptMeta={phase.promptMeta}
-          draft={phase.draft}
-          generating={generating}
-          quotaRemaining={bootstrap.data.quota.remaining}
-          offline={offline}
-          generateFailure={bootstrap.actionFailure}
-          onRetryGenerate={onRetryGenerate}
-          onSwap={onSwap}
-          onFreshPrompt={onFreshPrompt}
-          onAfterEvaluate={onAfterEvaluate}
-          onReviewingChange={onReviewingChange}
+        <>
+          {!reviewing ? (
+            <FocusLine focus={focus} variant={desktop ? "inline" : "stacked"} />
+          ) : null}
+          <WritingInterim
+            key={`${phase.sessionId}-${phase.promptText}`}
+            sessionId={phase.sessionId}
+            promptText={phase.promptText}
+            promptMeta={phase.promptMeta}
+            draft={phase.draft}
+            generating={generating}
+            quotaRemaining={bootstrap.data.quota.remaining}
+            offline={offline}
+            generateFailure={bootstrap.actionFailure}
+            onRetryGenerate={onRetryGenerate}
+            onSwap={onSwap}
+            onFreshPrompt={onFreshPrompt}
+            onAfterEvaluate={onAfterEvaluate}
+            onReviewingChange={onReviewingChange}
+          />
+        </>
+      ) : aReadyHero ? (
+        <FocusLine
+          focus={focus}
+          variant="hero"
+          generate={{
+            onGenerate: runGenerate,
+            generating,
+            disabled: quotaExhausted,
+          }}
         />
       ) : (
-        <HomePhaseA
-          variant={phase.kind === "A0-first-run" ? "first-run" : "ready"}
-          selectedLevel={phaseLevel}
-          onLevelChange={
-            phase.kind === "A0-first-run" ? onSelectLevel : () => undefined
-          }
-          onGenerate={() => {
-            if (phaseLevel) onGenerate(phaseLevel);
-          }}
-          generating={generating}
-          quotaRemaining={bootstrap.data.quota.remaining}
-        />
+        <>
+          {phase.kind === "A-ready" ? (
+            <FocusLine focus={focus} variant="inline" />
+          ) : null}
+          <HomePhaseA
+            variant={phase.kind === "A0-first-run" ? "first-run" : "ready"}
+            selectedLevel={phaseLevel}
+            onLevelChange={
+              phase.kind === "A0-first-run" ? onSelectLevel : () => undefined
+            }
+            onGenerate={runGenerate}
+            generating={generating}
+            quotaRemaining={bootstrap.data.quota.remaining}
+          />
+        </>
       )}
     </>
   );

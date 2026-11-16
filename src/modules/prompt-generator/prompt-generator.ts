@@ -9,6 +9,7 @@ import {
   renderForGenerator,
 } from "@/modules/dialect/render";
 import type { FrenchDialect } from "@/contracts/prompt";
+import type { MistakeCategory } from "@/contracts/mistake-category";
 import type { z } from "zod";
 
 export type { FrenchDialect } from "@/contracts/prompt";
@@ -37,9 +38,27 @@ export class PromptGenerator {
   async generate(
     level: CefrLevel,
     dialect: FrenchDialect,
+    options: {
+      focus?: readonly {
+        id: MistakeCategory;
+        label: string;
+        elicitHint: string;
+      }[];
+      recentTopics?: readonly string[];
+    } = {},
   ): Promise<WritingPrompt> {
     const dialectRules = renderForGenerator(dialect);
     const wordTarget = WORD_TARGET_BY_LEVEL[level];
+    const focus = options.focus ?? [];
+    const recentTopics = options.recentTopics ?? [];
+    const focusBlock =
+      focus.length === 0
+        ? ""
+        : `\nLe scénario doit naturellement faire pratiquer ces structures, sans nommer de termes de grammaire :\n${focus.map((item) => `- ${item.label} : ${item.elicitHint}`).join("\n")}`;
+    const topicsBlock =
+      recentTopics.length === 0
+        ? ""
+        : `\nÉvite ces sujets récents : ${recentTopics.join(", ")}.`;
 
     const systemPrompt = `Tu es un tuteur d'écriture en français. Génère des consignes d'écriture pour des apprenants au niveau CECR ${level}. L'apprenant utilise le français de la Louisiane (règles ci-dessous).
 
@@ -51,6 +70,7 @@ Chaque consigne doit :
 - Varier le registre (formel, familier, mixt) d'une consigne à l'autre ; ne pas toujours choisir familier
 - Ne jamais exiger le subjonctif, le passé simple ni le futur simple ; le futur avec aller + infinitif est permis
 - Ne pas imposer de nombre de mots dans le texte : l'objectif mot (${wordTarget.min}–${wordTarget.max}) est ajouté par le serveur
+${focusBlock}${topicsBlock}
 
 ${dialectRules}
 

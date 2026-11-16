@@ -18,10 +18,25 @@ import {
   quotaTimeZone,
 } from "@/modules/quota-manager/quota-store";
 import { first } from "@/lib/first";
+import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
+import { toFocusItems } from "@/modules/dialect/taxonomy";
+import { computeFocus } from "@/modules/weakness-service/compute-focus";
+import { listRankedWeaknesses } from "@/modules/weakness-service/weakness-store";
 import { and, desc, eq } from "drizzle-orm";
 
-async function getTodayActiveSession(): Promise<TodayActiveSession | null> {
+async function resolveFocus(focusJson: string | null | undefined) {
+  if (focusJson !== undefined) {
+    const snapshot = parseStoredFocus(focusJson);
+    if (snapshot !== null) return toFocusItems(snapshot);
+  }
+  return toFocusItems(computeFocus(await listRankedWeaknesses(), null));
+}
+
+async function getTodayActiveSession(): Promise<{
+  session: TodayActiveSession;
+  focusJson: string | null;
+} | null> {
   const today = todayLocalDateKey(quotaTimeZone());
   const rows = await db
     .select()
@@ -43,14 +58,20 @@ async function getTodayActiveSession(): Promise<TodayActiveSession | null> {
       ? { text: row.writingText, savedAt: row.writingSavedAt }
       : null;
   return {
-    id: row.id,
-    prompt: row.promptText,
-    promptMeta: parseStoredPromptMeta(row.promptMetaJson),
-    draft,
+    session: {
+      id: row.id,
+      prompt: row.promptText,
+      promptMeta: parseStoredPromptMeta(row.promptMetaJson),
+      draft,
+    },
+    focusJson: row.focusJson,
   };
 }
 
-async function getTodayReviewSession(): Promise<TodayReviewSession | null> {
+async function getTodayReviewSession(): Promise<{
+  session: TodayReviewSession;
+  focusJson: string | null;
+} | null> {
   const today = todayLocalDateKey(quotaTimeZone());
   const rows = await db
     .select()
@@ -71,33 +92,35 @@ async function getTodayReviewSession(): Promise<TodayReviewSession | null> {
   const stored = parseStoredEvaluation(row.evaluationJson);
   if (stored.status !== "v2") return null;
   return {
-    id: row.id,
-    prompt: row.promptText,
-    promptMeta: parseStoredPromptMeta(row.promptMetaJson),
-    writingText: row.writingText,
-    evaluation: stored.value,
-    corrections: await listCorrectionsForSession(row.id),
+    session: {
+      id: row.id,
+      prompt: row.promptText,
+      promptMeta: parseStoredPromptMeta(row.promptMetaJson),
+      writingText: row.writingText,
+      evaluation: stored.value,
+      corrections: await listCorrectionsForSession(row.id),
+    },
+    focusJson: row.focusJson,
   };
 }
 
 export async function buildTodayResponse(): Promise<TodayGetDto> {
-  const [level, quota, activeSession, advancement] = await Promise.all([
+  const [level, quota, active, advancement] = await Promise.all([
     getCurrentLevel(),
     getQuotaState(),
     getTodayActiveSession(),
     getPendingAdvancement(),
   ]);
 
-  const reviewSession =
-    activeSession === null ? await getTodayReviewSession() : null;
+  const review = active === null ? await getTodayReviewSession() : null;
 
   return {
     level,
     levelName: level ? CEFR_UI_LABELS[level] : null,
     quota,
-    focus: [],
-    activeSession,
-    reviewSession,
+    focus: await resolveFocus(active?.focusJson ?? review?.focusJson),
+    activeSession: active?.session ?? null,
+    reviewSession: review?.session ?? null,
     advancement,
   };
 }

@@ -25,9 +25,27 @@ type Bucket = {
   count: number;
   lastSeenAt: string;
   windowHits: boolean[];
+  windowCount: number;
 };
 
-export function aggregateWeaknesses(sessions: WeaknessSession[]): Weakness[] {
+export type RankedWeakness = Weakness & {
+  s: number;
+  windowCount: number;
+};
+
+export function toWeaknessDto(row: RankedWeakness): Weakness {
+  return {
+    category: row.category,
+    label: row.label,
+    count: row.count,
+    lastSeenAt: row.lastSeenAt,
+    trend: row.trend,
+  };
+}
+
+export function aggregateWeaknesses(
+  sessions: WeaknessSession[],
+): RankedWeakness[] {
   const feeding = sessions
     .filter((session) => sessionFeedsWeaknessMemory(session.kind))
     .slice()
@@ -43,15 +61,18 @@ export function aggregateWeaknesses(sessions: WeaknessSession[]): Weakness[] {
       }
       const category = correction.category;
       inSession.add(category);
+      const inWindow = index < windowLength;
       const bucket = buckets.get(category);
       if (bucket === undefined) {
         buckets.set(category, {
           count: 1,
           lastSeenAt: session.evaluatedAt,
           windowHits: Array.from({ length: windowLength }, () => false),
+          windowCount: inWindow ? 1 : 0,
         });
       } else {
         bucket.count += 1;
+        if (inWindow) bucket.windowCount += 1;
         if (session.evaluatedAt > bucket.lastSeenAt) {
           bucket.lastSeenAt = session.evaluatedAt;
         }
@@ -64,7 +85,7 @@ export function aggregateWeaknesses(sessions: WeaknessSession[]): Weakness[] {
     }
   }
 
-  const rows: Array<Weakness & { s: number }> = [];
+  const rows: RankedWeakness[] = [];
   for (const [category, bucket] of buckets) {
     rows.push({
       category,
@@ -73,6 +94,7 @@ export function aggregateWeaknesses(sessions: WeaknessSession[]): Weakness[] {
       lastSeenAt: bucket.lastSeenAt,
       trend: computeTrend(bucket.windowHits),
       s: bucket.windowHits.filter(Boolean).length,
+      windowCount: bucket.windowCount,
     });
   }
   rows.sort((a, b) => {
@@ -81,11 +103,5 @@ export function aggregateWeaknesses(sessions: WeaknessSession[]): Weakness[] {
     if (b.s !== a.s) return b.s - a.s;
     return b.count - a.count;
   });
-  return rows.map((row) => ({
-    category: row.category,
-    label: row.label,
-    count: row.count,
-    lastSeenAt: row.lastSeenAt,
-    trend: row.trend,
-  }));
+  return rows;
 }

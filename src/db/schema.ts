@@ -28,6 +28,7 @@ export const sessions = sqliteTable(
     evaluatedAt: text("evaluated_at"),
     abandonedAt: text("abandoned_at"),
     evaluationRaw: text("evaluation_raw"),
+    focusJson: text("focus_json"),
   },
   (table) => [index("sessions_quota_idx").on(table.kind, table.localDate)],
 );
