@@ -8,7 +8,6 @@ import { EvaluationCard } from "@/components/legacy/prompt/evaluation-card";
 import type { SessionView } from "@/contracts/session";
 import { LevelGetResponse, SessionsGetResponse } from "@/contracts/api";
 import { fetchJson } from "@/lib/http";
-import Link from "next/link";
 import { formatFrenchDateTime } from "@/lib/dates";
 
 const LOAD_ERROR = "An error occurred. Please try again.";
@@ -178,17 +177,9 @@ export function HistoryPage() {
   return (
     <div className="flex flex-1 flex-col">
       <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-8">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
-            History
-          </h1>
-          <Link
-            href="/"
-            className="text-sm text-zinc-500 transition-colors hover:text-zinc-700"
-          >
-            Back
-          </Link>
-        </div>
+        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
+          History
+        </h1>
 
         {levelData && levelData.history.length > 0 && (
           <div className="rounded-xl border bg-white p-6">
