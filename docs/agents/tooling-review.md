@@ -1077,3 +1077,96 @@ Non-blocking for T19 merge. Land **TOOL-PR68-1** and **TOOL-PR68-2** before T21.
 | TOOL-PR68-3 | `no-animate-pulse`; e2e hung routes must not `route.abort`   | T19 removes pulse; offline spec aborts after 11s hides missing timeout |
 | TOOL-PR68-4 | `no-connectivity-in-render`                                  | `useState(!navigator.onLine)` true on SSR; duplicate `online` listener |
 | —           | Folds TOOL-PR62-1/3, PR57-1, PR54-5, PR62-2, PR66-*, PR67-3  | Brackets, copy, e2e geometry/viewports, draft route, flat error codes  |
+
+### Backlog from PR #69 tooling review (2026-11-16)
+
+Non-blocking for T20 merge. Land **TOOL-PR69-3** and **TOOL-PR69-4** with the next route/error ticket; **TOOL-PR69-8** before more `*-store` DB work.
+
+| ID (draft)   | Rule / change                                                     | Notes                                                                                                              |
+| ------------ | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| TOOL-PR69-1  | `e2e-scenario-type-single-source`                                 | `E2eScenario` duplicated in `e2e/support/fixtures.ts` after `"advance"` added in `src/server/ai-client.ts`         |
+| TOOL-PR69-2  | `e2e-advancement-copy-single-source`                              | `advancement.spec.ts` literals `Te voilà en B2.` / `Rester en B1` vs `homeCopy.advance*` in `src/copy/fr.ts`       |
+| TOOL-PR69-3  | `api-learner-copy-single-source` (extends TOOL-PR66-4)            | `NO_LEVEL` + undo `NOT_FOUND`/`CONFLICT` French strings inline in route handlers                                   |
+| TOOL-PR69-4  | `route-error-map-single-source` (extends TOOL-PR68-1)             | `level/undo/route.ts` hand-built `{ error: { code, message } }`; draft route already uses `DRAFT_ERRORS` map       |
+| TOOL-PR69-5  | `advancement-streak-in-tests`                                     | `level-streak.test.ts` `toBe(3)` / `shouldPromote(3)` while production uses `ADVANCEMENT_STREAK` from `limits.ts`  |
+| TOOL-PR69-6  | `no-shadowed-domain-helper-in-tests`                              | Test file redefines `shouldPromote` matching private `level-store` logic — export or assert via `recordEvaluation` |
+| TOOL-PR69-7  | Widen `no-boolean-loading-state` → `*Busy` / `*busy` state names  | `home-page.tsx` `undoBusy` (+ `advancement-banner` `undoBusy` prop)                                                |
+| TOOL-PR69-8  | `modules-*-store-db-allowlist` ratchet in `eslint-config.test.ts` | ESLint ignores `src/modules/**/*-store.ts` for `@/db`; `level-store.ts` is the new permanent coupling              |
+| TOOL-PR69-9  | `level-since-epoch-single-source`                                 | Duplicated `1970-01-01T00:00:00.000Z` sentinel in `getStreakCount` / `recordEvaluation`                            |
+| TOOL-PR69-10 | `no-raw-sql-in-e2e-seeds`                                         | `e2e/support/advancement-seed.ts` multi-table `client.execute` SQL                                                 |
+| —            | Folds TOOL-PR62-1, TOOL-PR57-1, TOOL-PR54-5                       | `advancement-banner.tsx` `text-[18px]` / `px-[22px]`; `boundingBox` 44px; per-test `setViewportSize`               |
+
+**Proposed snippets (not in repo yet)**
+
+`e2e-scenario-type-single-source` — ESLint on `e2e/**`:
+
+```js
+"no-restricted-syntax": [
+  "error",
+  {
+    selector:
+      "TSTypeAliasDeclaration[id.name='E2eScenario']",
+    message:
+      "Import E2eScenario from src/server/ai-client; do not redefine scenario unions in e2e.",
+  },
+],
+```
+
+`e2e-advancement-copy-single-source` — ast-grep on `e2e/**`:
+
+```yaml
+id: e2e-advancement-copy-single-source
+language: Tsx
+severity: error
+message: "Import homeCopy.advanceLead/advanceUndo (or a test helper) instead of hardcoding advancement strings."
+rule:
+  kind: string
+  regex: "(?i)(Te voilà en |Rester en )"
+files: ["e2e/**"]
+ignores: ["e2e/support/**"]
+```
+
+`advancement-streak-in-tests` — ESLint override on `src/modules/cefr-tracker/**/*.test.ts`:
+
+```js
+"@typescript-eslint/no-magic-numbers": [
+  "error",
+  {
+    ignore: [0, 1, 2],
+    detectObjects: false,
+    enforceConst: true,
+    ignoreEnums: true,
+    ignoreNumericLiteralTypes: true,
+    ignoreReadonlyClassProperties: true,
+    ignoreTypeIndexes: true,
+  },
+],
+```
+
+(Pair with `src/config/limits.contract.test.ts` asserting `ADVANCEMENT_STREAK === PLACEMENT_STEPS` only when product intends them equal.)
+
+`no-boolean-loading-state` constraint widen:
+
+```yaml
+constraints:
+  STATE:
+    regex: "(?i)^(is)?(loading|busy|pending|submitting|generating|evaluating)$|(?i)busy$"
+```
+
+`level-since-epoch-single-source`:
+
+```yaml
+id: level-since-epoch-single-source
+language: Tsx
+severity: error
+message: "Use LEVEL_STREAK_EPOCH (src/lib/dates.ts or src/config) instead of an inline 1970 sentinel."
+rule:
+  kind: string
+  regex: '^"1970-01-01'
+files: ["src/**"]
+ignores: ["src/lib/dates.ts", "src/config/**"]
+```
+
+**Adversarial / test hooks (no new lint):** undo HTTP `409`/`404` covered only in `level-store.test.ts`, not `level/undo/route.test.ts`; ticket C2 no-promotion unit test absent (`recordEvaluation` at C2); e2e does not assert immediate post-evaluate banner before `loadToday` completes (relies on second fetch). Optional: export `shouldPromote` for tests instead of shadowing.
+
+**Already enforced / positive:** `ADVANCEMENT_STREAK` in `level-store.ts`; `LevelChangeDto` / `LevelUndoBody` in `@/contracts`; `tracker-store` / `CefrTracker` deleted; `placement` source integration test; `NO_LEVEL` integration test; component copy via `homeCopy`; `fake` `advance` scenario + validated `evaluation.b2.json` fixture.
