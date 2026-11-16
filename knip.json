@@ -22,7 +22,7 @@
     "eslint-plugin-jsx-a11y",
     "@eslint-community/eslint-plugin-eslint-comments"
   ],
-  "ignore": ["src/components/ui/textarea.tsx"],
+  "ignore": ["src/components/ui/textarea.tsx", "src/test/server-only-stub.ts"],
   "ignoreExportsUsedInFile": true,
   "ignoreIssues": {
     "src/db/**": ["exports"],

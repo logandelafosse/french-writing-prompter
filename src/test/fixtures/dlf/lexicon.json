@@ -1,0 +1,506 @@
+{
+  "version": "fixture",
+  "entries": [
+    {
+      "id": "asteur-0a4c0152c15a",
+      "headword": "asteur",
+      "forms": ["asteur", "asteure", "à c’te heure"],
+      "senses": [
+        {
+          "pos": "adv.",
+          "glosses": ["now, right now"],
+          "examples": [
+            {
+              "louisiana_french_text": "Asteure, j’vas essayer d’écrire à vous en cadjin.",
+              "translation": "Now I’m going to try to write to you in Cajun."
+            }
+          ]
+        },
+        {
+          "pos": "adv.",
+          "glosses": ["at present, these days, nowadays"],
+          "examples": [
+            {
+              "louisiana_french_text": "A c’te heure je reste à Basile.",
+              "translation": "I’m living in Basile these days."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bayou-7ec5f5b7f368",
+      "headword": "bayou",
+      "forms": ["bayou"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["bayou, stream"],
+          "examples": [
+            {
+              "louisiana_french_text": "Il reste sur le bayou.",
+              "translation": "He lives on the bayou."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "beaucoup-6608ca8f3a7f",
+      "headword": "beaucoup",
+      "forms": ["beaucoup", "boucoup"],
+      "senses": [
+        {
+          "pos": "adv.",
+          "glosses": ["very"],
+          "examples": [
+            {
+              "louisiana_french_text": "Avec douze piastres et demie, il pouvait pas aller beaucoup loin.",
+              "translation": "With twelve and a half dollars, he couldn’t go very far."
+            }
+          ]
+        },
+        {
+          "pos": "adv.",
+          "glosses": ["much, a lot, a great deal"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "berceuse-71be3f4d7d0b",
+      "headword": "berceuse",
+      "forms": ["berceuse"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["rocking chair, rocker"],
+          "examples": []
+        },
+        {
+          "pos": "n.f.",
+          "glosses": ["rocker, blade or runner of a rocking chair"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "bonhomme-d08faf901981",
+      "headword": "bonhomme",
+      "forms": ["bonhomme"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["man, fellow"],
+          "examples": [
+            {
+              "louisiana_french_text": "Il arrive un bonhomme.",
+              "translation": "A man is coming."
+            }
+          ]
+        },
+        {
+          "pos": "n.m.",
+          "glosses": ["any crude representation of a human figure"],
+          "examples": [
+            {
+              "louisiana_french_text": "Il a vu le bonhomme, et a cru que c’était Bouki. “Mais, ” il dit, “je vas t’installer, Bouki!”",
+              "translation": "He saw the mannequin and thought that it was Bouki. “Well,” he said, “I’ll fix you, Bouki!”"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "catastrophe-9d8ad258d056",
+      "headword": "catastrophe",
+      "forms": ["catastrophe"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["catastrophe"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "catin-cb2c54712a19",
+      "headword": "catin",
+      "forms": ["catin"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["doll"],
+          "examples": [
+            {
+              "louisiana_french_text": "Mes sœurs avaient des catins comme ça faits à la main.",
+              "translation": "My sisters had dolls like that, handmade."
+            }
+          ]
+        },
+        {
+          "pos": "n.f.",
+          "glosses": ["dear, sweetheart"],
+          "examples": [
+            {
+              "louisiana_french_text": "Chère ’tite catin.",
+              "translation": "Dear little sweetheart."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chaoui-c74205e16d1b",
+      "headword": "chaoui",
+      "forms": ["chaoui"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["raccoon"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "chevrette-f9654e10136b",
+      "headword": "chevrette",
+      "forms": ["chevrette"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["shrimp"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "cocodrie-fa99ae67e59b",
+      "headword": "cocodrie",
+      "forms": ["cocodrie", "crocodril", "crocodile"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["alligator"],
+          "examples": [
+            {
+              "louisiana_french_text": "Vousautres a déjà vu un cocodrie?",
+              "translation": "Have you ever seen an alligator?"
+            }
+          ]
+        },
+        {
+          "pos": "n.m.",
+          "glosses": ["crocodile"],
+          "examples": [
+            {
+              "louisiana_french_text": "Nousautres on a des alligators icitte, les cocodries peutêtre dans la Floride mais pas icitte.",
+              "translation": "We have alligators here, crocodiles can be found in Florida but not here."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "coton-a959cd80d77b",
+      "headword": "coton",
+      "forms": ["coton"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["stem, stalk"],
+          "examples": [
+            {
+              "louisiana_french_text": "Le coton de la feuille a cassé.",
+              "translation": "The stem of the leaf broke."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "créole-4110866e60ca",
+      "headword": "créole",
+      "forms": ["créole"],
+      "senses": [
+        {
+          "pos": "adj.",
+          "glosses": ["Creole, pertaining to Creole language or culture"],
+          "examples": [
+            {
+              "louisiana_french_text": "Ça c’est un mot créole.",
+              "translation": "That’s a Creole word."
+            }
+          ]
+        },
+        {
+          "pos": "adj.",
+          "glosses": [
+            "Creole, native to Louisiana, grown or produced in Louisiana"
+          ],
+          "examples": [
+            {
+              "louisiana_french_text": "Mon père élevait des bêtes, mais c’était juste des bêtes créoles, ça ça voulait dire qu’il avait pas une race particulière.",
+              "translation": "My father raised cattle, but they were just native [Louisiana] cattle, that meant that they weren’t any particular breed."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "côté-df98d2eb1ebb",
+      "headword": "côté",
+      "forms": ["côté"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["side"],
+          "examples": [
+            {
+              "louisiana_french_text": "T’amarres ta corde sur le côté du bateau, là tu jettes ça à l’eau.",
+              "translation": "You tie the rope onto the side of the boat, then you throw it in the water."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fais-dodo-51558e1aafcb",
+      "headword": "fais-dodo",
+      "forms": ["fais-dodo", "fais do-do"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["traditional Cajun community dance"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "gris-gris-ca992a9d959a",
+      "headword": "gris-gris",
+      "forms": ["gris-gris", "gri-gri"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["charm, amulet"],
+          "examples": [
+            {
+              "louisiana_french_text": "Le traiteur m’a passé un gris-gris.",
+              "translation": "The folk healer gave me a charm."
+            }
+          ]
+        },
+        {
+          "pos": "n.m.",
+          "glosses": ["spell, hex"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "gumbo-5f5185bd4052",
+      "headword": "gumbo",
+      "forms": ["gumbo"],
+      "senses": [
+        {
+          "pos": "n.",
+          "glosses": ["gumbo"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "ici-c10dcfacdb35",
+      "headword": "ici",
+      "forms": ["ici", "icite", "icitte"],
+      "senses": [
+        {
+          "pos": "adv.",
+          "glosses": ["here, over here, around here"],
+          "examples": [
+            {
+              "louisiana_french_text": "Nous-autres, on est tous des Catholiques ici.",
+              "translation": "We are all Catholics here."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lagniappe-8bc8f2b3ecff",
+      "headword": "lagniappe",
+      "forms": ["lagniappe"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["tip, bonus"],
+          "examples": [
+            {
+              "louisiana_french_text": "Hé toi! Tu veux me faire de la misère, hein? Je crois pas que je vas te donner lagniappe. Hey you!",
+              "translation": "You want to give me trouble? I don’t think I’m going to give you a bonus."
+            }
+          ]
+        },
+        {
+          "pos": "n.f.",
+          "glosses": ["little something extra received for free"],
+          "examples": [
+            {
+              "louisiana_french_text": "Dans le vieux temps, on avait toujours lagniappe quand on allait à la grocerie.",
+              "translation": "In the old days, we always had a little something extra when we went to the grocery store."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "moqueur-63193a585d5d",
+      "headword": "moqueur",
+      "forms": ["moqueur"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["mockingbird"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "mouiller-a05d63825efa",
+      "headword": "mouiller",
+      "forms": ["mouiller"],
+      "senses": [
+        {
+          "pos": "v.intr.",
+          "glosses": ["to rain"],
+          "examples": [
+            {
+              "louisiana_french_text": "Ça va mouiller fort à soir.",
+              "translation": "It’s going to rain hard tonight."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nénaine-9ba6a71849f4",
+      "headword": "nénaine",
+      "forms": ["nénaine", "nenaine", "naine"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["godmother"],
+          "examples": []
+        },
+        {
+          "pos": "n.f.",
+          "glosses": ["grandmother, grandma"],
+          "examples": [
+            {
+              "louisiana_french_text": "Naine va venir me voir demain.",
+              "translation": "Grandma is coming to see me tomorrow."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "parrain-f776c96996f5",
+      "headword": "parrain",
+      "forms": ["parrain"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["godfather, sponsor"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "patate-b86c63844d87",
+      "headword": "patate",
+      "forms": ["patate"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["potato"],
+          "examples": []
+        },
+        {
+          "pos": "n.f.",
+          "glosses": ["sweet potato"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "pirogue-3e5505dcd99f",
+      "headword": "pirogue",
+      "forms": ["pirogue"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["pirogue"],
+          "examples": [
+            {
+              "louisiana_french_text": "Pour faire une pirogue, ça c’est le moule qu’ils usont. Ça fait la bonne tenture sur les deux bords.",
+              "translation": "To make a pirogue, that’s the mold they use. That gives you a good flare on both sides."
+            }
+          ]
+        },
+        {
+          "pos": "n.f.",
+          "glosses": ["dugout canoe"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "tante-bd27fbfbee88",
+      "headword": "tante",
+      "forms": ["tante"],
+      "senses": [
+        {
+          "pos": "n.f.",
+          "glosses": ["aunt"],
+          "examples": [
+            {
+              "louisiana_french_text": "Je devais parler pour mes tantes et mes noncles.",
+              "translation": "I had to speak for my aunts and uncles."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "zire-d0ca77b30ac3",
+      "headword": "zire",
+      "forms": ["zire"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["disgust"],
+          "examples": []
+        }
+      ]
+    },
+    {
+      "id": "écrevisse-74cb4b54755c",
+      "headword": "écrevisse",
+      "forms": ["écrevisse", "écrivisse", "écruvisse", "crébisse"],
+      "senses": [
+        {
+          "pos": "n.m.",
+          "glosses": ["crawfish, crayfish"],
+          "examples": [
+            {
+              "louisiana_french_text": "On est fier, nous-aut’, que l’écrivisse est le symbole des Cadjins par rapport que c’est l’animal le plus courageux dedans le monde.",
+              "translation": "We’re proud that the crawfish is the symbol of the Cajuns because it’s the bravest animal in the world."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

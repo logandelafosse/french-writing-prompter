@@ -42,6 +42,17 @@ export function CorrectionCard({
               <strong className="text-standard font-medium">
                 {correction.suggestion}
               </strong>
+              {correction.dlf !== null ? (
+                <>
+                  {" "}
+                  <abbr
+                    title={reviewCopy.dlfTitle}
+                    className="text-dlf text-muted no-underline"
+                  >
+                    {reviewCopy.dlf}
+                  </abbr>
+                </>
+              ) : null}
             </>
           )}
         </p>

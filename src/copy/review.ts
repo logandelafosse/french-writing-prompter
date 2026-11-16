@@ -12,6 +12,8 @@ export const reviewCopy = {
   kindStandard: "Français standard",
   arrow: "→",
   avant: "avant :",
+  dlf: "DLF",
+  dlfTitle: "Dictionary of Louisiana French",
   actionAck: "Compris",
   srMark: (kind: Correction["kind"], n: number) => {
     switch (kind) {

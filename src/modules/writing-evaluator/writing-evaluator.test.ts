@@ -1,6 +1,14 @@
 import { describe, it, expect, vi } from "vitest";
 import { WritingEvaluator, type OpenAiClientLike } from "./writing-evaluator";
+import path from "node:path";
 import { buildEvaluatorPrompt } from "./build-evaluator-prompt";
+import { loadDlfLexicon } from "@/modules/dlf/load";
+import {
+  buildDlfIndex,
+  estimateHintTokens,
+  formatDlfHintSection,
+} from "@/modules/dlf/lookup";
+import { DLF_HINT_MAX_HITS, DLF_HINT_MAX_TOKENS } from "@/config/limits";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import type { CefrLevel } from "@/contracts/cefr";
 import { MISTAKE_CATEGORY_IDS } from "@/contracts/mistake-category";
@@ -101,5 +109,62 @@ describe("WritingEvaluator", () => {
     for (const id of MISTAKE_CATEGORY_IDS) {
       expect(built.system).toContain(id);
     }
+  });
+
+  it("injects a DLF gloss and Louisiana example for fixture hits in the text", async () => {
+    const index = loadDlfLexicon(
+      path.join(process.cwd(), "src/test/fixtures/dlf/lexicon.json"),
+    );
+    const mockClient: OpenAiClientLike = {
+      chatCompletionJSON: vi.fn().mockResolvedValue(outputFixture()),
+    };
+    const evaluator = new WritingEvaluator(mockClient, index);
+    await evaluator.evaluate(
+      "Asteur on va au bayou.",
+      makePrompt("B1"),
+      DEFAULT_DIALECT,
+    );
+    const params = vi.mocked(mockClient.chatCompletionJSON).mock.calls[0]?.[1];
+    const systemMsg = params?.messages.find((m) => m.role === "system");
+    expect(systemMsg?.content).toContain("now, right now");
+    expect(systemMsg?.content).toContain(
+      "Asteure, j’vas essayer d’écrire à vous en cadjin.",
+    );
+    expect(systemMsg?.content).toMatch(/usage louisianais attesté/i);
+  });
+
+  it("caps and truncates DLF hint cards to the documented token budget", () => {
+    const entries = Array.from({ length: 40 }, (_, i) => ({
+      id: `w-${i}`,
+      headword: `word${String(i).padStart(2, "0")}xxxx`,
+      forms: [`word${String(i).padStart(2, "0")}xxxx`],
+      senses: [
+        {
+          pos: "n.",
+          glosses: ["x".repeat(80)],
+          examples: [
+            {
+              louisiana_french_text: "y".repeat(80),
+              translation: "z".repeat(80),
+            },
+          ],
+        },
+      ],
+    }));
+    const index = buildDlfIndex(entries);
+    const cards = index.cardsForText(entries.map((e) => e.headword).join(" "));
+    expect(cards.length).toBeGreaterThan(0);
+    expect(cards.length).toBeLessThanOrEqual(DLF_HINT_MAX_HITS);
+    expect(estimateHintTokens(formatDlfHintSection(cards))).toBeLessThanOrEqual(
+      DLF_HINT_MAX_TOKENS,
+    );
+    const built = buildEvaluatorPrompt({
+      writing: "Texte.",
+      promptText: "Consigne.",
+      registre: null,
+      dialect: DEFAULT_DIALECT,
+      dlfCards: cards,
+    });
+    expect(built.system).toContain(cards[0]?.headword);
   });
 });

@@ -54,3 +54,7 @@ next-env.d.ts
 
 # scratch
 .ticket-issue-body.tmp.md
+
+# DLF lexicon Release asset (installed by npm run dlf:fetch)
+/src/data/dlf/lexicon.json
+/src/data/dlf/version

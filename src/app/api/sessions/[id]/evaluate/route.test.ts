@@ -108,6 +108,45 @@ describe("POST /api/sessions/:id/evaluate", () => {
     expect(second.status).toBe(409);
   });
 
+  it("attaches dlf to an attested standard suggestion from the fixture lexicon", async () => {
+    const session = await seedSession();
+    const response = await POST(
+      new Request(`http://localhost/api/sessions/${session.id}/evaluate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: writing }),
+      }),
+      { params: Promise.resolve({ id: String(session.id) }) },
+    );
+    expect(response.status).toBe(200);
+    const body = await readResponseJson(response, EvaluatePostResponse);
+    const standard = body.corrections.find((item) => item.kind === "standard");
+    expect(standard?.dlf).toEqual({
+      entryId: "asteur-0a4c0152c15a",
+      headword: "asteur",
+    });
+  });
+
+  it("still completes Evaluation when the lexicon file is missing", async () => {
+    vi.stubEnv("DLF_LEXICON_PATH", "/no/such/dlf-lexicon.json");
+    clearEnvCache();
+    const session = await seedSession();
+    const response = await POST(
+      new Request(`http://localhost/api/sessions/${session.id}/evaluate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: writing }),
+      }),
+      { params: Promise.resolve({ id: String(session.id) }) },
+    );
+    expect(response.status).toBe(200);
+    const body = await readResponseJson(response, EvaluatePostResponse);
+    const standard = body.corrections.find((item) => item.kind === "standard");
+    expect(standard?.kind).toBe("standard");
+    expect(standard?.dlf).toBeNull();
+    expect(body.evaluation.version).toBe(2);
+  });
+
   it("POST /api/evaluate is a thin alias", async () => {
     const session = await seedSession();
     const response = await postAlias(

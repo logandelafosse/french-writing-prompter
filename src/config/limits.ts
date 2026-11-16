@@ -19,6 +19,18 @@ export const EVALUATION_SCORE_MAX = 6;
 /** Max Corrections the evaluator may return per Evaluation. */
 export const EVALUATOR_CORRECTIONS_MAX = 15;
 
+/** Content words shorter than this are skipped for DLF prompt cards. */
+export const DLF_HINT_MIN_LETTERS = 4;
+
+/** Cap on DLF entries injected into the evaluator prompt (ticket: ~25–40). */
+export const DLF_HINT_MAX_HITS = 32;
+
+/**
+ * Max estimated tokens of injected DLF cards (ceil(chars / 4) in
+ * `estimateHintTokens`). Truncate from the end until the section fits.
+ */
+export const DLF_HINT_MAX_TOKENS = 400;
+
 export const WORD_TARGET_BY_LEVEL: Record<
   CefrLevel,
   { min: number; max: number }

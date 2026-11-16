@@ -8,6 +8,7 @@ import { PlacementPostBody } from "@/contracts/api";
 import { toPlaceholderEvaluation } from "@/contracts/evaluation";
 import { parseRequestBody } from "@/lib/http";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { getDlfIndex } from "@/modules/dlf/load";
 
 let placementTest: PlacementTest | null = null;
 
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
     const client = getAiClient(scenarioFromRequest(request));
     placementTest = new PlacementTest(
       new PromptGenerator(client),
-      new WritingEvaluator(client),
+      new WritingEvaluator(client, getDlfIndex()),
       DEFAULT_DIALECT,
     );
     const prompt = await placementTest.start();
