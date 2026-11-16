@@ -64,6 +64,9 @@ evidence only.
 - Before the model call, content words (4+ letters, cap `DLF_HINT_MAX_HITS`)
   that hit the lexicon are injected as short cards, truncated to
   `DLF_HINT_MAX_TOKENS` (estimated as `ceil(chars / 4)`).
-- After the model call, attested `standard` suggestions get
-  `dlf = { entryId, headword }`; a miss keeps the Correction and hides the
+- After the model call, a `standard` Correction gets
+  `dlf = { entryId, headword }` only when lookup hits on the **suggestion**
+  string (exact, plural-strip, or accent-fold of that form). An
+  `accentMismatch` hit still qualifies. A miss — including when only the
+  model's `dlf_headword` is attested — keeps the Correction and hides the
   badge.

@@ -83,7 +83,6 @@ export function postProcessEvaluation(
         row.item.kind === "standard"
           ? attributeStandard({
               suggestion: row.item.suggestion,
-              dlfHeadword: row.item.dlf_headword,
               lookup: ctx.lookupDlf ?? (() => null),
             })
           : null,

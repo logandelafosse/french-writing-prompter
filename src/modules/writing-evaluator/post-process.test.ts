@@ -163,6 +163,30 @@ describe("postProcessEvaluation", () => {
     });
   });
 
+  it("does not set dlf when the suggestion misses and only dlf_headword is attested", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "standard",
+          quote: "Maintenant",
+          suggestion: "mon char",
+          dlf_headword: "asteur",
+        }),
+      ]),
+      {
+        text: writing,
+        sessionId: 1,
+        now,
+        createId: ids(),
+        lookupDlf: (word) => dlfIndex.lookup(word),
+      },
+    );
+    const item = result.corrections[0];
+    expect(item?.kind).toBe("standard");
+    expect(item?.suggestion).toBe("mon char");
+    expect(item?.dlf).toBeNull();
+  });
+
   it("keeps an unattested standard Correction with dlf null and does not make a Mistake", () => {
     const result = postProcessEvaluation(
       baseOutput([

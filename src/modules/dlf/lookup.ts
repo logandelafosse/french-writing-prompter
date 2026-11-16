@@ -186,18 +186,18 @@ export function dlfIndexFromText(text: string): DlfIndex {
   return buildDlfIndex(parsed.value.entries);
 }
 
+/**
+ * Badge a `standard` suggestion only when `lookup` hits on that suggestion
+ * string (exact, then plural-strip, then accent-fold — same order as
+ * `DlfIndex.lookup`). An `accentMismatch` hit still qualifies: it is the
+ * suggestion form with different diacritics, not a different headword.
+ * The model's `dlf_headword` is never a fallback; a miss is `null`.
+ */
 export function attributeStandard(args: {
   suggestion: string;
-  dlfHeadword: string | null;
   lookup: (word: string) => DlfHit | null;
 }): { entryId: string; headword: string } | null {
-  const candidates = [args.suggestion];
-  if (args.dlfHeadword !== null && args.dlfHeadword.length > 0) {
-    candidates.push(args.dlfHeadword);
-  }
-  for (const word of candidates) {
-    const hit = args.lookup(word);
-    if (hit) return { entryId: hit.entryId, headword: hit.headword };
-  }
-  return null;
+  const hit = args.lookup(args.suggestion);
+  if (!hit) return null;
+  return { entryId: hit.entryId, headword: hit.headword };
 }
