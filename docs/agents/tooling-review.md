@@ -1170,3 +1170,51 @@ ignores: ["src/lib/dates.ts", "src/config/**"]
 **Adversarial / test hooks (no new lint):** undo HTTP `409`/`404` covered only in `level-store.test.ts`, not `level/undo/route.test.ts`; ticket C2 no-promotion unit test absent (`recordEvaluation` at C2); e2e does not assert immediate post-evaluate banner before `loadToday` completes (relies on second fetch). Optional: export `shouldPromote` for tests instead of shadowing.
 
 **Already enforced / positive:** `ADVANCEMENT_STREAK` in `level-store.ts`; `LevelChangeDto` / `LevelUndoBody` in `@/contracts`; `tracker-store` / `CefrTracker` deleted; `placement` source integration test; `NO_LEVEL` integration test; component copy via `homeCopy`; `fake` `advance` scenario + validated `evaluation.b2.json` fixture.
+
+### PR #70 (T21a — corrections table + parser)
+
+Non-blocking for T21a merge. Land **TOOL-PR70-1**, **TOOL-PR70-2**, **TOOL-PR70-3**, and **TOOL-PR70-5** before **T21b** (`chatCompletionJSON` + persist).
+
+| ID (draft)   | Rule / change                                              | Notes                                                                                                    |
+| ------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| TOOL-PR70-1  | `output-schema-strict-nullable`                            | `EvaluatorOutputSchema` / `EvaluationV2` use `z.object`; AC omits `additionalProperties: false` ratchet    |
+| TOOL-PR70-2  | `EVALUATOR_CORRECTIONS_MAX` + contracts `no-magic-numbers` | `.max(15)` in `evaluation.ts`; folds TOOL-PR63-9                                                         |
+| TOOL-PR70-3  | `Dimension` enum single-source                             | Four dimension keys repeated; backend §1 `Dimension`                                                     |
+| TOOL-PR70-4  | Export v2 `DimensionScore` shape                           | `DimensionScore` alias still legacy `{max}`; T21b import trap                                            |
+| TOOL-PR70-5  | LLM `category` → `MistakeCategory.nullable()`              | `z.string().nullable()` allows invented IDs at Structured Outputs boundary                               |
+| TOOL-PR70-6  | `countsAsMistake` exhaustive `switch`                       | Boolean-or; History `if/else if` on parse status misses future variants                                    |
+| TOOL-PR70-7  | `no-in-operator-schema-narrowing`                          | `toPlaceholderEvaluation` uses `"tips" in` / `"version" in`                                              |
+| TOOL-PR70-8  | Kind/status/anchor `as const` IDs                          | Inline `z.enum([...])`; T21b prompt will copy strings                                                     |
+| TOOL-PR70-9  | 1-based ints `.positive()`                                 | `occurrence`, `ordinal`, `sessionId` unbounded `.int()`                                                  |
+| TOOL-PR70-10 | DB text enums + JSON columns parse on read                 | `corrections` raw `text()` columns; land with T21b persist                                               |
+
+**Proposed snippets (not in repo yet)**
+
+`no-optional-in-output-schema` (ast-grep on evaluation/output contracts):
+
+```yaml
+id: no-optional-in-output-schema
+language: Tsx
+severity: error
+message: "LLM *OutputSchema must use .nullable(), never .optional()."
+rule:
+  pattern: $X.optional()
+files: ["src/contracts/evaluation.ts", "src/contracts/**/*output*"]
+```
+
+`countsAsMistake` exhaustive switch (reference for TOOL-PR70-6):
+
+```ts
+export function countsAsMistake(c: Pick<Correction, "kind" | "status">): boolean {
+  switch (c.kind) {
+    case "mistake":
+      return c.status !== "overturned";
+    case "standard":
+      return false;
+    case "dialect_check":
+      return c.status === "confirmed_mistake";
+  }
+}
+```
+
+**Already enforced / positive:** `parseJson` in `parseStoredEvaluation`; `EVALUATION_SCORE_MAX`; `MISTAKE_CATEGORY_IDS` + `z.enum`; omitted-nullable parse test; malformed → unreadable in History.
