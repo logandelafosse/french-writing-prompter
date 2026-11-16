@@ -16,6 +16,13 @@ describe("locateQuote", () => {
     expect(text.slice(8, 11)).toBe("foo");
   });
 
+  it("falls back to the first match at or after cursor when the n-th is missing", () => {
+    const text = "foo bar foo";
+    const found = locateQuote(text, "foo", 3, 3);
+    expect(found).toEqual({ span: { start: 8, end: 11 }, anchor: "exact" });
+    expect(text.slice(8, 11)).toBe("foo");
+  });
+
   it("matches curly vs straight apostrophe", () => {
     const text = "j'ai tombé";
     const found = locateQuote(text, "j\u2019ai", 1, 0);

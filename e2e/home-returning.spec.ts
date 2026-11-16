@@ -57,7 +57,6 @@ test("interim phase B submit still produces an Evaluation", async ({
   page,
   scenario,
 }) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
   await scenario("happy");
   await page.goto("/");
   await page.getByRole("button", { name: /A2/i }).click();

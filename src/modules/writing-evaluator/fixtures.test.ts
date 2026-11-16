@@ -77,6 +77,7 @@ function processFixture(name: string) {
     anchor: c.anchor,
     category: c.category,
     question: c.question,
+    explanation: c.explanation,
   }));
 }
 
@@ -92,6 +93,7 @@ describe("evaluator fixtures", () => {
         anchor: "exact",
         category: null,
         question: null,
+        explanation: "Préférence louisianaise, pas une faute.",
       },
       {
         id: "fix-2",
@@ -102,6 +104,7 @@ describe("evaluator fixtures", () => {
         anchor: "exact",
         category: "conjugaison",
         question: dialectCheckQuestion("je vas"),
+        explanation: "Je te demande si c'est voulu.",
       },
       {
         id: "fix-3",
@@ -112,6 +115,7 @@ describe("evaluator fixtures", () => {
         anchor: "exact",
         category: "accord",
         question: null,
+        explanation: "L'accord du nom au pluriel manque.",
       },
     ]);
   });
@@ -127,6 +131,7 @@ describe("evaluator fixtures", () => {
         anchor: "none",
         category: "orthographe",
         question: null,
+        explanation: "Citation absente du texte.",
       },
     ]);
   });
@@ -142,6 +147,7 @@ describe("evaluator fixtures", () => {
         anchor: "normalized",
         category: null,
         question: null,
+        explanation: "Même mot, casse différente.",
       },
       {
         id: "fix-2",
@@ -152,6 +158,7 @@ describe("evaluator fixtures", () => {
         anchor: "normalized",
         category: "orthographe",
         question: null,
+        explanation: "Apostrophe courbe.",
       },
     ]);
   });
@@ -167,6 +174,7 @@ describe("evaluator fixtures", () => {
         anchor: "exact",
         category: "accord",
         question: null,
+        explanation: "Le second enfant n'a pas de s.",
       },
     ]);
   });
@@ -182,6 +190,7 @@ describe("evaluator fixtures", () => {
         anchor: "exact",
         category: "accord",
         question: null,
+        explanation: "Premier empan.",
       },
       {
         id: "fix-2",
@@ -192,6 +201,7 @@ describe("evaluator fixtures", () => {
         anchor: "none",
         category: "accord",
         question: null,
+        explanation: "Deuxième empan chevauchant.",
       },
     ]);
   });
@@ -209,14 +219,25 @@ describe("evaluator fixtures", () => {
         anchor: "exact",
         category: "autre",
         question: null,
+        explanation: "Catégorie inventée.",
       },
     ]);
   });
 
   it("english-explanations still produce corrections", () => {
-    expect(processFixture("english-explanations.json")[0]?.kind).toBe(
-      "mistake",
-    );
+    expect(processFixture("english-explanations.json")).toEqual([
+      {
+        id: "fix-1",
+        ordinal: 1,
+        kind: "mistake",
+        quote: "Les enfant",
+        span: { start: 28, end: 38 },
+        anchor: "exact",
+        category: "accord",
+        question: null,
+        explanation: "Missing plural -s on the noun.",
+      },
+    ]);
   });
 
   it("invalid-json and missing-field raise AiOutputError", () => {
