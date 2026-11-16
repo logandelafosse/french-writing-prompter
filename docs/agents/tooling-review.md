@@ -984,3 +984,12 @@ Not in T13c scope; file as separate tooling tickets when convenient.
 | TOOL-PR54-7 | ESLint `allowTypeImports` negation for `*-store` + `quota-state-single-source` | hand-written `QuotaState` in store                        |
 | TOOL-PR54-8 | `no-arbitrary-chip-radius`                                                     | `rounded-[22px]` vs `rounded-chip`                        |
 | TOOL-PR54-9 | Unit test: stale `GET /api/level` vs `onLevelChange`                           | no generation guard on level fetch                        |
+
+### Backlog from PR #57 tooling review (2026-11-15)
+
+| ID (draft)  | Rule                         | Notes                                                            |
+| ----------- | ---------------------------- | ---------------------------------------------------------------- |
+| TOOL-PR57-1 | `no-e2e-layout-geometry`     | `boundingBox` / `children.length` in `expectTwoMobileHeaderRows` |
+| TOOL-PR57-2 | `no-display-contents`        | `sm:contents` on header row wrappers                             |
+| TOOL-PR57-3 | `no-effect-writes-own-dep`   | `syncFromShell` + `setData` retriggers effect                    |
+| TOOL-PR57-4 | `level-get-needs-generation` | implement `levelFetchGen` (TOOLS-PR54-9 product fix → **T13f**)  |
