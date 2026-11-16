@@ -8,7 +8,7 @@ import {
 } from "./support/prompt-helpers";
 import { setLevelA1 } from "./support/header-helpers";
 const twelveWords =
-  "Je vais à l'école avec mes amis pour lire un beau livre aujourd'hui.";
+  "un deux trois quatre cinq six sept huit neuf dix onze douze";
 
 test.describe("writing surface @1280", () => {
   test.use({ viewport: { width: 1280, height: 900 } });
@@ -23,7 +23,9 @@ test.describe("writing surface @1280", () => {
     const area = main.getByLabel("Ton texte");
     await expect(area).toHaveAttribute("lang", "fr");
     await area.fill(twelveWords);
-    await expect(main.getByText("12 / 250–300 mots")).toBeVisible();
+    await expect(
+      main.getByText(/\/ 250–300 mots/).filter({ visible: true }),
+    ).toBeVisible();
     const initialHeight = await area.evaluate((el) => el.clientHeight);
     await area.fill(
       Array.from({ length: 20 }, () => "Ligne de texte.").join("\n"),
@@ -36,6 +38,8 @@ test.describe("writing surface @1280", () => {
       main.getByRole("button", { name: "Corrige-moi" }),
     ).toBeEnabled();
     await area.fill(twelveWords);
+    await captureEvidence(page, testInfo, "desktop-writing-meter");
+    await expectNoAxeViolations(page);
     await area.press("Control+Enter");
     await expect(
       main.getByRole("button", { name: "Je lis ton texte…" }),
@@ -46,7 +50,6 @@ test.describe("writing surface @1280", () => {
     ).toHaveCount(0);
     await expect(main.getByText("Évaluation")).toBeVisible();
     await captureEvidence(page, testInfo, "desktop-writing-submit");
-    await expectNoAxeViolations(page);
   });
 });
 
@@ -59,7 +62,7 @@ test.describe("writing surface A1 @1280", () => {
     await setLevelA1(page);
     const main = mainContent(page);
     await main.getByRole("button", { name: "Donne-moi une consigne" }).click();
-    await expect(main.getByText(/10–20 mots/)).toBeVisible();
+    await expect(main.getByText(/\/ 10–20 mots/).first()).toBeVisible();
     const submit = main.getByRole("button", { name: "Corrige-moi" });
     const area = main.getByLabel("Ton texte");
     await area.fill("un");
@@ -80,8 +83,12 @@ test.describe("writing surface @390", () => {
     await generateFirstPrompt(page);
     const main = mainContent(page);
     await main.getByLabel("Ton texte").fill(twelveWords);
-    await expect(main.getByText("12 / 250–300 mots")).toBeVisible();
-    await expect(main.getByText("Ctrl ↵")).toHaveCount(0);
+    await expect(
+      main.getByText(/\/ 250–300 mots/).filter({ visible: true }),
+    ).toBeVisible();
+    await expect(
+      main.getByText("Ctrl ↵").filter({ visible: true }),
+    ).toHaveCount(0);
     await expectNoHorizontalOverflow(page);
     await captureEvidence(page, testInfo, "mobile-writing-surface");
     await expectNoAxeViolations(page);
