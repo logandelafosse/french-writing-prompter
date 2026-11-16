@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/",
+  usePathname: () => "/history",
 }));
 import { render, screen, waitFor, act } from "@testing-library/react";
 import { useEffect } from "react";

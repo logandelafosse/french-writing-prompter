@@ -48,7 +48,45 @@ export function nextLocalMidnightIso(
   return new Date(hi).toISOString();
 }
 
-/** e.g. « samedi 14 novembre » (lowercase weekday and month). */
+/** Page title date, e.g. « Samedi 14 novembre » (first letter capitalized). */
+export function formatHomeDateTitle(date: Date, timeZone?: string): string {
+  const lower = formatFrenchDate(date, timeZone);
+  if (lower.length === 0) return lower;
+  return `${lower.charAt(0).toUpperCase()}${lower.slice(1)}`;
+}
+
+export function homeDateTitleParts(
+  date: Date,
+  timeZone?: string,
+): { weekday: string; dayMonth: string; desktop: string } {
+  const tz = resolvedTimeZone(timeZone);
+  const parts = new Intl.DateTimeFormat("fr-FR", {
+    timeZone: tz,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).formatToParts(date);
+
+  const weekdayRaw = parts.find((p) => p.type === "weekday")?.value ?? "";
+  const day = parts.find((p) => p.type === "day")?.value ?? "";
+  const monthRaw = parts.find((p) => p.type === "month")?.value ?? "";
+
+  const weekday =
+    weekdayRaw.length > 0
+      ? `${weekdayRaw.charAt(0).toUpperCase()}${weekdayRaw.slice(1).toLowerCase()}`
+      : "";
+  const month =
+    monthRaw.length > 0
+      ? monthRaw.charAt(0).toLowerCase() + monthRaw.slice(1).toLowerCase()
+      : "";
+
+  return {
+    weekday,
+    dayMonth: `${day} ${month}`,
+    desktop: formatHomeDateTitle(date, timeZone),
+  };
+}
+
 export function formatFrenchDate(date: Date, timeZone?: string): string {
   const tz = resolvedTimeZone(timeZone);
   const parts = new Intl.DateTimeFormat("fr-FR", {

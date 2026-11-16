@@ -6,12 +6,6 @@ const PROMPT_SNIPPET = "La Nouvelle-Orléans";
 const HAPPY_WRITING =
   "Hier, je me suis promené dans mon quartier. J'ai vu des voisins et nous avons parlé du carnaval.";
 
-async function selectLevel(page: import("@playwright/test").Page) {
-  await page.getByRole("button", { name: "Select your level" }).click();
-  await page.getByRole("button", { name: "A2 Survie" }).click();
-  await expect(page.getByRole("button", { name: /A2.*Survie/ })).toBeVisible();
-}
-
 test("learner generates a prompt, writes, and sees the Evaluation and the History entry", async ({
   page,
   scenario,
@@ -20,15 +14,15 @@ test("learner generates a prompt, writes, and sees the Evaluation and the Histor
   await page.goto("/");
   await expectNoAxeViolations(page, LEGACY_AXE_DISABLED);
 
-  await selectLevel(page);
+  await page.getByRole("button", { name: /A2/i }).click();
+  await page.getByRole("button", { name: "Donne-moi une consigne" }).click();
   await captureEvidence(page, testInfo, "home-level");
 
-  await page.getByRole("button", { name: "Generate a prompt" }).click();
   await expect(page.getByText(PROMPT_SNIPPET)).toBeVisible();
   await captureEvidence(page, testInfo, "generated-prompt");
 
   await page.getByRole("textbox").fill(HAPPY_WRITING);
-  await page.getByRole("button", { name: "Submit for evaluation" }).click();
+  await page.getByRole("button", { name: "Corrige-moi" }).click();
   await expect(page.getByRole("heading", { name: "Evaluation" })).toBeVisible();
   await captureEvidence(page, testInfo, "evaluation");
 
@@ -49,14 +43,13 @@ test("malformed AI output shows an error and retry recovers", async ({
 }) => {
   await scenario("happy");
   await page.goto("/");
-  await selectLevel(page);
-
-  await page.getByRole("button", { name: "Generate a prompt" }).click();
+  await page.getByRole("button", { name: /A2/i }).click();
+  await page.getByRole("button", { name: "Donne-moi une consigne" }).click();
   await expect(page.getByText(PROMPT_SNIPPET)).toBeVisible();
   await page.getByRole("textbox").fill(HAPPY_WRITING);
 
   await scenario("malformed");
-  await page.getByRole("button", { name: "Submit for evaluation" }).click();
+  await page.getByRole("button", { name: "Corrige-moi" }).click();
   await expect(page.getByText("AI output was invalid.")).toBeVisible();
   await expect(page.getByText("Unhandled Runtime Error")).toHaveCount(0);
   await expect(
@@ -64,6 +57,6 @@ test("malformed AI output shows an error and retry recovers", async ({
   ).toHaveCount(0);
 
   await scenario("happy");
-  await page.getByRole("button", { name: "Retry evaluation" }).click();
+  await page.getByRole("button", { name: "Réessayer" }).click();
   await expect(page.getByRole("heading", { name: "Evaluation" })).toBeVisible();
 });
