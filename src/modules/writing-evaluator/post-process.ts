@@ -146,7 +146,8 @@ export function postProcessEvaluation(
         suggestion: row.item.suggestion,
         explanation: row.item.explanation,
         question:
-          row.item.kind === "dialect_check"
+          row.item.kind === "dialect_check" &&
+          (row.item.question === null || row.item.question.length === 0)
             ? dialectCheckQuestion(row.item.quote)
             : row.item.question,
         ruleIfDialect: row.item.rule_if_dialect,
