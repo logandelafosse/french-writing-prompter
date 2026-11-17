@@ -13,12 +13,8 @@ import { db } from "@/db";
 import { sessions } from "@/db/schema";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { elicitFocus } from "@/modules/dialect/taxonomy";
-import { computeFocus } from "@/modules/weakness-service/compute-focus";
-import {
-  consumePendingPin,
-  getPendingPractice,
-} from "@/modules/weakness-service/practice-store";
-import { listRankedWeaknesses } from "@/modules/weakness-service/weakness-store";
+import { currentFocus } from "@/modules/weakness-service/board";
+import { consumePendingPin } from "@/modules/weakness-service/practice-store";
 import { localDateKey, todayLocalDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
@@ -127,11 +123,9 @@ export const POST = withErrors(async function postPrompt(request: Request) {
         getAiClient(scenarioFromRequest(request)),
       );
 
-      const ranked = await listRankedWeaknesses();
-      const pin = await getPendingPractice();
-      const focusIds = computeFocus(ranked, pin?.category ?? null);
+      const live = await currentFocus();
       const prompt = await promptGenerator.generate(level, DEFAULT_DIALECT, {
-        focus: elicitFocus(focusIds),
+        focus: elicitFocus(live.focusIds),
         recentTopics: await recentTopics(),
       });
 
@@ -165,10 +159,12 @@ export const POST = withErrors(async function postPrompt(request: Request) {
         createdAt: now,
         kind: "daily",
         localDate,
-        focusJson: JSON.stringify(focusIds),
+        focusJson: JSON.stringify(live.focusIds),
       });
       const sessionId = Number(inserted.lastInsertRowid);
-      if (pin !== null) await consumePendingPin(pin.id, sessionId);
+      if (live.practiceId !== null) {
+        await consumePendingPin(live.practiceId, sessionId);
+      }
       await db.run(sql`commit`);
       transaction.open = false;
       const quota = await getQuotaState();

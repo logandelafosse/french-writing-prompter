@@ -18,12 +18,9 @@ import {
   quotaTimeZone,
 } from "@/modules/quota-manager/quota-store";
 import { first } from "@/lib/first";
-import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { toFocusItems } from "@/modules/dialect/taxonomy";
-import { computeFocus } from "@/modules/weakness-service/compute-focus";
-import { getPendingPin } from "@/modules/weakness-service/practice-store";
-import { listRankedWeaknesses } from "@/modules/weakness-service/weakness-store";
+import { currentFocus } from "@/modules/weakness-service/board";
 import { and, desc, eq } from "drizzle-orm";
 import type { MistakeCategory } from "@/contracts/mistake-category";
 import type { FocusItem } from "@/contracts/focus";
@@ -31,15 +28,8 @@ import type { FocusItem } from "@/contracts/focus";
 export async function resolveLearnerFocus(
   focusJson?: string | null,
 ): Promise<{ focus: FocusItem[]; pin: MistakeCategory | null }> {
-  const pin = await getPendingPin();
-  if (focusJson !== undefined) {
-    const snapshot = parseStoredFocus(focusJson);
-    if (snapshot !== null) return { focus: toFocusItems(snapshot), pin };
-  }
-  return {
-    focus: toFocusItems(computeFocus(await listRankedWeaknesses(), pin)),
-    pin,
-  };
+  const live = await currentFocus(focusJson);
+  return { focus: toFocusItems(live.focusIds), pin: live.pin };
 }
 
 export async function learnerFocusNow() {
