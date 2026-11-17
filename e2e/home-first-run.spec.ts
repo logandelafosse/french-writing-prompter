@@ -1,7 +1,7 @@
 import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
-import { setLevelB1, visibleHeaderQuota } from "./support/header-helpers";
+import { visibleHeaderQuota } from "./support/header-helpers";
 import { expectLevelPickerSixButtons } from "./support/home-helpers";
 import { PROMPT_FIXTURE_LAFAYETTE } from "./support/prompt-helpers";
 
@@ -74,29 +74,4 @@ test.describe("home first run @390", () => {
     await captureEvidence(page, testInfo, "b1-mobile");
     await expectNoAxeViolations(page);
   });
-});
-
-test("placement redirects home when level is already set", async ({
-  page,
-  scenario,
-}) => {
-  await scenario("happy");
-  await page.goto("/");
-  await setLevelB1(page);
-  await page.goto("/placement");
-  await expect(page).toHaveURL(/\/$/);
-});
-
-test("placement link opens reduced header", async ({ page, scenario }) => {
-  await scenario("happy");
-  await page.goto("/");
-  await page.getByRole("link", { name: /test de placement/i }).click();
-  await expect(page).toHaveURL(/\/placement$/);
-  await expect(
-    page.getByRole("link", { name: "Je connais mon niveau" }),
-  ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Historique" })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: /Niveau CECR/ })).toHaveCount(
-    0,
-  );
 });

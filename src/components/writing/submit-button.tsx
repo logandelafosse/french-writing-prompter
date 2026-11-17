@@ -6,17 +6,19 @@ export function SubmitButton({
   disabled,
   onClick,
   retry = false,
+  idleLabel,
 }: {
   busy: boolean;
   disabled?: boolean | undefined;
   onClick: () => void;
   retry?: boolean | undefined;
+  idleLabel?: string | undefined;
 }) {
   const label = busy
     ? homeCopy.submitBusy
     : retry
       ? homeCopy.retry
-      : homeCopy.submit;
+      : (idleLabel ?? homeCopy.submit);
   return (
     <Button
       size="lg"

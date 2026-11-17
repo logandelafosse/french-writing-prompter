@@ -36,15 +36,16 @@ export function PromptSheet({
   belowMeta?: ReactNode;
   generateBusy?: boolean | undefined;
   embedded?: boolean | undefined;
-  mode?: "write" | "review" | undefined;
+  mode?: "write" | "review" | "placement" | undefined;
 }) {
-  const metaLine = meta ? formatPromptMeta(meta) : null;
+  const placement = mode === "placement";
+  const metaLine = placement ? null : meta ? formatPromptMeta(meta) : null;
   const swapDisabled = swap?.disabled === true;
   const swapLabel = swap?.label ?? homeCopy.swapPrompt;
-  const onSwap = mode === "review" ? undefined : swap?.onSwap;
+  const onSwap = mode === "review" || placement ? undefined : swap?.onSwap;
   const review = mode === "review";
 
-  const body = (
+  const promptHeading = (
     <>
       <SectionLabel tone="primary">
         {label ?? homeCopy.promptLabel}
@@ -56,11 +57,25 @@ export function PromptSheet({
           "font-serif text-pretty whitespace-pre-wrap",
           review
             ? "text-prompt-review text-ink-2"
-            : "text-prompt text-ink max-sm:text-prompt-sm motion-safe:animate-prompt-rise",
+            : cn(
+                "text-prompt text-ink max-sm:text-prompt-sm",
+                !placement && "motion-safe:animate-prompt-rise",
+              ),
         )}
       >
         {promptText}
       </p>
+    </>
+  );
+  const body = (
+    <>
+      {placement ? (
+        <div className="border-line flex flex-col gap-2.5 border-b pb-[18px]">
+          {promptHeading}
+        </div>
+      ) : (
+        promptHeading
+      )}
       {metaLine || onSwap ? (
         <div className="border-line flex flex-col gap-2 border-b pb-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-x-4 sm:gap-y-1 sm:pb-3.5">
           {metaLine ? (
