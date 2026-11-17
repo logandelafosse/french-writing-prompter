@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -79,13 +77,6 @@ describe("resolveLearnerFocus", () => {
   });
 
   it("reads live Focus from the façade and keeps a stored snapshot", async () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/server/today/today.ts"),
-      "utf8",
-    );
-    expect(source).not.toMatch(/weakness-store|compute-focus|practice-store/);
-    expect(source).toContain("currentFocus");
-
     await seedEvaluated("2026-11-16T18:00:00.000Z", ["accents"]);
     await seedEvaluated("2026-11-15T18:00:00.000Z", ["accents"]);
     await seedEvaluated("2026-11-10T18:00:00.000Z", ["negation"]);

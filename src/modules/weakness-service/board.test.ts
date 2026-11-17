@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { corrections, practiceRequests, sessions } from "@/db/schema";
@@ -9,7 +9,7 @@ import {
   saveCorrections,
   saveSession,
 } from "@/modules/history-store/history-store";
-import { pinPractice } from "./practice-store";
+import { getPendingPractice, pinPractice } from "./practice-store";
 import { currentFocus, weaknessBoard } from "./board";
 
 const constraints = JSON.stringify({
@@ -114,39 +114,22 @@ describe("weaknessBoard", () => {
 
 describe("currentFocus", () => {
   beforeEach(async () => {
-    vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
     await db.delete(practiceRequests).execute();
     await db.delete(corrections).execute();
     await db.delete(sessions).execute();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   it("live ids for home snapshot", async () => {
     await seedEvaluated("2026-11-16T18:00:00.000Z", ["vocabulaire", "accents"]);
     await seedEvaluated("2026-11-15T18:00:00.000Z", ["vocabulaire", "accents"]);
     await seedEvaluated("2026-11-14T18:00:00.000Z", ["vocabulaire"]);
+    await pinPractice("negation", () => new Date("2026-11-16T19:00:00.000Z"));
+    const pending = await getPendingPractice();
 
-    const active = await saveSession({
-      promptText: "Décris ta ville.",
-      promptConstraints: constraints,
-      writingText: null,
-      evaluationJson: null,
-      cefrLevel: "B1",
-      localDate: "2026-11-14",
-      status: "active",
-    });
-    await db
-      .update(sessions)
-      .set({ focusJson: JSON.stringify(["negation"]) })
-      .where(eq(sessions.id, active.id));
+    const snapshot = await currentFocus(JSON.stringify(["orthographe"]));
 
-    const live = await currentFocus();
-
-    expect(live.focusIds).toEqual(["vocabulaire", "accents"]);
-    expect(live.pin).toBeNull();
-    expect(live.practiceId).toBeNull();
+    expect(snapshot.focusIds).toEqual(["orthographe"]);
+    expect(snapshot.pin).toBe("negation");
+    expect(snapshot.practiceId).toBe(pending?.id);
   });
 });

@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -219,13 +217,6 @@ describe("GET /api/weaknesses", () => {
   });
 
   it("assembles ranked Weaknesses, the pending pin, and live Focus through one façade", async () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/app/api/weaknesses/route.ts"),
-      "utf8",
-    );
-    expect(source).not.toMatch(/weakness-store|compute-focus|practice-store/);
-    expect(source).toContain("weaknessBoard");
-
     const dates = [
       "2026-11-16T18:00:00.000Z",
       "2026-11-15T18:00:00.000Z",

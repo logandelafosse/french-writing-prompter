@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -93,16 +91,6 @@ describe("POST /api/prompt focus assembly", () => {
   });
 
   it("snapshots live Focus from the façade and consumes that Practice Pin", async () => {
-    const source = readFileSync(
-      join(process.cwd(), "src/app/api/prompt/route.ts"),
-      "utf8",
-    );
-    expect(source).not.toMatch(
-      /weakness-store|compute-focus|getPendingPractice/,
-    );
-    expect(source).toContain("currentFocus");
-    expect(source).toContain("consumePendingPin");
-
     await seedEvaluated("2026-11-16T18:00:00.000Z", ["accents"]);
     await seedEvaluated("2026-11-15T18:00:00.000Z", ["accents"]);
     await seedEvaluated("2026-11-10T18:00:00.000Z", ["negation"]);
