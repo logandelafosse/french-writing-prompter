@@ -47,20 +47,20 @@ Scope: PRs [#75](https://github.com/logandelafosse/french-writing-prompter/pull/
 5. **P1** — Lefthook `pre-push` skip when push is docs-only; end `LEFTHOOK=0` for board.
 6. **P1** — `scripts/ticket-worktree` + board read via `git show origin/main:docs/plan/board.md`.
 7. **P1** — `pr:size` top files + split before dispatch if estimate ≥400 or first green ≥450.
-8. **P1** — Tier reviews: adversarial always; test/tooling when tests change; post blocking list as PR comment; re-review only the reviewer that blocked.
+8. **P1** — Diff-scoped reviews (all three reviewers; see `workflow.md` **Review scope**); post blocking list as PR comment; re-review only the reviewer that blocked, on the fix commit diff only.
 
 ### TOOL-SESSION backlog (T23–T27 arc)
 
-| ID             | Pri | Change                                               |
-| -------------- | --- | ---------------------------------------------------- |
-| TOOL-SESSION-1 | P0  | `writingField` + ast-grep ban substring label in e2e |
-| TOOL-SESSION-2 | P0  | CI: docs-only `main` push skips e2e                  |
-| TOOL-SESSION-3 | P0  | Offline opencode schema test                         |
-| TOOL-SESSION-4 | P0  | dev/migrate env loading without OpenAI for local DB  |
-| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip                     |
-| TOOL-SESSION-6 | P1  | `ticket-worktree` + board from `origin/main`         |
-| TOOL-SESSION-7 | P1  | `pr:size` file list + split thresholds               |
-| TOOL-SESSION-8 | P1  | Tiered review policy + PR comment trail              |
-| TOOL-SESSION-9 | P2  | Export TZ contract test (UTC vs Chicago)             |
+| ID             | Pri | Change                                                              |
+| -------------- | --- | ------------------------------------------------------------------- |
+| TOOL-SESSION-1 | P0  | `writingField` + ast-grep ban substring label in e2e                |
+| TOOL-SESSION-2 | P0  | CI: docs-only `main` push skips e2e                                 |
+| TOOL-SESSION-3 | P0  | Offline opencode schema test                                        |
+| TOOL-SESSION-4 | P0  | dev/migrate env loading without OpenAI for local DB                 |
+| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip                                    |
+| TOOL-SESSION-6 | P1  | `ticket-worktree` + board from `origin/main`                        |
+| TOOL-SESSION-7 | P1  | `pr:size` file list + split thresholds                              |
+| TOOL-SESSION-8 | P1  | Diff-scoped review briefs + PR comment trail (keep all 3 reviewers) |
+| TOOL-SESSION-9 | P2  | Export TZ contract test (UTC vs Chicago)                            |
 
 Reviewer: [385b4c0e-3ca1-4957-bb34-7657f9afa5b3](385b4c0e-3ca1-4957-bb34-7657f9afa5b3).

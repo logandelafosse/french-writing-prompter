@@ -1465,14 +1465,14 @@ Non-blocking for T25b merge. Prioritize **TOOL-PR78-1** and **TOOL-PR78-2** befo
 
 Full write-up: `docs/agents/session-retro.md`. Prioritize **TOOL-SESSION-1**–**4** before the next review-heavy e2e wave.
 
-| ID             | Pri | Summary                                                         |
-| -------------- | --- | --------------------------------------------------------------- |
-| TOOL-SESSION-1 | P0  | `writingField` + ban substring `getByLabel('Ton texte')` in e2e |
-| TOOL-SESSION-2 | P0  | Skip e2e on docs-only `main` push                               |
-| TOOL-SESSION-3 | P0  | No network fetch in lefthook schema test                        |
-| TOOL-SESSION-4 | P0  | `npm run dev` / migrate without requiring OpenAI for local DB   |
-| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip                                |
-| TOOL-SESSION-6 | P1  | `ticket-worktree` script                                        |
-| TOOL-SESSION-7 | P1  | `pr:size` top files + split thresholds                          |
-| TOOL-SESSION-8 | P1  | Tiered PR reviews + GitHub comment trail                        |
-| TOOL-SESSION-9 | P2  | Export TZ regression test                                       |
+| ID             | Pri | Summary                                                                        |
+| -------------- | --- | ------------------------------------------------------------------------------ |
+| TOOL-SESSION-1 | P0  | `writingField` + ban substring `getByLabel('Ton texte')` in e2e                |
+| TOOL-SESSION-2 | P0  | Skip e2e on docs-only `main` push                                              |
+| TOOL-SESSION-3 | P0  | No network fetch in lefthook schema test                                       |
+| TOOL-SESSION-4 | P0  | `npm run dev` / migrate without requiring OpenAI for local DB                  |
+| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip                                               |
+| TOOL-SESSION-6 | P1  | `ticket-worktree` script                                                       |
+| TOOL-SESSION-7 | P1  | `pr:size` top files + split thresholds                                         |
+| TOOL-SESSION-8 | P1  | Document diff-scoped review briefs in workflow; GitHub PR comment for blockers |
+| TOOL-SESSION-9 | P2  | Export TZ regression test                                                      |
