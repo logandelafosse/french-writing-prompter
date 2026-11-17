@@ -53,9 +53,10 @@ describe("WritingEvaluator", () => {
       DEFAULT_DIALECT,
     );
 
-    expect(result.dimensions).toHaveProperty("grammatical_accuracy");
-    expect(result.overall_cefr).toBe("B1");
+    expect(result.evaluation.dimensions).toHaveProperty("grammatical_accuracy");
+    expect(result.evaluation.overallCefr).toBe("B1");
     expect(result.corrections.length).toBeGreaterThan(0);
+    expect(result.raw.overall_cefr).toBe("B1");
   });
 
   it("embeds renderForEvaluator() output in the system prompt", async () => {

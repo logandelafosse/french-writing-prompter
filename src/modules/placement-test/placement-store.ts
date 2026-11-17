@@ -26,7 +26,6 @@ import {
   type WritingPrompt,
 } from "@/modules/prompt-generator/prompt-generator";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
-import { postProcessEvaluation } from "@/modules/writing-evaluator/post-process";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
 import { buildResults, computeLevel, stepLevel } from "./placement-test";
 
@@ -235,26 +234,30 @@ export class PlacementService {
       : { cefrLevel: fallback, dialect: DEFAULT_DIALECT };
     const promptMeta = parseStoredPromptMeta(row.promptMetaJson);
     const dialectNotes = await listActiveNotes();
-    // prettier-ignore
-    const raw = await this.evaluator.evaluate(
+    const evaluated = await this.evaluator.evaluate(
       text,
-      promptMeta ? { text: row.promptText, meta: promptMeta, constraints } : { text: row.promptText, constraints },
-      DEFAULT_DIALECT, dialectNotes,
+      promptMeta
+        ? { text: row.promptText, meta: promptMeta, constraints }
+        : { text: row.promptText, constraints },
+      DEFAULT_DIALECT,
+      {
+        dialectNotes,
+        sessionId: row.id,
+        now: this.now,
+        createId: this.createId,
+        focusCategories: parseStoredFocus(row.focusJson) ?? [],
+      },
     );
-    // prettier-ignore
-    const processed = postProcessEvaluation(raw, {
-      text, sessionId: row.id, now: this.now, createId: this.createId,
-      lookupDlf: (word) => this.dlf.lookup(word), dialectNotes,
-      focusCategories: parseStoredFocus(row.focusJson) ?? [],
-    });
-    // prettier-ignore
     await saveSession({
-      promptText: row.promptText, promptConstraints: row.promptConstraints,
-      writingText: text, evaluationJson: JSON.stringify(processed.evaluation),
-      evaluationRaw: JSON.stringify(raw), cefrLevel: processed.evaluation.overallCefr,
+      promptText: row.promptText,
+      promptConstraints: row.promptConstraints,
+      writingText: text,
+      evaluationJson: JSON.stringify(evaluated.evaluation),
+      evaluationRaw: JSON.stringify(evaluated.raw),
+      cefrLevel: evaluated.evaluation.overallCefr,
       id: row.id,
     });
-    await saveCorrections(processed.corrections, this.now);
+    await saveCorrections(evaluated.corrections, this.now);
   }
 
   private async finish(run: RunRow) {

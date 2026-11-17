@@ -1,10 +1,21 @@
-import { describe, expect, it } from "vitest";
-import { type EvaluatorOutputDraft } from "@/contracts/evaluation";
+import { describe, expect, it, vi } from "vitest";
+import {
+  EvaluatorOutputSchema,
+  type EvaluatorOutputDraft,
+} from "@/contracts/evaluation";
 import path from "node:path";
 import { countsAsMistake } from "@/contracts/correction";
+import type { LearnerDialectNote } from "@/contracts/dialect-note";
+import type { MistakeCategory } from "@/contracts/mistake-category";
 import { loadDlfLexicon } from "@/modules/dlf/load";
+import type { DlfIndex } from "@/modules/dlf/lookup";
 import { resourcesFor } from "@/modules/resources/catalog";
-import { dialectCheckQuestion, postProcessEvaluation } from "./post-process";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
+import { parseJson } from "@/lib/json";
+import { dialectCheckQuestion } from "./post-process";
+import { WritingEvaluator, type OpenAiClientLike } from "./writing-evaluator";
+import okMixedKinds from "./__fixtures__/ok-mixed-kinds.json";
 
 const dlfIndex = loadDlfLexicon(
   path.join(process.cwd(), "src/test/fixtures/dlf/lexicon.json"),
@@ -62,9 +73,92 @@ function correction(
   };
 }
 
-describe("postProcessEvaluation", () => {
-  it("keeps unlocatable corrections unmarked", () => {
-    const result = postProcessEvaluation(
+const prompt: WritingPrompt = {
+  text: "Décrivez votre ville natale en 100 mots.",
+  constraints: { cefrLevel: "B1", dialect: DEFAULT_DIALECT },
+};
+
+async function evaluate(
+  raw: EvaluatorOutputDraft,
+  ctx: {
+    text: string;
+    sessionId: number;
+    now: () => Date;
+    createId: () => string;
+    lookupDlf?: DlfIndex["lookup"];
+    dialectNotes?: readonly LearnerDialectNote[];
+    focusCategories?: readonly MistakeCategory[];
+  },
+) {
+  const client: OpenAiClientLike = {
+    chatCompletionJSON: vi.fn().mockResolvedValue(raw),
+  };
+  const dlf: DlfIndex | undefined = ctx.lookupDlf
+    ? { lookup: ctx.lookupDlf, cardsForText: () => [] }
+    : undefined;
+  return new WritingEvaluator(client, dlf).evaluate(
+    ctx.text,
+    prompt,
+    DEFAULT_DIALECT,
+    {
+      sessionId: ctx.sessionId,
+      now: ctx.now,
+      createId: ctx.createId,
+      ...(ctx.dialectNotes !== undefined
+        ? { dialectNotes: ctx.dialectNotes }
+        : {}),
+      ...(ctx.focusCategories !== undefined
+        ? { focusCategories: ctx.focusCategories }
+        : {}),
+    },
+  );
+}
+
+describe("evaluate", () => {
+  it("returns corrections with spans for mixed kinds", async () => {
+    const parsed = parseJson(
+      EvaluatorOutputSchema,
+      JSON.stringify(okMixedKinds),
+    );
+    if (!parsed.ok) throw new Error(String(parsed.cause));
+    const result = await evaluate(parsed.value, {
+      text: writing,
+      sessionId: 1,
+      now,
+      createId: ids(),
+    });
+    expect(
+      result.corrections.map((item) => ({
+        kind: item.kind,
+        quote: item.quote,
+        span: item.span,
+      })),
+    ).toEqual([
+      { kind: "standard", quote: "Maintenant", span: { start: 0, end: 10 } },
+      { kind: "dialect_check", quote: "je vas", span: { start: 11, end: 17 } },
+      { kind: "mistake", quote: "Les enfant", span: { start: 28, end: 38 } },
+    ]);
+  });
+
+  it("drops an empty quote", async () => {
+    const result = await evaluate(
+      baseOutput([
+        correction({ kind: "mistake", quote: "", suggestion: "y" }),
+        correction({
+          kind: "mistake",
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+        }),
+      ]),
+      { text: writing, sessionId: 1, now, createId: ids() },
+    );
+    expect(result.corrections.map((item) => item.quote)).toEqual([
+      "Les enfant",
+    ]);
+  });
+
+  it("keeps unlocatable corrections unmarked", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -79,8 +173,8 @@ describe("postProcessEvaluation", () => {
     expect(result.corrections[0]?.anchor).toBe("none");
   });
 
-  it("keeps an overlapping second quote with span null", () => {
-    const result = postProcessEvaluation(
+  it("keeps an overlapping second quote with span null", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -101,8 +195,8 @@ describe("postProcessEvaluation", () => {
     expect(result.corrections[1]?.anchor).toBe("none");
   });
 
-  it("enforces kind invariants", () => {
-    const result = postProcessEvaluation(
+  it("enforces kind invariants", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "standard",
@@ -142,9 +236,9 @@ describe("postProcessEvaluation", () => {
     expect(check?.question).toBe(dialectCheckQuestion("je vas"));
   });
 
-  it("keeps a non-empty dialect_check question from the model", () => {
+  it("keeps a non-empty dialect_check question from the model", async () => {
     const asked = "C'est voulu, ça\u202F?";
-    const result = postProcessEvaluation(
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "dialect_check",
@@ -162,8 +256,8 @@ describe("postProcessEvaluation", () => {
     );
   });
 
-  it("sets dlf on an attested standard suggestion", () => {
-    const result = postProcessEvaluation(
+  it("sets dlf on an attested standard suggestion", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "standard",
@@ -188,8 +282,8 @@ describe("postProcessEvaluation", () => {
     });
   });
 
-  it("does not set dlf when the suggestion misses and only dlf_headword is attested", () => {
-    const result = postProcessEvaluation(
+  it("does not set dlf when the suggestion misses and only dlf_headword is attested", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "standard",
@@ -212,8 +306,8 @@ describe("postProcessEvaluation", () => {
     expect(item?.dlf).toBeNull();
   });
 
-  it("keeps an unattested standard Correction with dlf null and does not make a Mistake", () => {
-    const result = postProcessEvaluation(
+  it("keeps an unattested standard Correction with dlf null and does not make a Mistake", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "standard",
@@ -237,8 +331,8 @@ describe("postProcessEvaluation", () => {
     expect(item ? countsAsMistake(item) : true).toBe(false);
   });
 
-  it("fills lemma from the quote and example from the containing sentence when the model leaves them null", () => {
-    const result = postProcessEvaluation(
+  it("fills lemma from the quote and example from the containing sentence when the model leaves them null", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -259,8 +353,8 @@ describe("postProcessEvaluation", () => {
     expect(item?.dialectPattern).toBeNull();
   });
 
-  it("keeps model-provided dialect fields and hides no pattern when one is given", () => {
-    const result = postProcessEvaluation(
+  it("keeps model-provided dialect fields and hides no pattern when one is given", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "dialect_check",
@@ -281,8 +375,8 @@ describe("postProcessEvaluation", () => {
     expect(item?.dialectPattern).toBe("aller au présent");
   });
 
-  it("drops a mistake whose quote matches an active word-scope note", () => {
-    const result = postProcessEvaluation(
+  it("drops a mistake whose quote matches an active word-scope note", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -314,8 +408,8 @@ describe("postProcessEvaluation", () => {
     expect(result.corrections.map((c) => c.quote)).toEqual(["Les enfant"]);
   });
 
-  it("drops a mistake whose quote matches the note form when learnerForm differs", () => {
-    const result = postProcessEvaluation(
+  it("drops a mistake whose quote matches the note form when learnerForm differs", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -342,8 +436,8 @@ describe("postProcessEvaluation", () => {
     expect(result.corrections).toHaveLength(0);
   });
 
-  it("keeps the mistake when the matching word-scope note is soft-deleted", () => {
-    const result = postProcessEvaluation(
+  it("keeps the mistake when the matching word-scope note is soft-deleted", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -371,8 +465,8 @@ describe("postProcessEvaluation", () => {
     expect(result.corrections[0]?.quote).toBe("a tombé");
   });
 
-  it("sets isFocus only on Mistakes whose category is in the session snapshot", () => {
-    const result = postProcessEvaluation(
+  it("sets isFocus only on Mistakes whose category is in the session snapshot", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -413,8 +507,8 @@ describe("postProcessEvaluation", () => {
     ).toBe(false);
   });
 
-  it("drops invented and other-category resource ids then fills category defaults", () => {
-    const result = postProcessEvaluation(
+  it("drops invented and other-category resource ids then fills category defaults", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "mistake",
@@ -439,8 +533,8 @@ describe("postProcessEvaluation", () => {
     ]);
   });
 
-  it("leaves resourceIds empty on standard and open dialect_check", () => {
-    const result = postProcessEvaluation(
+  it("leaves resourceIds empty on standard and open dialect_check", async () => {
+    const result = await evaluate(
       baseOutput([
         correction({
           kind: "standard",

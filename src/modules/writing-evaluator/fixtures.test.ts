@@ -1,13 +1,15 @@
 import fs from "node:fs";
 import path from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { AiOutputError } from "@/modules/openai-client/ai-output-error";
 import { parseJson } from "@/lib/json";
 import {
   EvaluatorOutputSchema,
   type EvaluatorOutputDraft,
 } from "@/contracts/evaluation";
-import { postProcessEvaluation } from "./post-process";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
+import { WritingEvaluator, type OpenAiClientLike } from "./writing-evaluator";
 
 const DIR = path.join(import.meta.dirname, "__fixtures__");
 const writing =
@@ -34,17 +36,32 @@ function throughChatCompletionJSON(text: string): EvaluatorOutputDraft {
   );
 }
 
-function processFixture(name: string) {
+const prompt: WritingPrompt = {
+  text: "Consigne.",
+  constraints: { cefrLevel: "B1", dialect: DEFAULT_DIALECT },
+};
+
+async function correctionsFrom(raw: EvaluatorOutputDraft, text: string) {
+  const client: OpenAiClientLike = {
+    chatCompletionJSON: vi.fn().mockResolvedValue(raw),
+  };
+  let n = 0;
+  const result = await new WritingEvaluator(client).evaluate(
+    text,
+    prompt,
+    DEFAULT_DIALECT,
+    {
+      sessionId: 7,
+      now: () => new Date("2026-11-16T18:00:00.000Z"),
+      createId: () => `fix-${++n}`,
+    },
+  );
+  return result.corrections;
+}
+
+async function processFixture(name: string) {
   const raw = throughChatCompletionJSON(load(name));
-  return postProcessEvaluation(raw, {
-    text: writing,
-    sessionId: 7,
-    now: () => new Date("2026-11-16T18:00:00.000Z"),
-    createId: (() => {
-      let n = 0;
-      return () => `fix-${++n}`;
-    })(),
-  }).corrections.map((c) => ({
+  return (await correctionsFrom(raw, writing)).map((c) => ({
     id: c.id,
     ordinal: c.ordinal,
     kind: c.kind,
@@ -58,23 +75,17 @@ function processFixture(name: string) {
 }
 
 describe("evaluator fixtures", () => {
-  it("ok-standard-louisiana produces ma voiture as standard", () => {
+  it("ok-standard-louisiana produces ma voiture as standard", async () => {
     const louisianaWriting = "J'arrive avec ma voiture. Les enfant jouent.";
     const raw = throughChatCompletionJSON(load("ok-standard-louisiana.json"));
-    const corrections = postProcessEvaluation(raw, {
-      text: louisianaWriting,
-      sessionId: 7,
-      now: () => new Date("2026-11-16T18:00:00.000Z"),
-      createId: (() => {
-        let n = 0;
-        return () => `fix-${++n}`;
-      })(),
-    }).corrections.map((c) => ({
-      kind: c.kind,
-      quote: c.quote,
-      suggestion: c.suggestion,
-      span: c.span,
-    }));
+    const corrections = (await correctionsFrom(raw, louisianaWriting)).map(
+      (c) => ({
+        kind: c.kind,
+        quote: c.quote,
+        suggestion: c.suggestion,
+        span: c.span,
+      }),
+    );
     expect(corrections).toEqual([
       {
         kind: "standard",
@@ -97,8 +108,8 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("ok-mixed-kinds produces stable corrections", () => {
-    expect(processFixture("ok-mixed-kinds.json")).toEqual([
+  it("ok-mixed-kinds produces stable corrections", async () => {
+    expect(await processFixture("ok-mixed-kinds.json")).toEqual([
       {
         id: "fix-1",
         ordinal: 1,
@@ -139,8 +150,8 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("quote-not-found stays unanchored", () => {
-    expect(processFixture("quote-not-found.json")).toEqual([
+  it("quote-not-found stays unanchored", async () => {
+    expect(await processFixture("quote-not-found.json")).toEqual([
       {
         id: "fix-1",
         ordinal: 1,
@@ -155,8 +166,10 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("quote-wrong-case-curly-apostrophe normalizes", () => {
-    expect(processFixture("quote-wrong-case-curly-apostrophe.json")).toEqual([
+  it("quote-wrong-case-curly-apostrophe normalizes", async () => {
+    expect(
+      await processFixture("quote-wrong-case-curly-apostrophe.json"),
+    ).toEqual([
       {
         id: "fix-1",
         ordinal: 1,
@@ -182,8 +195,8 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("duplicate-quote-occurrence-2 hits the second enfant", () => {
-    expect(processFixture("duplicate-quote-occurrence-2.json")).toEqual([
+  it("duplicate-quote-occurrence-2 hits the second enfant", async () => {
+    expect(await processFixture("duplicate-quote-occurrence-2.json")).toEqual([
       {
         id: "fix-1",
         ordinal: 1,
@@ -198,8 +211,8 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("overlapping-quotes unanchors the second", () => {
-    expect(processFixture("overlapping-quotes.json")).toEqual([
+  it("overlapping-quotes unanchors the second", async () => {
+    expect(await processFixture("overlapping-quotes.json")).toEqual([
       {
         id: "fix-1",
         ordinal: 1,
@@ -225,11 +238,11 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("unknown-category maps to autre after post-process", () => {
+  it("unknown-category maps to autre after evaluate", async () => {
     expect(
       parseJson(EvaluatorOutputSchema, load("unknown-category.json")).ok,
     ).toBe(true);
-    expect(processFixture("unknown-category.json")).toEqual([
+    expect(await processFixture("unknown-category.json")).toEqual([
       {
         id: "fix-1",
         ordinal: 1,
@@ -244,8 +257,8 @@ describe("evaluator fixtures", () => {
     ]);
   });
 
-  it("english-explanations still produce corrections", () => {
-    expect(processFixture("english-explanations.json")).toEqual([
+  it("english-explanations still produce corrections", async () => {
+    expect(await processFixture("english-explanations.json")).toEqual([
       {
         id: "fix-1",
         ordinal: 1,
