@@ -162,4 +162,46 @@ describe("MarkedText", () => {
     /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark DOM asserts */
     expect(screen.getByText(writing)).toBeVisible();
   });
+
+  it("stagger delays only when animate is set", () => {
+    const writing = "Les enfant jouent.";
+    const first = "Les enfant";
+    const second = "jouent";
+    const corrections = [
+      correction({
+        id: "m2",
+        ordinal: 2,
+        kind: "mistake",
+        span: {
+          start: writing.indexOf(second),
+          end: writing.indexOf(second) + second.length,
+        },
+      }),
+      correction({
+        id: "m1",
+        ordinal: 1,
+        kind: "mistake",
+        span: { start: 0, end: first.length },
+      }),
+    ];
+
+    const { container, rerender } = render(
+      <MarkedText animate text={writing} corrections={corrections} />,
+    );
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; stagger delay is the motion-2 contract */
+    const animated = container.querySelectorAll("mark");
+    expect(animated).toHaveLength(2);
+    expect(animated[0]).toHaveStyle({ animationDelay: "0ms" });
+    expect(animated[1]).toHaveStyle({ animationDelay: "60ms" });
+    expect(animated[0]?.className).toMatch(/animate-mark-paint/);
+    expect(animated[1]?.className).toMatch(/animate-mark-paint/);
+
+    rerender(<MarkedText text={writing} corrections={corrections} />);
+    const still = container.querySelectorAll("mark");
+    expect(still[0]?.style.animationDelay).toBe("");
+    expect(still[1]?.style.animationDelay).toBe("");
+    expect(still[0]?.className).not.toMatch(/animate-mark-paint/);
+    expect(still[1]?.className).not.toMatch(/animate-mark-paint/);
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark stagger asserts */
+  });
 });

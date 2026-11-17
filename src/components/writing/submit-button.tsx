@@ -22,7 +22,6 @@ export function SubmitButton({
   return (
     <Button
       size="lg"
-      className="min-h-[50px] px-6 sm:min-h-12"
       busy={busy}
       disabled={disabled}
       aria-keyshortcuts="Meta+Enter Control+Enter"

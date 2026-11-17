@@ -6,7 +6,7 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary font-semibold text-white hover:bg-primary-hover disabled:border-0 disabled:bg-transparent disabled:text-disabled-text",
+          "bg-primary font-semibold text-white hover:bg-primary-hover disabled:border-0 disabled:bg-transparent disabled:text-disabled-text max-sm:min-h-btn-mobile max-sm:w-full",
         secondary:
           "border border-line-strong bg-sheet text-sm font-medium text-ink hover:bg-desk-highlight disabled:bg-transparent disabled:text-disabled-text",
         "secondary-strong":
@@ -25,7 +25,7 @@ export const buttonVariants = cva(
       },
       size: {
         md: "min-h-touch px-4",
-        lg: "min-h-btn px-6 text-base",
+        lg: "min-h-btn-mobile w-full px-6 text-lg sm:min-h-btn sm:w-auto sm:text-base",
         "block-mobile": "min-h-btn-mobile w-full px-6 text-lg",
       },
     },

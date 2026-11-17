@@ -15,7 +15,7 @@ export function TextLink({
     <Link
       className={cn(
         "text-primary hover:text-primary-hover inline-flex items-center text-[15px] font-medium",
-        compact ? "min-h-9 sm:min-h-8" : "min-h-touch",
+        compact ? "min-h-touch sm:min-h-8" : "min-h-touch",
         className,
       )}
       {...props}

@@ -105,7 +105,7 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
 
   // prettier-ignore
   return (
-    <main className="max-w-list mx-auto flex w-full flex-col gap-7 px-6 py-5 pb-20">
+    <main className="max-w-list mx-auto flex w-full flex-col gap-7 px-5 py-5 pb-20 sm:px-6">
       <PageTitle>{carnetCopy.title}</PageTitle>
       {loadUi.status === "error" || practiceUi.status === "error" ? (
         <ErrorAlert

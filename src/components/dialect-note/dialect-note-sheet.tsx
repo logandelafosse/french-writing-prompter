@@ -76,7 +76,7 @@ export function DialectNoteSheet({
         <Dialog.Backdrop className="bg-scrim fixed inset-0 z-40" />
         <Dialog.Popup
           aria-modal="true"
-          className="bg-sheet sm:max-w-panel sm:shadow-panel fixed z-50 flex flex-col gap-[22px] transition-transform duration-300 max-sm:inset-x-0 max-sm:bottom-0 max-sm:max-h-[90vh] max-sm:w-full max-sm:p-6 max-sm:data-[ending-style]:translate-y-full max-sm:data-[starting-style]:translate-y-full sm:inset-y-0 sm:right-0 sm:w-full sm:p-[36px_40px] sm:data-[ending-style]:translate-x-full sm:data-[starting-style]:translate-x-full"
+          className="bg-sheet sm:max-w-panel sm:shadow-panel focus-within:outline-primary fixed z-50 flex flex-col gap-[22px] transition-transform duration-300 focus-within:outline-2 focus-within:outline-offset-2 max-sm:inset-x-0 max-sm:bottom-0 max-sm:max-h-[90vh] max-sm:w-full max-sm:p-6 max-sm:data-[ending-style]:translate-y-full max-sm:data-[starting-style]:translate-y-full sm:inset-y-0 sm:right-0 sm:w-full sm:p-[36px_40px] sm:data-[ending-style]:translate-x-full sm:data-[starting-style]:translate-x-full"
         >
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1">

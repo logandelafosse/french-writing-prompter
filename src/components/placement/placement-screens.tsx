@@ -95,7 +95,7 @@ export function PlacementResult({ result }: { result: PlacementResultView }) {
       <Surface padding="intro" aria-live="polite" className="flex flex-col gap-[26px] max-sm:p-[22px_18px]">
         <div className="flex flex-wrap items-center gap-x-7 gap-y-3">
           <span className="text-primary text-[96px] leading-[0.9] font-bold tracking-[-0.04em]">{result.finalLevel}</span>
-          <div className="flex min-w-[300px] flex-1 flex-col gap-1.5">
+          <div className="flex min-w-[300px] flex-1 flex-col gap-1.5 max-sm:min-w-0">
             <SectionLabel>{placementCopy.doneLabel(result.levelName)}</SectionLabel>
             <p lang="fr" className="text-ink font-serif text-[22px]/[1.4]">{result.summary}</p>
           </div>
@@ -105,7 +105,7 @@ export function PlacementResult({ result }: { result: PlacementResultView }) {
             <div key={row.step} className={cn("border-line flex flex-wrap items-baseline gap-x-4 gap-y-0.5 py-3", index === last ? "border-y" : "border-t")}>
               <dt className="text-muted w-[110px] shrink-0 text-sm">{placementCopy.stepN(row.step)}</dt>
               <dd className="m-0 w-12 shrink-0 text-[17px] font-semibold">{row.evaluatedLevel}</dd>
-              <dd lang="fr" className="m-0 min-w-[260px] flex-1 text-[15px]">{row.summary}</dd>
+              <dd lang="fr" className="m-0 min-w-[260px] flex-1 text-[15px] max-sm:min-w-0">{row.summary}</dd>
             </div>
           ))}
         </dl>

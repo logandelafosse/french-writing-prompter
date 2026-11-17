@@ -27,7 +27,7 @@ export function ResourceLinks({
           href={resource.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[14px] sm:min-h-8"
+          className="min-h-touch text-[14px] sm:min-h-8"
         >
           {resource.type === "grammaire"
             ? reviewCopy.resourceGrammar(resource.label)

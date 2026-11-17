@@ -23,6 +23,9 @@ describe("globals.css base layer", () => {
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*animation-duration:\s*0\.01ms !important/,
     );
     expect(base).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*animation-name:\s*none !important/,
+    );
+    expect(base).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*transition-duration:\s*0\.01ms !important/,
     );
   });

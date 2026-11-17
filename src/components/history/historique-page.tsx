@@ -44,7 +44,7 @@ export function HistoriquePage() {
     offline || (loadUi.status === "error" && loadUi.failure === "offline");
   const ready = loadUi.status === "ready" ? loadUi : null;
   return (
-    <main className="max-w-list mx-auto flex w-full flex-col gap-6 px-6 py-5 pb-20">
+    <main className="max-w-list mx-auto flex w-full flex-col gap-6 px-5 py-5 pb-20 sm:px-6">
       <div className="flex flex-col gap-1.5">
         <PageTitle>{historyCopy.title}</PageTitle>
         {ready?.levelLine ? (

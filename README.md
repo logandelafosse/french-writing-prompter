@@ -1,4 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Consigne · Louisiana Languages
+
+A Louisiana French writing tutor. Each day you get up to three consignes, write in French, and receive an Evaluation with Corrections in three kinds (Mistake, Standard→Louisiana, Dialect check). A Carnet holds Dialect Notes and Weaknesses. A Placement Test sets the starting CEFR Level.
+
+## Prerequisites
+
+- Node.js 20
+- `OPENAI_API_KEY` (required unless you run the fake client)
+- Optional: `APP_TIME_ZONE`, `DLF_LEXICON_PATH`
+
+## Commands
+
+```bash
+npm run dev
+npm run db:migrate
+npm run check
+npm run test:e2e
+AI_CLIENT=fake npm run dev
+npm run dialect:export
+DLF_LEXICON_VERSION=x.y.z npm run dlf:fetch
+```
+
+`npm run dev` applies migrations then starts Next.js. `AI_CLIENT=fake` runs the UI offline against fixture-backed AI. `npm run test:e2e` is the Playwright suite. `npm run dlf:fetch` builds/updates the DLF lexicon pin.
+
+## Docs
+
+- Domain language: [`CONTEXT.md`](CONTEXT.md)
+- Plan and tickets: [`docs/plan/`](docs/plan/)
+- UI spec: [`docs/design/handoff/`](docs/design/handoff/)
+- Deploy: [`docs/plan/vercel-deployment.md`](docs/plan/vercel-deployment.md)
 
 ## DLF lexicon
 
@@ -7,38 +36,3 @@ Louisiana French glosses come from a versioned lexicon artifact published by
 `DLF_LEXICON_VERSION=x.y.z npm run dlf:fetch` and set `DLF_LEXICON_PATH`.
 Tests use the committed fixture via `DLF_LEXICON_PATH`. See
 `docs/plan/dlf-lexicon.md`.
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) on this machine, or `http://<this-machine-LAN-IP>:3000` from another device on the same network.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

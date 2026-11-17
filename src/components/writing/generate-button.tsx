@@ -15,13 +15,7 @@ export function GenerateButton({
   label: string;
 }) {
   return (
-    <Button
-      size="lg"
-      className="min-h-[54px] w-full sm:min-h-12 sm:w-auto"
-      disabled={disabled}
-      busy={busy}
-      onClick={onClick}
-    >
+    <Button size="lg" disabled={disabled} busy={busy} onClick={onClick}>
       {busy ? homeCopy.generateBusy : label}
     </Button>
   );

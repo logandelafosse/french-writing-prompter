@@ -604,6 +604,7 @@ function WritingInterim({
           quotaRemaining={quotaRemaining}
           generating={generating}
           onNextPrompt={onFreshPrompt}
+          animateMarks
         />
         {generateFailure !== null &&
         !(generateFailure === "offline" && offline) ? (
@@ -624,6 +625,7 @@ function WritingInterim({
           className={cn(
             "flex flex-col gap-4 max-sm:gap-3.5 max-sm:p-[22px_18px]",
             "focus-within:border-primary focus-within:border-l-primary focus-within:border-l-2",
+            "focus-within:outline-primary focus-within:outline-2 focus-within:outline-offset-2",
           )}
         >
           <PromptSheet

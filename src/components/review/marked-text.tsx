@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Correction } from "@/contracts/correction";
 import { reviewCopy } from "@/copy/review";
+import { cn } from "@/lib/utils";
 
 type MarkedKind = "mistake" | "standard" | "dialect_check";
 
@@ -23,12 +24,12 @@ function markKind(
 
 function markClass(kind: Mark["kind"]) {
   if (kind === "standard") {
-    return "border-b-standard border-b-2 border-dashed bg-transparent py-px text-inherit";
+    return "border-b-standard border-b-2 border-dashed bg-transparent bg-no-repeat py-px text-inherit";
   }
   if (kind === "dialect_check") {
-    return "bg-dialect-tint decoration-dialect px-0.5 py-px text-inherit underline decoration-wavy underline-offset-[5px]";
+    return "decoration-dialect [background-size:100%_100%] bg-[image:linear-gradient(var(--color-dialect-tint),var(--color-dialect-tint))] bg-no-repeat px-0.5 py-px text-inherit underline decoration-wavy underline-offset-[5px]";
   }
-  return "bg-mistake-tint border-b-mistake border-b-2 px-0.5 py-px text-inherit";
+  return "[background-size:100%_100%] bg-[image:linear-gradient(var(--color-mistake-tint),var(--color-mistake-tint))] bg-no-repeat border-b-mistake border-b-2 px-0.5 py-px text-inherit";
 }
 
 function markerClass(kind: Mark["kind"]) {
@@ -53,7 +54,13 @@ function paragraphRanges(text: string): { start: number; end: number }[] {
   return ranges.filter((range) => range.end > range.start);
 }
 
-function renderRange(text: string, start: number, end: number, marks: Mark[]) {
+function renderRange(
+  text: string,
+  start: number,
+  end: number,
+  marks: Mark[],
+  animate: boolean,
+) {
   const nodes: ReactNode[] = [];
   let cursor = start;
   for (const item of marks) {
@@ -62,7 +69,18 @@ function renderRange(text: string, start: number, end: number, marks: Mark[]) {
     const to = Math.min(item.span.end, end);
     if (from > cursor) nodes.push(text.slice(cursor, from));
     nodes.push(
-      <mark key={item.id} className={markClass(item.kind)}>
+      <mark
+        key={item.id}
+        className={cn(
+          markClass(item.kind),
+          animate && "motion-safe:animate-mark-paint",
+        )}
+        style={
+          animate
+            ? { animationDelay: `${(item.ordinal - 1) * 60}ms` }
+            : undefined
+        }
+      >
         {text.slice(from, to)}
       </mark>,
       <sup key={`${item.id}-n`} className="ml-[3px]">
@@ -89,12 +107,14 @@ function renderRange(text: string, start: number, end: number, marks: Mark[]) {
 export function MarkedText({
   text,
   corrections,
+  animate = false,
 }: {
   text: string;
   corrections: Pick<
     Correction,
     "id" | "ordinal" | "kind" | "span" | "status"
   >[];
+  animate?: boolean | undefined;
 }) {
   const marks = corrections.flatMap((item) => {
     const kind = markKind(item);
@@ -110,7 +130,7 @@ export function MarkedText({
     >
       {paragraphRanges(text).map((range) => (
         <p key={range.start} className="m-0">
-          {renderRange(text, range.start, range.end, marks)}
+          {renderRange(text, range.start, range.end, marks, animate)}
         </p>
       ))}
     </div>
