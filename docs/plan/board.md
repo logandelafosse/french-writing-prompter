@@ -83,8 +83,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | --- | --------------------------------------------- | ---- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | T28 | Weakness memory and Carnet "À travailler"     | AFK  | T22, T26   | **Done** — [PR #81](https://github.com/logandelafosse/french-writing-prompter/pull/81) `5b48e5b`.                                                                     |
 | T29 | Focus du jour driving prompts; "Pratiquer ça" | AFK  | T15, T28   | **Done** — [PR #82](https://github.com/logandelafosse/french-writing-prompter/pull/82) + [PR #83](https://github.com/logandelafosse/french-writing-prompter/pull/83). |
-| T30 | Resource catalog and links                    | AFK  | T28        | **Ready** — on Ready column.                                                                                                                                          |
-| T30 | Resource catalog and links                    | AFK  | T28        | Needs Weakness categories. Q7: general French starter catalog; LA CI later.                                                                                           |
+| T30 | Resource catalog and links                    | AFK  | T28        | **Ready** — on Ready column; Q7: general French starter catalog; LA CI later.                                                                                         |
 
 ### Phase 5 — Host (planned, not on board DAG yet)
 
