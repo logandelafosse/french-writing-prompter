@@ -58,4 +58,4 @@ Tickets that depend on one of these are HITL and stay `Blocked` until it is answ
 
 ## Models
 
-(2026-11-15 — Opus utilization exhausted.) Coordinator and all three reviewers: Grok 4.7 high (`grok-4.7-high-fast`). Implementer: Composer 2.5 when available; otherwise Grok 4.6 (`cursor-grok-4.6-high-fast` — medium preferred if offered).
+(2026-11-15 — Opus utilization exhausted; 2026-11-16 — Composer 2.5 no longer preferred.) Coordinator and all three reviewers: Grok 4.7 high (`grok-4.7-high-fast`). Implementer: router auto-decide (leave model unset) or Grok 4.6 (`cursor-grok-4.6-high-fast`).
