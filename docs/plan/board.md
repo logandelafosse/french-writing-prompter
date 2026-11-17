@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-17 by coordinator (D03 In review, [PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92)).
+Last updated: 2026-11-17 by coordinator (D03 merged; D01 In progress).
 
 ## Ready
 
@@ -16,13 +16,13 @@ _Also planned: D01 after D03, D05 after D01. Hosting T36–T39 waits on `docs/pl
 
 ## In progress
 
-_None._
+| ID  | Ticket                 | Why                                                                                            |
+| --- | ---------------------- | ---------------------------------------------------------------------------------------------- |
+| D01 | Prompt issuance module | Implementer, branch `ticket/d01-prompt-issuance`, started 2026-11-17. Spec `tickets/D01-*.md`. |
 
 ## In review
 
-| ID  | Ticket                  | Why                                                                                                                                                  |
-| --- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D03 | Weakness / Focus façade | [PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92) `11f8490`. Adversarial, test, and tooling reviewers running. 2026-11-17. |
+_None._
 
 ## Blocked
 
@@ -96,13 +96,13 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 6 — Deepen modules
 
-| ID  | Ticket                   | Type | Blocked by    | Why not ready                                                                                     |
-| --- | ------------------------ | ---- | ------------- | ------------------------------------------------------------------------------------------------- |
-| D02 | Evaluate pipeline façade | AFK  | —             | **Done** — [PR #91](https://github.com/logandelafosse/french-writing-prompter/pull/91) `259c229`. |
-| D03 | Weakness / Focus façade  | AFK  | —             | **In review** — [PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92).      |
-| D01 | Prompt issuance module   | AFK  | D03 preferred | Wait until Focus façade lands. `tickets/D01-*.md`.                                                |
-| D04 | Learner-dialect context  | AFK  | —             | **Ready** — D02 merged. Dispatch after D03 and D01. `tickets/D04-*.md`.                           |
-| D05 | Session / Draft façade   | AFK  | D01 helpful   | After issuance thins Home’s server edge. `tickets/D05-*.md`.                                      |
+| ID  | Ticket                   | Type | Blocked by  | Why not ready                                                                                     |
+| --- | ------------------------ | ---- | ----------- | ------------------------------------------------------------------------------------------------- |
+| D02 | Evaluate pipeline façade | AFK  | —           | **Done** — [PR #91](https://github.com/logandelafosse/french-writing-prompter/pull/91) `259c229`. |
+| D03 | Weakness / Focus façade  | AFK  | —           | **Done** — [PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92) `db003c8`. |
+| D01 | Prompt issuance module   | AFK  | —           | **In progress** — `ticket/d01-prompt-issuance`, started 2026-11-17.                               |
+| D04 | Learner-dialect context  | AFK  | —           | **Ready** — D02 merged. Dispatch after D03 and D01. `tickets/D04-*.md`.                           |
+| D05 | Session / Draft façade   | AFK  | D01 helpful | After issuance thins Home’s server edge. `tickets/D05-*.md`.                                      |
 
 Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CONTEXT.md`](../../CONTEXT.md).
 
@@ -126,6 +126,7 @@ Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CON
 
 | ID   | Ticket                                                                                                                                           | Why                                                                                                                                                                                                                                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D03  | Weakness / Focus façade ([PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92))                                            | Merged `db003c8` 2026-11-17. `pr:size` 78. Test fix `74c0ae5`. Follow-up: TOOL-PR92-1 restricted weakness imports. D01 unblocked.                                                                                                                                                                        |
 | D02  | Evaluate pipeline façade ([PR #91](https://github.com/logandelafosse/french-writing-prompter/pull/91))                                           | Merged `259c229` 2026-11-17. `pr:size` 74. Reviews clear. Follow-ups: TOOL-PR91-1 restricted post-process imports; TOOL-PR91-2 `pr:size` base ref. D04 unblocked.                                                                                                                                        |
 | T00  | Own repo and gitignore ([#2](https://github.com/logandelafosse/french-writing-prompter/issues/2))                                                | Done 2026-11-15 in the initial commit. Q1: private repo, `Personal-Projects` ignores the folder. All shell checks recorded on the issue.                                                                                                                                                                 |
 | T01  | Isolated test DB and generated migrations ([#3](https://github.com/logandelafosse/french-writing-prompter/issues/3))                             | Merged [PR #38](https://github.com/logandelafosse/french-writing-prompter/pull/38) 2026-11-15; CI `check` green. Follow-ups: Vitest guard hardening backlog, T07 ast-grep rules.                                                                                                                         |
