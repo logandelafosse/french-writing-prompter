@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { CefrLevel, LevelSource } from "./cefr";
-import { Evaluation, EvaluationV2 } from "./evaluation";
+import { EvaluationV2 } from "./evaluation";
 import { Correction } from "./correction";
 import { DialectNote, DialectNoteScope } from "./dialect-note";
 import { FocusItem } from "./focus";
@@ -9,7 +9,6 @@ import {
   DIALECT_NOTE_EXAMPLE_MAX,
   DIALECT_NOTE_FORM_MAX,
 } from "@/config/limits";
-import { PromptConstraints } from "./prompt";
 import { PromptMeta } from "./prompt-meta";
 import { SessionStatus, SessionSummary, SessionDetail } from "./session";
 
@@ -139,12 +138,6 @@ export const QuotaGetResponse = z.strictObject({
   resetsAt: z.string(),
 });
 
-export const WritingPromptDto = z.object({
-  text: z.string(),
-  meta: PromptMeta,
-  constraints: PromptConstraints,
-});
-
 export const PromptSessionDto = z.strictObject({
   id: z.number(),
   promptText: z.string(),
@@ -181,26 +174,3 @@ export const SessionsGetResponse = z.strictObject({
 });
 
 export const SessionDetailGetResponse = SessionDetail;
-
-export const PlacementPostBody = z.discriminatedUnion("action", [
-  z.strictObject({ action: z.literal("start") }),
-  z.strictObject({ action: z.literal("submit"), writing: z.string() }),
-]);
-
-export const PlacementPostResponse = z.union([
-  z.strictObject({
-    type: z.literal("prompt"),
-    prompt: WritingPromptDto,
-    step: z.number(),
-  }),
-  z.strictObject({
-    type: z.literal("next_prompt"),
-    prompt: WritingPromptDto,
-    step: z.number(),
-  }),
-  z.strictObject({
-    type: z.literal("complete"),
-    finalLevel: CefrLevel,
-    evaluations: z.array(Evaluation),
-  }),
-]);

@@ -1,95 +1,61 @@
-import { describe, it, expect, vi } from "vitest";
-import {
-  PlacementTest,
-  type EvaluatorLike,
-  type PromptGeneratorLike,
-} from "./placement-test";
-import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
-import type { EvaluatorOutput } from "@/contracts/evaluation";
-import type { CefrLevel } from "@/contracts/cefr";
-import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
-import { WORD_TARGET_BY_LEVEL } from "@/config/limits";
+import { describe, expect, it } from "vitest";
+import { buildResults, computeLevel, stepLevel } from "./placement-test";
 
-function makePrompt(level: CefrLevel): WritingPrompt {
-  return {
-    text: `Prompt for ${level}`,
-    meta: {
-      genre: "récit",
-      tense: "présent",
-      tone: "",
-      registre: "familier",
-      wordTarget: WORD_TARGET_BY_LEVEL[level],
-      topic: "test",
-      topicTags: [],
-    },
-    constraints: { cefrLevel: level, dialect: DEFAULT_DIALECT },
-  };
-}
-
-function makeEvaluation(cefr: CefrLevel): EvaluatorOutput {
-  return {
-    dimensions: {
-      grammatical_accuracy: { score: 3, comment: "" },
-      vocabulary: { score: 3, comment: "" },
-      coherence: { score: 3, comment: "" },
-      register_style: { score: 3, comment: "" },
-    },
-    overall_cefr: cefr,
-    summary: "",
-    next_level_tip: "",
-    corrections: [],
-  };
-}
-
-describe("PlacementTest", () => {
-  function createPlacementTest() {
-    const mockPromptGenerator: PromptGeneratorLike = {
-      generate: vi
-        .fn()
-        .mockResolvedValueOnce(makePrompt("A2"))
-        .mockResolvedValueOnce(makePrompt("B1"))
-        .mockResolvedValueOnce(makePrompt("B2")),
-    };
-
-    const mockEvaluator: EvaluatorLike = {
-      evaluate: vi
-        .fn()
-        .mockResolvedValueOnce(makeEvaluation("A2"))
-        .mockResolvedValueOnce(makeEvaluation("B1"))
-        .mockResolvedValueOnce(makeEvaluation("B1")),
-    };
-
-    return new PlacementTest(
-      mockPromptGenerator,
-      mockEvaluator,
-      DEFAULT_DIALECT,
-    );
-  }
-
-  it("begins the test and returns the first prompt", async () => {
-    const test = createPlacementTest();
-    const prompt = await test.start();
-    expect(prompt.text).toBe("Prompt for A2");
-    expect(test.getState()).toBe("waiting_for_writing");
+describe("placement logic › fixed step levels and median result", () => {
+  it("returns A2, B1, B2 for steps 1–3", () => {
+    expect(stepLevel(1)).toBe("A2");
+    expect(stepLevel(2)).toBe("B1");
+    expect(stepLevel(3)).toBe("B2");
   });
 
-  it("throws if started when not idle", async () => {
-    const test = createPlacementTest();
-    await test.start();
-    await expect(test.start()).rejects.toThrow("Test already in progress");
+  it("computeLevel of A2, B2, B1 is B1", () => {
+    expect(computeLevel(["A2", "B2", "B1"])).toBe("B1");
   });
+});
 
-  it("returns final result after 3rd submission", async () => {
-    const test = createPlacementTest();
-    await test.start();
-    await test.submitWriting("w1");
-    await test.submitWriting("w2");
-    const result = await test.submitWriting("w3");
-    if (result.type !== "complete") throw new Error("expected complete");
+describe("placement logic › buildResults", () => {
+  it("maps three evaluated sessions to steps in order and counts Mistakes", () => {
+    const result = buildResults({ finalLevel: "B1" }, [
+      {
+        step: 2,
+        promptLevel: "B1",
+        evaluatedLevel: "B2",
+        summary: "Étape 2",
+        nextLevelTip: "Pour atteindre C1, varie tes temps.",
+        corrections: [{ kind: "mistake", status: "open" }],
+      },
+      {
+        step: 1,
+        promptLevel: "A2",
+        evaluatedLevel: "A2",
+        summary: "Étape 1",
+        nextLevelTip: "Pour atteindre B1, allonge tes phrases.",
+        corrections: [],
+      },
+      {
+        step: 3,
+        promptLevel: "B2",
+        evaluatedLevel: "B1",
+        summary: "Étape 3",
+        nextLevelTip: "Pour atteindre B2, varie tes connecteurs.",
+        corrections: [
+          { kind: "mistake", status: "open" },
+          { kind: "mistake", status: "overturned" },
+          { kind: "standard", status: "open" },
+          { kind: "dialect_check", status: "confirmed_mistake" },
+        ],
+      },
+    ]);
+
     expect(result.finalLevel).toBe("B1");
-  });
-
-  it("computes median CEFR level", () => {
-    expect(PlacementTest.computeLevel(["A1", "B2", "B1"])).toBe("B1");
+    expect(result.levelName).toBe("Seuil");
+    expect(result.summary).toBe("Pour atteindre B2, varie tes connecteurs.");
+    expect(result.steps.map((step) => step.step)).toEqual([1, 2, 3]);
+    expect(result.steps[0]?.summary).toBe("Étape 1");
+    expect(result.steps[0]?.mistakeCount).toBe(0);
+    expect(result.steps[1]?.mistakeCount).toBe(1);
+    expect(result.steps[2]?.mistakeCount).toBe(2);
+    expect(result.steps[2]?.promptLevel).toBe("B2");
+    expect(result.steps[2]?.evaluatedLevel).toBe("B1");
   });
 });

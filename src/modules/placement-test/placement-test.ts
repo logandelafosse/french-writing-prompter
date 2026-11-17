@@ -1,133 +1,49 @@
-import type {
-  WritingPrompt,
-  FrenchDialect,
-} from "@/modules/prompt-generator/prompt-generator";
-import type { EvaluatorOutput } from "@/contracts/evaluation";
-import { CEFR_ORDER, type CefrLevel } from "@/contracts/cefr";
 import { PLACEMENT_STEPS } from "@/config/limits";
-import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
-
-export type PlacementTestState = "idle" | "waiting_for_writing" | "complete";
-
-export type SubmitResult =
-  | { type: "next_prompt"; prompt: WritingPrompt; step: number }
-  | { type: "complete"; finalLevel: CefrLevel; evaluations: EvaluatorOutput[] };
-
-export interface PromptGeneratorLike {
-  generate(level: CefrLevel, dialect: FrenchDialect): Promise<WritingPrompt>;
-}
-
-export interface EvaluatorLike {
-  evaluate(
-    writing: string,
-    prompt: WritingPrompt,
-    dialect: FrenchDialect,
-  ): Promise<EvaluatorOutput>;
-}
+import { CEFR_ORDER, CEFR_UI_LABELS, type CefrLevel } from "@/contracts/cefr";
+import { countsAsMistake, type Correction } from "@/contracts/correction";
+import type { PlacementResultView } from "@/contracts/placement";
 
 const STARTING_LEVELS: CefrLevel[] = ["A2", "B1", "B2"];
 
-export class PlacementTest {
-  private state: PlacementTestState = "idle";
-  private currentStep = 0;
-  private evaluations: EvaluatorOutput[] = [];
-  private currentPrompt: WritingPrompt | null = null;
-
-  constructor(
-    private promptGenerator: PromptGeneratorLike,
-    private evaluator: EvaluatorLike,
-    private dialect: FrenchDialect = DEFAULT_DIALECT,
-  ) {}
-
-  getState(): PlacementTestState {
-    return this.state;
+export function stepLevel(step: number): CefrLevel {
+  const level = STARTING_LEVELS[step - 1];
+  if (level === undefined) {
+    throw new Error(`No starting level for placement step ${step}`);
   }
+  return level;
+}
 
-  getCurrentStep(): number {
-    return this.currentStep;
+export function computeLevel(cefrLevels: CefrLevel[]): CefrLevel {
+  const sorted = [...cefrLevels].sort((a, b) => CEFR_ORDER[a] - CEFR_ORDER[b]);
+  const median = sorted[1];
+  if (median === undefined) {
+    throw new Error("computeLevel requires at least two CEFR levels");
   }
+  return median;
+}
 
-  async start(): Promise<WritingPrompt> {
-    if (this.state !== "idle") {
-      throw new Error("Test already in progress");
-    }
-
-    this.state = "waiting_for_writing";
-    this.currentStep = 1;
-    this.evaluations = [];
-
-    const initialLevel = STARTING_LEVELS[0];
-    if (initialLevel === undefined) {
-      throw new Error("Placement test has no starting level configured");
-    }
-    this.currentPrompt = await this.promptGenerator.generate(
-      initialLevel,
-      this.dialect,
-    );
-
-    return this.currentPrompt;
+// prettier-ignore
+export function buildResults(
+  run: { finalLevel: CefrLevel },
+  sessions: readonly {
+    step: number; promptLevel: CefrLevel; evaluatedLevel: CefrLevel;
+    summary: string; nextLevelTip: string;
+    corrections: ReadonlyArray<Pick<Correction, "kind" | "status">>;
+  }[],
+): PlacementResultView {
+  const ordered = [...sessions].sort((a, b) => a.step - b.step);
+  const last = ordered[ordered.length - 1];
+  if (ordered.length !== PLACEMENT_STEPS || last === undefined) {
+    throw new Error("buildResults requires three evaluated sessions");
   }
-
-  async submitWriting(writing: string): Promise<SubmitResult> {
-    if (this.state !== "waiting_for_writing") {
-      throw new Error("Test not in progress");
-    }
-
-    if (!writing.trim()) {
-      throw new Error("Writing text is required");
-    }
-
-    if (!this.currentPrompt) {
-      throw new Error("No active prompt");
-    }
-
-    const evaluation = await this.evaluator.evaluate(
-      writing,
-      this.currentPrompt,
-      this.dialect,
-    );
-
-    this.evaluations.push(evaluation);
-
-    if (this.currentStep >= PLACEMENT_STEPS) {
-      this.state = "complete";
-      const finalLevel = PlacementTest.computeLevel(
-        this.evaluations.map((e) => e.overall_cefr),
-      );
-      return {
-        type: "complete",
-        finalLevel,
-        evaluations: [...this.evaluations],
-      };
-    }
-
-    this.currentStep++;
-    const level = STARTING_LEVELS[this.currentStep - 1];
-    if (level === undefined) {
-      throw new Error(
-        `No starting level for placement step ${this.currentStep}`,
-      );
-    }
-    this.currentPrompt = await this.promptGenerator.generate(
-      level,
-      this.dialect,
-    );
-
-    return {
-      type: "next_prompt",
-      prompt: this.currentPrompt,
-      step: this.currentStep,
-    };
-  }
-
-  static computeLevel(cefrLevels: CefrLevel[]): CefrLevel {
-    const sorted = [...cefrLevels].sort(
-      (a, b) => CEFR_ORDER[a] - CEFR_ORDER[b],
-    );
-    const median = sorted[1];
-    if (median === undefined) {
-      throw new Error("computeLevel requires at least two CEFR levels");
-    }
-    return median;
-  }
+  return {
+    finalLevel: run.finalLevel,
+    levelName: CEFR_UI_LABELS[run.finalLevel],
+    summary: last.nextLevelTip,
+    steps: ordered.map((session) => ({
+      step: session.step, promptLevel: session.promptLevel,
+      evaluatedLevel: session.evaluatedLevel, summary: session.summary,
+      mistakeCount: session.corrections.filter(countsAsMistake).length,
+    })),
+  };
 }

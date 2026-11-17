@@ -1,0 +1,269 @@
+import { and, desc, eq } from "drizzle-orm";
+import { DRAFT_TEXT_MAX, PLACEMENT_STEPS } from "@/config/limits";
+import { parseCefrLevel } from "@/contracts/cefr";
+import { parseStoredEvaluation } from "@/contracts/evaluation";
+import { PlacementRunStatus, PlacementRunView } from "@/contracts/placement";
+import { PromptConstraints } from "@/contracts/prompt";
+import { db } from "@/db";
+import { placementRuns, sessions } from "@/db/schema";
+import { localDateKey } from "@/lib/dates";
+import { parseJson } from "@/lib/json";
+import { parseStoredFocus } from "@/lib/parse-stored-focus";
+import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
+import { getCurrentLevel, setLevel } from "@/modules/cefr-tracker/level-store";
+import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
+import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { emptyDlfIndex, type DlfIndex } from "@/modules/dlf/lookup";
+import {
+  getSessionDetail,
+  rememberWriting,
+  saveCorrections,
+  saveSession,
+} from "@/modules/history-store/history-store";
+import {
+  PromptGenerator,
+  type OpenAiClientLike,
+  type WritingPrompt,
+} from "@/modules/prompt-generator/prompt-generator";
+import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
+import { postProcessEvaluation } from "@/modules/writing-evaluator/post-process";
+import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
+import { buildResults, computeLevel, stepLevel } from "./placement-test";
+
+export type PlacementFailure = {
+  ok: false;
+  code: "NOT_FOUND" | "CONFLICT" | "VALIDATION";
+  message: string;
+};
+
+type RunRow = typeof placementRuns.$inferSelect;
+type SessionRow = typeof sessions.$inferSelect;
+const inProgress = PlacementRunStatus.enum.in_progress;
+const complete = PlacementRunStatus.enum.complete;
+const fail = (
+  code: PlacementFailure["code"],
+  message: string,
+): PlacementFailure => ({ ok: false, code, message });
+
+async function firstRow<T>(rows: Promise<T[]>) {
+  return (await rows)[0] ?? null;
+}
+
+// prettier-ignore
+async function runById(id: number) {
+  return firstRow(db.select().from(placementRuns).where(eq(placementRuns.id, id)).limit(1));
+}
+
+// prettier-ignore
+async function runByStatus(status: string) {
+  return firstRow(db.select().from(placementRuns).where(eq(placementRuns.status, status)).orderBy(desc(placementRuns.id)).limit(1));
+}
+
+// prettier-ignore
+async function sessionFor(runId: number, step: number) {
+  return firstRow(db.select().from(sessions).where(and(eq(sessions.placementRunId, runId), eq(sessions.placementStep, step))).limit(1));
+}
+
+export async function abandonInProgressPlacementRuns(
+  now: () => Date = () => new Date(),
+) {
+  // prettier-ignore
+  await db.update(placementRuns).set({
+    status: PlacementRunStatus.enum.abandoned, completedAt: now().toISOString(),
+  }).where(eq(placementRuns.status, inProgress));
+}
+
+async function insertSession(
+  runId: number,
+  step: number,
+  prompt: WritingPrompt,
+  now: Date,
+) {
+  const meta = prompt.meta;
+  if (meta === undefined) throw new Error("Prompt generator returned no meta");
+  // prettier-ignore
+  await db.insert(sessions).values({
+    promptText: prompt.text, promptMetaJson: JSON.stringify(meta),
+    promptConstraints: JSON.stringify(prompt.constraints), writingText: null,
+    evaluationJson: null, cefrLevel: null, createdAt: now.toISOString(),
+    kind: "placement", localDate: localDateKey(now, quotaTimeZone()),
+    status: "active", promptLevel: stepLevel(step),
+    placementRunId: runId, placementStep: step,
+  });
+}
+
+export class PlacementService {
+  private readonly generator: PromptGenerator;
+  private readonly evaluator: WritingEvaluator;
+  private readonly dlf: DlfIndex;
+  private readonly now: () => Date;
+  private readonly createId: () => string;
+
+  // prettier-ignore
+  constructor(deps: {
+    client: OpenAiClientLike; dlf?: DlfIndex; now?: () => Date; createId?: () => string;
+  }) {
+    this.dlf = deps.dlf ?? emptyDlfIndex();
+    this.generator = new PromptGenerator(deps.client);
+    this.evaluator = new WritingEvaluator(deps.client, this.dlf);
+    this.now = deps.now ?? (() => new Date());
+    this.createId = deps.createId ?? (() => crypto.randomUUID());
+  }
+
+  async getCurrent() {
+    const current =
+      (await runByStatus(inProgress)) ?? (await runByStatus(complete));
+    return { run: current ? await this.toView(current) : null };
+  }
+
+  async start(): Promise<
+    PlacementFailure | { ok: true; created: boolean; view: PlacementRunView }
+  > {
+    const existing = await runByStatus(inProgress);
+    if (existing) {
+      return { ok: true, created: false, view: await this.toView(existing) };
+    }
+    if ((await getCurrentLevel()) !== null) {
+      return fail("CONFLICT", "Un niveau CECR est déjà défini.");
+    }
+    const prompt = await this.generator.generate(stepLevel(1), DEFAULT_DIALECT);
+    // prettier-ignore
+    const inserted = await db.insert(placementRuns).values({
+      status: inProgress, step: 1, finalLevel: null,
+      startedAt: this.now().toISOString(), completedAt: null,
+    });
+    const runId = Number(inserted.lastInsertRowid);
+    await insertSession(runId, 1, prompt, this.now());
+    const created = await runById(runId);
+    if (created === null) throw new Error("placement run missing after insert");
+    return { ok: true, created: true, view: await this.toView(created) };
+  }
+
+  async submit(
+    runId: number,
+    input: { sessionId: number; text: string },
+  ): Promise<PlacementFailure | { ok: true; view: PlacementRunView }> {
+    const run = await runById(runId);
+    if (run === null) {
+      return fail("NOT_FOUND", "Test de placement introuvable.");
+    }
+    if (run.status !== inProgress) {
+      return fail("CONFLICT", "Ce test de placement n'est plus en cours.");
+    }
+    const current = await sessionFor(run.id, run.step);
+    if (current === null || current.id !== input.sessionId) {
+      // prettier-ignore
+      return fail("CONFLICT", "Cette séance n'est pas l'étape en cours du test de placement.");
+    }
+    const text = input.text.replace(/\r\n/g, "\n").trim();
+    if (text.length === 0 || text.length > DRAFT_TEXT_MAX) {
+      // prettier-ignore
+      return fail("VALIDATION", "Le texte doit contenir entre 1 et 20 000 caractères.");
+    }
+    await this.evaluateIfNeeded(current, text);
+    if (run.step >= PLACEMENT_STEPS) {
+      return { ok: true, view: await this.finish(run) };
+    }
+    const nextStep = run.step + 1;
+    if ((await sessionFor(run.id, nextStep)) === null) {
+      // prettier-ignore
+      await insertSession(run.id, nextStep, await this.generator.generate(stepLevel(nextStep), DEFAULT_DIALECT), this.now());
+    }
+    // prettier-ignore
+    await db.update(placementRuns).set({ step: nextStep }).where(eq(placementRuns.id, run.id));
+    const updated = await runById(run.id);
+    if (updated === null) {
+      throw new Error(`placement run ${run.id} missing after step advance`);
+    }
+    return { ok: true, view: await this.toView(updated) };
+  }
+
+  private async evaluateIfNeeded(row: SessionRow, text: string) {
+    if (row.status === "evaluated" || row.evaluationJson) return;
+    await rememberWriting(row.id, text, this.now().toISOString());
+    const parsed = parseJson(PromptConstraints, row.promptConstraints);
+    const fallback =
+      parseCefrLevel(row.promptLevel) ?? stepLevel(row.placementStep ?? 1);
+    const constraints = parsed.ok
+      ? parsed.value
+      : { cefrLevel: fallback, dialect: DEFAULT_DIALECT };
+    const promptMeta = parseStoredPromptMeta(row.promptMetaJson);
+    const dialectNotes = await listActiveNotes();
+    // prettier-ignore
+    const raw = await this.evaluator.evaluate(
+      text,
+      promptMeta ? { text: row.promptText, meta: promptMeta, constraints } : { text: row.promptText, constraints },
+      DEFAULT_DIALECT, dialectNotes,
+    );
+    // prettier-ignore
+    const processed = postProcessEvaluation(raw, {
+      text, sessionId: row.id, now: this.now, createId: this.createId,
+      lookupDlf: (word) => this.dlf.lookup(word), dialectNotes,
+      focusCategories: parseStoredFocus(row.focusJson) ?? [],
+    });
+    // prettier-ignore
+    await saveSession({
+      promptText: row.promptText, promptConstraints: row.promptConstraints,
+      writingText: text, evaluationJson: JSON.stringify(processed.evaluation),
+      evaluationRaw: JSON.stringify(raw), cefrLevel: processed.evaluation.overallCefr,
+      id: row.id,
+    });
+    await saveCorrections(processed.corrections, this.now);
+  }
+
+  private async finish(run: RunRow) {
+    const results = await this.resultsFor(run);
+    await setLevel(results.finalLevel, "placement");
+    // prettier-ignore
+    await db.update(placementRuns).set({
+      status: complete, finalLevel: results.finalLevel,
+      completedAt: this.now().toISOString(),
+    }).where(eq(placementRuns.id, run.id));
+    const completed = await runById(run.id);
+    if (completed === null) {
+      throw new Error(`placement run ${run.id} missing after complete`);
+    }
+    return this.toView(completed);
+  }
+
+  private async resultsFor(run: RunRow) {
+    const parts = [];
+    // prettier-ignore
+    const rows = await db.select().from(sessions).where(eq(sessions.placementRunId, run.id));
+    for (const row of rows) {
+      const stored = parseStoredEvaluation(row.evaluationJson);
+      const step = row.placementStep;
+      const promptLevel = parseCefrLevel(row.promptLevel);
+      if (stored.status !== "v2" || step === null || promptLevel === null)
+        continue;
+      const detail = await getSessionDetail(row.id);
+      // prettier-ignore
+      parts.push({
+        step, promptLevel, evaluatedLevel: stored.value.overallCefr,
+        summary: stored.value.summary, nextLevelTip: stored.value.nextLevelTip,
+        corrections: detail?.corrections ?? [],
+      });
+    }
+    const finalLevel =
+      parseCefrLevel(run.finalLevel) ??
+      computeLevel(parts.map((part) => part.evaluatedLevel));
+    return buildResults({ finalLevel }, parts);
+  }
+
+  private async toView(run: RunRow) {
+    const sessionRow = await sessionFor(run.id, run.step);
+    if (sessionRow === null) {
+      throw new Error(`placement run ${run.id} missing step ${run.step}`);
+    }
+    const session = await getSessionDetail(sessionRow.id);
+    if (session === null) {
+      throw new Error(`placement session ${sessionRow.id} missing`);
+    }
+    const done = run.status === complete;
+    // prettier-ignore
+    return PlacementRunView.parse({
+      id: run.id, status: done ? complete : inProgress, step: run.step, session,
+      ...(done ? { results: await this.resultsFor(run) } : {}),
+    });
+  }
+}
