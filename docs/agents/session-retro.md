@@ -13,7 +13,7 @@ On each retro:
 3. File actionable items as **TOOL-SESSION-N** in the retro’s backlog table and mirror P0–P1 rows into `docs/agents/tooling-review.md` under a `### Session retro` heading.
 4. Update `docs/agents/workflow.md` counter: **Next retro after ticket &lt;ID&gt; merges.**
 
-**Last retro:** T27 merged (PR #80, 2026-11-16). **Next retro after:** T32 merges (five tickets: T28–T32), or sooner if Logan requests.
+**Last retro:** T32 merged (PR #86; arc T28–T32, 2026-11-16). **Next retro after:** T37 merges (five tickets from T33 onward), or sooner if Logan requests.
 
 ## Retro — T23–T27 (2026-11-16)
 
