@@ -13,7 +13,9 @@ export default async function HistoriqueDetailPage({
 }) {
   const { id: raw } = await params;
   if (!SESSION_ID.test(raw)) notFound();
-  const session = await loadEvaluatedSession(Number(raw));
-  if (session === null) notFound();
-  return <SessionReviewPage session={session} />;
+  const loaded = await loadEvaluatedSession(Number(raw));
+  if (loaded === null) notFound();
+  return (
+    <SessionReviewPage session={loaded.session} timeZone={loaded.timeZone} />
+  );
 }

@@ -10,7 +10,13 @@ import { Surface } from "@/components/ui/surface";
 import { TextLink } from "@/components/ui/text-link";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 
-export function SessionReviewPage({ session }: { session: SessionDetail }) {
+export function SessionReviewPage({
+  session,
+  timeZone,
+}: {
+  session: SessionDetail;
+  timeZone: string;
+}) {
   const unreadable = session.dataIssues.includes("evaluation_unreadable");
   const legacy = session.dataIssues.includes("evaluation_legacy");
   const writing = session.writingText ?? "";
@@ -26,7 +32,7 @@ export function SessionReviewPage({ session }: { session: SessionDetail }) {
           {session.title}
         </PageTitle>
         <p className="text-muted m-0 text-sm max-sm:px-2">
-          {pastReviewMeta(session)}
+          {pastReviewMeta(session, timeZone)}
         </p>
       </div>
       <div className="flex flex-wrap items-start gap-7">
