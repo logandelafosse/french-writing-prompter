@@ -1,90 +1,47 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { db } from "@/db";
-import { sessions } from "@/db/schema";
+import { corrections, levelChanges, sessions } from "@/db/schema";
 import { saveSession } from "@/modules/history-store/history-store";
 import evaluationFixture from "@/test/fixtures/ai/evaluation.valid.json";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
-import { AI_MODEL } from "@/config/ai";
 import { SessionsGetResponse } from "@/contracts/api";
 import { readResponseJson } from "@/test/read-response-json";
 import { GET } from "./route";
 
-async function clearSessions() {
-  await db.delete(sessions).execute();
+const constraints = JSON.stringify({
+  cefrLevel: "B1",
+  dialect: DEFAULT_DIALECT,
+});
+
+function getSessions(query = "") {
+  return GET(new Request(`http://localhost/api/sessions${query}`));
 }
 
 describe("GET /api/sessions", () => {
   beforeEach(async () => {
-    await clearSessions();
+    vi.setSystemTime(new Date("2026-11-14T18:00:00.000Z"));
+    await db.delete(corrections).execute();
+    await db.delete(sessions).execute();
+    await db.delete(levelChanges).execute();
   });
 
-  it("returns one parsed view per row, including unreadable stored JSON", async () => {
-    await saveSession({
-      promptText: "Valid session",
-      promptConstraints: JSON.stringify({
-        cefrLevel: "B1",
-        dialect: DEFAULT_DIALECT,
-      }),
-      writingText: "Mon texte.",
-      evaluationJson: JSON.stringify(evaluationFixture),
-      cefrLevel: "B1",
-    });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
+  it("malformed evaluation row yields evaluation_unreadable and still lists the prompt", async () => {
     await saveSession({
-      promptText: "Residue legacy row",
-      promptConstraints: "{}",
-      writingText: "Garde mon texte.",
+      promptText: "Consigne score cinq",
+      promptConstraints: constraints,
+      writingText: "Mon texte gardé.",
       evaluationJson: '{"score": 5}',
       cefrLevel: "A2",
+      status: "evaluated",
     });
-
     await saveSession({
-      promptText: "Broken JSON row",
-      promptConstraints: JSON.stringify({
-        cefrLevel: "A2",
-        dialect: DEFAULT_DIALECT,
-      }),
-      writingText: "Encore du texte.",
-      evaluationJson: '"{oops"',
-      cefrLevel: "A2",
-    });
-
-    const response = await GET();
-    const body = await readResponseJson(response, SessionsGetResponse);
-
-    expect(body.sessions).toHaveLength(3);
-
-    const valid = body.sessions.find((s) => s.promptText === "Valid session");
-    expect(valid).toBeDefined();
-    if (!valid) return;
-    expect(valid.evaluation).toEqual({ ok: true, value: evaluationFixture });
-    expect(valid.promptLevel).toBe("B1");
-
-    const residue = body.sessions.find(
-      (s) => s.promptText === "Residue legacy row",
-    );
-    expect(residue).toBeDefined();
-    if (!residue) return;
-    expect(residue.evaluation).toEqual({ ok: false, reason: "unreadable" });
-    expect(residue.promptLevel).toBeNull();
-
-    const broken = body.sessions.find(
-      (s) => s.promptText === "Broken JSON row",
-    );
-    expect(broken).toBeDefined();
-    if (!broken) return;
-    expect(broken.evaluation).toEqual({ ok: false, reason: "unreadable" });
-    expect(broken.promptLevel).toBe("A2");
-  });
-
-  it("maps EvaluationV2 stored JSON to a readable placeholder Evaluation", async () => {
-    await saveSession({
-      promptText: "V2 session",
-      promptConstraints: JSON.stringify({
-        cefrLevel: "B1",
-        dialect: DEFAULT_DIALECT,
-      }),
-      writingText: "Mon texte.",
+      promptText: "Consigne contraintes vides",
+      promptConstraints: "{}",
+      writingText: "Autre texte.",
       evaluationJson: JSON.stringify({
         version: 2,
         dimensions: {
@@ -95,39 +52,107 @@ describe("GET /api/sessions", () => {
         },
         overallCefr: "B1",
         summary: "s",
-        nextLevelTip: "Pour atteindre B2, travaille les connecteurs.",
-        model: AI_MODEL,
+        nextLevelTip: "tip",
+        model: "fake",
         promptVersion: "evaluator@2",
-        evaluatedAt: "2026-11-16T18:00:00.000Z",
+        evaluatedAt: "2026-11-14T18:00:00.000Z",
       }),
+      cefrLevel: "A2",
+      status: "evaluated",
+    });
+    await saveSession({
+      promptText: "Consigne v1",
+      promptConstraints: constraints,
+      writingText: "Texte v1.",
+      evaluationJson: JSON.stringify(evaluationFixture),
       cefrLevel: "B1",
+      status: "evaluated",
     });
 
-    const response = await GET();
+    const response = await getSessions();
+    expect(response.status).toBe(200);
     const body = await readResponseJson(response, SessionsGetResponse);
-    const v2 = body.sessions.find((s) => s.promptText === "V2 session");
-    expect(v2).toBeDefined();
-    if (!v2) return;
-    expect(v2.evaluation).toEqual({
-      ok: true,
-      value: {
-        overall_cefr: "B1",
-        dimensions: {
-          grammatical_accuracy: { score: 4, max: 6, comment: "a" },
-          vocabulary: { score: 3, max: 6, comment: "b" },
-          coherence: { score: 4, max: 6, comment: "c" },
-          register_style: { score: 3, max: 6, comment: "d" },
-        },
-        tips: {
-          per_dimension: {
-            grammatical_accuracy: "a",
-            vocabulary: "b",
-            coherence: "c",
-            register_style: "d",
-          },
-          holistic: "Pour atteindre B2, travaille les connecteurs.",
-        },
-      },
+
+    expect(body.sessions).toHaveLength(3);
+    const scoreFive = body.sessions.find(
+      (row) => row.promptText === "Consigne score cinq",
+    );
+    expect(scoreFive?.dataIssues).toEqual(["evaluation_unreadable"]);
+    expect(scoreFive?.promptText).toBe("Consigne score cinq");
+
+    const emptyConstraints = body.sessions.find(
+      (row) => row.promptText === "Consigne contraintes vides",
+    );
+    expect(emptyConstraints?.dataIssues).toEqual(["prompt_meta_unreadable"]);
+
+    const v1 = body.sessions.find((row) => row.promptText === "Consigne v1");
+    expect(v1?.dataIssues).toEqual(["evaluation_legacy"]);
+  });
+
+  it("derives display status for abandoned and unused sessions", async () => {
+    await saveSession({
+      promptText: "Évaluée",
+      promptConstraints: constraints,
+      writingText: "Texte évalué.",
+      evaluationJson: JSON.stringify(evaluationFixture),
+      cefrLevel: "B1",
+      status: "evaluated",
+      localDate: "2026-11-13",
     });
+    await saveSession({
+      promptText: "Brouillon",
+      promptConstraints: constraints,
+      writingText: "Un brouillon abandonné.",
+      evaluationJson: null,
+      cefrLevel: "B1",
+      status: "abandoned",
+      localDate: "2026-11-13",
+    });
+    await saveSession({
+      promptText: "Inutilisée",
+      promptConstraints: constraints,
+      writingText: null,
+      evaluationJson: null,
+      cefrLevel: "B1",
+      status: "abandoned",
+      localDate: "2026-11-12",
+    });
+    await saveSession({
+      promptText: "Aujourd'hui",
+      promptConstraints: constraints,
+      writingText: "En cours.",
+      evaluationJson: null,
+      cefrLevel: "B1",
+      status: "active",
+      localDate: "2026-11-14",
+    });
+    await saveSession({
+      promptText: "Placement",
+      promptConstraints: constraints,
+      writingText: "Texte placement.",
+      evaluationJson: JSON.stringify(evaluationFixture),
+      cefrLevel: "B1",
+      status: "evaluated",
+      kind: "placement",
+      localDate: "2026-11-13",
+    });
+
+    const response = await getSessions();
+    const body = await readResponseJson(response, SessionsGetResponse);
+    const byPrompt = Object.fromEntries(
+      body.sessions.map((row) => [row.promptText, row.displayStatus]),
+    );
+
+    expect(byPrompt).toEqual({
+      Évaluée: "evaluated",
+      Brouillon: "draft_abandoned",
+      Inutilisée: "prompt_unused",
+    });
+    expect(body.sessions.map((row) => row.promptText)).not.toContain(
+      "Aujourd'hui",
+    );
+    expect(body.sessions.map((row) => row.promptText)).not.toContain(
+      "Placement",
+    );
   });
 });

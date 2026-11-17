@@ -38,10 +38,10 @@ describe("wrapped API routes return INTERNAL JSON on unexpected errors", () => {
       "INTERNAL",
     );
 
-    vi.spyOn(historyStore, "getSessionViews").mockRejectedValueOnce(
+    vi.spyOn(historyStore, "listSessionSummaries").mockRejectedValueOnce(
       new Error("boom"),
     );
-    response = await getSessions();
+    response = await getSessions(new Request("http://localhost/api/sessions"));
     expect(response.status).toBe(500);
     expect((await readResponseJson(response, ErrorEnvelope)).error.code).toBe(
       "INTERNAL",

@@ -11,7 +11,7 @@ const PROMPT_SNIPPET = PROMPT_FIXTURE_LAFAYETTE;
 const HAPPY_WRITING =
   "Hier, je me suis promené dans mon quartier. J'ai vu des voisins et nous avons parlé du carnaval.";
 
-test("learner generates a prompt, writes, and sees the Evaluation and the History entry", async ({
+test("learner generates a prompt, writes, and sees the Evaluation and the Historique entry", async ({
   page,
   scenario,
 }, testInfo) => {
@@ -32,15 +32,14 @@ test("learner generates a prompt, writes, and sees the Evaluation and the Histor
   await captureEvidence(page, testInfo, "evaluation");
 
   await page.getByRole("link", { name: "Historique" }).click();
-  await expect(page.getByRole("heading", { name: "History" })).toBeVisible();
-  await expectNoAxeViolations(page, LEGACY_AXE_DISABLED);
-  await expect(page.getByText(/Sessions \(1\)/)).toBeVisible();
-  await page.getByRole("button", { name: /Lafayette/ }).click();
-  await expect(
-    page
-      .getByRole("main")
-      .getByText(/Raconte en style familier/, { exact: false }),
-  ).toBeVisible();
+  const main = mainContent(page);
+  await expect(main.getByRole("heading", { name: "Historique" })).toBeVisible();
+  await expectNoAxeViolations(page);
+  const list = main.getByRole("region", { name: "Séances passées" });
+  const row = list.getByRole("button").filter({ hasText: /évaluée/ });
+  await expect(row).toBeVisible();
+  await row.click();
+  await expect(list.getByText(/Raconte en style familier/)).toBeVisible();
   await captureEvidence(page, testInfo, "history-session");
 });
 

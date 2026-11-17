@@ -34,7 +34,13 @@ test.describe("draft autosave @1280", () => {
     await generateFirstPrompt(page);
     await mainContent(page).getByLabel("Ton texte").fill(draftText);
     await page.getByRole("link", { name: "Historique" }).click();
-    await expect(page.getByRole("heading", { name: "History" })).toBeVisible();
+    const historique = mainContent(page);
+    await expect(
+      historique.getByRole("heading", { name: "Historique" }),
+    ).toBeVisible();
+    await expect(
+      historique.getByRole("region", { name: "Séances passées" }),
+    ).toBeVisible();
     await page.getByRole("link", { name: /^Consigne/ }).click();
     await expect(page.getByLabel("Ton texte")).toHaveValue(draftText);
   });

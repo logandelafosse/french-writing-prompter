@@ -89,7 +89,3 @@ export function formatFrenchTime(date: Date, timeZone?: string): string {
 
   return `${hour} h ${minute}`;
 }
-
-export function formatFrenchDateTime(date: Date, timeZone?: string): string {
-  return `${formatFrenchDate(date, timeZone)} ${formatFrenchTime(date, timeZone)}`;
-}
