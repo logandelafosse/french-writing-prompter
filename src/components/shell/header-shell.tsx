@@ -133,7 +133,7 @@ export function LevelMenu({
                   role="menuitemradio"
                   aria-checked={option === level}
                   className={cn(
-                    "min-h-touch rounded-base flex cursor-default items-center px-3 py-2 text-[15px] outline-none",
+                    "min-h-touch rounded-base flex cursor-default items-center px-3 py-2 text-[15px]",
                     "data-highlighted:bg-primary-tint data-checked:font-semibold",
                   )}
                 >

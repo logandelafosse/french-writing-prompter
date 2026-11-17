@@ -23,7 +23,29 @@ describe("globals.css base layer", () => {
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*animation-duration:\s*0\.01ms !important/,
     );
     expect(base).toMatch(
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*animation-name:\s*none !important/,
+    );
+    expect(base).toMatch(
       /@media\s*\(prefers-reduced-motion:\s*reduce\)[\s\S]*transition-duration:\s*0\.01ms !important/,
+    );
+  });
+
+  it("mark paint starts empty and keeps delayed frames via fill-mode both", () => {
+    const css = readFileSync(path.join(APP_DIR, "globals.css"), "utf-8");
+    expect(css).toMatch(
+      /--animate-mark-paint:\s*mark-paint 420ms ease-out both/,
+    );
+    expect(css).toMatch(
+      /@keyframes mark-paint\s*\{[\s\S]*?from\s*\{[\s\S]*?background-size:\s*0%/,
+    );
+    expect(css).toMatch(
+      /@keyframes mark-underline\s*\{[\s\S]*?from\s*\{[\s\S]*?width:\s*0%/,
+    );
+    expect(css).toMatch(
+      /mark\[data-animate\]::after\s*\{[\s\S]*?animation:\s*mark-underline 420ms ease-out both/,
+    );
+    expect(css).toMatch(
+      /mark\[data-animate\]::after\s*\{[\s\S]*?animation-delay:\s*inherit/,
     );
   });
 });

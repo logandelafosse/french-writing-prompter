@@ -93,7 +93,7 @@ export function RuledTextarea({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="focus-within:outline-primary flex flex-col gap-2 focus-within:outline-2 focus-within:outline-offset-2">
       <SectionLabel as="label" htmlFor={id}>
         {label}
       </SectionLabel>

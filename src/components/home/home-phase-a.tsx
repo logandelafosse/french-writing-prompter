@@ -78,7 +78,10 @@ export function HomePhaseA({
 }) {
   const exhausted = variant === "ready" && quotaRemaining === 0;
   return (
-    <Surface padding="intro" className="flex flex-col gap-[26px]">
+    <Surface
+      padding="intro"
+      className="flex flex-col gap-[26px] max-sm:p-[22px_18px]"
+    >
       {variant === "first-run" ? (
         <>
           <div className="flex flex-col gap-2.5">

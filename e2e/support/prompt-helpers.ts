@@ -20,7 +20,9 @@ export async function generateFirstPrompt(page: Page) {
   await expect(
     main.getByRole("button", { name: "Je cherche une consigne…" }),
   ).toBeDisabled();
-  await expect(main.getByText(PROMPT_FIXTURE_LAFAYETTE)).toBeVisible();
+  const prompt = main.getByText(PROMPT_FIXTURE_LAFAYETTE);
+  await expect(prompt).toBeVisible();
+  await expect(prompt).toHaveCSS("opacity", "1");
 }
 
 async function verticalBounds(locator: Locator) {

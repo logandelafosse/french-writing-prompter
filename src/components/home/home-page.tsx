@@ -22,7 +22,7 @@ import { classifyFetchError, fetchJson, type FetchError } from "@/lib/http";
 import type { ClassifiedFetchFailure } from "@/contracts/errors";
 import type { Correction } from "@/contracts/correction";
 import { homeCopy } from "@/copy/fr";
-import { Surface } from "@/components/ui/surface";
+import { Surface, writingFocusClassName } from "@/components/ui/surface";
 import { ReviewScreen } from "@/components/review/review-screen";
 import { RuledTextarea } from "@/components/writing/ruled-textarea";
 import { WritingFooter } from "@/components/writing/writing-footer";
@@ -604,6 +604,7 @@ function WritingInterim({
           quotaRemaining={quotaRemaining}
           generating={generating}
           onNextPrompt={onFreshPrompt}
+          animateMarks
         />
         {generateFailure !== null &&
         !(generateFailure === "offline" && offline) ? (
@@ -623,7 +624,7 @@ function WritingInterim({
           padding="home"
           className={cn(
             "flex flex-col gap-4 max-sm:gap-3.5 max-sm:p-[22px_18px]",
-            "focus-within:border-primary focus-within:border-l-primary focus-within:border-l-2",
+            writingFocusClassName,
           )}
         >
           <PromptSheet

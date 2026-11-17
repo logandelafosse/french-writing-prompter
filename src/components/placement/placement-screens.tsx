@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { PageTitle } from "@/components/ui/page-title";
 import { SectionLabel } from "@/components/ui/section-label";
-import { Surface } from "@/components/ui/surface";
+import { Surface, writingFocusClassName } from "@/components/ui/surface";
 import { TextLink } from "@/components/ui/text-link";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { RuledTextarea } from "@/components/writing/ruled-textarea";
@@ -73,7 +73,7 @@ export function PlacementStep({
         <PageTitle size="step">{placementCopy.stepTitle(step)}</PageTitle>
         <PlacementProgress step={step} />
       </div>
-      <Surface padding="home" className="flex flex-col gap-[18px] max-sm:p-[22px_18px]">
+      <Surface padding="home" className={cn("flex flex-col gap-[18px] max-sm:p-[22px_18px]", writingFocusClassName)}>
         <PromptSheet embedded mode="placement" promptText={prompt} meta={null} animateKey={`${sessionId}-${prompt}`} />
         <RuledTextarea label={homeCopy.writingLabel} value={autosave.text} readOnly={submitting} onSubmitShortcut={runSubmit} onChange={(value) => { autosave.onTextChange(value); onText(value); }} />
         <WritingFooter text={autosave.text} target={null} layout="desktop" submitBusy={submitting} savedAt={autosave.savedAt} onSubmit={runSubmit} submitLabel={step === 3 ? placementCopy.seeLevel : placementCopy.next} />
@@ -95,7 +95,7 @@ export function PlacementResult({ result }: { result: PlacementResultView }) {
       <Surface padding="intro" aria-live="polite" className="flex flex-col gap-[26px] max-sm:p-[22px_18px]">
         <div className="flex flex-wrap items-center gap-x-7 gap-y-3">
           <span className="text-primary text-[96px] leading-[0.9] font-bold tracking-[-0.04em]">{result.finalLevel}</span>
-          <div className="flex min-w-[300px] flex-1 flex-col gap-1.5">
+          <div className="flex min-w-[300px] flex-1 flex-col gap-1.5 max-sm:min-w-0">
             <SectionLabel>{placementCopy.doneLabel(result.levelName)}</SectionLabel>
             <p lang="fr" className="text-ink font-serif text-[22px]/[1.4]">{result.summary}</p>
           </div>
@@ -105,7 +105,7 @@ export function PlacementResult({ result }: { result: PlacementResultView }) {
             <div key={row.step} className={cn("border-line flex flex-wrap items-baseline gap-x-4 gap-y-0.5 py-3", index === last ? "border-y" : "border-t")}>
               <dt className="text-muted w-[110px] shrink-0 text-sm">{placementCopy.stepN(row.step)}</dt>
               <dd className="m-0 w-12 shrink-0 text-[17px] font-semibold">{row.evaluatedLevel}</dd>
-              <dd lang="fr" className="m-0 min-w-[260px] flex-1 text-[15px]">{row.summary}</dd>
+              <dd lang="fr" className="m-0 min-w-[260px] flex-1 text-[15px] max-sm:min-w-0">{row.summary}</dd>
             </div>
           ))}
         </dl>

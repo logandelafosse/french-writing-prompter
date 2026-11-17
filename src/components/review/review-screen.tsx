@@ -47,6 +47,7 @@ export function ReviewScreen({
   quotaRemaining,
   generating,
   onNextPrompt,
+  animateMarks = false,
 }: {
   promptText: string;
   promptMeta: PromptMeta | null;
@@ -57,6 +58,7 @@ export function ReviewScreen({
   quotaRemaining: number;
   generating: boolean;
   onNextPrompt: () => void;
+  animateMarks?: boolean | undefined;
 }) {
   const carnetFocus = focus[0];
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -182,7 +184,11 @@ export function ReviewScreen({
             <p className="text-label text-muted m-0 uppercase">
               {reviewCopy.textLabel(countWords(writingText))}
             </p>
-            <MarkedText text={writingText} corrections={items} />
+            <MarkedText
+              text={writingText}
+              corrections={items}
+              animate={animateMarks}
+            />
           </Surface>
         </section>
         <section
