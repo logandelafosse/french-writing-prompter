@@ -21,7 +21,6 @@ import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
 import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
-import { postProcessEvaluation } from "@/modules/writing-evaluator/post-process";
 import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
 import { getDlfIndex } from "@/modules/dlf/load";
 import { DRAFT_TEXT_MAX } from "@/config/limits";
@@ -109,37 +108,34 @@ export const POST = withErrors(async function postSessionEvaluate(
 
   const promptMeta = parseStoredPromptMeta(session.promptMetaJson);
   const dialectNotes = await listActiveNotes();
-  const raw = await evaluator.evaluate(
+  const now = new Date();
+  const evaluated = await evaluator.evaluate(
     text,
     promptMeta
       ? { text: session.promptText, meta: promptMeta, constraints }
       : { text: session.promptText, constraints },
     DEFAULT_DIALECT,
-    dialectNotes,
+    {
+      dialectNotes,
+      sessionId,
+      now: () => now,
+      createId: () => crypto.randomUUID(),
+      focusCategories: parseStoredFocus(session.focusJson) ?? [],
+    },
   );
-  const now = new Date();
-  const processed = postProcessEvaluation(raw, {
-    text,
-    sessionId,
-    now: () => now,
-    createId: () => crypto.randomUUID(),
-    lookupDlf: (word) => dlf.lookup(word),
-    dialectNotes,
-    focusCategories: parseStoredFocus(session.focusJson) ?? [],
-  });
 
   await saveSession({
     promptText: session.promptText,
     promptConstraints: session.promptConstraints,
     writingText: text,
-    evaluationJson: JSON.stringify(processed.evaluation),
-    evaluationRaw: JSON.stringify(raw),
-    cefrLevel: processed.evaluation.overallCefr,
+    evaluationJson: JSON.stringify(evaluated.evaluation),
+    evaluationRaw: JSON.stringify(evaluated.raw),
+    cefrLevel: evaluated.evaluation.overallCefr,
     id: sessionId,
   });
-  await saveCorrections(processed.corrections, () => now);
+  await saveCorrections(evaluated.corrections, () => now);
 
-  const advancement = await recordEvaluation(processed.evaluation.overallCefr);
+  const advancement = await recordEvaluation(evaluated.evaluation.overallCefr);
 
   return NextResponse.json(
     EvaluatePostResponse.parse({
@@ -150,10 +146,10 @@ export const POST = withErrors(async function postSessionEvaluate(
         writingText: text,
         promptLevel: parseCefrLevel(session.promptLevel),
         status: "evaluated",
-        cefrLevel: processed.evaluation.overallCefr,
+        cefrLevel: evaluated.evaluation.overallCefr,
       },
-      evaluation: processed.evaluation,
-      corrections: processed.corrections,
+      evaluation: evaluated.evaluation,
+      corrections: evaluated.corrections,
       advancement,
     }),
   );

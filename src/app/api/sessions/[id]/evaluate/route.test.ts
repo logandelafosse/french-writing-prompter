@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -6,8 +8,15 @@ import { clearEnvCache } from "@/server/env";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
+import { getDlfIndex } from "@/modules/dlf/load";
+import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
+import { getAiClient } from "@/server/ai-client";
 import { EvaluatePostResponse } from "@/contracts/api";
+import { EvaluatorOutputSchema, EvaluationV2 } from "@/contracts/evaluation";
+import { PromptConstraints } from "@/contracts/prompt";
 import { ErrorEnvelope } from "@/contracts/errors";
+import { parseJson } from "@/lib/json";
 import { readResponseJson } from "@/test/read-response-json";
 import { POST } from "./route";
 
@@ -30,6 +39,112 @@ async function seedSession() {
     localDate: "2026-11-16",
     promptLevel: "A2",
   });
+}
+
+describe("evaluate route", () => {
+  beforeEach(async () => {
+    vi.stubEnv("AI_CLIENT", "fake");
+    vi.stubEnv("OPENAI_API_KEY", "");
+    clearEnvCache();
+    await db.delete(corrections).execute();
+    await db.delete(sessions).execute();
+    await db.delete(levelChanges).execute();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    clearEnvCache();
+  });
+
+  it("only persists module output", async () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/api/sessions/[id]/evaluate/route.ts"),
+      "utf8",
+    );
+    expect(source).not.toMatch(/postProcessEvaluation/);
+
+    const session = await seedSession();
+    const response = await POST(
+      new Request(`http://localhost/api/sessions/${session.id}/evaluate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: writing }),
+      }),
+      { params: Promise.resolve({ id: String(session.id) }) },
+    );
+    expect(response.status).toBe(200);
+    const body = await readResponseJson(response, EvaluatePostResponse);
+
+    const stored = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, session.id));
+    const storedEvaluation = parseJson(
+      EvaluationV2,
+      stored[0]?.evaluationJson ?? "",
+    );
+    const storedRaw = parseJson(
+      EvaluatorOutputSchema,
+      stored[0]?.evaluationRaw ?? "",
+    );
+    expect(storedEvaluation.ok).toBe(true);
+    expect(storedRaw.ok).toBe(true);
+    if (!storedEvaluation.ok || !storedRaw.ok) return;
+    expect(storedEvaluation.value).toEqual(body.evaluation);
+
+    const constraintsResult = parseJson(PromptConstraints, constraints);
+    expect(constraintsResult.ok).toBe(true);
+    if (!constraintsResult.ok) return;
+    const moduleResult = await new WritingEvaluator(
+      getAiClient("happy"),
+      getDlfIndex(),
+    ).evaluate(
+      writing,
+      { text: "Écris sur le bayou.", constraints: constraintsResult.value },
+      DEFAULT_DIALECT,
+      {
+        dialectNotes: await listActiveNotes(),
+        sessionId: session.id,
+        focusCategories: [],
+        now: () => new Date("2026-11-16T18:00:00.000Z"),
+        createId: () => "module-compare",
+      },
+    );
+
+    expect(storedRaw.value).toEqual(moduleResult.raw);
+    expect(body.corrections.map(correctionMark)).toEqual(
+      moduleResult.corrections.map(correctionMark),
+    );
+    const rows = await db
+      .select()
+      .from(corrections)
+      .where(eq(corrections.sessionId, session.id));
+    expect(rows.map((row) => row.quote).sort()).toEqual(
+      body.corrections.map((item) => item.quote).sort(),
+    );
+  });
+});
+
+function correctionMark(item: {
+  kind: string;
+  quote: string;
+  span: { start: number; end: number } | null;
+  anchor: string;
+  category: string | null;
+  suggestion: string;
+  isFocus: boolean;
+  dlf: { entryId: string; headword: string } | null;
+}) {
+  return {
+    kind: item.kind,
+    quote: item.quote,
+    span: item.span,
+    anchor: item.anchor,
+    category: item.category,
+    suggestion: item.suggestion,
+    isFocus: item.isFocus,
+    dlf: item.dlf,
+  };
 }
 
 describe("POST /api/sessions/:id/evaluate", () => {
