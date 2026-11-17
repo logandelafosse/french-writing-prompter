@@ -129,4 +129,37 @@ describe("MarkedText", () => {
     ).not.toBeInTheDocument();
     expect(screen.getByText(writing)).toBeVisible();
   });
+
+  it("resolved dialect note span renders as plain text", () => {
+    const quote = "a tombé";
+    const writing = `Mon petit cousin ${quote} dans la boue.`;
+    const start = writing.indexOf(quote);
+    const span = { start, end: start + quote.length };
+    const base = correction({
+      id: "d1",
+      ordinal: 6,
+      kind: "dialect_check",
+      span,
+    });
+
+    const { rerender, container } = render(
+      <MarkedText
+        text={writing}
+        corrections={[{ ...base, status: "overturned" }]}
+      />,
+    );
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: unmarked resolved notes have no role; <mark> count is the contract */
+    expect(container.querySelectorAll("mark")).toHaveLength(0);
+    expect(screen.getByText(writing)).toBeVisible();
+
+    rerender(
+      <MarkedText
+        text={writing}
+        corrections={[{ ...base, status: "confirmed_dialect" }]}
+      />,
+    );
+    expect(container.querySelectorAll("mark")).toHaveLength(0);
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark DOM asserts */
+    expect(screen.getByText(writing)).toBeVisible();
+  });
 });

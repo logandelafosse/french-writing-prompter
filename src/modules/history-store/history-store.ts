@@ -12,12 +12,16 @@ import {
   type CorrectionStatus,
 } from "@/contracts/correction";
 import { attachResources } from "@/modules/resources/catalog";
-import { parseStoredEvaluation } from "@/contracts/evaluation";
+import {
+  parseStoredEvaluation,
+  scoresFromStored,
+} from "@/contracts/evaluation";
 import { PromptConstraints } from "@/contracts/prompt";
 import { PromptMeta } from "@/contracts/prompt-meta";
 import { FocusSnapshot } from "@/contracts/focus";
 import { parseCefrLevel } from "@/contracts/cefr";
 import {
+  SessionDetail,
   SessionStatus,
   type CorrectionSummaryItem,
   type DataIssue,
@@ -147,6 +151,33 @@ export async function getSession(id: number): Promise<Session | null> {
   if (rows.length === 0) return null;
   const row = first(rows, `session id ${id}`);
   return rowToSession(row);
+}
+
+export async function getSessionDetail(
+  id: number,
+  options?: { now?: () => Date },
+): Promise<SessionDetail | null> {
+  const rows = await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.id, id))
+    .limit(1);
+  if (rows.length === 0) return null;
+  const row = first(rows, `session id ${id}`);
+  const items = await listCorrectionsForSession(id);
+  const tz = quotaTimeZone();
+  const today = localDateKey((options?.now ?? (() => new Date()))(), tz);
+  const summary = rowToSessionSummary(row, items, tz, today);
+  const prompt = readPromptMeta(row);
+  const stored = parseStoredEvaluation(row.evaluationJson);
+  return SessionDetail.parse({
+    ...summary,
+    promptMeta: prompt.meta,
+    writingText: row.writingText,
+    writingSavedAt: row.writingSavedAt,
+    evaluation: scoresFromStored(stored),
+    corrections: stored.status === "v1" ? [] : items,
+  });
 }
 
 export async function getAllSessions(): Promise<Session[]> {

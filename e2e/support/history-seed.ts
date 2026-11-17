@@ -129,3 +129,96 @@ export async function seedHistoryList(): Promise<{ evaluatedId: number }> {
     client.close();
   }
 }
+
+const WRITING =
+  "Les enfant jouent. J'arrive avec ma voiture. Mon cousin a tombé.";
+const EVAL_V1 = JSON.stringify({
+  dimensions: {
+    grammatical_accuracy: { score: 4, max: 6, comment: "Good grammar" },
+    vocabulary: { score: 3, max: 6, comment: "Decent vocab" },
+    coherence: { score: 4, max: 6, comment: "Well structured" },
+    register_style: { score: 3, max: 6, comment: "Ok register" },
+  },
+  overall_cefr: "B1",
+  tips: {
+    per_dimension: {
+      grammatical_accuracy: "Work on conjugations",
+      vocabulary: "Expand your word choice",
+      coherence: "Use more connectors",
+      register_style: "Vary your register",
+    },
+    holistic: "To reach B2, focus on more complex sentence structures.",
+  },
+});
+
+export async function seedPastReview(): Promise<{
+  markedId: number;
+  malformedId: number;
+  legacyId: number;
+}> {
+  const databaseUrl = process.env.DATABASE_URL ?? "file:./.e2e/e2e.db";
+  assertE2eDatabaseUrl(databaseUrl);
+  const client = createClient({ url: databaseUrl });
+  try {
+    const markedId = await insertSession(client, {
+      prompt: "Raconte la boucherie.",
+      writing: WRITING,
+      evaluation: EVAL_V2,
+      createdAt: "2026-11-14T18:00:00.000Z",
+      status: "evaluated",
+    });
+    const mistakeQuote = "Les enfant";
+    const standardQuote = "ma voiture";
+    const dialectQuote = "a tombé";
+    const mistakeStart = WRITING.indexOf(mistakeQuote);
+    const standardStart = WRITING.indexOf(standardQuote);
+    const dialectStart = WRITING.indexOf(dialectQuote);
+    await client.execute({
+      sql: `INSERT INTO corrections (
+        id, session_id, ordinal, kind, category, quote, span_start, span_end,
+        anchor, suggestion, explanation, question, resource_ids_json, status, created_at
+      ) VALUES
+        (?, ?, 1, 'mistake', 'accord', ?, ?, ?, 'exact', 'Les enfants', 'Accord.', NULL, '[]', 'open', ?),
+        (?, ?, 2, 'standard', NULL, ?, ?, ?, 'exact', 'mon char', 'Louisiane.', NULL, '[]', 'open', ?),
+        (?, ?, 3, 'dialect_check', 'auxiliaire', ?, ?, ?, 'exact', 'est tombé', 'Auxiliaire.', ?, '[]', 'open', ?)`,
+      args: [
+        `${markedId}-1`,
+        markedId,
+        mistakeQuote,
+        mistakeStart,
+        mistakeStart + mistakeQuote.length,
+        "2026-11-14T18:00:00.000Z",
+        `${markedId}-2`,
+        markedId,
+        standardQuote,
+        standardStart,
+        standardStart + standardQuote.length,
+        "2026-11-14T18:00:00.000Z",
+        `${markedId}-3`,
+        markedId,
+        dialectQuote,
+        dialectStart,
+        dialectStart + dialectQuote.length,
+        "Ça se dit comme ça chez toi, « a tombé » ?",
+        "2026-11-14T18:00:00.000Z",
+      ],
+    });
+    const malformedId = await insertSession(client, {
+      prompt: "Consigne cassée.",
+      writing: "Texte gardé sans marques.",
+      evaluation: '{"score": 5}',
+      createdAt: "2026-11-11T18:00:00.000Z",
+      status: "evaluated",
+    });
+    const legacyId = await insertSession(client, {
+      prompt: "Consigne v1.",
+      writing: "Texte d'avant les corrections.",
+      evaluation: EVAL_V1,
+      createdAt: "2026-11-10T18:00:00.000Z",
+      status: "evaluated",
+    });
+    return { markedId, malformedId, legacyId };
+  } finally {
+    client.close();
+  }
+}

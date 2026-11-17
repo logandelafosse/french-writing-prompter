@@ -15,6 +15,8 @@ export const historyCopy = {
   empty: "Pas encore de séance.",
   prompt: "CONSIGNE D'ÉCRITURE",
   text: (n: number) => `TON TEXTE · ${n} MOTS`,
+  readAll: "Lire tout le texte avec ses marques",
+  back: "← Historique",
   corrections: "CORRECTIONS",
   kindMistake: "Faute",
   kindStandard: "Français standard",
@@ -69,8 +71,26 @@ export function writingExcerpt(text: string): string | null {
 }
 
 // prettier-ignore
+export function pastReviewMeta(
+  item: Pick<
+    SessionSummary,
+    "createdAt" | "mistakeCount" | "evaluatedLevel" | "promptLevel"
+  >,
+  timeZone?: string,
+): string {
+  const date = formatHistoryDate(item.createdAt, timeZone);
+  return [
+    date,
+    formatFauteCount(item.mistakeCount),
+    item.evaluatedLevel ?? item.promptLevel,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+}
+
 export function historyRowTitle(item: SessionSummary): string {
-  if (item.displayStatus === "draft_abandoned") return historyCopy.abandonedTitle;
+  if (item.displayStatus === "draft_abandoned")
+    return historyCopy.abandonedTitle;
   if (item.displayStatus === "prompt_unused") return historyCopy.unusedTitle;
   return item.title;
 }

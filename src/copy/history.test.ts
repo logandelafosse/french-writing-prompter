@@ -4,6 +4,7 @@ import {
   formatLevelLine,
   historyTitle,
   mistakeCount,
+  pastReviewMeta,
 } from "./history";
 
 const prompt =
@@ -39,6 +40,22 @@ describe("historyTitle", () => {
         date: "14 novembre",
       }),
     ).not.toContain(prompt);
+  });
+});
+
+describe("pastReviewMeta", () => {
+  it("joins weekday date, faute count and level without évaluée", () => {
+    expect(
+      pastReviewMeta(
+        {
+          createdAt: "2026-11-14T18:00:00.000Z",
+          mistakeCount: 2,
+          evaluatedLevel: "B1",
+          promptLevel: "A2",
+        },
+        "America/Chicago",
+      ),
+    ).toBe("Samedi 14 novembre · 2 fautes · B1");
   });
 });
 

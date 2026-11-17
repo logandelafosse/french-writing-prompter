@@ -21,6 +21,7 @@ export const reviewCopy = {
   actionPushback: "C'est du français louisianais",
   actionConfirm: "Oui, c'est à nous-autres",
   actionReject: "Non, corrige-le",
+  unanswered: "Pas répondu",
   savedNote: "Note de dialecte sauvée",
   savedNoteLink: "Voir le Carnet",
   sheetEyebrow: "Mon français louisianais",

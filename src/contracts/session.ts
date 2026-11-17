@@ -1,7 +1,9 @@
 import { z } from "zod";
 import { CefrLevel } from "./cefr";
-import { Evaluation } from "./evaluation";
+import { Correction } from "./correction";
+import { Evaluation, EvaluationScores } from "./evaluation";
 import { MistakeCategory } from "./mistake-category";
+import { PromptMeta } from "./prompt-meta";
 
 export const SessionStatus = z.enum(["active", "evaluated", "abandoned"]);
 export type SessionStatus = z.infer<typeof SessionStatus>;
@@ -54,6 +56,15 @@ export const SessionSummary = z.object({
   correctionsSummary: z.array(CorrectionSummaryItem),
 });
 export type SessionSummary = z.infer<typeof SessionSummary>;
+
+export const SessionDetail = SessionSummary.extend({
+  promptMeta: PromptMeta.nullable(),
+  writingText: z.string().nullable(),
+  writingSavedAt: z.string().nullable(),
+  evaluation: EvaluationScores.nullable(),
+  corrections: z.array(Correction),
+});
+export type SessionDetail = z.infer<typeof SessionDetail>;
 
 export const SavedDraft = z.object({
   text: z.string(),
