@@ -116,21 +116,21 @@ _Avoid_: score history, graph series
 
 Where each glossary term's behaviour should live. Paths are seams, not alternate definitions — language still comes from the entries above. Deepening plan: `docs/plan/deepenings.md`.
 
-| Term                                                      | Owning module (seam)                                                               | Notes                                                                |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| Writing Prompt                                            | `src/modules/prompt-generator`                                                     | Issuance (quota, Focus, persist) must move behind a façade — see D01 |
-| Student Writing / Draft / Session                         | `src/modules/history-store` → Session façade (D05)                                 | Store stays persistence; lifecycle is the deepening                  |
-| Evaluation                                                | `src/modules/writing-evaluator`                                                    | Raw LLM output and post-process sit behind `evaluate`                |
-| Correction / Mistake / Standard→Louisiana / Dialect check | `src/modules/writing-evaluator` (emit) + `src/modules/correction-service` (status) | Status machine stays in correction-service                           |
-| Span                                                      | `src/modules/writing-evaluator` (`locate-quote`)                                   | Internal to `evaluate`; not a route concern                          |
-| Dialect Note / Louisiana French / French Dialect          | `src/modules/dialect`                                                              | One **learner-dialect context** for gen/eval (D04)                   |
-| DLF                                                       | `src/modules/dlf`                                                                  | Lookup index is the deep Interface                                   |
-| Weakness / Weakness Trend / Focus du jour / Practice Pin  | `src/modules/weakness-service`                                                     | `weaknessBoard` and `currentFocus`                                   |
-| Resource                                                  | `src/modules/resources`                                                            | Catalog pick only; model never invents URLs                          |
-| CEFR Level (streak, undo, sources)                        | `src/modules/cefr-tracker`                                                         |                                                                      |
-| Placement Test                                            | `src/modules/placement-test`                                                       | `PlacementService` + pure helpers — durable                          |
-| Daily Quota                                               | `src/modules/quota-manager`                                                        | Keep `quotaTimeZone` inside this module                              |
-| Carnet                                                    | UI composition (`src/components/carnet`)                                           | Not a domain module; composes Weakness + Dialect Note                |
+| Term                                                      | Owning module (seam)                                                               | Notes                                                                                 |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Writing Prompt                                            | `src/modules/prompt-issuance` (`issueDailyPrompt`)                                 | Quota, abandon, Focus, and the new daily Session. `prompt-generator` writes the text. |
+| Student Writing / Draft / Session                         | `src/modules/history-store` → Session façade (D05)                                 | Store stays persistence; lifecycle is the deepening                                   |
+| Evaluation                                                | `src/modules/writing-evaluator`                                                    | Raw LLM output and post-process sit behind `evaluate`                                 |
+| Correction / Mistake / Standard→Louisiana / Dialect check | `src/modules/writing-evaluator` (emit) + `src/modules/correction-service` (status) | Status machine stays in correction-service                                            |
+| Span                                                      | `src/modules/writing-evaluator` (`locate-quote`)                                   | Internal to `evaluate`; not a route concern                                           |
+| Dialect Note / Louisiana French / French Dialect          | `src/modules/dialect`                                                              | One **learner-dialect context** for gen/eval (D04)                                    |
+| DLF                                                       | `src/modules/dlf`                                                                  | Lookup index is the deep Interface                                                    |
+| Weakness / Weakness Trend / Focus du jour / Practice Pin  | `src/modules/weakness-service`                                                     | `weaknessBoard` and `currentFocus`                                                    |
+| Resource                                                  | `src/modules/resources`                                                            | Catalog pick only; model never invents URLs                                           |
+| CEFR Level (streak, undo, sources)                        | `src/modules/cefr-tracker`                                                         |                                                                                       |
+| Placement Test                                            | `src/modules/placement-test`                                                       | `PlacementService` + pure helpers — durable                                           |
+| Daily Quota                                               | `src/modules/quota-manager`                                                        | Keep `quotaTimeZone` inside this module                                               |
+| Carnet                                                    | UI composition (`src/components/carnet`)                                           | Not a domain module; composes Weakness + Dialect Note                                 |
 
 ## Example dialogue
 
