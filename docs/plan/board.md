@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-17 by coordinator (D02 In progress on `ticket/d02-evaluate-pipeline-facade`).
+Last updated: 2026-11-17 by coordinator (D02 In review, [PR #91](https://github.com/logandelafosse/french-writing-prompter/pull/91)).
 
 ## Ready
 
@@ -16,13 +16,13 @@ _Also planned (Backlog until deps clear): D01 (after D03), D04 (after D02), D05 
 
 ## In progress
 
-| ID  | Ticket                   | Why                                                                                                     |
-| --- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
-| D02 | Evaluate pipeline façade | Implementer, branch `ticket/d02-evaluate-pipeline-facade`, started 2026-11-17. Spec `tickets/D02-*.md`. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                   | Why                                                                                                                                                          |
+| --- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D02 | Evaluate pipeline façade | [PR #91](https://github.com/logandelafosse/french-writing-prompter/pull/91) `7949c0f`. Adversarial, test, and tooling reviewers running. Started 2026-11-17. |
 
 ## Blocked
 
@@ -96,13 +96,13 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 6 — Deepen modules
 
-| ID  | Ticket                   | Type | Blocked by    | Why not ready                                                                |
-| --- | ------------------------ | ---- | ------------- | ---------------------------------------------------------------------------- |
-| D02 | Evaluate pipeline façade | AFK  | —             | **In progress** — `ticket/d02-evaluate-pipeline-facade`, started 2026-11-17. |
-| D03 | Weakness / Focus façade  | AFK  | —             | **Ready** — on Ready column.                                                 |
-| D01 | Prompt issuance module   | AFK  | D03 preferred | Wait until Focus façade lands (or wire temporary). `tickets/D01-*.md`.       |
-| D04 | Learner-dialect context  | AFK  | D02 preferred | After evaluate owns post-process. `tickets/D04-*.md`.                        |
-| D05 | Session / Draft façade   | AFK  | D01 helpful   | After issuance thins Home’s server edge. `tickets/D05-*.md`.                 |
+| ID  | Ticket                   | Type | Blocked by    | Why not ready                                                                                |
+| --- | ------------------------ | ---- | ------------- | -------------------------------------------------------------------------------------------- |
+| D02 | Evaluate pipeline façade | AFK  | —             | **In review** — [PR #91](https://github.com/logandelafosse/french-writing-prompter/pull/91). |
+| D03 | Weakness / Focus façade  | AFK  | —             | **Ready** — on Ready column.                                                                 |
+| D01 | Prompt issuance module   | AFK  | D03 preferred | Wait until Focus façade lands (or wire temporary). `tickets/D01-*.md`.                       |
+| D04 | Learner-dialect context  | AFK  | D02 preferred | After evaluate owns post-process. `tickets/D04-*.md`.                                        |
+| D05 | Session / Draft façade   | AFK  | D01 helpful   | After issuance thins Home’s server edge. `tickets/D05-*.md`.                                 |
 
 Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CONTEXT.md`](../../CONTEXT.md).
 
