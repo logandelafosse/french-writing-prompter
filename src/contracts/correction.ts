@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { MistakeCategory } from "./mistake-category";
+import { ResourceLink } from "./resource";
 
 export const CorrectionKind = z.enum(["mistake", "standard", "dialect_check"]);
 export type CorrectionKind = z.infer<typeof CorrectionKind>;
@@ -39,6 +40,7 @@ export const Correction = z.object({
   category: MistakeCategory.nullable(),
   dlf: z.object({ entryId: z.string(), headword: z.string() }).nullable(),
   resourceIds: z.array(z.string()),
+  resources: z.array(ResourceLink).default([]),
   status: CorrectionStatus,
   dialectNoteId: z.number().int().nullable(),
   isFocus: z.boolean(),

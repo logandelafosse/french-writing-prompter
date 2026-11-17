@@ -153,6 +153,37 @@ test.describe("review @1280", () => {
     await expect(page.getByRole("link", { name: /faute/ })).toHaveCount(1);
     await expect(page.getByRole("link", { name: "faute 3" })).toBeVisible();
   });
+
+  test("Mistake cards show catalog Resource links even if the evaluator invents an id", async ({
+    page,
+    scenario,
+  }, testInfo) => {
+    await scenario("happy");
+    await generateFirstPrompt(page);
+    await submitWriting(page, mixedWriting);
+    const mistakeCard = page
+      .getByRole("article")
+      .filter({ hasText: "Les enfant" });
+    const grammar = mistakeCard.getByRole("link", { name: /Grammaire ·/ });
+    const input = mistakeCard.getByRole("link", { name: /Input ·/ });
+    await expect(grammar).toHaveCount(1);
+    await expect(input).toHaveCount(1);
+    await expect(grammar).toHaveAttribute("target", "_blank");
+    await expect(grammar).toHaveAttribute("rel", /noopener/);
+    await expect(grammar).toContainText("(nouvel onglet)");
+    await expect(input).toHaveAttribute("target", "_blank");
+    await expect(input).toHaveAttribute("rel", /noopener/);
+    const standardCard = page
+      .getByRole("article")
+      .filter({ hasText: "Maintenant" });
+    await expect(
+      standardCard.getByRole("link", { name: /Grammaire ·/ }),
+    ).toHaveCount(0);
+    await expect(
+      standardCard.getByRole("link", { name: /Input ·/ }),
+    ).toHaveCount(0);
+    await captureEvidence(page, testInfo, "review-resources-1280");
+  });
 });
 
 test.describe("review @390", () => {
@@ -194,5 +225,31 @@ test.describe("review @390", () => {
     await expect(page.getByText("Pour monter")).toBeVisible();
     await captureEvidence(page, testInfo, "mobile-scores");
     await expectNoAxeViolations(page);
+  });
+
+  test("Mistake cards show catalog Resource links at 390", async ({
+    page,
+    scenario,
+  }, testInfo) => {
+    await scenario("happy");
+    await generateFirstPrompt(page);
+    await submitWriting(page, mixedWriting);
+    const mistakeCard = page
+      .getByRole("article")
+      .filter({ hasText: "Les enfant" });
+    const grammar = mistakeCard.getByRole("link", { name: /Grammaire ·/ });
+    const input = mistakeCard.getByRole("link", { name: /Input ·/ });
+    await expect(grammar).toHaveCount(1);
+    await expect(input).toHaveCount(1);
+    await expect(grammar).toHaveAttribute("target", "_blank");
+    await expect(grammar).toHaveAttribute("rel", /noopener/);
+    await expect(grammar).toContainText("(nouvel onglet)");
+    const standardCard = page
+      .getByRole("article")
+      .filter({ hasText: "Maintenant" });
+    await expect(
+      standardCard.getByRole("link", { name: /Grammaire ·/ }),
+    ).toHaveCount(0);
+    await captureEvidence(page, testInfo, "review-resources-390");
   });
 });

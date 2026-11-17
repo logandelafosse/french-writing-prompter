@@ -7,6 +7,7 @@ import { localDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
 import { Correction, type CorrectionStatus } from "@/contracts/correction";
+import { attachResources } from "@/modules/resources/catalog";
 import {
   parseStoredEvaluation,
   toPlaceholderEvaluation,
@@ -249,7 +250,7 @@ function correctionFromRow(
     dialectLemma: row.dialectLemma,
     dialectPattern: row.dialectPattern,
   });
-  return parsed.success ? parsed.data : null;
+  return parsed.success ? attachResources(parsed.data) : null;
 }
 
 type CorrectionReader = Pick<LibSQLDatabase<typeof schema>, "select">;

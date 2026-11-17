@@ -5,6 +5,7 @@ import { reviewCopy } from "@/copy/review";
 import { Button } from "@/components/ui/button";
 import { TextLink } from "@/components/ui/text-link";
 import { cn } from "@/lib/utils";
+import { ResourceLinks } from "./resource-links";
 
 const cardClass =
   "rounded-base border-line bg-sheet flex flex-col gap-2 border p-[16px_18px] outline-none";
@@ -180,6 +181,7 @@ export function CorrectionCard({
           <p className="m-0 text-[15px] leading-normal">
             {correction.explanation}
           </p>
+          <ResourceLinks resources={correction.resources} layout="column" />
           <div className="flex flex-wrap items-center gap-1 gap-x-4">
             <Button
               variant="secondary"
@@ -194,10 +196,15 @@ export function CorrectionCard({
           </div>
         </>
       ) : correction.status === "confirmed_mistake" ? (
-        <p className="m-0 text-[15px] leading-normal">
-          {correction.explanation}
-        </p>
-      ) : null}
+        <>
+          <p className="m-0 text-[15px] leading-normal">
+            {correction.explanation}
+          </p>
+          <ResourceLinks resources={correction.resources} layout="column" />
+        </>
+      ) : (
+        <ResourceLinks resources={correction.resources} layout="column" />
+      )}
     </article>
   );
 }

@@ -3,6 +3,7 @@ import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
+import { seedResourceWeaknesses } from "./support/resources-seed";
 
 const writing = "Mon petit cousin a tombé dans la boue. Les enfant jouent.";
 const savedRule =
@@ -199,6 +200,38 @@ test("two genre Mistakes show under À travailler and a pushed-back category doe
     carnet.getByRole("heading", { name: "Accents (é / è / ê)" }),
   ).toHaveCount(0);
   await captureEvidence(page, testInfo, "weaknesses");
+});
+
+test.describe("carnet resources @390", () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test("actif rows show Resource links at 44px; tranquille rows show none", async ({
+    page,
+  }, testInfo) => {
+    await seedResourceWeaknesses();
+    await page.goto("/carnet");
+    const carnet = mainContent(page);
+    const actif = carnet
+      .getByRole("article")
+      .filter({ hasText: "Genre des noms" });
+    const grammar = actif.getByRole("link", { name: /Grammaire ·/ });
+    const input = actif.getByRole("link", { name: /Input ·/ });
+    await expect(grammar).toHaveCount(1);
+    await expect(input).toHaveCount(1);
+    const grammarBox = await grammar.boundingBox();
+    const inputBox = await input.boundingBox();
+    expect(grammarBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+    expect(inputBox?.height ?? 0).toBeGreaterThanOrEqual(44);
+    const quiet = carnet.getByRole("article").filter({ hasText: "Accents" });
+    await expect(quiet.getByRole("link", { name: /Grammaire ·/ })).toHaveCount(
+      0,
+    );
+    await captureEvidence(page, testInfo, "carnet-resources");
+  });
 });
 
 test("Non, corrige-le adds the dialect-check category to À travailler", async ({

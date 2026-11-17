@@ -28,6 +28,7 @@ describe("isProductionPath", () => {
     "next-env.d.ts",
     "src/data/seed.json",
     "package-lock.json",
+    "src/modules/resources/catalog.data.ts",
   ];
 
   it.each(production)("counts %s as production", (filePath) => {

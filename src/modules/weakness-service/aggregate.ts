@@ -3,6 +3,7 @@ import { countsAsMistake, type Correction } from "@/contracts/correction";
 import type { MistakeCategory } from "@/contracts/mistake-category";
 import type { Weakness, WeaknessTrend } from "@/contracts/weakness";
 import { mistakeCategoryLabels } from "@/copy/carnet";
+import { resourcesForWeakness } from "@/modules/resources/catalog";
 import { computeTrend } from "./compute-trend";
 
 export type WeaknessSession = {
@@ -51,6 +52,7 @@ export function toWeaknessDto(
     trend: row.trend,
     isFocus: focusIds.has(row.category),
     pinned: pin === row.category,
+    resources: resourcesForWeakness(row.category, row.trend),
   };
 }
 

@@ -28,6 +28,7 @@ import {
   DialectNoteSheet,
   type DialectNoteSheetSave,
 } from "@/components/dialect-note/dialect-note-sheet";
+import { ResourceLinks } from "@/components/review/resource-links";
 
 // prettier-ignore
 type LoadUi = { status: "loading" } | { status: "ready"; notes: DialectNote[]; weaknesses: Weakness[] } | { status: "error" };
@@ -290,6 +291,9 @@ function CarnetWeaknessRow({
             </>
           ) : null}
         </p>
+        {quiet ? null : (
+          <ResourceLinks resources={weakness.resources} layout="row" />
+        )}
       </div>
       {showPractice ? (
         <Button

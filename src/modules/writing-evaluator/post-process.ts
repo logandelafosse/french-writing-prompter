@@ -9,6 +9,7 @@ import {
 } from "@/contracts/evaluation";
 import { attributeStandard, type DlfHit } from "@/modules/dlf/lookup";
 import { matchesActiveWordScopeNote } from "@/modules/dialect/learner-notes";
+import { attachResources, resourceIdsFor } from "@/modules/resources/catalog";
 import { locateQuote, spansOverlap } from "./locate-quote";
 
 export const EVALUATOR_PROMPT_VERSION = "evaluator@2";
@@ -133,39 +134,45 @@ export function postProcessEvaluation(
       row.item.kind === "standard"
         ? null
         : (parseCorrectionCategory(row.item.category) ?? "autre");
-    return Correction.parse({
-      id: ctx.createId(),
-      sessionId: ctx.sessionId,
-      ordinal: index + 1,
-      kind: row.item.kind,
-      quote: row.item.quote,
-      span: row.found.span,
-      anchor: row.found.anchor,
-      suggestion: row.item.suggestion,
-      explanation: row.item.explanation,
-      question:
-        row.item.kind === "dialect_check" &&
-        (row.item.question === null || row.item.question.length === 0)
-          ? dialectCheckQuestion(row.item.quote)
-          : row.item.question,
-      ruleIfDialect: row.item.rule_if_dialect,
-      category,
-      dlf:
-        row.item.kind === "standard"
-          ? attributeStandard({
-              suggestion: row.item.suggestion,
-              lookup: ctx.lookupDlf ?? (() => null),
-            })
-          : null,
-      resourceIds: [],
-      status: "open",
-      dialectNoteId: null,
-      isFocus:
-        row.item.kind === "mistake" &&
-        category !== null &&
-        focusSet.has(category),
-      ...dialectFields(row.item, ctx.text, row.found.span),
-    });
+    return attachResources(
+      Correction.parse({
+        id: ctx.createId(),
+        sessionId: ctx.sessionId,
+        ordinal: index + 1,
+        kind: row.item.kind,
+        quote: row.item.quote,
+        span: row.found.span,
+        anchor: row.found.anchor,
+        suggestion: row.item.suggestion,
+        explanation: row.item.explanation,
+        question:
+          row.item.kind === "dialect_check" &&
+          (row.item.question === null || row.item.question.length === 0)
+            ? dialectCheckQuestion(row.item.quote)
+            : row.item.question,
+        ruleIfDialect: row.item.rule_if_dialect,
+        category,
+        dlf:
+          row.item.kind === "standard"
+            ? attributeStandard({
+                suggestion: row.item.suggestion,
+                lookup: ctx.lookupDlf ?? (() => null),
+              })
+            : null,
+        resourceIds: resourceIdsFor(
+          row.item.kind,
+          category,
+          row.item.resource_ids,
+        ),
+        status: "open",
+        dialectNoteId: null,
+        isFocus:
+          row.item.kind === "mistake" &&
+          category !== null &&
+          focusSet.has(category),
+        ...dialectFields(row.item, ctx.text, row.found.span),
+      }),
+    );
   });
 
   return {
