@@ -4,13 +4,13 @@ How the UI redesign (and later work) gets built by agents. The board is `docs/pl
 
 ## Roles
 
-| Role                 | Model                                                     | Owns                                                                                                                                                       |
-| -------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Coordinator          | Grok 4.7 high (`grok-4.7-high-fast`)                      | The board. Picks the next ticket, dispatches implementers and reviewers, records every status change and why. Never writes production code.                |
-| Implementer          | Router default, or Grok 4.6 (`cursor-grok-4.6-high-fast`) | One ticket on one branch. TDD, Playwright validation, PR. Do not pin Composer 2.5 — leave model unset for router auto-decide, or pass Grok 4.6 explicitly. |
-| Adversarial reviewer | Grok 4.7 high (`grok-4.7-high-fast`)                      | Spec adherence and bug hunting on the PR diff. (Opus paused — no utilization left.)                                                                        |
-| Test reviewer        | Grok 4.7 high (`grok-4.7-high-fast`)                      | Test quality: duplication, terseness, usefulness, slop.                                                                                                    |
-| Tooling reviewer     | Grok 4.7 high (`grok-4.7-high-fast`)                      | Where a lint rule, ast-grep rule, type, or script would have prevented a finding.                                                                          |
+| Role                 | Model                                                     | Owns                                                                                                                                                                            |
+| -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Coordinator          | Grok 4.7 high (`grok-4.7-high-fast`)                      | The board. Picks the next ticket, dispatches implementers and reviewers, records every status change and why. Never writes production code.                                     |
+| Implementer          | Router default, or Grok 4.6 (`cursor-grok-4.6-high-fast`) | One ticket on one branch. TDD, Playwright validation, PR. Do not pin Composer 2.5 — leave model unset for router auto-decide, or pass Grok 4.6 explicitly.                      |
+| Adversarial reviewer | Grok 4.7 high (`grok-4.7-high-fast`)                      | Spec adherence and bug hunting on the PR diff. (Opus paused — no utilization left.)                                                                                             |
+| Test reviewer        | Grok 4.7 high (`grok-4.7-high-fast`)                      | Test quality: duplication, terseness, usefulness, slop.                                                                                                                         |
+| Tooling reviewer     | Grok 4.7 high (`grok-4.7-high-fast`)                      | Where a lint rule, ast-grep rule, type, or **deterministic script** would have prevented a finding or cut agent toil/confusion (also scans session-retro TOOL-SESSION backlog). |
 
 The three reviewers run in parallel on the same PR and never see each other's output.
 
@@ -22,7 +22,7 @@ Reviews are **not** a whole-repo audit. Each reviewer works from the **PR diff a
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Adversarial | Ticket + **production hunks** in the diff (`src/`, excluding `*.test.*`, `*.spec.*`) + HANDOFF **sections for screens touched** in the diff + PR “What a learner sees” | Full `HANDOFF.md`, `implementation-map.md`, `CONTEXT.md`, or files with no hunks |
 | Test        | Ticket acceptance criteria + **test hunks** in the diff (`**/*.test.*`, `e2e/**`, fixtures only if referenced by changed tests)                                        | Production sources except the few lines a test import requires                   |
-| Tooling     | Ticket + **production and config hunks** in the diff (`src/`, `tooling/`, `eslint.config.*`, `sgconfig.yml`, `lefthook.yml`, workflows)                                | Entire rule catalogs, `knip` full graph, or modules unchanged in the PR          |
+| Tooling     | Ticket + **production and config hunks** in the diff + skim `docs/agents/session-retro.md` **TOOL-SESSION** backlog for toil that this PR’s pattern could close        | Entire rule catalogs, `knip` full graph, or modules unchanged in the PR          |
 
 **Efficiency rules**
 
@@ -69,7 +69,7 @@ Use **Review scope**; findings only on changed lines.
 
 **Test reviewer.** Read the ticket’s test-related acceptance criteria, then **only test/e2e hunks** in the diff. Report: duplication, implementation-detail asserts, tests that pass if the feature were deleted, over-mocking, missing AC edges, verbose setup, Playwright that only checks visibility. Recommend deletions as readily as additions. Do not re-review the full suite under `src/`.
 
-**Tooling reviewer.** Read the ticket and **production + tooling config hunks** in the diff. For patterns introduced or touched in this PR, ask whether an existing rule should have caught them; if not, propose a **concrete** lint rule, ast-grep rule, stricter type, Zod boundary, or script (snippet + target path). File proposals as TOOL-PR\* or Backlog rows. Stay on the diff: do not propose repo-wide rule sweeps. After a fix commit, a short tooling pass on `git diff HEAD~1..HEAD` is enough.
+**Tooling reviewer.** Read the ticket and **production + tooling config hunks** in the diff. Also skim `docs/agents/session-retro.md` (latest section + **TOOL-SESSION** backlog) and open P0–P1 rows in `docs/agents/tooling-review.md` for **agent toil and confusion** this PR’s pattern could eliminate (wrong worktree, label drift, docs CI burn, repeated manual gates, ambiguous copy seams). Prefer **deterministic scripts** (Node/`npm run` checks, CI path filters, worktree helpers, fixture validators) over prose or “agents should remember X”. For patterns introduced or touched in this PR, ask whether an existing rule should have caught them; if not, propose a **concrete** lint rule, ast-grep rule, stricter type, Zod boundary, or script (snippet + target path + how it fails). Prefer a script that fails the gate over a soft convention. File proposals as TOOL-PR\* or TOOL-SESSION\* / Backlog rows. Stay on the diff for product findings; session-toil proposals may cite the retro row they close. After a fix commit, a short tooling pass on `git diff HEAD~1..HEAD` is enough (skip full retro re-read unless the fix is tooling).
 
 ## Session efficiency retro (every five merges)
 
