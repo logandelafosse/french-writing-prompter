@@ -3,6 +3,7 @@ import { type EvaluatorOutputDraft } from "@/contracts/evaluation";
 import path from "node:path";
 import { countsAsMistake } from "@/contracts/correction";
 import { loadDlfLexicon } from "@/modules/dlf/load";
+import { resourcesFor } from "@/modules/resources/catalog";
 import { dialectCheckQuestion, postProcessEvaluation } from "./post-process";
 
 const dlfIndex = loadDlfLexicon(
@@ -390,5 +391,58 @@ describe("postProcessEvaluation", () => {
     expect(
       result.corrections.find((row) => row.kind === "standard")?.isFocus,
     ).toBe(false);
+  });
+
+  it("drops invented and other-category resource ids then fills category defaults", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "mistake",
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+          category: "accord",
+          resource_ids: ["invented-resource", "grammaire-genre"],
+        }),
+      ]),
+      { text: writing, sessionId: 1, now, createId: ids() },
+    );
+    const item = result.corrections[0];
+    expect(item?.kind).toBe("mistake");
+    expect(item?.resourceIds).not.toContain("invented-resource");
+    expect(item?.resourceIds).not.toContain("grammaire-genre");
+    expect(item?.resourceIds).toEqual(
+      resourcesFor("accord", []).map((link) => link.id),
+    );
+    expect(item?.resources.map((link) => link.type)).toEqual([
+      "grammaire",
+      "input",
+    ]);
+  });
+
+  it("leaves resourceIds empty on standard and open dialect_check", () => {
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "standard",
+          quote: "Maintenant",
+          suggestion: "Asteur",
+          resource_ids: ["grammaire-accord"],
+        }),
+        correction({
+          kind: "dialect_check",
+          quote: "je vas",
+          suggestion: "je vais",
+          category: "conjugaison",
+          resource_ids: ["grammaire-conjugaison"],
+        }),
+      ]),
+      { text: writing, sessionId: 1, now, createId: ids() },
+    );
+    const standard = result.corrections.find((c) => c.kind === "standard");
+    const check = result.corrections.find((c) => c.kind === "dialect_check");
+    expect(standard?.resourceIds).toEqual([]);
+    expect(standard?.resources).toEqual([]);
+    expect(check?.resourceIds).toEqual([]);
+    expect(check?.resources).toEqual([]);
   });
 });

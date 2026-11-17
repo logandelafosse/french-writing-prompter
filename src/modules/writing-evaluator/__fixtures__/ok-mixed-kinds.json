@@ -63,7 +63,7 @@
       "question": null,
       "rule_if_dialect": "Si c'est louisianais, on garderait enfant au pluriel sans s.",
       "dlf_headword": null,
-      "resource_ids": ["grammaire-accord"],
+      "resource_ids": ["invented-resource"],
       "context_quote": null,
       "dialect_example": null,
       "dialect_lemma": null,

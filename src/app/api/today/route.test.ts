@@ -181,6 +181,12 @@ describe("GET /api/today", () => {
     const response = await GET();
     const body = await readResponseJson(response, TodayGetResponse);
     expect(body.activeSession).toBeNull();
+    const resources = body.reviewSession?.corrections[0]?.resources ?? [];
+    expect(resources.map((link) => link.type)).toEqual(["grammaire", "input"]);
+    for (const link of resources) {
+      expect(link.url).toMatch(/^https:\/\//);
+      expect(link.label.length).toBeGreaterThan(0);
+    }
     expect(body.reviewSession).toEqual({
       id: saved.id,
       prompt: "Consigne du jour",

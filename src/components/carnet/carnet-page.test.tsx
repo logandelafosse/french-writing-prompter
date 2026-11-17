@@ -22,6 +22,21 @@ const sessionNote: DialectNote = {
   updatedAt: "2026-11-14T16:00:00-06:00",
 };
 
+const genreLinks = [
+  {
+    id: "grammaire-genre",
+    type: "grammaire" as const,
+    label: "le genre des noms",
+    url: "https://www.laits.utexas.edu/tex/gr/no3.html",
+  },
+  {
+    id: "input-innerfrench",
+    type: "input" as const,
+    label: "InnerFrench",
+    url: "https://www.youtube.com/@innerfrench",
+  },
+];
+
 const genreWeakness: Weakness = {
   category: "genre",
   label: "Genre des noms",
@@ -30,6 +45,7 @@ const genreWeakness: Weakness = {
   trend: "actif",
   isFocus: false,
   pinned: false,
+  resources: genreLinks,
 };
 
 const accentsQuiet: Weakness = {
@@ -40,6 +56,7 @@ const accentsQuiet: Weakness = {
   trend: "tranquille",
   isFocus: false,
   pinned: false,
+  resources: [],
 };
 
 const autreWeakness: Weakness = {
@@ -50,6 +67,7 @@ const autreWeakness: Weakness = {
   trend: "actif",
   isFocus: false,
   pinned: false,
+  resources: genreLinks,
 };
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -206,6 +224,13 @@ describe("CarnetPage", () => {
     expect(
       screen.getByRole("heading", { name: carnetCopy.weakTitle }),
     ).toBeVisible();
+    const row = screen.getByRole("article");
+    expect(
+      within(row).getByRole("link", { name: /Grammaire · le genre des noms/ }),
+    ).toHaveAttribute("target", "_blank");
+    expect(
+      within(row).getByRole("link", { name: /Input · InnerFrench/ }),
+    ).toHaveAttribute("rel", expect.stringContaining("noopener"));
   });
 
   it("mutes a tranquille Weakness title and meta", async () => {
@@ -218,6 +243,9 @@ describe("CarnetPage", () => {
     expect(screen.getByText(/vu le 6 novembre · tranquille/)).toHaveClass(
       "text-muted",
     );
+    expect(
+      screen.queryByRole("link", { name: /Grammaire ·/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("Pratiquer ça pins the row and clears a practice error on retry", async () => {

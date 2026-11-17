@@ -1,6 +1,7 @@
 import { describe, it, expect, vi } from "vitest";
 import { WritingEvaluator, type OpenAiClientLike } from "./writing-evaluator";
 import path from "node:path";
+import { catalog } from "@/modules/resources/catalog";
 import { buildEvaluatorPrompt } from "./build-evaluator-prompt";
 import { loadDlfLexicon } from "@/modules/dlf/load";
 import {
@@ -108,6 +109,22 @@ describe("WritingEvaluator", () => {
     expect(built.system).toContain("formel");
     for (const id of MISTAKE_CATEGORY_IDS) {
       expect(built.system).toContain(id);
+    }
+  });
+
+  it("lists every catalog id with type and categories and no urls", () => {
+    const built = buildEvaluatorPrompt({
+      writing: "Texte.",
+      promptText: "Consigne.",
+      registre: "familier",
+      dialect: DEFAULT_DIALECT,
+    });
+    expect(built.system).toMatch(/N'invente jamais d'URL ni d'ID/i);
+    for (const entry of catalog) {
+      expect(built.system).toContain(entry.id);
+      expect(built.system).toContain(entry.type);
+      expect(built.system).toContain(entry.title);
+      expect(built.system).not.toContain(entry.url);
     }
   });
 

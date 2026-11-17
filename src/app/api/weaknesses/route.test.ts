@@ -115,6 +115,50 @@ describe("GET /api/weaknesses", () => {
       lastSeenAt: "2026-11-16T18:00:00.000Z",
       trend: "actif",
     });
+    const resources = body.weaknesses[0]?.resources ?? [];
+    expect(resources.map((link) => link.type)).toEqual(["grammaire", "input"]);
+    for (const link of resources) {
+      expect(link.url).toMatch(/^https:\/\//);
+    }
+  });
+
+  it("omits Resource links on tranquille Weaknesses", async () => {
+    const dates = [
+      "2026-11-10T18:00:00.000Z",
+      "2026-11-11T18:00:00.000Z",
+      "2026-11-12T18:00:00.000Z",
+      "2026-11-13T18:00:00.000Z",
+      "2026-11-14T18:00:00.000Z",
+      "2026-11-15T18:00:00.000Z",
+      "2026-11-16T18:00:00.000Z",
+    ];
+    const oldest = await seedEvaluated(dates[0] ?? "");
+    await saveCorrections(
+      [
+        correction(oldest.id, {
+          id: "c-accents",
+          kind: "mistake",
+          category: "accents",
+        }),
+      ],
+      () => new Date(dates[0] ?? ""),
+    );
+    for (const evaluatedAt of dates.slice(1)) {
+      await seedEvaluated(evaluatedAt);
+    }
+    const latest = await seedEvaluated("2026-11-17T18:00:00.000Z");
+    await saveCorrections(
+      [correction(latest.id, { id: "c-genre-latest", kind: "mistake" })],
+      () => new Date("2026-11-17T18:00:00.000Z"),
+    );
+
+    const body = await readResponseJson(await GET(), WeaknessesGetResponse);
+    const quiet = body.weaknesses.find((row) => row.category === "accents");
+    const active = body.weaknesses.find((row) => row.category === "genre");
+    expect(quiet?.trend).toBe("tranquille");
+    expect(quiet?.resources).toEqual([]);
+    expect(active?.trend).toBe("actif");
+    expect(active?.resources.length).toBe(2);
   });
 
   it("counts Mistakes from a placement session", async () => {

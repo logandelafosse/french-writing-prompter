@@ -6,7 +6,7 @@ import { CorrectionCard } from "./correction-card";
 
 function standard(
   partial: Pick<Correction, "id" | "ordinal" | "quote" | "suggestion"> &
-    Partial<Pick<Correction, "explanation" | "status" | "dlf">>,
+    Partial<Pick<Correction, "explanation" | "status" | "dlf" | "resources">>,
 ): Correction {
   return Correction.parse({
     sessionId: 1,
@@ -262,5 +262,57 @@ describe("CorrectionCard mistake pushback", () => {
     expect(
       screen.getByRole("button", { name: reviewCopy.actionPushback }),
     ).toBeVisible();
+  });
+
+  it("shows catalog Resource links on a Mistake and none on standard", () => {
+    const resources = [
+      {
+        id: "grammaire-accord",
+        type: "grammaire" as const,
+        label: "l'accord",
+        url: "https://example.com/grammar",
+      },
+      {
+        id: "input-innerfrench",
+        type: "input" as const,
+        label: "InnerFrench",
+        url: "https://example.com/input",
+      },
+    ];
+    const { rerender } = render(
+      <CorrectionCard
+        correction={mistake({
+          id: "m1",
+          ordinal: 3,
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+          resources,
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    const card = screen.getByRole("article");
+    expect(
+      within(card).getByRole("link", { name: /Grammaire · l'accord/ }),
+    ).toHaveAttribute("target", "_blank");
+    expect(
+      within(card).getByRole("link", { name: /Input · InnerFrench/ }),
+    ).toBeVisible();
+
+    rerender(
+      <CorrectionCard
+        correction={standard({
+          id: "s1",
+          ordinal: 1,
+          quote: "ma voiture",
+          suggestion: "mon char",
+          resources,
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    expect(
+      screen.queryByRole("link", { name: /Grammaire ·/ }),
+    ).not.toBeInTheDocument();
   });
 });

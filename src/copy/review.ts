@@ -73,6 +73,9 @@ export const reviewCopy = {
     register_style:
       "Adéquation du ton à la consigne (lettre, récit…), naturel, et dispositifs rhétoriques sans forcer.",
   },
+  resourceGrammar: (label: string) => `Grammaire · ${label}`,
+  resourceInput: (label: string) => `Input · ${label}`,
+  newTab: "(nouvel onglet)",
 } as const;
 
 export function formatEvaluationSummary(

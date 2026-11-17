@@ -52,5 +52,9 @@ export function isProductionPath(filePath: string): boolean {
     return false;
   }
 
+  if (normalized === "src/modules/resources/catalog.data.ts") {
+    return false;
+  }
+
   return true;
 }
