@@ -227,7 +227,7 @@ export function AppHeader({
             Carnet
           </TextLink>
           <TextLink
-            href="/history"
+            href="/historique"
             className={cn(
               "min-h-touch",
               current === "historique"
@@ -361,7 +361,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
 
   const current = pathname.startsWith("/carnet")
     ? ("carnet" as const)
-    : pathname.startsWith("/history")
+    : pathname.startsWith("/historique")
       ? ("historique" as const)
       : undefined;
 

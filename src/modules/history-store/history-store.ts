@@ -6,18 +6,36 @@ import type * as schema from "@/db/schema";
 import { localDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { quotaTimeZone } from "@/modules/quota-manager/quota-store";
-import { Correction, type CorrectionStatus } from "@/contracts/correction";
-import { attachResources } from "@/modules/resources/catalog";
 import {
-  parseStoredEvaluation,
-  toPlaceholderEvaluation,
-} from "@/contracts/evaluation";
+  countsAsMistake,
+  Correction,
+  type CorrectionStatus,
+} from "@/contracts/correction";
+import { attachResources } from "@/modules/resources/catalog";
+import { parseStoredEvaluation } from "@/contracts/evaluation";
 import { PromptConstraints } from "@/contracts/prompt";
-import { SessionStatus, type SessionView } from "@/contracts/session";
+import { PromptMeta } from "@/contracts/prompt-meta";
+import { FocusSnapshot } from "@/contracts/focus";
+import { parseCefrLevel } from "@/contracts/cefr";
+import {
+  SessionStatus,
+  type CorrectionSummaryItem,
+  type DataIssue,
+  type SessionDisplayStatus,
+  type SessionSummary,
+} from "@/contracts/session";
+import { getLevelHistory } from "@/modules/cefr-tracker/level-store";
+import { toFocusItems } from "@/modules/dialect/taxonomy";
+import {
+  formatHistoryDay,
+  formatLevelLine,
+  historyTitle,
+  writingExcerpt,
+} from "@/copy/history";
 import { first } from "@/lib/first";
 import { parseJson } from "@/lib/json";
 import { parseStoredFocus } from "@/lib/parse-stored-focus";
-import { eq, desc, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, lt, sql } from "drizzle-orm";
 
 export interface SessionData {
   promptText: string;
@@ -140,13 +158,36 @@ export async function getAllSessions(): Promise<Session[]> {
   return rows.map(rowToSession);
 }
 
-export async function getSessionViews(): Promise<SessionView[]> {
-  const rows = await db
-    .select()
-    .from(sessions)
-    .orderBy(desc(sessions.createdAt));
-
-  return rows.map(rowToSessionView);
+// prettier-ignore
+export async function listSessionSummaries(options: {
+  limit: number; cursor?: string; now?: () => Date;
+}): Promise<{ sessions: SessionSummary[]; nextCursor: string | null; levelLine: string | null }> {
+  const now = options.now ?? (() => new Date());
+  const tz = quotaTimeZone();
+  const today = localDateKey(now(), tz);
+  const rows = await db.select().from(sessions).where(
+    options.cursor ? and(eq(sessions.kind, "daily"), lt(sessions.createdAt, options.cursor)) : eq(sessions.kind, "daily"),
+  ).orderBy(desc(sessions.createdAt)).limit(options.limit + 2);
+  const eligible = rows.filter((row) => displayStatusFor(row, today) !== "in_progress");
+  const page = eligible.slice(0, options.limit);
+  const nextCursor = eligible.length > options.limit ? (page[page.length - 1]?.createdAt ?? null) : null;
+  const ids = page.map((row) => row.id);
+  const correctionRows = ids.length === 0 ? [] : await db.select().from(corrections).where(inArray(corrections.sessionId, ids)).orderBy(corrections.ordinal);
+  const focusById = new Map(page.map((row) => [row.id, new Set(parseStoredFocus(row.focusJson) ?? [])]));
+  const bySession = new Map<number, Correction[]>(page.map((row) => [row.id, []]));
+  for (const item of correctionRows) {
+    const parsed = correctionFromRow(item, focusById.get(item.sessionId) ?? new Set());
+    if (parsed) bySession.get(item.sessionId)?.push(parsed);
+  }
+  const history = await getLevelHistory();
+  const levelLine = formatLevelLine(
+    history.filter((change) => change.revertsChangeId === undefined).slice().reverse().map((change) => ({ level: change.toLevel, since: change.createdAt })),
+    tz,
+  );
+  return {
+    sessions: page.map((row) => rowToSessionSummary(row, bySession.get(row.id) ?? [], tz, today)),
+    nextCursor, levelLine,
+  };
 }
 
 export async function sessionCount(): Promise<number> {
@@ -348,26 +389,73 @@ export async function rememberWriting(
     .where(eq(sessions.id, sessionId));
 }
 
-function rowToSessionView(row: typeof sessions.$inferSelect): SessionView {
-  const constraints = parseJson(PromptConstraints, row.promptConstraints);
-  const promptLevel = constraints.ok ? constraints.value.cefrLevel : null;
+// prettier-ignore
+function displayStatusFor(row: typeof sessions.$inferSelect, today: string): SessionDisplayStatus {
+  const status = sessionStatus(row.status);
+  if (status === "evaluated") return "evaluated";
+  if (status === "active" && row.localDate === today) return "in_progress";
+  return countWords(row.writingText ?? "") > 0 ? "draft_abandoned" : "prompt_unused";
+}
 
-  let evaluation: SessionView["evaluation"] = null;
-  const stored = parseStoredEvaluation(row.evaluationJson);
-  if (stored.status === "v1") {
-    evaluation = { ok: true, value: stored.value };
-  } else if (stored.status === "v2") {
-    evaluation = { ok: true, value: toPlaceholderEvaluation(stored.value) };
-  } else if (stored.status === "malformed") {
-    evaluation = { ok: false, reason: "unreadable" };
+// prettier-ignore
+function readPromptMeta(row: typeof sessions.$inferSelect): { meta: PromptMeta | null; unreadable: boolean } {
+  if (row.promptMetaJson && row.promptMetaJson.length > 0) {
+    const parsed = parseJson(PromptMeta, row.promptMetaJson);
+    return { meta: parsed.ok ? parsed.value : null, unreadable: !parsed.ok };
   }
+  return { meta: null, unreadable: !parseJson(PromptConstraints, row.promptConstraints).ok };
+}
 
+// prettier-ignore
+function readFocus(raw: string | null): { ids: NonNullable<ReturnType<typeof parseStoredFocus>>; unreadable: boolean } {
+  if (raw === null || raw.length === 0) return { ids: [], unreadable: false };
+  const parsed = parseJson(FocusSnapshot, raw);
+  return parsed.ok ? { ids: parsed.value, unreadable: false } : { ids: [], unreadable: true };
+}
+
+// prettier-ignore
+function correctionSummaries(items: Correction[]): {
+  mistakeCount: number; countsByKind: SessionSummary["countsByKind"]; correctionsSummary: CorrectionSummaryItem[];
+} {
+  const correctionsSummary: CorrectionSummaryItem[] = [];
+  let mistake = 0, standard = 0, dialectNote = 0;
+  for (const item of items) {
+    if (countsAsMistake(item)) {
+      mistake += 1;
+      correctionsSummary.push({ kind: "mistake", quote: item.quote, suggestion: item.suggestion });
+    } else if (item.kind === "standard") {
+      standard += 1;
+      correctionsSummary.push({ kind: "standard", quote: item.quote, suggestion: item.suggestion });
+    } else if (item.status === "confirmed_dialect" || item.status === "overturned") {
+      dialectNote += 1;
+      correctionsSummary.push({ kind: "dialect_note", quote: item.quote });
+    }
+  }
+  return { mistakeCount: mistake, countsByKind: { mistake, standard, dialectNote }, correctionsSummary };
+}
+
+// prettier-ignore
+function rowToSessionSummary(row: typeof sessions.$inferSelect, items: Correction[], timeZone: string, today: string): SessionSummary {
+  const dataIssues: DataIssue[] = [];
+  const stored = parseStoredEvaluation(row.evaluationJson);
+  if (stored.status === "malformed") dataIssues.push("evaluation_unreadable");
+  if (stored.status === "v1") dataIssues.push("evaluation_legacy");
+  const prompt = readPromptMeta(row);
+  if (prompt.unreadable) dataIssues.push("prompt_meta_unreadable");
+  const focus = readFocus(row.focusJson);
+  if (focus.unreadable) dataIssues.push("focus_unreadable");
+  const focusItems = toFocusItems(focus.ids);
+  const constraints = parseJson(PromptConstraints, row.promptConstraints);
+  const grouped = correctionSummaries(stored.status === "v1" ? [] : items);
   return {
-    id: row.id,
-    createdAt: row.createdAt,
-    promptText: row.promptText,
-    writingText: row.writingText,
-    promptLevel,
-    evaluation,
+    id: row.id, createdAt: row.createdAt, kind: row.kind === "placement" ? "placement" : "daily",
+    displayStatus: displayStatusFor(row, today),
+    title: historyTitle({ focusLabels: focusItems.map((item) => item.historyName), genre: prompt.meta?.genre ?? null, date: formatHistoryDay(row.createdAt, timeZone) }),
+    focus: focusItems.map((item) => ({ id: item.id, label: item.historyName })),
+    wordCount: countWords(row.writingText ?? ""), mistakeCount: grouped.mistakeCount, countsByKind: grouped.countsByKind,
+    promptLevel: constraints.ok ? constraints.value.cefrLevel : parseCefrLevel(row.promptLevel),
+    evaluatedLevel: stored.status === "v2" ? stored.value.overallCefr : stored.status === "v1" ? stored.value.overall_cefr : parseCefrLevel(row.cefrLevel),
+    dataIssues, promptText: row.promptText, excerpt: writingExcerpt(row.writingText ?? ""),
+    correctionsSummary: grouped.correctionsSummary,
   };
 }

@@ -104,7 +104,10 @@ test.describe("hung fetches", () => {
     test.setTimeout(60_000);
     await scenario("happy");
     await page.route("**/api/today", holdIndefinitely);
-    await page.route("**/api/sessions", holdIndefinitely);
+    await page.route(
+      (url) => url.pathname === "/api/sessions",
+      holdIndefinitely,
+    );
     await page.goto("/");
     const notice = page.getByRole("status");
     await expect(notice).toContainText("Pas de connexion.", {
