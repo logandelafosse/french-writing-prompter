@@ -76,8 +76,8 @@ describe("MarkedText", () => {
     );
 
     const marked = screen.getByText(quote);
-    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; dashed/outlined styles are the kind contract */
-    expect(marked.closest("mark")).toHaveClass("border-dashed");
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; kind attribute is the dashed-underline contract */
+    expect(marked.closest("mark")).toHaveAttribute("data-kind", "standard");
     expect(container.querySelectorAll("mark")).toHaveLength(1);
     /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark DOM asserts */
 
@@ -106,8 +106,11 @@ describe("MarkedText", () => {
     );
 
     const marked = screen.getByText(quote);
-    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; wavy/squared styles are the dialect contract */
-    expect(marked.closest("mark")).toHaveClass("decoration-wavy");
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; kind attribute is the wavy-underline contract */
+    expect(marked.closest("mark")).toHaveAttribute(
+      "data-kind",
+      "dialect_check",
+    );
     expect(container.querySelectorAll("mark")).toHaveLength(1);
     /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark DOM asserts */
 
@@ -195,6 +198,9 @@ describe("MarkedText", () => {
     expect(animated[1]).toHaveStyle({ animationDelay: "60ms" });
     expect(animated[0]?.className).toMatch(/animate-mark-paint/);
     expect(animated[1]?.className).toMatch(/animate-mark-paint/);
+    expect(animated[0]).toHaveAttribute("data-animate", "");
+    expect(animated[1]).toHaveAttribute("data-animate", "");
+    expect(animated[0]).toHaveAttribute("data-kind", "mistake");
 
     rerender(<MarkedText text={writing} corrections={corrections} />);
     const still = container.querySelectorAll("mark");
@@ -202,6 +208,35 @@ describe("MarkedText", () => {
     expect(still[1]?.style.animationDelay).toBe("");
     expect(still[0]?.className).not.toMatch(/animate-mark-paint/);
     expect(still[1]?.className).not.toMatch(/animate-mark-paint/);
+    expect(still[0]).not.toHaveAttribute("data-animate");
+    expect(still[1]).not.toHaveAttribute("data-animate");
     /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of mark stagger asserts */
+  });
+
+  it("animated standard marks paint via data-kind and data-animate", () => {
+    const quote = "ma voiture";
+    const writing = `J'arrive avec ${quote}.`;
+    const start = writing.indexOf(quote);
+    const { container } = render(
+      <MarkedText
+        animate
+        text={writing}
+        corrections={[
+          correction({
+            id: "s1",
+            ordinal: 2,
+            kind: "standard",
+            span: { start, end: start + quote.length },
+          }),
+        ]}
+      />,
+    );
+    /* eslint-disable testing-library/no-container, testing-library/no-node-access -- reason: <mark> has no role; standard paint uses data-kind plus stagger delay */
+    const mark = container.querySelector("mark");
+    expect(mark).toHaveAttribute("data-kind", "standard");
+    expect(mark).toHaveAttribute("data-animate", "");
+    expect(mark).toHaveStyle({ animationDelay: "60ms" });
+    expect(mark?.className).toMatch(/animate-mark-paint/);
+    /* eslint-enable testing-library/no-container, testing-library/no-node-access -- reason: end of standard paint asserts */
   });
 });

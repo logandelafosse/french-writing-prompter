@@ -24,12 +24,12 @@ function markKind(
 
 function markClass(kind: Mark["kind"]) {
   if (kind === "standard") {
-    return "border-b-standard border-b-2 border-dashed bg-transparent bg-no-repeat py-px text-inherit";
+    return "bg-transparent bg-no-repeat py-px text-inherit";
   }
   if (kind === "dialect_check") {
-    return "decoration-dialect [background-size:100%_100%] bg-[image:linear-gradient(var(--color-dialect-tint),var(--color-dialect-tint))] bg-no-repeat px-0.5 py-px text-inherit underline decoration-wavy underline-offset-[5px]";
+    return "[background-size:100%_100%] bg-[image:linear-gradient(var(--color-dialect-tint),var(--color-dialect-tint))] bg-no-repeat px-0.5 py-px text-inherit";
   }
-  return "[background-size:100%_100%] bg-[image:linear-gradient(var(--color-mistake-tint),var(--color-mistake-tint))] bg-no-repeat border-b-mistake border-b-2 px-0.5 py-px text-inherit";
+  return "[background-size:100%_100%] bg-[image:linear-gradient(var(--color-mistake-tint),var(--color-mistake-tint))] bg-no-repeat px-0.5 py-px text-inherit";
 }
 
 function markerClass(kind: Mark["kind"]) {
@@ -71,6 +71,8 @@ function renderRange(
     nodes.push(
       <mark
         key={item.id}
+        data-kind={item.kind}
+        data-animate={animate ? "" : undefined}
         className={cn(
           markClass(item.kind),
           animate && "motion-safe:animate-mark-paint",

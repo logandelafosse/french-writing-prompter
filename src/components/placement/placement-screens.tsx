@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { PageTitle } from "@/components/ui/page-title";
 import { SectionLabel } from "@/components/ui/section-label";
-import { Surface } from "@/components/ui/surface";
+import { Surface, writingFocusClassName } from "@/components/ui/surface";
 import { TextLink } from "@/components/ui/text-link";
 import { PromptSheet } from "@/components/writing/prompt-sheet";
 import { RuledTextarea } from "@/components/writing/ruled-textarea";
@@ -73,7 +73,7 @@ export function PlacementStep({
         <PageTitle size="step">{placementCopy.stepTitle(step)}</PageTitle>
         <PlacementProgress step={step} />
       </div>
-      <Surface padding="home" className="flex flex-col gap-[18px] max-sm:p-[22px_18px]">
+      <Surface padding="home" className={cn("flex flex-col gap-[18px] max-sm:p-[22px_18px]", writingFocusClassName)}>
         <PromptSheet embedded mode="placement" promptText={prompt} meta={null} animateKey={`${sessionId}-${prompt}`} />
         <RuledTextarea label={homeCopy.writingLabel} value={autosave.text} readOnly={submitting} onSubmitShortcut={runSubmit} onChange={(value) => { autosave.onTextChange(value); onText(value); }} />
         <WritingFooter text={autosave.text} target={null} layout="desktop" submitBusy={submitting} savedAt={autosave.savedAt} onSubmit={runSubmit} submitLabel={step === 3 ? placementCopy.seeLevel : placementCopy.next} />

@@ -12,7 +12,7 @@
   --font-sans: var(--font-bricolage), "Trebuchet MS", sans-serif;
   --font-serif: var(--font-newsreader), Georgia, serif;
   --animate-prompt-rise: prompt-rise 200ms ease-out forwards;
-  --animate-mark-paint: mark-paint 420ms ease-out forwards;
+  --animate-mark-paint: mark-paint 420ms ease-out both;
 }
 
 @keyframes prompt-rise {
@@ -32,6 +32,15 @@
   }
   to {
     background-size: 100% 100%;
+  }
+}
+
+@keyframes mark-underline {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
   }
 }
 
@@ -78,6 +87,41 @@
   :focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+  }
+  mark[data-kind] {
+    position: relative;
+  }
+  mark[data-kind]::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    pointer-events: none;
+  }
+  mark[data-kind="mistake"]::after {
+    height: 2px;
+    background-color: var(--color-mistake);
+  }
+  mark[data-kind="standard"]::after {
+    height: 2px;
+    background-image: repeating-linear-gradient(
+      to right,
+      var(--color-standard) 0 5px,
+      transparent 5px 9px
+    );
+  }
+  mark[data-kind="dialect_check"]::after {
+    height: 5px;
+    background-color: var(--color-dialect);
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5' viewBox='0 0 8 5'%3E%3Cpath fill='none' stroke='black' stroke-width='1.25' d='M0 3 Q2 1 4 3 T8 3'/%3E%3C/svg%3E");
+    mask-repeat: repeat-x;
+    mask-position: left bottom;
+    mask-size: 8px 5px;
+  }
+  mark[data-animate]::after {
+    animation: mark-underline 420ms ease-out both;
+    animation-delay: inherit;
   }
   @media (prefers-reduced-motion: reduce) {
     *,

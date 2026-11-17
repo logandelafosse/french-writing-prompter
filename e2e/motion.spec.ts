@@ -21,17 +21,32 @@ async function submitWriting(page: Page, text: string) {
   await expectEvaluationWithScores(page);
 }
 
-async function markMotion(
-  page: Page,
-): Promise<{ name: string; delayMs: number }[]> {
+async function markMotion(page: Page): Promise<
+  {
+    kind: string | null;
+    name: string;
+    delayMs: number;
+    fillMode: string;
+    backgroundSize: string;
+    underlineWidth: string;
+  }[]
+> {
   return page.evaluate(() =>
     [...document.querySelectorAll("mark")].map((el) => {
       const style = getComputedStyle(el);
+      const underline = getComputedStyle(el, "::after");
       const raw = style.animationDelay;
       const delayMs = raw.endsWith("ms")
         ? Number.parseFloat(raw)
         : Number.parseFloat(raw) * 1000;
-      return { name: style.animationName, delayMs };
+      return {
+        kind: el.getAttribute("data-kind"),
+        name: style.animationName,
+        delayMs,
+        fillMode: style.animationFillMode,
+        backgroundSize: style.backgroundSize,
+        underlineWidth: underline.width,
+      };
     }),
   );
 }
@@ -47,9 +62,14 @@ test("marks paint on arrival, not on reload, none with reduced motion", async ({
   await captureEvidence(page, testInfo, "marks-on-arrival");
   const arriving = await markMotion(page);
   expect(arriving.length).toBeGreaterThan(1);
+  expect(arriving.some((mark) => mark.kind === "standard")).toBe(true);
+  expect(arriving.some((mark) => mark.kind === "mistake")).toBe(true);
   for (const mark of arriving) {
     expect(mark.name).not.toBe("none");
     expect(mark.name.length).toBeGreaterThan(0);
+    expect(mark.fillMode === "both" || mark.fillMode === "backwards").toBe(
+      true,
+    );
   }
   const delays = arriving.map((item) => item.delayMs);
   expect(delays).toEqual([...delays].sort((a, b) => a - b));
@@ -61,6 +81,30 @@ test("marks paint on arrival, not on reload, none with reduced motion", async ({
   expect(restored.length).toBeGreaterThan(1);
   for (const mark of restored) {
     expect(mark.name === "none" || mark.name === "").toBe(true);
+  }
+});
+
+test("delayed marks start empty before they paint", async ({
+  page,
+  scenario,
+}) => {
+  await scenario("happy");
+  await generateFirstPrompt(page);
+  await page.addStyleTag({
+    content:
+      "*, *::before, *::after { animation-play-state: paused !important; }",
+  });
+  await submitWriting(page, mixedWriting);
+  const paused = await markMotion(page);
+  expect(paused.length).toBeGreaterThan(1);
+  expect(paused.some((mark) => mark.kind === "standard")).toBe(true);
+  expect(paused.some((mark) => mark.delayMs > 0)).toBe(true);
+  for (const mark of paused) {
+    expect(mark.fillMode === "both" || mark.fillMode === "backwards").toBe(
+      true,
+    );
+    expect(mark.backgroundSize.startsWith("0%")).toBe(true);
+    expect(Number.parseFloat(mark.underlineWidth)).toBe(0);
   }
 });
 

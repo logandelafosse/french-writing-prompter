@@ -1,6 +1,9 @@
 import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
+export const writingFocusClassName =
+  "focus-within:border-primary focus-within:border-l-primary focus-within:border-l-2 focus-within:outline-primary focus-within:outline-2 focus-within:outline-offset-2";
+
 export type SurfacePadding =
   | "home"
   | "intro"

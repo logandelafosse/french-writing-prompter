@@ -7,8 +7,11 @@ import { TextLink } from "@/components/ui/text-link";
 import { cn } from "@/lib/utils";
 import { ResourceLinks } from "./resource-links";
 
+const focusRingClass =
+  "focus:outline-primary focus:outline-2 focus:outline-offset-2";
 const cardClass =
-  "rounded-base border-line bg-sheet flex flex-col gap-2 border p-[16px_18px] outline-none";
+  "rounded-base border-line bg-sheet flex flex-col gap-2 border p-[16px_18px] " +
+  focusRingClass;
 
 type CorrectionCardProps = {
   correction: Correction;
@@ -38,7 +41,7 @@ export function CorrectionCard(props: CorrectionCardProps) {
       <article
         id={`correction-${correction.ordinal}`}
         tabIndex={-1}
-        className="outline-none"
+        className={focusRingClass}
       >
         <p className="m-0 text-[15px]">
           {reviewCopy.savedNote}{" "}

@@ -27,4 +27,16 @@ describe("RuledTextarea", () => {
     await user.keyboard("{Meta>}{Enter}{/Meta}");
     expect(onSubmitShortcut).toHaveBeenCalledTimes(1);
   });
+
+  it("shows a 2px primary ring with 2px offset on the field while focused", () => {
+    render(<RuledTextarea label="Ton texte" value="" onChange={vi.fn()} />);
+    const area = screen.getByLabelText("Ton texte");
+    expect(area.className).toMatch(/outline-none/);
+    /* eslint-disable testing-library/no-node-access -- reason: the ring lives on the field wrapper so the lined textarea can keep outline:none */
+    const wrap = area.parentElement;
+    /* eslint-enable testing-library/no-node-access -- reason: end of wrapper class asserts */
+    expect(wrap?.className).toMatch(/focus-within:outline-2/);
+    expect(wrap?.className).toMatch(/focus-within:outline-offset-2/);
+    expect(wrap?.className).toMatch(/focus-within:outline-primary/);
+  });
 });

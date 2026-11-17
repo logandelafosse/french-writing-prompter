@@ -1,8 +1,9 @@
-import { type Page } from "@playwright/test";
+import { type Locator, type Page } from "@playwright/test";
 import { test, expect } from "./support/fixtures";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
 import { homeCopy } from "../src/copy/fr";
+import { placementCopy } from "../src/copy/placement";
 import { reviewCopy } from "../src/copy/review";
 
 const mixedWriting = "Maintenant je vas au bayou. Les enfant jouent.";
@@ -104,6 +105,47 @@ test("Compris moves focus to the next open card", async ({
   ).toHaveCount(0);
   const next = page.getByRole("article").filter({ hasText: "Maintenant" });
   await expect(next).toBeFocused();
+  await expectPrimaryOutline(next);
+});
+
+test("Placement writing surface shows a 2px ring while the textarea is focused", async ({
+  page,
+  scenario,
+}) => {
+  await scenario("happy");
+  await page.goto("/placement");
+  await page.getByRole("button", { name: placementCopy.start }).click();
+  await expect(
+    page.getByRole("heading", { name: placementCopy.stepTitle(1) }),
+  ).toBeVisible();
+  const field = page.getByRole("textbox", { name: "Ton texte", exact: true });
+  await field.focus();
+  const outline = await field.evaluate((el) => {
+    let node: HTMLElement | null = el.parentElement;
+    while (node) {
+      const cls = node.getAttribute("class") ?? "";
+      if (
+        cls.includes("focus-within:outline-2") &&
+        cls.includes("rounded-base") &&
+        cls.includes("shadow-sheet")
+      ) {
+        const style = getComputedStyle(node);
+        return {
+          style: style.outlineStyle,
+          width: Number.parseFloat(style.outlineWidth),
+          offset: Number.parseFloat(style.outlineOffset),
+          color: style.outlineColor,
+        };
+      }
+      node = node.parentElement;
+    }
+    return null;
+  });
+  expect(outline).not.toBeNull();
+  expect(outline?.style).not.toBe("none");
+  expect(outline?.width).toBeGreaterThanOrEqual(2);
+  expect(outline?.offset).toBeGreaterThanOrEqual(2);
+  expect(outline?.color).toBe("rgb(31, 90, 74)");
 });
 
 test("keyboard focus shows a 2px primary outline", async ({
@@ -119,6 +161,22 @@ test("keyboard focus shows a 2px primary outline", async ({
   const failures = await collectFocusOutlineFailures(page);
   expect(failures).toEqual([]);
 });
+
+async function expectPrimaryOutline(locator: Locator) {
+  const outline = await locator.evaluate((el) => {
+    const style = getComputedStyle(el);
+    return {
+      style: style.outlineStyle,
+      width: Number.parseFloat(style.outlineWidth),
+      offset: Number.parseFloat(style.outlineOffset),
+      color: style.outlineColor,
+    };
+  });
+  expect(outline.style).not.toBe("none");
+  expect(outline.width).toBeGreaterThanOrEqual(2);
+  expect(outline.offset).toBeGreaterThanOrEqual(2);
+  expect(outline.color).toBe("rgb(31, 90, 74)");
+}
 
 async function collectFocusOutlineFailures(page: Page) {
   await page.keyboard.press("Tab");

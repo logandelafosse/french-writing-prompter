@@ -69,6 +69,25 @@ describe("CorrectionCard standard", () => {
     expect(within(card).queryByText("DLF")).not.toBeInTheDocument();
   });
 
+  it("uses a 2px primary focus ring with 2px offset instead of outline-none", () => {
+    render(
+      <CorrectionCard
+        correction={standard({
+          id: "s1",
+          ordinal: 1,
+          quote: "ma voiture",
+          suggestion: "mon char",
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    const card = screen.getByRole("article");
+    expect(card.className).toMatch(/focus:outline-2/);
+    expect(card.className).toMatch(/focus:outline-offset-2/);
+    expect(card.className).toMatch(/focus:outline-primary/);
+    expect(card.className).not.toMatch(/(^|\s)outline-none(\s|$)/);
+  });
+
   it("shows a DLF abbr badge on an attested standard suggestion", () => {
     render(
       <CorrectionCard
