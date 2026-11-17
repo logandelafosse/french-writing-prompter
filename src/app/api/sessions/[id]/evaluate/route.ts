@@ -16,13 +16,11 @@ import {
 import { parseCefrLevel } from "@/contracts/cefr";
 import { PromptConstraints } from "@/contracts/prompt";
 import { EvaluatePostResponse, SessionEvaluatePostBody } from "@/contracts/api";
-import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { loadLearnerDialectContext } from "@/modules/dialect/learner-dialect-context";
 import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
 import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
-import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
-import { getDlfIndex } from "@/modules/dlf/load";
 import { DRAFT_TEXT_MAX } from "@/config/limits";
 
 const SessionId = z.coerce.number().int().positive();
@@ -42,10 +40,8 @@ export const POST = withErrors(async function postSessionEvaluate(
   const parsed = await parseRequestBody(request, SessionEvaluatePostBody);
   if (!parsed.ok) return parsed.response;
 
-  const dlf = getDlfIndex();
   const evaluator = new WritingEvaluator(
     getAiClient(scenarioFromRequest(request)),
-    dlf,
   );
 
   const sessionId = id.data;
@@ -93,6 +89,7 @@ export const POST = withErrors(async function postSessionEvaluate(
 
   await rememberWriting(sessionId, text, new Date().toISOString());
 
+  const learnerDialect = await loadLearnerDialectContext();
   const constraintsResult = parseJson(
     PromptConstraints,
     session.promptConstraints,
@@ -103,20 +100,18 @@ export const POST = withErrors(async function postSessionEvaluate(
     ? constraintsResult.value
     : {
         cefrLevel: fallbackLevel ?? level,
-        dialect: DEFAULT_DIALECT,
+        dialect: learnerDialect.dialect,
       };
 
   const promptMeta = parseStoredPromptMeta(session.promptMetaJson);
-  const dialectNotes = await listActiveNotes();
   const now = new Date();
   const evaluated = await evaluator.evaluate(
     text,
     promptMeta
       ? { text: session.promptText, meta: promptMeta, constraints }
       : { text: session.promptText, constraints },
-    DEFAULT_DIALECT,
+    learnerDialect,
     {
-      dialectNotes,
       sessionId,
       now: () => now,
       createId: () => crypto.randomUUID(),

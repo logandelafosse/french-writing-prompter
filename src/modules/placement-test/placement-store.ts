@@ -11,9 +11,10 @@ import { parseJson } from "@/lib/json";
 import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { getCurrentLevel, setLevel } from "@/modules/cefr-tracker/level-store";
-import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
-import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
-import { emptyDlfIndex, type DlfIndex } from "@/modules/dlf/lookup";
+import {
+  loadLearnerDialectContext,
+  type LearnerDialectContext,
+} from "@/modules/dialect/learner-dialect-context";
 import {
   getSessionDetail,
   rememberWriting,
@@ -116,17 +117,15 @@ async function insertSession(
 export class PlacementService {
   private readonly generator: PromptGenerator;
   private readonly evaluator: WritingEvaluator;
-  private readonly dlf: DlfIndex;
   private readonly now: () => Date;
   private readonly createId: () => string;
 
   // prettier-ignore
   constructor(deps: {
-    client: OpenAiClientLike; dlf?: DlfIndex; now?: () => Date; createId?: () => string;
+    client: OpenAiClientLike; now?: () => Date; createId?: () => string;
   }) {
-    this.dlf = deps.dlf ?? emptyDlfIndex();
     this.generator = new PromptGenerator(deps.client);
-    this.evaluator = new WritingEvaluator(deps.client, this.dlf);
+    this.evaluator = new WritingEvaluator(deps.client);
     this.now = deps.now ?? (() => new Date());
     this.createId = deps.createId ?? (() => crypto.randomUUID());
   }
@@ -149,7 +148,7 @@ export class PlacementService {
       }
       const prompt = await this.generator.generate(
         stepLevel(1),
-        DEFAULT_DIALECT,
+        await loadLearnerDialectContext(),
       );
       const open = await runByStatus(inProgress);
       // prettier-ignore
@@ -198,7 +197,8 @@ export class PlacementService {
         // prettier-ignore
         return fail("VALIDATION", "Le texte doit contenir entre 1 et 20 000 caractères.");
       }
-      await this.evaluateIfNeeded(current, text);
+      const learnerDialect = await loadLearnerDialectContext();
+      await this.evaluateIfNeeded(current, text, learnerDialect);
       if (run.step >= PLACEMENT_STEPS) {
         return { ok: true, view: await this.finish(run) };
       }
@@ -206,7 +206,7 @@ export class PlacementService {
       if ((await sessionFor(run.id, nextStep)) === null) {
         try {
           // prettier-ignore
-          await insertSession(run.id, nextStep, await this.generator.generate(stepLevel(nextStep), DEFAULT_DIALECT), this.now());
+          await insertSession(run.id, nextStep, await this.generator.generate(stepLevel(nextStep), learnerDialect), this.now());
         } catch (error) {
           if (!uniqueFailed(error)) throw error;
         }
@@ -223,7 +223,11 @@ export class PlacementService {
     });
   }
 
-  private async evaluateIfNeeded(row: SessionRow, text: string) {
+  private async evaluateIfNeeded(
+    row: SessionRow,
+    text: string,
+    learnerDialect: LearnerDialectContext,
+  ) {
     if (row.status === "evaluated" || row.evaluationJson) return;
     await rememberWriting(row.id, text, this.now().toISOString());
     const parsed = parseJson(PromptConstraints, row.promptConstraints);
@@ -231,17 +235,15 @@ export class PlacementService {
       parseCefrLevel(row.promptLevel) ?? stepLevel(row.placementStep ?? 1);
     const constraints = parsed.ok
       ? parsed.value
-      : { cefrLevel: fallback, dialect: DEFAULT_DIALECT };
+      : { cefrLevel: fallback, dialect: learnerDialect.dialect };
     const promptMeta = parseStoredPromptMeta(row.promptMetaJson);
-    const dialectNotes = await listActiveNotes();
     const evaluated = await this.evaluator.evaluate(
       text,
       promptMeta
         ? { text: row.promptText, meta: promptMeta, constraints }
         : { text: row.promptText, constraints },
-      DEFAULT_DIALECT,
+      learnerDialect,
       {
-        dialectNotes,
         sessionId: row.id,
         now: this.now,
         createId: this.createId,

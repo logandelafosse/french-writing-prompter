@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { PlacementGetResponse } from "@/contracts/placement";
-import { getDlfIndex } from "@/modules/dlf/load";
 import {
   PlacementService,
   type PlacementFailure,
@@ -11,7 +10,6 @@ import { withErrors } from "@/server/with-errors";
 export function placementService(request?: Request) {
   return new PlacementService({
     client: getAiClient(request ? scenarioFromRequest(request) : "happy"),
-    dlf: getDlfIndex(),
   });
 }
 

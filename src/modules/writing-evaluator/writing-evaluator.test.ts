@@ -15,7 +15,9 @@ import type { CefrLevel } from "@/contracts/cefr";
 import { MISTAKE_CATEGORY_IDS } from "@/contracts/mistake-category";
 import { EvaluatorOutputSchema } from "@/contracts/evaluation";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import type { LearnerDialectContext } from "@/modules/dialect/learner-dialect-context";
 import { renderForEvaluator } from "@/modules/dialect/render";
+import { emptyDlfIndex } from "@/modules/dlf/lookup";
 import { parseJson } from "@/lib/json";
 import okMixedKinds from "./__fixtures__/ok-mixed-kinds.json";
 
@@ -35,6 +37,12 @@ function makePrompt(cefr: CefrLevel): WritingPrompt {
   };
 }
 
+function dialectContext(
+  dlf: LearnerDialectContext["dlf"] = emptyDlfIndex(),
+): LearnerDialectContext {
+  return { dialect: DEFAULT_DIALECT, dlf };
+}
+
 function outputFixture() {
   const parsed = parseJson(EvaluatorOutputSchema, JSON.stringify(okMixedKinds));
   if (!parsed.ok) throw new Error(String(parsed.cause));
@@ -50,7 +58,7 @@ describe("WritingEvaluator", () => {
     const result = await evaluator.evaluate(
       "Ma ville est belle.",
       makePrompt("A2"),
-      DEFAULT_DIALECT,
+      dialectContext(),
     );
 
     expect(result.evaluation.dimensions).toHaveProperty("grammatical_accuracy");
@@ -67,7 +75,7 @@ describe("WritingEvaluator", () => {
     await evaluator.evaluate(
       "Test writing.",
       makePrompt("A2"),
-      DEFAULT_DIALECT,
+      dialectContext(),
     );
 
     const params = vi.mocked(mockClient.chatCompletionJSON).mock.calls[0]?.[1];
@@ -84,7 +92,7 @@ describe("WritingEvaluator", () => {
     await evaluator.evaluate(
       "Mon texte en français.",
       makePrompt("B1"),
-      DEFAULT_DIALECT,
+      dialectContext(),
     );
 
     const params = vi.mocked(mockClient.chatCompletionJSON).mock.calls[0]?.[1];
@@ -136,11 +144,11 @@ describe("WritingEvaluator", () => {
     const mockClient: OpenAiClientLike = {
       chatCompletionJSON: vi.fn().mockResolvedValue(outputFixture()),
     };
-    const evaluator = new WritingEvaluator(mockClient, index);
+    const evaluator = new WritingEvaluator(mockClient);
     await evaluator.evaluate(
       "Asteur on va au bayou.",
       makePrompt("B1"),
-      DEFAULT_DIALECT,
+      dialectContext(index),
     );
     const params = vi.mocked(mockClient.chatCompletionJSON).mock.calls[0]?.[1];
     const systemMsg = params?.messages.find((m) => m.role === "system");

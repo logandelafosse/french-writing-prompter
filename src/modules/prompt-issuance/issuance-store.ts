@@ -12,7 +12,7 @@ import { localDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { getCurrentLevel } from "@/modules/cefr-tracker/level-store";
-import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { loadLearnerDialectContext } from "@/modules/dialect/learner-dialect-context";
 import { elicitFocus } from "@/modules/dialect/taxonomy";
 import {
   PromptGenerator,
@@ -136,7 +136,7 @@ async function issueLocked(
     const live = await currentFocus();
     const prompt = await new PromptGenerator(deps.client).generate(
       level,
-      DEFAULT_DIALECT,
+      await loadLearnerDialectContext(),
       {
         focus: elicitFocus(live.focusIds),
         recentTopics: await recentTopics(),
