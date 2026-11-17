@@ -7,6 +7,7 @@ export async function resetE2eDatabase(): Promise<void> {
   const client = createClient({ url: databaseUrl });
   try {
     await client.execute("DELETE FROM dialect_notes");
+    await client.execute("DELETE FROM practice_requests");
     await client.execute("DELETE FROM sessions");
     await client.execute("DELETE FROM level_changes");
   } finally {

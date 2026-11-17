@@ -9,6 +9,8 @@ export const reviewCopy = {
   mobileListLabel: "Corrections",
   none: "Aucune correction",
   kindMistake: "Faute",
+  tagFocus: "focus du jour",
+  carnetCta: (shortName: string) => `« ${shortName} » dans le Carnet →`,
   kindStandard: "Français standard",
   kindDialect: "Ça se dit comme ça ?",
   arrow: "→",

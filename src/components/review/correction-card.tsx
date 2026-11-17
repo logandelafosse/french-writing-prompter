@@ -152,6 +152,11 @@ export function CorrectionCard({
           {correction.ordinal}
         </span>
         <span className="uppercase">{reviewCopy.kindMistake}</span>
+        {correction.isFocus ? (
+          <span className="text-primary font-medium tracking-normal">
+            {reviewCopy.tagFocus}
+          </span>
+        ) : null}
       </div>
       <p
         lang="fr"

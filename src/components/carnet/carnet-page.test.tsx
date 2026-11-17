@@ -28,6 +28,8 @@ const genreWeakness: Weakness = {
   count: 2,
   lastSeenAt: "2026-11-14T16:00:00-06:00",
   trend: "actif",
+  isFocus: false,
+  pinned: false,
 };
 
 const accentsQuiet: Weakness = {
@@ -36,6 +38,18 @@ const accentsQuiet: Weakness = {
   count: 1,
   lastSeenAt: "2026-11-06T16:00:00-06:00",
   trend: "tranquille",
+  isFocus: false,
+  pinned: false,
+};
+
+const autreWeakness: Weakness = {
+  category: "autre",
+  label: "Autre",
+  count: 1,
+  lastSeenAt: "2026-11-14T16:00:00-06:00",
+  trend: "actif",
+  isFocus: false,
+  pinned: false,
 };
 
 function jsonResponse(body: unknown, status = 200): Response {
@@ -204,5 +218,115 @@ describe("CarnetPage", () => {
     expect(screen.getByText(/vu le 6 novembre · tranquille/)).toHaveClass(
       "text-muted",
     );
+  });
+
+  it("Pratiquer ça pins the row and clears a practice error on retry", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.mocked(globalThis.fetch);
+    let pinned = false;
+    let failOnce = true;
+    fetchMock.mockImplementation((input, init) => {
+      const url = fetchUrl(input);
+      if (url.includes("/practice")) {
+        if (failOnce) {
+          failOnce = false;
+          return Promise.resolve(new Response("fail", { status: 500 }));
+        }
+        pinned = (init?.method ?? "POST") !== "DELETE";
+        return Promise.resolve(jsonResponse({ pinned }));
+      }
+      if (url.includes("/api/weaknesses")) {
+        return Promise.resolve(
+          jsonResponse({
+            weaknesses: [{ ...genreWeakness, pinned, isFocus: false }],
+            focus: [],
+          }),
+        );
+      }
+      return Promise.resolve(jsonResponse({ notes: [] }));
+    });
+    render(<CarnetPage now={now} />);
+    const practice = await screen.findByRole("button", {
+      name: carnetCopy.weakPractice,
+    });
+    expect(practice).toHaveAttribute("aria-pressed", "false");
+    await user.click(practice);
+    expect(
+      await screen.findByText("Une erreur s'est produite. Réessaie."),
+    ).toBeVisible();
+    await user.click(
+      screen.getByRole("button", { name: carnetCopy.weakPractice }),
+    );
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Une erreur s'est produite. Réessaie."),
+      ).not.toBeInTheDocument();
+    });
+    expect(
+      screen.getByRole("button", { name: carnetCopy.weakPractice }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      within(screen.getByRole("article")).getByText("prochaine consigne"),
+    ).toBeVisible();
+  });
+
+  it("shows focus du jour on a Focus Weakness", async () => {
+    mockCarnet([], [{ ...genreWeakness, isFocus: true }]);
+    render(<CarnetPage now={now} />);
+    await screen.findByRole("heading", { name: "Genre des noms" });
+    expect(screen.getByText(carnetCopy.weakMetaFocus)).toBeVisible();
+  });
+
+  it("does not show Pratiquer ça on Autre", async () => {
+    mockCarnet([], [genreWeakness, autreWeakness]);
+    render(<CarnetPage now={now} />);
+    expect(await screen.findByRole("heading", { name: "Autre" })).toBeVisible();
+    expect(
+      screen.getAllByRole("button", { name: carnetCopy.weakPractice }),
+    ).toHaveLength(1);
+  });
+
+  it("disables every Pratiquer ça button while a pin is saving", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.mocked(globalThis.fetch);
+    let releaseHeld = (): void => undefined;
+    const held = new Promise<void>((resolve) => {
+      releaseHeld = () => {
+        resolve();
+      };
+    });
+    fetchMock.mockImplementation(async (input) => {
+      const url = fetchUrl(input);
+      if (url.includes("/practice")) {
+        await held;
+        return jsonResponse({ pinned: true });
+      }
+      if (url.includes("/api/weaknesses")) {
+        return jsonResponse({
+          weaknesses: [genreWeakness, accentsQuiet],
+          focus: [],
+        });
+      }
+      return jsonResponse({ notes: [] });
+    });
+    render(<CarnetPage now={now} />);
+    const buttons = await screen.findAllByRole("button", {
+      name: carnetCopy.weakPractice,
+    });
+    const first = buttons[0];
+    const second = buttons[1];
+    expect(buttons).toHaveLength(2);
+    if (first === undefined || second === undefined) return;
+    await user.click(first);
+    await waitFor(() => {
+      expect(first).toBeDisabled();
+      expect(second).toBeDisabled();
+    });
+    releaseHeld();
+    await waitFor(() => {
+      expect(
+        screen.getAllByRole("button", { name: carnetCopy.weakPractice })[0],
+      ).toBeEnabled();
+    });
   });
 });

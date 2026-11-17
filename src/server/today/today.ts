@@ -22,15 +22,30 @@ import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
 import { toFocusItems } from "@/modules/dialect/taxonomy";
 import { computeFocus } from "@/modules/weakness-service/compute-focus";
+import { getPendingPin } from "@/modules/weakness-service/practice-store";
 import { listRankedWeaknesses } from "@/modules/weakness-service/weakness-store";
 import { and, desc, eq } from "drizzle-orm";
+import type { MistakeCategory } from "@/contracts/mistake-category";
+import type { FocusItem } from "@/contracts/focus";
 
-async function resolveFocus(focusJson: string | null | undefined) {
+export async function resolveLearnerFocus(
+  focusJson?: string | null,
+): Promise<{ focus: FocusItem[]; pin: MistakeCategory | null }> {
+  const pin = await getPendingPin();
   if (focusJson !== undefined) {
     const snapshot = parseStoredFocus(focusJson);
-    if (snapshot !== null) return toFocusItems(snapshot);
+    if (snapshot !== null) return { focus: toFocusItems(snapshot), pin };
   }
-  return toFocusItems(computeFocus(await listRankedWeaknesses(), null));
+  return {
+    focus: toFocusItems(computeFocus(await listRankedWeaknesses(), pin)),
+    pin,
+  };
+}
+
+export async function learnerFocusNow() {
+  const active = await getTodayActiveSession();
+  const review = active === null ? await getTodayReviewSession() : null;
+  return resolveLearnerFocus(active?.focusJson ?? review?.focusJson);
 }
 
 async function getTodayActiveSession(): Promise<{
@@ -113,12 +128,16 @@ export async function buildTodayResponse(): Promise<TodayGetDto> {
   ]);
 
   const review = active === null ? await getTodayReviewSession() : null;
+  const { focus, pin } = await resolveLearnerFocus(
+    active?.focusJson ?? review?.focusJson,
+  );
 
   return {
     level,
     levelName: level ? CEFR_UI_LABELS[level] : null,
     quota,
-    focus: await resolveFocus(active?.focusJson ?? review?.focusJson),
+    focus,
+    pin,
     activeSession: active?.session ?? null,
     reviewSession: review?.session ?? null,
     advancement,

@@ -69,6 +69,14 @@ export const corrections = sqliteTable(
   ],
 );
 
+export const practiceRequests = sqliteTable("practice_requests", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  category: text("category").notNull(),
+  createdAt: text("created_at").notNull(),
+  consumedSessionId: integer("consumed_session_id"),
+  cancelledAt: text("cancelled_at"),
+});
+
 export const dialectNotes = sqliteTable("dialect_notes", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   rule: text("rule").notNull(),

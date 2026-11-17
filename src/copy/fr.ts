@@ -51,5 +51,7 @@ export const homeCopy = {
   focusLabel: "Focus du jour",
   focusReasonAuto:
     "C'est ce qui est revenu le plus dans tes dernières évaluations. La consigne va t'y faire travailler.",
+  focusReasonPinned:
+    "Tu l'as choisi dans le Carnet. La consigne va t'y faire travailler.",
   focusChange: "Changer de focus dans le Carnet",
 } as const;

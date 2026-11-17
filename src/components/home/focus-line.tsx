@@ -11,9 +11,11 @@ export function FocusLine({
   focus,
   variant,
   generate,
+  source = "auto",
 }: {
   focus: readonly FocusItem[];
   variant: FocusLineVariant;
+  source?: "auto" | "practice";
   generate?: {
     onGenerate: () => void;
     generating: boolean;
@@ -21,6 +23,10 @@ export function FocusLine({
   };
 }) {
   if (focus.length === 0) return null;
+  const reason =
+    source === "practice"
+      ? homeCopy.focusReasonPinned
+      : homeCopy.focusReasonAuto;
   const joined = focus.map((item) => item.inlineName).join(" · ");
   const label = (
     <SectionLabel tone="primary">{homeCopy.focusLabel}</SectionLabel>
@@ -43,9 +49,7 @@ export function FocusLine({
             {item.name}
           </p>
         ))}
-        <p className="text-muted m-0 text-sm/[1.45]">
-          {homeCopy.focusReasonAuto}
-        </p>
+        <p className="text-muted m-0 text-sm/[1.45]">{reason}</p>
         {generate ? (
           <div className="mt-auto flex flex-col gap-1.5">
             <GenerateButton

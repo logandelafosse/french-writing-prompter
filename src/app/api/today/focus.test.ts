@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { corrections, levelChanges, sessions } from "@/db/schema";
+import {
+  corrections,
+  levelChanges,
+  practiceRequests,
+  sessions,
+} from "@/db/schema";
 import { Correction } from "@/contracts/correction";
 import { FocusItem } from "@/contracts/focus";
 import { TodayGetResponse } from "@/contracts/today";
@@ -83,6 +88,7 @@ async function seedEvaluated(
 describe("Focus on today, weaknesses, and prompt snapshot", () => {
   beforeEach(async () => {
     vi.setSystemTime(new Date("2026-11-14T12:00:00-06:00"));
+    await db.delete(practiceRequests).execute();
     await db.delete(corrections).execute();
     await db.delete(sessions).execute();
     await db.delete(levelChanges).execute();

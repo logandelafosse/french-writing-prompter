@@ -12,6 +12,9 @@ export const carnetCopy = {
   weakEmpty:
     "Rien à travailler pour l'instant. Les fautes qui reviennent vont apparaître icitte.",
   weakToday: "aujourd'hui",
+  weakPractice: "Pratiquer ça",
+  weakMetaPinned: "prochaine consigne",
+  weakMetaFocus: "focus du jour",
   trendEnProgres: "en progrès",
   notesTitle: "Mon français louisianais",
   notesIntro:

@@ -6,9 +6,11 @@ import {
   DialectNoteCreateResponse,
   DialectNoteListResponse,
   DialectNotePatchResponse,
+  PracticePinResponse,
   WeaknessesGetResponse,
 } from "@/contracts/api";
 import type { DialectNote } from "@/contracts/dialect-note";
+import type { MistakeCategory } from "@/contracts/mistake-category";
 import type { Weakness } from "@/contracts/weakness";
 import {
   carnetCopy,
@@ -36,6 +38,9 @@ const emptyDraft = { lemma: "", example: "", pattern: null, rule: "", scope: "wo
 
 export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
   const [loadUi, setLoadUi] = useState<LoadUi>({ status: "loading" });
+  const [practiceUi, setPracticeUi] = useState<
+    { status: "idle" } | { status: "saving" } | { status: "error" }
+  >({ status: "idle" });
   const [sheet, setSheet] = useState<SheetUi>({ status: "closed" });
   const [confirmingId, setConfirmingId] = useState<number | null>(null);
   const addRef = useRef<HTMLButtonElement>(null);
@@ -74,6 +79,21 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
     return null;
   };
 
+  const pinCategory = async (category: MistakeCategory, pinned: boolean) => {
+    setPracticeUi({ status: "saving" });
+    const result = await fetchJson(
+      `/api/weaknesses/${category}/practice`,
+      PracticePinResponse,
+      { method: pinned ? "DELETE" : "POST" },
+    );
+    if (!result.ok) {
+      setPracticeUi({ status: "error" });
+      return;
+    }
+    setPracticeUi({ status: "idle" });
+    await load();
+  };
+
   const notes = loadUi.status === "ready" ? loadUi.notes : [];
   const weaknesses = loadUi.status === "ready" ? loadUi.weaknesses : [];
   const editNote = sheet.status === "edit" ? sheet.note : null;
@@ -86,7 +106,15 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
   return (
     <main className="max-w-list mx-auto flex w-full flex-col gap-7 px-6 py-5 pb-20">
       <PageTitle>{carnetCopy.title}</PageTitle>
-      {loadUi.status === "error" ? <ErrorAlert lead={homeCopy.loadError} onRetry={() => void load()} /> : null}
+      {loadUi.status === "error" || practiceUi.status === "error" ? (
+        <ErrorAlert
+          lead={homeCopy.loadError}
+          onRetry={() => {
+            setPracticeUi({ status: "idle" });
+            void load();
+          }}
+        />
+      ) : null}
       <Surface padding="list" className="flex flex-col max-sm:p-[22px_18px]">
         <div className="flex flex-col gap-1 pb-4">
           <h2 className="text-section-title m-0">{carnetCopy.weakTitle}</h2>
@@ -97,7 +125,13 @@ export function CarnetPage({ now = () => new Date() }: { now?: () => Date }) {
             <p className="border-line text-muted m-0 border-t py-4 text-[15px]">{carnetCopy.weakEmpty}</p>
           ) : null}
           {weaknesses.map((weakness) => (
-            <CarnetWeaknessRow key={weakness.category} weakness={weakness} now={now} />
+            <CarnetWeaknessRow
+              key={weakness.category}
+              weakness={weakness}
+              now={now}
+              practiceDisabled={practiceUi.status === "saving"}
+              onPractice={pinCategory}
+            />
           ))}
         </div>
       </Surface>
@@ -224,18 +258,51 @@ function DialectNoteRow({
 function CarnetWeaknessRow({
   weakness,
   now,
+  practiceDisabled,
+  onPractice,
 }: {
   weakness: Weakness;
   now: () => Date;
+  practiceDisabled: boolean;
+  onPractice: (
+    category: MistakeCategory,
+    pinned: boolean,
+  ) => void | Promise<void>;
 }) {
   const quiet = weakness.trend === "tranquille";
+  const extra = weakness.pinned
+    ? carnetCopy.weakMetaPinned
+    : weakness.isFocus
+      ? carnetCopy.weakMetaFocus
+      : null;
+  const showPractice = weakness.category !== "autre";
   // prettier-ignore
   return (
     <article id={`weakness-${weakness.category}`} className="border-line flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t py-4">
       <div className="flex min-w-0 flex-1 basis-[380px] flex-col gap-1">
         <h3 lang="fr" className={`m-0 font-serif text-[22px] font-medium ${quiet ? "text-ink-2" : ""}`}>{weakness.label}</h3>
-        <p lang="fr" className={`m-0 text-[15px] ${quiet ? "text-muted" : "text-ink-2"}`}>{formatWeaknessMeta(weakness, now)}</p>
+        <p lang="fr" className={`m-0 text-[15px] ${quiet ? "text-muted" : "text-ink-2"}`}>
+          {formatWeaknessMeta(weakness, now)}
+          {extra ? (
+            <>
+              {" · "}
+              <span className={weakness.isFocus && !weakness.pinned ? "text-primary font-semibold" : undefined}>{extra}</span>
+            </>
+          ) : null}
+        </p>
       </div>
+      {showPractice ? (
+        <Button
+          variant={quiet ? "secondary" : "outline-primary"}
+          aria-pressed={weakness.pinned}
+          disabled={practiceDisabled}
+          onClick={() => {
+            void onPractice(weakness.category, weakness.pinned);
+          }}
+        >
+          {carnetCopy.weakPractice}
+        </Button>
+      ) : null}
     </article>
   );
 }

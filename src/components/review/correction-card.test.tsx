@@ -231,6 +231,22 @@ describe("CorrectionCard dialect_check", () => {
 });
 
 describe("CorrectionCard mistake pushback", () => {
+  it("tags a Focus Mistake with focus du jour", () => {
+    render(
+      <CorrectionCard
+        correction={mistake({
+          id: "m1",
+          ordinal: 2,
+          quote: "Les enfant",
+          suggestion: "Les enfants",
+          isFocus: true,
+        })}
+        onAcknowledge={() => undefined}
+      />,
+    );
+    expect(screen.getByText(reviewCopy.tagFocus)).toBeVisible();
+  });
+
   it("open mistake cards offer C'est du français louisianais", () => {
     render(
       <CorrectionCard

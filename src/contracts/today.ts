@@ -5,6 +5,7 @@ import { Correction } from "./correction";
 import { EvaluationV2 } from "./evaluation";
 import { PromptMeta } from "./prompt-meta";
 import { FocusItem } from "./focus";
+import { MistakeCategory } from "./mistake-category";
 import { SavedDraft } from "./session";
 
 export const TodayActiveSession = z.object({
@@ -32,6 +33,7 @@ export const TodayGetResponse = z.strictObject({
   levelName: z.string().nullable(),
   quota: QuotaGetResponse,
   focus: z.array(FocusItem),
+  pin: MistakeCategory.nullable(),
   activeSession: TodayActiveSession.nullable(),
   reviewSession: TodayReviewSession.nullable(),
   advancement: LevelChangeDto.nullable(),

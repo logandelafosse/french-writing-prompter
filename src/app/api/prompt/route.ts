@@ -14,6 +14,10 @@ import { sessions } from "@/db/schema";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { elicitFocus } from "@/modules/dialect/taxonomy";
 import { computeFocus } from "@/modules/weakness-service/compute-focus";
+import {
+  consumePendingPin,
+  getPendingPractice,
+} from "@/modules/weakness-service/practice-store";
 import { listRankedWeaknesses } from "@/modules/weakness-service/weakness-store";
 import { localDateKey, todayLocalDateKey } from "@/lib/dates";
 import { countWords } from "@/lib/count-words";
@@ -124,7 +128,8 @@ export const POST = withErrors(async function postPrompt(request: Request) {
       );
 
       const ranked = await listRankedWeaknesses();
-      const focusIds = computeFocus(ranked, null);
+      const pin = await getPendingPractice();
+      const focusIds = computeFocus(ranked, pin?.category ?? null);
       const prompt = await promptGenerator.generate(level, DEFAULT_DIALECT, {
         focus: elicitFocus(focusIds),
         recentTopics: await recentTopics(),
@@ -163,6 +168,7 @@ export const POST = withErrors(async function postPrompt(request: Request) {
         focusJson: JSON.stringify(focusIds),
       });
       const sessionId = Number(inserted.lastInsertRowid);
+      if (pin !== null) await consumePendingPin(pin.id, sessionId);
       await db.run(sql`commit`);
       transaction.open = false;
       const quota = await getQuotaState();
