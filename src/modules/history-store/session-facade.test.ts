@@ -130,24 +130,26 @@ describe("sessionFacade", () => {
 
     const review = await loadSessionForReview(session.id, now);
 
-    expect(review).toMatchObject({
-      id: session.id,
-      writingText: "Les enfant jouent.",
-      evaluation: {
-        overallCefr: "B1",
-        nextLevelTip: "Varie les connecteurs.",
-        dimensions: {
-          grammatical_accuracy: { score: 4, comment: "Accords à revoir." },
-        },
+    expect(review?.id).toBe(session.id);
+    expect(review?.writingText).toBe("Les enfant jouent.");
+    expect(review?.evaluation).toEqual({
+      overallCefr: "B1",
+      nextLevelTip: "Varie les connecteurs.",
+      dimensions: {
+        grammatical_accuracy: { score: 4, comment: "Accords à revoir." },
+        vocabulary: { score: 3, comment: "Lexique simple." },
+        coherence: { score: 4, comment: "Suite claire." },
+        register_style: { score: 3, comment: "Registre tenu." },
       },
-      corrections: [
-        {
-          kind: "mistake",
-          quote: "Les enfant",
-          suggestion: "Les enfants",
-          explanation: "Accord.",
-        },
-      ],
+    });
+    expect(review?.corrections).toHaveLength(1);
+    expect(review?.corrections[0]).toMatchObject({
+      kind: "mistake",
+      quote: "Les enfant",
+      span: { start: 0, end: 11 },
+      suggestion: "Les enfants",
+      explanation: "Accord.",
+      status: "open",
     });
   });
 });
