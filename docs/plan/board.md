@@ -4,20 +4,21 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-17 by coordinator (deepenings planned D01–D05; hosting still HITL).
+Last updated: 2026-11-17 by coordinator (D02 In progress on `ticket/d02-evaluate-pipeline-facade`).
 
 ## Ready
 
-| ID  | Ticket                   | Why                                                                               |
-| --- | ------------------------ | --------------------------------------------------------------------------------- |
-| D02 | Evaluate pipeline façade | No blockers; highest Leverage on the fat evaluate route. Spec `tickets/D02-*.md`. |
-| D03 | Weakness / Focus façade  | No blockers; unblocks cleaner D01. Spec `tickets/D03-*.md`.                       |
+| ID  | Ticket                  | Why                                                         |
+| --- | ----------------------- | ----------------------------------------------------------- |
+| D03 | Weakness / Focus façade | No blockers; unblocks cleaner D01. Spec `tickets/D03-*.md`. |
 
 _Also planned (Backlog until deps clear): D01 (after D03), D04 (after D02), D05 (after D01 helpful). Hosting T36–T39 waits on `docs/plan/vercel-deployment.md` HITL. Plan: `docs/plan/deepenings.md`._
 
 ## In progress
 
-_None._
+| ID  | Ticket                   | Why                                                                                                      |
+| --- | ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| D02 | Evaluate pipeline façade | Implementer, branch `ticket/d02-evaluate-pipeline-facade`, started 2026-11-17. Spec `tickets/D02-*.md`. |
 
 ## In review
 
@@ -97,7 +98,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 | ID  | Ticket                   | Type | Blocked by    | Why not ready                                                          |
 | --- | ------------------------ | ---- | ------------- | ---------------------------------------------------------------------- |
-| D02 | Evaluate pipeline façade | AFK  | —             | **Ready** — on Ready column.                                           |
+| D02 | Evaluate pipeline façade | AFK  | —             | **In progress** — `ticket/d02-evaluate-pipeline-facade`, started 2026-11-17. |
 | D03 | Weakness / Focus façade  | AFK  | —             | **Ready** — on Ready column.                                           |
 | D01 | Prompt issuance module   | AFK  | D03 preferred | Wait until Focus façade lands (or wire temporary). `tickets/D01-*.md`. |
 | D04 | Learner-dialect context  | AFK  | D02 preferred | After evaluate owns post-process. `tickets/D04-*.md`.                  |
