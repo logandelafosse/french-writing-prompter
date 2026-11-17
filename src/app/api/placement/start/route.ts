@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { PlacementStartResponse } from "@/contracts/placement";
 import { withErrors } from "@/server/with-errors";
-import { placementErrorResponse, placementService } from "../helpers";
+import { placementErrorResponse, placementService } from "../route";
 
 export const POST = withErrors(async function postPlacementStart(
   request: Request,

@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { DRAFT_TEXT_MAX, PLACEMENT_STEPS } from "@/config/limits";
 import { parseCefrLevel } from "@/contracts/cefr";
 import { parseStoredEvaluation } from "@/contracts/evaluation";
@@ -40,37 +40,59 @@ type RunRow = typeof placementRuns.$inferSelect;
 type SessionRow = typeof sessions.$inferSelect;
 const inProgress = PlacementRunStatus.enum.in_progress;
 const complete = PlacementRunStatus.enum.complete;
-const fail = (
-  code: PlacementFailure["code"],
-  message: string,
-): PlacementFailure => ({ ok: false, code, message });
+// prettier-ignore
+const fail = (code: PlacementFailure["code"], message: string): PlacementFailure =>
+  ({ ok: false, code, message });
+const uniqueFailed = (error: unknown): boolean =>
+  error instanceof Error &&
+  (error.message.includes("UNIQUE constraint failed") ||
+    uniqueFailed(error.cause));
 
-async function firstRow<T>(rows: Promise<T[]>) {
-  return (await rows)[0] ?? null;
+let placementWrites = Promise.resolve();
+function withPlacementLock<T>(fn: () => Promise<T>): Promise<T> {
+  const run = placementWrites.then(fn, fn);
+  // prettier-ignore
+  placementWrites = run.then(() => undefined, () => undefined);
+  return run;
 }
 
 // prettier-ignore
 async function runById(id: number) {
-  return firstRow(db.select().from(placementRuns).where(eq(placementRuns.id, id)).limit(1));
+  return (await db.select().from(placementRuns).where(eq(placementRuns.id, id)).limit(1))[0] ?? null;
 }
 
 // prettier-ignore
 async function runByStatus(status: string) {
-  return firstRow(db.select().from(placementRuns).where(eq(placementRuns.status, status)).orderBy(desc(placementRuns.id)).limit(1));
+  return (await db.select().from(placementRuns).where(eq(placementRuns.status, status)).orderBy(desc(placementRuns.id)).limit(1))[0] ?? null;
 }
 
 // prettier-ignore
 async function sessionFor(runId: number, step: number) {
-  return firstRow(db.select().from(sessions).where(and(eq(sessions.placementRunId, runId), eq(sessions.placementStep, step))).limit(1));
+  return (await db.select().from(sessions).where(and(eq(sessions.placementRunId, runId), eq(sessions.placementStep, step))).limit(1))[0] ?? null;
 }
 
 export async function abandonInProgressPlacementRuns(
   now: () => Date = () => new Date(),
 ) {
-  // prettier-ignore
-  await db.update(placementRuns).set({
-    status: PlacementRunStatus.enum.abandoned, completedAt: now().toISOString(),
-  }).where(eq(placementRuns.status, inProgress));
+  return withPlacementLock(async () => {
+    const at = now().toISOString();
+    const ids = (
+      await db
+        .select({ id: placementRuns.id })
+        .from(placementRuns)
+        .where(eq(placementRuns.status, inProgress))
+    ).map((row) => row.id);
+    if (ids.length > 0) {
+      // prettier-ignore
+      await db.update(sessions).set({ status: "abandoned", abandonedAt: at }).where(
+        and(inArray(sessions.placementRunId, ids), eq(sessions.status, "active")),
+      );
+    }
+    // prettier-ignore
+    await db.update(placementRuns).set({
+      status: PlacementRunStatus.enum.abandoned, completedAt: at,
+    }).where(eq(placementRuns.status, inProgress));
+  });
 }
 
 async function insertSession(
@@ -119,63 +141,87 @@ export class PlacementService {
   async start(): Promise<
     PlacementFailure | { ok: true; created: boolean; view: PlacementRunView }
   > {
-    const existing = await runByStatus(inProgress);
-    if (existing) {
-      return { ok: true, created: false, view: await this.toView(existing) };
-    }
-    if ((await getCurrentLevel()) !== null) {
-      return fail("CONFLICT", "Un niveau CECR est déjà défini.");
-    }
-    const prompt = await this.generator.generate(stepLevel(1), DEFAULT_DIALECT);
-    // prettier-ignore
-    const inserted = await db.insert(placementRuns).values({
-      status: inProgress, step: 1, finalLevel: null,
-      startedAt: this.now().toISOString(), completedAt: null,
+    return withPlacementLock(async () => {
+      const existing = await runByStatus(inProgress);
+      // prettier-ignore
+      if (existing) return { ok: true, created: false, view: await this.toView(existing) };
+      if ((await getCurrentLevel()) !== null) {
+        return fail("CONFLICT", "Un niveau CECR est déjà défini.");
+      }
+      const prompt = await this.generator.generate(
+        stepLevel(1),
+        DEFAULT_DIALECT,
+      );
+      const open = await runByStatus(inProgress);
+      // prettier-ignore
+      if (open) return { ok: true, created: false, view: await this.toView(open) };
+      try {
+        // prettier-ignore
+        const inserted = await db.insert(placementRuns).values({
+          status: inProgress, step: 1, finalLevel: null,
+          startedAt: this.now().toISOString(), completedAt: null,
+        });
+        const runId = Number(inserted.lastInsertRowid);
+        await insertSession(runId, 1, prompt, this.now());
+        const created = await runById(runId);
+        if (created === null) {
+          throw new Error("placement run missing after insert");
+        }
+        return { ok: true, created: true, view: await this.toView(created) };
+      } catch (error) {
+        if (!uniqueFailed(error)) throw error;
+        const again = await runByStatus(inProgress);
+        if (again === null) throw error;
+        return { ok: true, created: false, view: await this.toView(again) };
+      }
     });
-    const runId = Number(inserted.lastInsertRowid);
-    await insertSession(runId, 1, prompt, this.now());
-    const created = await runById(runId);
-    if (created === null) throw new Error("placement run missing after insert");
-    return { ok: true, created: true, view: await this.toView(created) };
   }
 
   async submit(
     runId: number,
     input: { sessionId: number; text: string },
   ): Promise<PlacementFailure | { ok: true; view: PlacementRunView }> {
-    const run = await runById(runId);
-    if (run === null) {
-      return fail("NOT_FOUND", "Test de placement introuvable.");
-    }
-    if (run.status !== inProgress) {
-      return fail("CONFLICT", "Ce test de placement n'est plus en cours.");
-    }
-    const current = await sessionFor(run.id, run.step);
-    if (current === null || current.id !== input.sessionId) {
+    return withPlacementLock(async () => {
+      const run = await runById(runId);
+      if (run === null) {
+        return fail("NOT_FOUND", "Test de placement introuvable.");
+      }
+      if (run.status !== inProgress) {
+        return fail("CONFLICT", "Ce test de placement n'est plus en cours.");
+      }
+      const current = await sessionFor(run.id, run.step);
+      if (current === null || current.id !== input.sessionId) {
+        // prettier-ignore
+        return fail("CONFLICT", "Cette séance n'est pas l'étape en cours du test de placement.");
+      }
+      const text = input.text.replace(/\r\n/g, "\n").trim();
+      if (text.length === 0 || text.length > DRAFT_TEXT_MAX) {
+        // prettier-ignore
+        return fail("VALIDATION", "Le texte doit contenir entre 1 et 20 000 caractères.");
+      }
+      await this.evaluateIfNeeded(current, text);
+      if (run.step >= PLACEMENT_STEPS) {
+        return { ok: true, view: await this.finish(run) };
+      }
+      const nextStep = run.step + 1;
+      if ((await sessionFor(run.id, nextStep)) === null) {
+        try {
+          // prettier-ignore
+          await insertSession(run.id, nextStep, await this.generator.generate(stepLevel(nextStep), DEFAULT_DIALECT), this.now());
+        } catch (error) {
+          if (!uniqueFailed(error)) throw error;
+        }
+      }
       // prettier-ignore
-      return fail("CONFLICT", "Cette séance n'est pas l'étape en cours du test de placement.");
-    }
-    const text = input.text.replace(/\r\n/g, "\n").trim();
-    if (text.length === 0 || text.length > DRAFT_TEXT_MAX) {
-      // prettier-ignore
-      return fail("VALIDATION", "Le texte doit contenir entre 1 et 20 000 caractères.");
-    }
-    await this.evaluateIfNeeded(current, text);
-    if (run.step >= PLACEMENT_STEPS) {
-      return { ok: true, view: await this.finish(run) };
-    }
-    const nextStep = run.step + 1;
-    if ((await sessionFor(run.id, nextStep)) === null) {
-      // prettier-ignore
-      await insertSession(run.id, nextStep, await this.generator.generate(stepLevel(nextStep), DEFAULT_DIALECT), this.now());
-    }
-    // prettier-ignore
-    await db.update(placementRuns).set({ step: nextStep }).where(eq(placementRuns.id, run.id));
-    const updated = await runById(run.id);
-    if (updated === null) {
-      throw new Error(`placement run ${run.id} missing after step advance`);
-    }
-    return { ok: true, view: await this.toView(updated) };
+      await db.update(placementRuns).set({ step: nextStep }).where(
+      and(eq(placementRuns.id, run.id), eq(placementRuns.step, run.step), eq(placementRuns.status, inProgress)),
+    );
+      const updated = await runById(run.id);
+      if (updated === null) {
+        throw new Error(`placement run ${run.id} missing after step advance`);
+      }
+      return { ok: true, view: await this.toView(updated) };
+    });
   }
 
   private async evaluateIfNeeded(row: SessionRow, text: string) {
@@ -213,12 +259,12 @@ export class PlacementService {
 
   private async finish(run: RunRow) {
     const results = await this.resultsFor(run);
-    await setLevel(results.finalLevel, "placement");
     // prettier-ignore
-    await db.update(placementRuns).set({
+    const cas = await db.update(placementRuns).set({
       status: complete, finalLevel: results.finalLevel,
       completedAt: this.now().toISOString(),
-    }).where(eq(placementRuns.id, run.id));
+    }).where(and(eq(placementRuns.id, run.id), eq(placementRuns.status, inProgress)));
+    if (cas.rowsAffected > 0) await setLevel(results.finalLevel, "placement");
     const completed = await runById(run.id);
     if (completed === null) {
       throw new Error(`placement run ${run.id} missing after complete`);

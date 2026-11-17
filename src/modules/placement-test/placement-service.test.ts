@@ -240,6 +240,94 @@ describe("placement service › retry after generation failure does not re-evalu
   });
 });
 
+describe("placement service › concurrent start creates one in_progress run", () => {
+  beforeEach(async () => {
+    vi.stubEnv("AI_CLIENT", "fake");
+    clearEnvCache();
+    await resetDb();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    clearEnvCache();
+  });
+
+  it("inserts a single run and step-1 session when two starts overlap", async () => {
+    const [first, second] = await Promise.all([
+      service().start(),
+      service().start(),
+    ]);
+    expect(first.ok && second.ok).toBe(true);
+    if (!first.ok || !second.ok) return;
+    expect(first.view.id).toBe(second.view.id);
+
+    const runRows = await db.select().from(placementRuns);
+    expect(runRows).toHaveLength(1);
+    expect(runRows[0]?.status).toBe("in_progress");
+    expect(await db.select().from(sessions)).toHaveLength(1);
+  });
+});
+
+describe("placement service › concurrent submit advances a step once", () => {
+  beforeEach(async () => {
+    vi.stubEnv("AI_CLIENT", "fake");
+    clearEnvCache();
+    await resetDb();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    clearEnvCache();
+  });
+
+  it("keeps one session per step when the same step is submitted twice", async () => {
+    const started = await service().start();
+    if (!started.ok) throw new Error("expected start");
+    const input = {
+      sessionId: started.view.session.id,
+      text: WRITING,
+    };
+    const [first, second] = await Promise.all([
+      service().submit(started.view.id, input),
+      service().submit(started.view.id, input),
+    ]);
+    expect([first, second].some((result) => result.ok)).toBe(true);
+
+    const runRows = await db.select().from(placementRuns);
+    expect(runRows).toHaveLength(1);
+    expect(runRows[0]?.step).toBe(2);
+    expect(await db.select().from(sessions)).toHaveLength(2);
+  });
+
+  it("records one placement level change when step 3 is submitted twice", async () => {
+    const started = await service().start();
+    if (!started.ok) throw new Error("expected start");
+    let view = started.view;
+    for (let step = 0; step < 2; step += 1) {
+      const submitted = await service().submit(view.id, {
+        sessionId: view.session.id,
+        text: WRITING,
+      });
+      if (!submitted.ok) throw new Error("expected submit");
+      view = submitted.view;
+    }
+    const input = { sessionId: view.session.id, text: WRITING };
+    const [first, second] = await Promise.all([
+      service().submit(view.id, input),
+      service().submit(view.id, input),
+    ]);
+    expect(
+      [first, second].some(
+        (result) => result.ok && result.view.status === "complete",
+      ),
+    ).toBe(true);
+
+    const changes = await db.select().from(levelChanges);
+    expect(changes).toHaveLength(1);
+    expect(changes[0]?.source).toBe("placement");
+  });
+});
+
 describe("placement service › placement sessions do not count toward the auto-advancement streak", () => {
   beforeEach(async () => {
     vi.stubEnv("AI_CLIENT", "fake");

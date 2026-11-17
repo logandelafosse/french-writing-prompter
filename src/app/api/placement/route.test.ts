@@ -219,6 +219,11 @@ describe("placement routes › PUT /api/level abandons an in-progress run", () =
     const rows = await db.select().from(placementRuns);
     expect(rows[0]?.status).toBe("abandoned");
 
+    const sessionRows = await db.select().from(sessions);
+    expect(sessionRows).toHaveLength(1);
+    expect(sessionRows[0]?.status).toBe("abandoned");
+    expect(sessionRows[0]?.abandonedAt).toBeTruthy();
+
     const current = await readResponseJson(
       await getPlacement(),
       PlacementGetResponse,

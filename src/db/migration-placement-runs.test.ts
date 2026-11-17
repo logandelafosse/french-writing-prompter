@@ -27,6 +27,12 @@ describe("placement_runs migration", () => {
     const names = sessionColumns.rows.map((row) => row.name);
     expect(names).toContain("placement_run_id");
     expect(names).toContain("placement_step");
+    const indexes = await client.execute(
+      "SELECT name FROM sqlite_master WHERE type = 'index'",
+    );
+    const indexNames = indexes.rows.map((row) => row.name);
+    expect(indexNames).toContain("placement_runs_in_progress_idx");
+    expect(indexNames).toContain("sessions_placement_step_idx");
     client.close();
   });
 });

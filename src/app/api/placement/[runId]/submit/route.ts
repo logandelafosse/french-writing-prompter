@@ -6,7 +6,7 @@ import {
 } from "@/contracts/placement";
 import { parseRequestBody } from "@/lib/http";
 import { withErrors } from "@/server/with-errors";
-import { placementErrorResponse, placementService } from "../../helpers";
+import { placementErrorResponse, placementService } from "../../route";
 
 const RunId = z.coerce.number().int().positive();
 
