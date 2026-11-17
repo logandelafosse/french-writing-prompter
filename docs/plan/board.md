@@ -16,8 +16,8 @@ _Also planned (Backlog until deps clear): D01 (after D03), D04 (after D02), D05 
 
 ## In progress
 
-| ID  | Ticket                   | Why                                                                                                      |
-| --- | ------------------------ | -------------------------------------------------------------------------------------------------------- |
+| ID  | Ticket                   | Why                                                                                                     |
+| --- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
 | D02 | Evaluate pipeline façade | Implementer, branch `ticket/d02-evaluate-pipeline-facade`, started 2026-11-17. Spec `tickets/D02-*.md`. |
 
 ## In review
@@ -96,13 +96,13 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 ### Phase 6 — Deepen modules
 
-| ID  | Ticket                   | Type | Blocked by    | Why not ready                                                          |
-| --- | ------------------------ | ---- | ------------- | ---------------------------------------------------------------------- |
+| ID  | Ticket                   | Type | Blocked by    | Why not ready                                                                |
+| --- | ------------------------ | ---- | ------------- | ---------------------------------------------------------------------------- |
 | D02 | Evaluate pipeline façade | AFK  | —             | **In progress** — `ticket/d02-evaluate-pipeline-facade`, started 2026-11-17. |
-| D03 | Weakness / Focus façade  | AFK  | —             | **Ready** — on Ready column.                                           |
-| D01 | Prompt issuance module   | AFK  | D03 preferred | Wait until Focus façade lands (or wire temporary). `tickets/D01-*.md`. |
-| D04 | Learner-dialect context  | AFK  | D02 preferred | After evaluate owns post-process. `tickets/D04-*.md`.                  |
-| D05 | Session / Draft façade   | AFK  | D01 helpful   | After issuance thins Home’s server edge. `tickets/D05-*.md`.           |
+| D03 | Weakness / Focus façade  | AFK  | —             | **Ready** — on Ready column.                                                 |
+| D01 | Prompt issuance module   | AFK  | D03 preferred | Wait until Focus façade lands (or wire temporary). `tickets/D01-*.md`.       |
+| D04 | Learner-dialect context  | AFK  | D02 preferred | After evaluate owns post-process. `tickets/D04-*.md`.                        |
+| D05 | Session / Draft façade   | AFK  | D01 helpful   | After issuance thins Home’s server edge. `tickets/D05-*.md`.                 |
 
 Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CONTEXT.md`](../../CONTEXT.md).
 
