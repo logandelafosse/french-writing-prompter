@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-17 by coordinator (D05 In review, [PR #95](https://github.com/logandelafosse/french-writing-prompter/pull/95)).
+Last updated: 2026-11-17 by coordinator (D05 merged; deepenings D01–D05 done).
 
 ## Ready
 
@@ -16,9 +16,7 @@ _None._
 
 ## In review
 
-| ID  | Ticket                 | Why                                                                                                                                                  |
-| --- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| D05 | Session / Draft façade | [PR #95](https://github.com/logandelafosse/french-writing-prompter/pull/95) `c1245f0`. Adversarial, test, and tooling reviewers running. 2026-11-17. |
+_None._
 
 ## Blocked
 
@@ -98,7 +96,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | D03 | Weakness / Focus façade  | AFK  | —          | **Done** — [PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92) `db003c8`. |
 | D01 | Prompt issuance module   | AFK  | —          | **Done** — [PR #93](https://github.com/logandelafosse/french-writing-prompter/pull/93) `a7352c1`. |
 | D04 | Learner-dialect context  | AFK  | —          | **Done** — [PR #94](https://github.com/logandelafosse/french-writing-prompter/pull/94) `db59def`. |
-| D05 | Session / Draft façade   | AFK  | —          | **In review** — [PR #95](https://github.com/logandelafosse/french-writing-prompter/pull/95).      |
+| D05 | Session / Draft façade   | AFK  | —          | **Done** — [PR #95](https://github.com/logandelafosse/french-writing-prompter/pull/95) `719f50b`. |
 
 Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CONTEXT.md`](../../CONTEXT.md).
 
@@ -122,6 +120,7 @@ Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CON
 
 | ID   | Ticket                                                                                                                                           | Why                                                                                                                                                                                                                                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D05  | Session / Draft façade ([PR #95](https://github.com/logandelafosse/french-writing-prompter/pull/95))                                             | Merged `719f50b` 2026-11-17. `pr:size` 36. Test fix `3bd4595`. Follow-up: TOOL-PR95-1 keep draft and review callers on the façade. Home unchanged.                                                                                                                                                       |
 | D04  | Learner-dialect context ([PR #94](https://github.com/logandelafosse/french-writing-prompter/pull/94))                                            | Merged `db59def` 2026-11-17. `pr:size` 54. Reviews clear. One context for generate and evaluate.                                                                                                                                                                                                         |
 | D01  | Prompt issuance module ([PR #93](https://github.com/logandelafosse/french-writing-prompter/pull/93))                                             | Merged `a7352c1` 2026-11-17. `pr:size` 248. Route 46 lines, no `@/db`. Reviews clear. D05 unblocked.                                                                                                                                                                                                     |
 | D03  | Weakness / Focus façade ([PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92))                                            | Merged `db003c8` 2026-11-17. `pr:size` 78. Test fix `74c0ae5`. Follow-up: TOOL-PR92-1 restricted weakness imports. D01 unblocked.                                                                                                                                                                        |
