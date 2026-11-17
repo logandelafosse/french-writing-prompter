@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { DRAFT_TEXT_MAX } from "@/config/limits";
 import { parseRequestBody } from "@/lib/http";
-import { saveActiveDraft } from "@/modules/history-store/history-store";
+import { saveDraft } from "@/modules/history-store/session-facade";
 import { withErrors } from "@/server/with-errors";
 
 const DraftPutBody = z.strictObject({ text: z.string() });
@@ -33,7 +33,7 @@ export const PUT = withErrors(async function putDraft(
     return draftError("VALIDATION");
 
   const text = parsed.value.text.replace(/\r\n/g, "\n");
-  const saved = await saveActiveDraft(id.data, text, () => new Date());
+  const saved = await saveDraft(id.data, text, () => new Date());
   if (!saved.ok) return draftError(saved.code);
   return NextResponse.json({
     savedAt: saved.savedAt,

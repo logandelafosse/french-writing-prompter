@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SessionDetailGetResponse } from "@/contracts/api";
-import { getSessionDetail } from "@/modules/history-store/history-store";
+import { loadSessionForReview } from "@/modules/history-store/session-facade";
 import { withErrors } from "@/server/with-errors";
 
 const SESSION_ID = /^[1-9]\d*$/;
@@ -20,7 +20,7 @@ export const GET = withErrors(async function getSessionById(
 ) {
   const { id: raw } = await context.params;
   if (!SESSION_ID.test(raw)) return sessionError("VALIDATION");
-  const detail = await getSessionDetail(Number(raw));
+  const detail = await loadSessionForReview(Number(raw), () => new Date());
   if (detail === null) return sessionError("NOT_FOUND");
   return NextResponse.json(SessionDetailGetResponse.parse(detail));
 });

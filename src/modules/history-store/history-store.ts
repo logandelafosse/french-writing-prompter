@@ -380,32 +380,6 @@ export async function setCorrectionStatus(
   return getCorrection(id);
 }
 
-export async function saveActiveDraft(
-  sessionId: number,
-  text: string,
-  now: () => Date,
-): Promise<
-  | { ok: true; savedAt: string; wordCount: number }
-  | { ok: false; code: "NOT_FOUND" | "NOT_ACTIVE" }
-> {
-  const rows = await db
-    .select({ status: sessions.status })
-    .from(sessions)
-    .where(eq(sessions.id, sessionId))
-    .limit(1);
-  if (rows.length === 0) return { ok: false, code: "NOT_FOUND" };
-  const row = first(rows, `session ${sessionId}`);
-  if (sessionStatus(row.status) !== "active") {
-    return { ok: false, code: "NOT_ACTIVE" };
-  }
-  const savedAt = now().toISOString();
-  await db
-    .update(sessions)
-    .set({ writingText: text, writingSavedAt: savedAt })
-    .where(eq(sessions.id, sessionId));
-  return { ok: true, savedAt, wordCount: countWords(text) };
-}
-
 export async function rememberWriting(
   sessionId: number,
   text: string,
