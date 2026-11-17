@@ -1,7 +1,9 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { sessions } from "@/db/schema";
+import { levelChanges, sessions } from "@/db/schema";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
@@ -14,6 +16,17 @@ import { POST } from "./route";
 const QuotaExhaustedBody = z.object({
   error: z.literal("QUOTA_EXHAUSTED"),
   resetsAt: z.string(),
+});
+
+describe("prompt route", () => {
+  it("does not import db", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/api/prompt/route.ts"),
+      "utf8",
+    );
+    expect(source).not.toMatch(/from ["']@\/db["']/);
+    expect(source).not.toMatch(/from ["']@\/db\//);
+  });
 });
 
 describe("POST /api/prompt quota", { concurrent: false }, () => {
@@ -130,6 +143,20 @@ describe("POST /api/prompt quota", { concurrent: false }, () => {
       promptMeta: posted.session.promptMeta,
       draft: null,
     });
+  });
+
+  it("returns 400 when no CEFR level is set", async () => {
+    await db.delete(levelChanges).execute();
+    const response = await POST(
+      new Request("http://localhost/api/prompt", { method: "POST" }),
+    );
+    expect(response.status).toBe(400);
+    await readResponseJson(
+      response,
+      z.object({
+        error: z.literal("No CEFR level set. Please set your level first."),
+      }),
+    );
   });
 
   it("never exceeds the daily max under concurrent requests", async () => {
