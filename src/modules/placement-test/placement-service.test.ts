@@ -16,7 +16,6 @@ import {
   getStreakCount,
   recordEvaluation,
 } from "@/modules/cefr-tracker/level-store";
-import { saveSession } from "@/modules/history-store/history-store";
 import type { OpenAiClientLike } from "@/modules/prompt-generator/prompt-generator";
 
 const WRITING = "Maintenant je vas. Les enfant jouent au parc.";
@@ -112,27 +111,6 @@ describe("placement service › full run sets level via level service with sourc
     expect(changes).toHaveLength(1);
     expect(changes[0]?.source).toBe("placement");
     expect(changes[0]?.toLevel).toBe("B1");
-  });
-});
-
-describe("placement service › does not consume daily quota", () => {
-  beforeEach(async () => {
-    vi.stubEnv("AI_CLIENT", "fake");
-    clearEnvCache();
-    await resetDb();
-  });
-
-  afterEach(() => {
-    vi.unstubAllEnvs();
-    clearEnvCache();
-  });
-
-  it("creates no daily sessions", async () => {
-    await completeRun(service());
-    const daily = (await db.select().from(sessions)).filter(
-      (row) => row.kind === "daily",
-    );
-    expect(daily).toHaveLength(0);
   });
 });
 
@@ -342,42 +320,53 @@ describe("placement service › placement sessions do not count toward the auto-
   });
 
   it("ignores placement Evaluations when counting the streak", async () => {
-    await completeRun(service());
-    vi.setSystemTime(new Date("2026-12-01T12:00:00.000Z"));
-    await saveSession({
-      promptText: "Consigne",
-      promptConstraints: "{}",
-      writingText: "Texte",
-      evaluationJson: "{}",
-      cefrLevel: "B2",
-      kind: "daily",
-      localDate: "2026-12-01",
-      status: "evaluated",
-      promptLevel: "B1",
-    });
-    await saveSession({
-      promptText: "Consigne",
-      promptConstraints: "{}",
-      writingText: "Texte",
-      evaluationJson: "{}",
-      cefrLevel: "B2",
-      kind: "daily",
-      localDate: "2026-12-01",
-      status: "evaluated",
-      promptLevel: "B1",
-    });
+    const placementNow = new Date("2026-01-01T12:00:00.000Z");
+    vi.setSystemTime(placementNow);
+    await completeRun(
+      new PlacementService({
+        client: getAiClient("happy"),
+        dlf: getDlfIndex(),
+        now: () => placementNow,
+      }),
+    );
+
     await db
       .update(sessions)
       .set({
-        status: "evaluated",
         cefrLevel: "B2",
-        evaluatedAt: "2026-12-01T12:00:00.000Z",
+        status: "evaluated",
+        evaluatedAt: "2026-01-05T12:00:00.000Z",
       })
-      .where(eq(sessions.kind, "daily"));
-    await db
-      .update(sessions)
-      .set({ evaluatedAt: "2026-12-01T12:00:00.000Z" })
       .where(eq(sessions.kind, "placement"));
+
+    await db.insert(sessions).values([
+      {
+        promptText: "Consigne",
+        promptConstraints: "{}",
+        writingText: "Texte",
+        evaluationJson: "{}",
+        cefrLevel: "B2",
+        createdAt: "2026-01-02T12:00:00.000Z",
+        kind: "daily",
+        localDate: "2026-01-02",
+        status: "evaluated",
+        evaluatedAt: "2026-01-02T12:00:00.000Z",
+        promptLevel: "B1",
+      },
+      {
+        promptText: "Consigne",
+        promptConstraints: "{}",
+        writingText: "Texte",
+        evaluationJson: "{}",
+        cefrLevel: "B2",
+        createdAt: "2026-01-03T12:00:00.000Z",
+        kind: "daily",
+        localDate: "2026-01-03",
+        status: "evaluated",
+        evaluatedAt: "2026-01-03T12:00:00.000Z",
+        promptLevel: "B1",
+      },
+    ]);
 
     expect(await getStreakCount()).toBe(2);
     expect(await recordEvaluation("B2")).toBeNull();

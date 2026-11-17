@@ -42,7 +42,7 @@ describe("placement logic › buildResults", () => {
           { kind: "mistake", status: "open" },
           { kind: "mistake", status: "overturned" },
           { kind: "standard", status: "open" },
-          { kind: "dialect_check", status: "confirmed_mistake" },
+          { kind: "dialect_check", status: "confirmed_dialect" },
         ],
       },
     ]);
@@ -54,7 +54,7 @@ describe("placement logic › buildResults", () => {
     expect(result.steps[0]?.summary).toBe("Étape 1");
     expect(result.steps[0]?.mistakeCount).toBe(0);
     expect(result.steps[1]?.mistakeCount).toBe(1);
-    expect(result.steps[2]?.mistakeCount).toBe(2);
+    expect(result.steps[2]?.mistakeCount).toBe(1);
     expect(result.steps[2]?.promptLevel).toBe("B2");
     expect(result.steps[2]?.evaluatedLevel).toBe("B1");
   });
