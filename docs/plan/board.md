@@ -4,13 +4,13 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-16 by coordinator (T32 done; T33 ready).
+Last updated: 2026-11-16 by coordinator (T33 done; T34 ready).
 
 ## Ready
 
-| ID  | Ticket                             | Why                                                                                                           |
-| --- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| T33 | Persistent Placement Test (server) | T32 merged [PR #86](https://github.com/logandelafosse/french-writing-prompter/pull/86) `8a87ac8`; closed #34. |
+| ID  | Ticket                 | Why                                                                                                           |
+| --- | ---------------------- | ------------------------------------------------------------------------------------------------------------- |
+| T34 | Placement Test screens | T33 merged [PR #87](https://github.com/logandelafosse/french-writing-prompter/pull/87) `635d7fc`; closed #35. |
 
 ## In progress
 
@@ -86,7 +86,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T30 | Resource catalog and links                    | AFK  | T28        | **Done** — [PR #84](https://github.com/logandelafosse/french-writing-prompter/pull/84) `6d59359`; closed #32.                                                         |
 | T31 | History redesign                              | AFK  | T18, T22   | **Done** — [PR #85](https://github.com/logandelafosse/french-writing-prompter/pull/85) `bfd661e`; closed #33.                                                         |
 | T32 | Read-only past review                         | AFK  | T25, T31   | **Done** — [PR #86](https://github.com/logandelafosse/french-writing-prompter/pull/86); closed #34.                                                                   |
-| T33 | Persistent Placement Test (server)            | AFK  | T20, T21   | **Ready** — on Ready column.                                                                                                                                          |
+| T33 | Persistent Placement Test (server)            | AFK  | T20, T21   | **Done** — [PR #87](https://github.com/logandelafosse/french-writing-prompter/pull/87) `635d7fc`; closed #35.                                                         |
+| T34 | Placement Test screens                        | AFK  | T16, T33   | **Ready** — on Ready column.                                                                                                                                          |
 
 ### Phase 5 — Host (planned, not on board DAG yet)
 
@@ -100,8 +101,8 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | --- | ---------------------------------------- | ---- | ------------------ | -------------------------------------------------------------------------------------------------------- |
 | T31 | History redesign                         | AFK  | T18, T22           | **Done** — [PR #85](https://github.com/logandelafosse/french-writing-prompter/pull/85).                  |
 | T32 | Read-only past review                    | AFK  | T25, T31           | **Done** — [PR #86](https://github.com/logandelafosse/french-writing-prompter/pull/86).                  |
-| T33 | Persistent Placement Test (server)       | AFK  | T20, T21           | **Ready** — on Ready column.                                                                             |
-| T34 | Placement Test screens                   | AFK  | T16, T33           | Needs writing surface and the placement API                                                              |
+| T33 | Persistent Placement Test (server)       | AFK  | T20, T21           | **Done** — [PR #87](https://github.com/logandelafosse/french-writing-prompter/pull/87).                  |
+| T34 | Placement Test screens                   | AFK  | T16, T33           | **Ready** — on Ready column.                                                                             |
 | T35 | Cleanup, motion, 390 px pass, a11y sweep | AFK  | T13–T34 UI tickets | Runs last. Split into T35a (mechanical) / T35b (motion, 390 px, a11y, README) is pre-approved, see spec. |
 
 ## Done
@@ -149,4 +150,5 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T29b | Pratiquer ça + review Focus tags (parent [#31](https://github.com/logandelafosse/french-writing-prompter/issues/31))                             | Merged [PR #83](https://github.com/logandelafosse/french-writing-prompter/pull/83) `e3cacdb` 2026-11-16; `pr:size` 359; pin fixes `27d98a5`; closed #31.                                                                                                                                                 |
 | T30  | Resource catalog and links ([#32](https://github.com/logandelafosse/french-writing-prompter/issues/32))                                          | Merged [PR #84](https://github.com/logandelafosse/french-writing-prompter/pull/84) `6d59359` 2026-11-16; `pr:size` 227; closed #32.                                                                                                                                                                      |
 | T31  | History redesign ([#33](https://github.com/logandelafosse/french-writing-prompter/issues/33))                                                    | Merged [PR #85](https://github.com/logandelafosse/french-writing-prompter/pull/85) `bfd661e` 2026-11-16; `pr:size` ~488; closed #33.                                                                                                                                                                     |
-| T32  | Read-only past review ([#34](https://github.com/logandelafosse/french-writing-prompter/issues/34))                                               | Merged [PR #86](https://github.com/logandelafosse/french-writing-prompter/pull/86) `8a87ac8`; timezone fix `6146af2`; closed #34. T33 ready.                                                                                                                                                             |
+| T32  | Read-only past review ([#34](https://github.com/logandelafosse/french-writing-prompter/issues/34))                                               | Merged [PR #86](https://github.com/logandelafosse/french-writing-prompter/pull/86) `8a87ac8`; closed #34.                                                                                                                                                                                                |
+| T33  | Persistent Placement Test server ([#35](https://github.com/logandelafosse/french-writing-prompter/issues/35))                                    | Merged [PR #87](https://github.com/logandelafosse/french-writing-prompter/pull/87) `635d7fc`; race fixes `69eb8c8`; test locks `519d53a`; TOOL-PR87-* backlog; closed #35. T34 ready.                                                                                                                    |
