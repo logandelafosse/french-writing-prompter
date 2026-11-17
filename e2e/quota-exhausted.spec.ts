@@ -8,6 +8,7 @@ import {
   mainContent,
   PROMPT_FIXTURE_LAFAYETTE,
 } from "./support/prompt-helpers";
+import { homeCopy } from "../src/copy/fr";
 
 async function openThirdPrompt(page: Page) {
   await page.goto("/");
@@ -40,9 +41,7 @@ test.describe("quota exhausted @1280", () => {
       "T'as pris tes trois consignes pour aujourd'hui.",
     );
     await expect(notice).toContainText(/dans \d+ h \d{2}/);
-    await expect(notice).toContainText(
-      "Ton brouillon reste icitte : tu peux le finir et l'envoyer quand tu veux.",
-    );
+    await expect(notice).toContainText(homeCopy.quotaNoticeDraft);
     await expect(main.getByText("Consigne d'écriture · 3 sur 3")).toBeVisible();
     await expect(
       main.getByRole("button", {

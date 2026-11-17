@@ -30,7 +30,7 @@ function correction(
     anchor: "exact",
     suggestion: "la table",
     explanation: "Genre.",
-    question: partial.kind === "dialect_check" ? "Ça se dit ?" : null,
+    question: partial.kind === "dialect_check" ? "Ça se dit\u202F?" : null,
     ruleIfDialect: "On dit le table.",
     category: partial.kind === "standard" ? null : "genre",
     dlf: null,

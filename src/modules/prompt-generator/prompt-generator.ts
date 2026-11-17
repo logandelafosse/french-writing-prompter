@@ -54,27 +54,27 @@ export class PromptGenerator {
     const focusBlock =
       focus.length === 0
         ? ""
-        : `\nLe scénario doit naturellement faire pratiquer ces structures, sans nommer de termes de grammaire :\n${focus.map((item) => `- ${item.label} : ${item.elicitHint}`).join("\n")}`;
+        : `\nLe scénario doit naturellement faire pratiquer ces structures, sans nommer de termes de grammaire\u202F:\n${focus.map((item) => `- ${item.label}\u202F: ${item.elicitHint}`).join("\n")}`;
     const topicsBlock =
       recentTopics.length === 0
         ? ""
-        : `\nÉvite ces sujets récents : ${recentTopics.join(", ")}.`;
+        : `\nÉvite ces sujets récents\u202F: ${recentTopics.join(", ")}.`;
 
     const systemPrompt = `Tu es un tuteur d'écriture en français. Génère des consignes d'écriture pour des apprenants au niveau CECR ${level}. L'apprenant utilise le français de la Louisiane (règles ci-dessous).
 
-Chaque consigne doit :
+Chaque consigne doit\u202F:
 - Être un scénario d'un paragraphe en français (champ text), entre 150 et 1500 caractères
 - Indiquer clairement dans le texte le registre attendu (formel, familier ou mixte)
 - Renseigner genre, temps verbal, ton, registre, sujet et jusqu'à trois étiquettes de sujet — le tout en français
 - S'adapter au niveau de l'apprenant
-- Varier le registre (formel, familier, mixt) d'une consigne à l'autre ; ne pas toujours choisir familier
-- Ne jamais exiger le subjonctif, le passé simple ni le futur simple ; le futur avec aller + infinitif est permis
-- Ne pas imposer de nombre de mots dans le texte : l'objectif mot (${wordTarget.min}–${wordTarget.max}) est ajouté par le serveur
+- Varier le registre (formel, familier, mixt) d'une consigne à l'autre\u202F; ne pas toujours choisir familier
+- Ne jamais exiger le subjonctif, le passé simple ni le futur simple\u202F; le futur avec aller + infinitif est permis
+- Ne pas imposer de nombre de mots dans le texte\u202F: l'objectif mot (${wordTarget.min}–${wordTarget.max}) est ajouté par le serveur
 ${focusBlock}${topicsBlock}
 
 ${dialectRules}
 
-Description du niveau ${level} :
+Description du niveau ${level}\u202F:
 ${LEVEL_DESCRIPTIONS[level]}`;
 
     const modelOutput = await this.openai.chatCompletionJSON(

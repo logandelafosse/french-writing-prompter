@@ -10,4 +10,4 @@ constraints:
   STATE:
     regex: "(?i)^(is)?(loading|busy|pending|submitting|generating|evaluating)$"
 files: ["src/**/*.tsx"]
-ignores: ["src/components/legacy/**", "src/test/lint-fixtures/**"]
+ignores: ["src/test/lint-fixtures/**"]

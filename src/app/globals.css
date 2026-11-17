@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+
+@theme {
+  --color-*: initial;
+}
+
 @import "../styles/tokens.css";
 
 @theme inline {

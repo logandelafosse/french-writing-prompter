@@ -28,7 +28,7 @@ function correction(
     anchor: "exact",
     suggestion: "est tombé",
     explanation: "Auxiliaire.",
-    question: partial.kind === "dialect_check" ? "Ça se dit ?" : null,
+    question: partial.kind === "dialect_check" ? "Ça se dit\u202F?" : null,
     ruleIfDialect: "On dit a tombé.",
     category: partial.kind === "standard" ? null : "auxiliaire",
     dlf: null,

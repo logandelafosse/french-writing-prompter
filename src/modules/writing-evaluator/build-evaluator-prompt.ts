@@ -26,25 +26,25 @@ const TEMPLATE = `Tu es un tuteur de français louisianais. Écris toutes tes ex
 
 {{registre}}
 
-Le français standard n'est jamais une faute : il ne doit jamais baisser un score de dimension ni overall_cefr.
+Le français standard n'est jamais une faute\u202F: il ne doit jamais baisser un score de dimension ni overall_cefr.
 
 Correction kinds:
-- mistake : faute en français standard ET louisianais. category parmi l'enum ; rule_if_dialect = la phrase si l'apprenant dit que c'est louisianais.
-- standard : français standard correct là où une forme louisianaise est courante. Jamais une faute. suggestion = forme louisianaise. Au plus 3. category null.
-- dialect_check : tu n'es pas sûr. question en français, suggestion si c'est une faute, category et rule_if_dialect.
+- mistake\u202F: faute en français standard ET louisianais. category parmi l'enum\u202F; rule_if_dialect = la phrase si l'apprenant dit que c'est louisianais.
+- standard\u202F: français standard correct là où une forme louisianaise est courante. Jamais une faute. suggestion = forme louisianaise. Au plus 3. category null.
+- dialect_check\u202F: tu n'es pas sûr. question en français, suggestion si c'est une faute, category et rule_if_dialect.
 Si tu hésites entre mistake et dialect_check, choisis dialect_check.
 
 Catégories (IDs stables) :
 {{categories}}
 
-Citation : copie quote caractère pour caractère (1–8 mots, sans ellipse). Plus courte empan possible. Si la même quote apparaît plusieurs fois, renseigne occurrence (1-based). Ordre du texte, sans chevauchement.
+Citation\u202F: copie quote caractère pour caractère (1–8 mots, sans ellipse). Plus courte empan possible. Si la même quote apparaît plusieurs fois, renseigne occurrence (1-based). Ordre du texte, sans chevauchement.
 
 {{dlf}}
 
-Resources : Pour chaque mistake, choisis au plus un ID grammaire et un ID input dans cette liste, pour sa catégorie. N'invente jamais d'URL ni d'ID.
+Resources\u202F: Pour chaque mistake, choisis au plus un ID grammaire et un ID input dans cette liste, pour sa catégorie. N'invente jamais d'URL ni d'ID.
 {{resources}}
 
-Scores : chaque dimension de 1 à {{scoreMax}}. overall_cefr. next_level_tip cadré « Pour atteindre … ».`;
+Scores\u202F: chaque dimension de 1 à {{scoreMax}}. overall_cefr. next_level_tip cadré «\u202FPour atteindre …\u202F».`;
 
 export function buildEvaluatorPrompt(input: EvaluatorPromptInput): {
   version: string;
@@ -54,7 +54,7 @@ export function buildEvaluatorPrompt(input: EvaluatorPromptInput): {
   const registre =
     input.registre === null
       ? "Juge Registre et style selon le registre annoncé dans la consigne."
-      : `Juge la dimension register_style contre le registre de la consigne : ${input.registre}. Un écart de registre est un problème de registre, pas une Mistake de dialecte.`;
+      : `Juge la dimension register_style contre le registre de la consigne\u202F: ${input.registre}. Un écart de registre est un problème de registre, pas une Mistake de dialecte.`;
   const system = TEMPLATE.replace(
     "{{dialect}}",
     renderForEvaluator(input.dialect),

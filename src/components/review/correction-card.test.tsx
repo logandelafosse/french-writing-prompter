@@ -14,7 +14,7 @@ function standard(
     span: { start: 0, end: 10 },
     anchor: "exact",
     explanation:
-      "« Voiture », c'est correct. Par icitte, on dit plus souvent « char ».",
+      "«\u202FVoiture\u202F», c'est correct. Par icitte, on dit plus souvent «\u202Fchar\u202F».",
     question: null,
     ruleIfDialect: null,
     category: null,
@@ -47,7 +47,8 @@ describe("CorrectionCard standard", () => {
     expect(within(card).getByText("ma voiture")).toBeVisible();
     expect(
       within(card).getByText(
-        "« Voiture », c'est correct. Par icitte, on dit plus souvent « char ».",
+        "«\u202FVoiture\u202F», c'est correct. Par icitte, on dit plus souvent «\u202Fchar\u202F».",
+        { collapseWhitespace: false },
       ),
     ).toBeVisible();
 
@@ -121,8 +122,8 @@ function dialect(
     kind: "dialect_check",
     span: { start: 0, end: 7 },
     anchor: "exact",
-    explanation: "Le français standard prend « est tombé ».",
-    question: "Ça se dit comme ça chez toi, « a tombé » ?",
+    explanation: "Le français standard prend «\u202Fest tombé\u202F».",
+    question: "Ça se dit comme ça chez toi, «\u202Fa tombé\u202F»\u202F?",
     ruleIfDialect: "On dit a tombé.",
     category: "auxiliaire",
     dlf: null,
@@ -172,10 +173,17 @@ describe("CorrectionCard dialect_check", () => {
     );
     const card = screen.getByRole("article");
     expect(card).toHaveAttribute("id", "correction-6");
-    expect(within(card).getByText(reviewCopy.kindDialect)).toBeVisible();
+    expect(
+      within(card).getByText(reviewCopy.kindDialect, {
+        collapseWhitespace: false,
+      }),
+    ).toBeVisible();
     expect(within(card).getByText("mon petit cousin a tombé")).toBeVisible();
     expect(
-      within(card).getByText("Ça se dit comme ça chez toi, « a tombé » ?"),
+      within(card).getByText(
+        "Ça se dit comme ça chez toi, «\u202Fa tombé\u202F»\u202F?",
+        { collapseWhitespace: false },
+      ),
     ).toBeVisible();
     expect(
       within(card).getByRole("button", { name: reviewCopy.actionConfirm }),
@@ -332,7 +340,10 @@ describe("CorrectionCard readOnly", () => {
       />,
     );
     expect(
-      screen.getByText("Ça se dit comme ça chez toi, « a tombé » ?"),
+      screen.getByText(
+        "Ça se dit comme ça chez toi, «\u202Fa tombé\u202F»\u202F?",
+        { collapseWhitespace: false },
+      ),
     ).toBeVisible();
     expect(screen.getByText(reviewCopy.unanswered)).toBeVisible();
   });

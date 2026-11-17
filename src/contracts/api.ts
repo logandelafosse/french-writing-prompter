@@ -41,15 +41,8 @@ export const LevelUndoResponse = z.strictObject({
 });
 export type LevelUndoResponse = z.infer<typeof LevelUndoResponse>;
 
-export type LevelGetDto = z.infer<typeof LevelGetResponse>;
-
 export const LevelPutResponse = z.strictObject({
   change: LevelChangeDto,
-});
-
-export const EvaluatePostBody = z.strictObject({
-  writing: z.string(),
-  sessionId: z.number(),
 });
 
 export const SessionEvaluatePostBody = z.strictObject({

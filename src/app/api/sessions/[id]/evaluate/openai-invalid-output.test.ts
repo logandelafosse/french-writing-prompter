@@ -24,7 +24,7 @@ async function clearSessions() {
   await db.delete(sessions).execute();
 }
 
-describe("POST /api/evaluate", () => {
+describe("POST /api/sessions/:id/evaluate invalid model output", () => {
   beforeEach(async () => {
     vi.stubEnv("AI_CLIENT", "openai");
     vi.stubEnv("OPENAI_API_KEY", "sk-test");
@@ -77,11 +77,12 @@ describe("POST /api/evaluate", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/evaluate", {
+      new Request(`http://localhost/api/sessions/${session.id}/evaluate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ writing: "Mon texte.", sessionId: session.id }),
+        body: JSON.stringify({ text: "Mon texte." }),
       }),
+      { params: Promise.resolve({ id: String(session.id) }) },
     );
 
     expect(response.status).toBe(502);

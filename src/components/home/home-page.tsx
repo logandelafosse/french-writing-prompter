@@ -532,11 +532,15 @@ function WritingInterim({
     if (!writing.trim()) return;
     setSubmitUi("evaluating");
     setSubmitFailure(null);
-    const result = await fetchJson("/api/evaluate", EvaluatePostResponse, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ writing: writing.trim(), sessionId }),
-    });
+    const result = await fetchJson(
+      `/api/sessions/${sessionId}/evaluate`,
+      EvaluatePostResponse,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: writing.trim() }),
+      },
+    );
     if (!result.ok) {
       const failure = classifyFetchError(result.error);
       setSubmitUi("error");

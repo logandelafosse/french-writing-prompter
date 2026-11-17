@@ -94,7 +94,7 @@ describe("levelLine", () => {
         ],
         "America/Chicago",
       ),
-    ).toBe("Niveau : A2 depuis le 3 octobre, B1 depuis le 28 octobre.");
+    ).toBe("Niveau\u202F: A2 depuis le 3 octobre, B1 depuis le 28 octobre.");
     expect(formatLevelLine([])).toBeNull();
   });
 
@@ -113,6 +113,6 @@ describe("levelLine", () => {
         ],
         "America/Chicago",
       ),
-    ).toBe("Niveau : A2 depuis le 3 octobre.");
+    ).toBe("Niveau\u202F: A2 depuis le 3 octobre.");
   });
 });

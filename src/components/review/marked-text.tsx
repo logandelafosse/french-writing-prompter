@@ -71,7 +71,9 @@ function renderRange(text: string, start: number, end: number, marks: Mark[]) {
           aria-label={reviewCopy.srMark(item.kind, item.ordinal)}
           className={markerClass(item.kind)}
         >
-          {item.kind === "dialect_check" ? `${item.ordinal} ?` : item.ordinal}
+          {item.kind === "dialect_check"
+            ? `${item.ordinal}\u202F?`
+            : item.ordinal}
         </a>
       </sup>,
       <span key={`${item.id}-sr`} className="sr-only">

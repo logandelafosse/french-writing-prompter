@@ -4,7 +4,7 @@ export const placementCopy = {
   intro: "Trois consignes, une après l'autre. Écris ce que tu peux pour chacune. À la fin, je te donne ton niveau CECR et on commence pour de vrai.",
   stepN: (n: number) => `Étape ${n}`,
   stepNames: ["Première consigne", "Deuxième consigne", "Troisième consigne"] as const,
-  caption: "Écris comme tu parles : le français de la Louisiane, c'est ça qui compte icitte. Tes brouillons sont gardés à mesure.",
+  caption: "Écris comme tu parles\u202F: le français de la Louisiane, c'est ça qui compte icitte. Tes brouillons sont gardés à mesure.",
   start: "Commencer",
   stepTitle: (n: number) => `Test de placement · étape ${n} sur 3`,
   progressLabel: "Avancement du test",

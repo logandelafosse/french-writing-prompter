@@ -87,7 +87,7 @@ describe("PATCH /api/corrections/:id", () => {
     const check = Correction.parse({
       ...mistake(session.id, "c-check"),
       kind: "dialect_check",
-      question: "Ça se dit ?",
+      question: "Ça se dit\u202F?",
     });
     await saveCorrections([check], () => new Date());
 
@@ -107,7 +107,7 @@ describe("PATCH /api/corrections/:id", () => {
     const check = Correction.parse({
       ...mistake(session.id, "c-check"),
       kind: "dialect_check",
-      question: "Ça se dit ?",
+      question: "Ça se dit\u202F?",
     });
     await saveCorrections([check], () => new Date());
 

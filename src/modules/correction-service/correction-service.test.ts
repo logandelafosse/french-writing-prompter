@@ -23,7 +23,7 @@ function correction(
     anchor: "exact",
     suggestion: "est tombé",
     explanation: "Auxiliaire.",
-    question: kind === "dialect_check" ? "Ça se dit ?" : null,
+    question: kind === "dialect_check" ? "Ça se dit\u202F?" : null,
     ruleIfDialect: "On dit a tombé.",
     category: kind === "standard" ? null : "auxiliaire",
     dlf: null,

@@ -7,7 +7,7 @@ import {
   EvaluatorOutputSchema,
   type EvaluatorOutputDraft,
 } from "@/contracts/evaluation";
-import { dialectCheckQuestion, postProcessEvaluation } from "./post-process";
+import { postProcessEvaluation } from "./post-process";
 
 const DIR = path.join(import.meta.dirname, "__fixtures__");
 const writing =
@@ -118,7 +118,11 @@ describe("evaluator fixtures", () => {
         span: { start: 11, end: 17 },
         anchor: "exact",
         category: "conjugaison",
-        question: dialectCheckQuestion("je vas"),
+        question:
+          throughChatCompletionJSON(
+            load("ok-mixed-kinds.json"),
+          ).corrections.find((c) => c.kind === "dialect_check")?.question ??
+          null,
         explanation: "Je te demande si c'est voulu.",
       },
       {

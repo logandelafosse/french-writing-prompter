@@ -3,3 +3,4 @@ valid:
   - "const cls = 'bg-sheet text-ink';"
 invalid:
   - "const hex = '#ff0000';"
+  - "style={{ color: '#333' }}"

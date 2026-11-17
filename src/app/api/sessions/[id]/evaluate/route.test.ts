@@ -10,7 +10,6 @@ import { EvaluatePostResponse } from "@/contracts/api";
 import { ErrorEnvelope } from "@/contracts/errors";
 import { readResponseJson } from "@/test/read-response-json";
 import { POST } from "./route";
-import { POST as postAlias } from "@/app/api/evaluate/route";
 
 const writing =
   "Maintenant je vas au bayou. Les enfant jouent. J'ai vu les enfant près du pont.";
@@ -145,21 +144,6 @@ describe("POST /api/sessions/:id/evaluate", () => {
     expect(standard?.kind).toBe("standard");
     expect(standard?.dlf).toBeNull();
     expect(body.evaluation.version).toBe(2);
-  });
-
-  it("POST /api/evaluate is a thin alias", async () => {
-    const session = await seedSession();
-    const response = await postAlias(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ writing, sessionId: session.id }),
-      }),
-    );
-    expect(response.status).toBe(200);
-    const body = await readResponseJson(response, EvaluatePostResponse);
-    expect(body.evaluation.version).toBe(2);
-    expect(body.corrections.length).toBe(3);
   });
 
   it("answers 502 AI_INVALID_OUTPUT for malformed model JSON", async () => {

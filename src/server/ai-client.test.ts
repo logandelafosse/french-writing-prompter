@@ -30,7 +30,7 @@ describe("getAiClient", () => {
     vi.stubEnv("OPENAI_API_KEY", "sk-test");
     clearEnvCache();
 
-    const request = new Request("http://localhost/api/evaluate", {
+    const request = new Request("http://localhost/api/sessions/1/evaluate", {
       headers: { "x-e2e-scenario": "malformed" },
     });
     expect(scenarioFromRequest(request)).toBe("malformed");

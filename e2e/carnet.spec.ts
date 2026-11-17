@@ -4,6 +4,7 @@ import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
 import { seedResourceWeaknesses } from "./support/resources-seed";
+import { carnetCopy } from "../src/copy/carnet";
 
 const writing = "Mon petit cousin a tombé dans la boue. Les enfant jouent.";
 const savedRule =
@@ -135,11 +136,7 @@ test("empty Carnet shows the empty-state line and has no axe violations", async 
       "Rien à travailler pour l'instant. Les fautes qui reviennent vont apparaître icitte.",
     ),
   ).toBeVisible();
-  await expect(
-    main.getByText(
-      "Pas encore de notes. Quand le tuteur te demande « Ça se dit comme ça ? », ta réponse vient icitte.",
-    ),
-  ).toBeVisible();
+  await expect(main.getByText(carnetCopy.notesEmpty)).toBeVisible();
   await expect(
     main.getByRole("button", { name: "Essayer encore" }),
   ).toHaveCount(0);

@@ -42,7 +42,7 @@ test.describe("errors @1280", () => {
     await area.fill(writing);
 
     let fail = true;
-    await page.route("**/api/evaluate", async (route) => {
+    await page.route("**/api/sessions/*/evaluate", async (route) => {
       if (route.request().method() !== "POST") {
         await route.continue();
         return;
@@ -119,7 +119,7 @@ test.describe("errors @390", () => {
     const main = mainContent(page);
     await main.getByLabel("Ton texte").fill(writing);
 
-    await page.route("**/api/evaluate", async (route) => {
+    await page.route("**/api/sessions/*/evaluate", async (route) => {
       if (route.request().method() === "POST") {
         await route.fulfill(aiUnavailable);
         return;

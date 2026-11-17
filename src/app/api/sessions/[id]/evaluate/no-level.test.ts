@@ -31,11 +31,12 @@ describe("evaluate without a level", () => {
 
     const { POST } = await import("./route");
     const response = await POST(
-      new Request("http://localhost/api/evaluate", {
+      new Request(`http://localhost/api/sessions/${session.id}/evaluate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ writing: "Bonjour.", sessionId: session.id }),
+        body: JSON.stringify({ text: "Bonjour." }),
       }),
+      { params: Promise.resolve({ id: String(session.id) }) },
     );
     expect(response.status).toBe(400);
     const body = await readResponseJson(response, ErrorEnvelope);

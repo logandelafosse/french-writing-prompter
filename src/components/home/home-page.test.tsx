@@ -387,7 +387,7 @@ describe("HomePage evaluation error", () => {
           jsonResponse({ savedAt: "2026-11-14T18:00:00.000Z", wordCount: 6 }),
         );
       }
-      if (url.includes("/api/evaluate") && init?.method === "POST") {
+      if (url.includes("/evaluate") && init?.method === "POST") {
         evalAttempts += 1;
         if (evalAttempts === 1) {
           return Promise.resolve(
@@ -490,7 +490,7 @@ describe("HomePage review generate error", () => {
           jsonResponse({ savedAt: "2026-11-14T18:00:00.000Z", wordCount: 6 }),
         );
       }
-      if (url.includes("/api/evaluate") && init?.method === "POST") {
+      if (url.includes("/evaluate") && init?.method === "POST") {
         return Promise.resolve(jsonResponse(evaluateOkResponse));
       }
       if (url.includes("/api/level") && init?.method === "PUT") {
@@ -672,7 +672,7 @@ describe("HomePage FocusLine", () => {
           jsonResponse({ savedAt: "2026-11-14T18:00:00.000Z", wordCount: 6 }),
         );
       }
-      if (url.includes("/api/evaluate") && init?.method === "POST") {
+      if (url.includes("/evaluate") && init?.method === "POST") {
         return Promise.resolve(jsonResponse(evaluateOkResponse));
       }
       if (url.includes("/api/quota")) {

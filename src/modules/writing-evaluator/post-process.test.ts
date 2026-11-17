@@ -142,6 +142,26 @@ describe("postProcessEvaluation", () => {
     expect(check?.question).toBe(dialectCheckQuestion("je vas"));
   });
 
+  it("keeps a non-empty dialect_check question from the model", () => {
+    const asked = "C'est voulu, ça\u202F?";
+    const result = postProcessEvaluation(
+      baseOutput([
+        correction({
+          kind: "dialect_check",
+          quote: "je vas",
+          suggestion: "je vais",
+          category: "conjugaison",
+          question: asked,
+        }),
+      ]),
+      { text: writing, sessionId: 1, now, createId: ids() },
+    );
+    expect(result.corrections[0]?.question).toBe(asked);
+    expect(result.corrections[0]?.question).not.toBe(
+      dialectCheckQuestion("je vas"),
+    );
+  });
+
   it("sets dlf on an attested standard suggestion", () => {
     const result = postProcessEvaluation(
       baseOutput([

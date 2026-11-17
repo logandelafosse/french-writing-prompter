@@ -93,7 +93,7 @@ function formatDlfHintCard(card: DlfHintCard): string {
   const example =
     card.example === null
       ? ""
-      : ` Ex. « ${card.example} »${
+      : ` Ex. «\u202F${card.example}\u202F»${
           card.translation === null ? "" : ` (${card.translation})`
         }`;
   return `- ${card.headword}${pos}: ${card.gloss}.${example}`;
@@ -102,7 +102,7 @@ function formatDlfHintCard(card: DlfHintCard): string {
 export function formatDlfHintSection(cards: DlfHintCard[]): string {
   if (cards.length === 0) return "";
   const body = cards.map(formatDlfHintCard).join("\n");
-  return `Mots du texte attestés dans le Dictionary of Louisiana French. Traite-les comme usage louisianais attesté ; ne les « corrige » pas vers le français standard.\n${body}`;
+  return `Mots du texte attestés dans le Dictionary of Louisiana French. Traite-les comme usage louisianais attesté\u202F; ne les «\u202Fcorrige\u202F» pas vers le français standard.\n${body}`;
 }
 
 export function buildDlfIndex(entries: readonly DlfLexiconEntry[]): DlfIndex {

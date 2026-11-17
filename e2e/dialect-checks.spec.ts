@@ -3,6 +3,7 @@ import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
+import { reviewCopy } from "../src/copy/review";
 
 const writing = "Mon petit cousin a tombé dans la boue. Les enfant jouent.";
 const repeatWriting = "Il a tombé hier.";
@@ -51,7 +52,7 @@ test.describe("dialect checks @1280", () => {
       page.getByText("1 faute · 1 à vérifier", { exact: true }),
     ).toBeVisible();
     const card = page.getByRole("article").filter({ hasText: "a tombé" });
-    await expect(card).toContainText("Ça se dit comme ça ?");
+    await expect(card).toContainText(reviewCopy.kindDialect);
 
     const patched = page.waitForResponse(
       (response) =>
