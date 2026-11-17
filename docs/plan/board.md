@@ -4,7 +4,7 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-17 by coordinator (D03 merged; D01 In progress).
+Last updated: 2026-11-17 by coordinator (D01 In review, [PR #93](https://github.com/logandelafosse/french-writing-prompter/pull/93)).
 
 ## Ready
 
@@ -16,13 +16,13 @@ _Also planned: D01 after D03, D05 after D01. Hosting T36–T39 waits on `docs/pl
 
 ## In progress
 
-| ID  | Ticket                 | Why                                                                                            |
-| --- | ---------------------- | ---------------------------------------------------------------------------------------------- |
-| D01 | Prompt issuance module | Implementer, branch `ticket/d01-prompt-issuance`, started 2026-11-17. Spec `tickets/D01-*.md`. |
+_None._
 
 ## In review
 
-_None._
+| ID  | Ticket                 | Why                                                                                                                                                  |
+| --- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D01 | Prompt issuance module | [PR #93](https://github.com/logandelafosse/french-writing-prompter/pull/93) `8581a90`. Adversarial, test, and tooling reviewers running. 2026-11-17. |
 
 ## Blocked
 
@@ -100,7 +100,7 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | --- | ------------------------ | ---- | ----------- | ------------------------------------------------------------------------------------------------- |
 | D02 | Evaluate pipeline façade | AFK  | —           | **Done** — [PR #91](https://github.com/logandelafosse/french-writing-prompter/pull/91) `259c229`. |
 | D03 | Weakness / Focus façade  | AFK  | —           | **Done** — [PR #92](https://github.com/logandelafosse/french-writing-prompter/pull/92) `db003c8`. |
-| D01 | Prompt issuance module   | AFK  | —           | **In progress** — `ticket/d01-prompt-issuance`, started 2026-11-17.                               |
+| D01 | Prompt issuance module   | AFK  | —           | **In review** — [PR #93](https://github.com/logandelafosse/french-writing-prompter/pull/93).      |
 | D04 | Learner-dialect context  | AFK  | —           | **Ready** — D02 merged. Dispatch after D03 and D01. `tickets/D04-*.md`.                           |
 | D05 | Session / Draft façade   | AFK  | D01 helpful | After issuance thins Home’s server edge. `tickets/D05-*.md`.                                      |
 
