@@ -7,6 +7,7 @@ import {
 } from "@/modules/cefr-tracker/level-store";
 import { LevelPutBody } from "@/contracts/api";
 import { parseRequestBody } from "@/lib/http";
+import { abandonInProgressPlacementRuns } from "@/modules/placement-test/placement-store";
 import { withErrors } from "@/server/with-errors";
 
 export const GET = withErrors(async function getLevel() {
@@ -25,5 +26,6 @@ export const PUT = withErrors(async function putLevel(request: Request) {
   }
 
   const change = await setLevel(parsed.value.level, "manual");
+  await abandonInProgressPlacementRuns();
   return NextResponse.json({ change });
 });

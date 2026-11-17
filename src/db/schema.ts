@@ -29,9 +29,20 @@ export const sessions = sqliteTable(
     abandonedAt: text("abandoned_at"),
     evaluationRaw: text("evaluation_raw"),
     focusJson: text("focus_json"),
+    placementRunId: integer("placement_run_id"),
+    placementStep: integer("placement_step"),
   },
   (table) => [index("sessions_quota_idx").on(table.kind, table.localDate)],
 );
+
+export const placementRuns = sqliteTable("placement_runs", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  status: text("status").notNull(),
+  step: integer("step").notNull(),
+  finalLevel: text("final_level"),
+  startedAt: text("started_at").notNull(),
+  completedAt: text("completed_at"),
+});
 
 export const corrections = sqliteTable(
   "corrections",

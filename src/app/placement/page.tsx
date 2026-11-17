@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { PlacementTestCard } from "@/components/legacy/placement/placement-test-card";
 import { TodayGetResponse } from "@/contracts/today";
 import { fetchJson } from "@/lib/http";
 
@@ -19,8 +18,6 @@ export default function PlacementPage() {
     };
   }, [router]);
   return (
-    <main className="max-w-home mx-auto flex w-full flex-col gap-6 px-5 py-5 pb-20 sm:px-6">
-      <PlacementTestCard />
-    </main>
+    <main className="max-w-home mx-auto flex w-full flex-col gap-6 px-5 py-5 pb-20 sm:px-6"></main>
   );
 }

@@ -157,56 +157,6 @@ export function scoresFromStored(
   return parsed.success ? parsed.data : null;
 }
 
-function placeholderFromDimensions(
-  dimensions: EvaluatorOutput["dimensions"],
-  overall_cefr: Evaluation["overall_cefr"],
-  holistic: string,
-): Evaluation {
-  const per_dimension = {
-    grammatical_accuracy: dimensions.grammatical_accuracy.comment,
-    vocabulary: dimensions.vocabulary.comment,
-    coherence: dimensions.coherence.comment,
-    register_style: dimensions.register_style.comment,
-  };
-  const scores = {
-    grammatical_accuracy: dimensions.grammatical_accuracy,
-    vocabulary: dimensions.vocabulary,
-    coherence: dimensions.coherence,
-    register_style: dimensions.register_style,
-  };
-  return {
-    overall_cefr,
-    tips: { per_dimension, holistic },
-    dimensions: {
-      grammatical_accuracy: {
-        ...scores.grammatical_accuracy,
-        max: EVALUATION_SCORE_MAX,
-      },
-      vocabulary: { ...scores.vocabulary, max: EVALUATION_SCORE_MAX },
-      coherence: { ...scores.coherence, max: EVALUATION_SCORE_MAX },
-      register_style: { ...scores.register_style, max: EVALUATION_SCORE_MAX },
-    },
-  };
-}
-
-export function toPlaceholderEvaluation(
-  value: Evaluation | EvaluationV2 | EvaluatorOutput,
-): Evaluation {
-  if ("tips" in value) return value;
-  if ("version" in value) {
-    return placeholderFromDimensions(
-      value.dimensions,
-      value.overallCefr,
-      value.nextLevelTip,
-    );
-  }
-  return placeholderFromDimensions(
-    value.dimensions,
-    value.overall_cefr,
-    value.next_level_tip,
-  );
-}
-
 export function parseCorrectionCategory(
   raw: string | null,
 ): MistakeCategory | null {
