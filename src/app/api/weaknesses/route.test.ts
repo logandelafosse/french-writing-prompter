@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
@@ -14,6 +16,7 @@ import {
   saveSession,
 } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { pinPractice } from "@/modules/weakness-service/practice-store";
 import { readResponseJson } from "@/test/read-response-json";
 import { POST as postDialectNote } from "@/app/api/dialect-notes/route";
 import { GET } from "./route";
@@ -212,6 +215,75 @@ describe("GET /api/weaknesses", () => {
     const after = await readResponseJson(await GET(), WeaknessesGetResponse);
     expect(after.weaknesses).toEqual([
       expect.objectContaining({ category: "genre", count: 1 }),
+    ]);
+  });
+
+  it("assembles ranked Weaknesses, the pending pin, and live Focus through one façade", async () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/api/weaknesses/route.ts"),
+      "utf8",
+    );
+    expect(source).not.toMatch(/weakness-store|compute-focus|practice-store/);
+    expect(source).toContain("weaknessBoard");
+
+    const dates = [
+      "2026-11-16T18:00:00.000Z",
+      "2026-11-15T18:00:00.000Z",
+      "2026-11-14T18:00:00.000Z",
+      "2026-11-13T18:00:00.000Z",
+    ] as const;
+    const categories = [
+      ["prepositions", "genre", "autre"],
+      ["prepositions", "genre", "autre"],
+      ["prepositions", "autre"],
+      ["accord"],
+    ] as const;
+
+    for (const [index, evaluatedAt] of dates.entries()) {
+      const session = await seedEvaluated(evaluatedAt);
+      const cats = categories[index] ?? [];
+      await saveCorrections(
+        cats.map((category, ordinal) =>
+          correction(session.id, {
+            id: `${evaluatedAt}-${category}`,
+            kind: "mistake",
+            category,
+            ordinal: ordinal + 1,
+          }),
+        ),
+        () => new Date(evaluatedAt),
+      );
+    }
+    await pinPractice("accord", () => new Date("2026-11-16T19:00:00.000Z"));
+
+    const body = await readResponseJson(await GET(), WeaknessesGetResponse);
+    expect(body.weaknesses.map((row) => row.category)).toEqual([
+      "prepositions",
+      "autre",
+      "genre",
+      "accord",
+    ]);
+    expect(body.weaknesses.map((row) => row.trend)).toEqual([
+      "actif",
+      "actif",
+      "actif",
+      "en_progres",
+    ]);
+    expect(body.weaknesses.map((row) => row.pinned)).toEqual([
+      false,
+      false,
+      false,
+      true,
+    ]);
+    expect(body.focus.map((item) => item.id)).toEqual([
+      "accord",
+      "prepositions",
+    ]);
+    expect(body.weaknesses.map((row) => row.isFocus)).toEqual([
+      true,
+      false,
+      false,
+      true,
     ]);
   });
 });
