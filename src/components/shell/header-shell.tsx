@@ -78,16 +78,22 @@ export function QuotaText({
 export function LevelMenu({
   level,
   onChange,
+  open,
+  onOpenChange,
 }: {
   level: CefrLevel;
   onChange: (level: CefrLevel) => Promise<void>;
+  open?: boolean | undefined;
+  onOpenChange?: ((open: boolean) => void) | undefined;
 }) {
   const triggerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <Menu.Root
-      onOpenChange={(open, eventDetails) => {
-        if (!open && eventDetails.reason === "escape-key") {
+      open={open}
+      onOpenChange={(next, eventDetails) => {
+        onOpenChange?.(next);
+        if (!next && eventDetails.reason === "escape-key") {
           triggerRef.current?.focus();
         }
       }}
@@ -148,13 +154,23 @@ export type AppHeaderProps = {
   quota: QuotaGetDto | null;
   levelReady: boolean;
   quotaReady: boolean;
-  placementLink?: {
-    href: string;
-    label: "Je connais mon niveau" | "Finir plus tard";
-  } | null;
+  placementLink?:
+    | {
+        href: string;
+        label: "Je connais mon niveau" | "Finir plus tard";
+      }
+    | null
+    | undefined;
   current?: "carnet" | "historique" | undefined;
   onLevelChange?: (level: CefrLevel) => Promise<void>;
+  levelMenuOpen?: boolean | undefined;
+  onLevelMenuOpen?: ((open: boolean) => void) | undefined;
 };
+
+type PlacementHeaderLink = {
+  href: string;
+  label: "Je connais mon niveau" | "Finir plus tard";
+} | null;
 
 export function AppHeader({
   variant,
@@ -165,6 +181,8 @@ export function AppHeader({
   placementLink = null,
   current,
   onLevelChange,
+  levelMenuOpen,
+  onLevelMenuOpen,
 }: AppHeaderProps) {
   if (variant === "placement") {
     return (
@@ -206,7 +224,12 @@ export function AppHeader({
           </span>
         </Link>
         {level && onLevelChange ? (
-          <LevelMenu level={level} onChange={onLevelChange} />
+          <LevelMenu
+            level={level}
+            onChange={onLevelChange}
+            open={levelMenuOpen}
+            onOpenChange={onLevelMenuOpen}
+          />
         ) : null}
       </div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 sm:contents">
@@ -259,6 +282,8 @@ type HeaderContextValue = {
   refreshQuota: () => Promise<void>;
   refreshShell: (optimisticLevel?: CefrLevel) => Promise<void>;
   syncFromToday: (payload: TodayGetDto) => void;
+  setPlacementLink: (link: PlacementHeaderLink) => void;
+  openLevelMenu: () => void;
 };
 
 const HeaderContext = createContext<HeaderContextValue | null>(null);
@@ -278,6 +303,8 @@ export function HeaderShell({ children }: { children: ReactNode }) {
   const [quota, setQuota] = useState<QuotaGetDto | null>(null);
   const [levelReady, setLevelReady] = useState(false);
   const [quotaReady, setQuotaReady] = useState(false);
+  const [placementLink, setPlacementLink] = useState<PlacementHeaderLink>(null);
+  const [levelMenuOpen, setLevelMenuOpen] = useState(false);
   const quotaFetchGen = useRef(0);
 
   const fetchQuota = useCallback(async () => {
@@ -365,10 +392,9 @@ export function HeaderShell({ children }: { children: ReactNode }) {
       ? ("historique" as const)
       : undefined;
 
-  const contextValue = useMemo(
-    () => ({ level, refreshQuota, refreshShell, syncFromToday }),
-    [level, refreshQuota, refreshShell, syncFromToday],
-  );
+  const openLevelMenu = useCallback(() => setLevelMenuOpen(true), []);
+  // prettier-ignore
+  const contextValue = useMemo(() => ({ level, refreshQuota, refreshShell, syncFromToday, setPlacementLink, openLevelMenu }), [level, openLevelMenu, refreshQuota, refreshShell, syncFromToday]);
 
   return (
     <HeaderContext.Provider value={contextValue}>
@@ -378,13 +404,11 @@ export function HeaderShell({ children }: { children: ReactNode }) {
         quota={quota}
         levelReady={levelReady}
         quotaReady={quotaReady}
-        placementLink={
-          placementPath
-            ? { href: "/", label: "Je connais mon niveau" as const }
-            : null
-        }
+        placementLink={placementPath ? placementLink : null}
         current={current}
         onLevelChange={onLevelChange}
+        levelMenuOpen={levelMenuOpen}
+        onLevelMenuOpen={setLevelMenuOpen}
       />
       {children}
     </HeaderContext.Provider>

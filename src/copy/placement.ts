@@ -1,0 +1,20 @@
+// prettier-ignore
+export const placementCopy = {
+  title: "Test de placement",
+  intro: "Trois consignes, une après l'autre. Écris ce que tu peux pour chacune. À la fin, je te donne ton niveau CECR et on commence pour de vrai.",
+  stepN: (n: number) => `Étape ${n}`,
+  stepNames: ["Première consigne", "Deuxième consigne", "Troisième consigne"] as const,
+  caption: "Écris comme tu parles : le français de la Louisiane, c'est ça qui compte icitte. Tes brouillons sont gardés à mesure.",
+  start: "Commencer",
+  stepTitle: (n: number) => `Test de placement · étape ${n} sur 3`,
+  progressLabel: "Avancement du test",
+  progressValue: (n: number) => `Étape ${n} sur 3`,
+  next: "Consigne suivante",
+  seeLevel: "Voir mon niveau",
+  doneTitle: "Test de placement · fini",
+  doneLabel: (levelName: string) => `TON NIVEAU CECR · ${levelName.toLocaleUpperCase("fr-FR")}`,
+  doneCta: "Ma première consigne",
+  doneOther: "Choisir un autre niveau",
+  knowLevel: "Je connais mon niveau",
+  finishLater: "Finir plus tard",
+} as const;

@@ -13,6 +13,7 @@ export function WritingFooter({
   savedAt,
   localOnly = false,
   onSubmit,
+  submitLabel,
 }: {
   text: string;
   target: { min: number; max: number } | null;
@@ -22,6 +23,7 @@ export function WritingFooter({
   savedAt?: string | null | undefined;
   localOnly?: boolean | undefined;
   onSubmit: () => void;
+  submitLabel?: string | undefined;
 }) {
   const draftStatus = <DraftStatus savedAt={savedAt} localOnly={localOnly} />;
   const disabled = isSubmitDisabled(text, submitBusy);
@@ -38,6 +40,7 @@ export function WritingFooter({
               busy={submitBusy}
               disabled={disabled}
               retry={submitRetry}
+              idleLabel={submitLabel}
               onClick={onSubmit}
             />
           }
@@ -62,6 +65,7 @@ export function WritingFooter({
           busy={submitBusy}
           disabled={disabled}
           retry={submitRetry}
+          idleLabel={submitLabel}
           onClick={onSubmit}
         />
       </div>
