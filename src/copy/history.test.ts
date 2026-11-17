@@ -64,12 +64,30 @@ describe("levelLine", () => {
     expect(
       formatLevelLine(
         [
-          { level: "A2", since: "2026-10-03T18:00:00.000Z" },
-          { level: "B1", since: "2026-10-28T18:00:00.000Z" },
+          { id: 2, toLevel: "B1", createdAt: "2026-10-28T18:00:00.000Z" },
+          { id: 1, toLevel: "A2", createdAt: "2026-10-03T18:00:00.000Z" },
         ],
         "America/Chicago",
       ),
     ).toBe("Niveau : A2 depuis le 3 octobre, B1 depuis le 28 octobre.");
     expect(formatLevelLine([])).toBeNull();
+  });
+
+  it("omits a reverted auto-advancement from getLevelHistory order", () => {
+    expect(
+      formatLevelLine(
+        [
+          {
+            id: 3,
+            toLevel: "A2",
+            createdAt: "2026-10-29T18:00:00.000Z",
+            revertsChangeId: 2,
+          },
+          { id: 2, toLevel: "B1", createdAt: "2026-10-28T18:00:00.000Z" },
+          { id: 1, toLevel: "A2", createdAt: "2026-10-03T18:00:00.000Z" },
+        ],
+        "America/Chicago",
+      ),
+    ).toBe("Niveau : A2 depuis le 3 octobre.");
   });
 });

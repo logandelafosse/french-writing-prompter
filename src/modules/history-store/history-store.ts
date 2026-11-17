@@ -180,10 +180,7 @@ export async function listSessionSummaries(options: {
     if (parsed) bySession.get(item.sessionId)?.push(parsed);
   }
   const history = await getLevelHistory();
-  const levelLine = formatLevelLine(
-    history.filter((change) => change.revertsChangeId === undefined).slice().reverse().map((change) => ({ level: change.toLevel, since: change.createdAt })),
-    tz,
-  );
+  const levelLine = formatLevelLine(history, tz);
   return {
     sessions: page.map((row) => rowToSessionSummary(row, bySession.get(row.id) ?? [], tz, today)),
     nextCursor, levelLine,

@@ -51,9 +51,14 @@ export function formatHistoryDay(iso: string, timeZone?: string): string {
 }
 
 // prettier-ignore
-export function formatLevelLine(entries: readonly { level: string; since: string }[], timeZone?: string): string | null {
+export function formatLevelLine(
+  history: readonly { id: number; toLevel: string; createdAt: string; revertsChangeId?: number | undefined }[],
+  timeZone?: string,
+): string | null {
+  const reverted = new Set(history.flatMap((change) => change.revertsChangeId === undefined ? [] : [change.revertsChangeId]));
+  const entries = history.filter((change) => change.revertsChangeId === undefined && !reverted.has(change.id)).slice().reverse();
   if (entries.length === 0) return null;
-  return `Niveau : ${entries.map((entry) => `${entry.level} depuis le ${formatHistoryDay(entry.since, timeZone)}`).join(", ")}.`;
+  return `Niveau : ${entries.map((change) => `${change.toLevel} depuis le ${formatHistoryDay(change.createdAt, timeZone)}`).join(", ")}.`;
 }
 
 export function writingExcerpt(text: string): string | null {
