@@ -4,13 +4,14 @@ Turn the CEFR grading demo into the Louisiana French writing tutor designed in `
 
 ## Inputs
 
-| Doc                                           | What it decides                                                                            |
-| --------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `docs/design/handoff/HANDOFF.md` + `screens/` | The target UI: tokens, components, copy, states, a11y                                      |
-| `docs/design/implementation-map.md`           | Screen → component → route/state mapping, copy table, 50 design gaps with assumed defaults |
-| `docs/plan/backend-requirements.md`           | Domain model, schema + migrations, API contracts, LLM prompts, DLF measurements            |
-| `docs/agents/tooling-review.md`               | Compiler, ESLint, ast-grep, Zod, Playwright, and pre-commit setup                          |
-| `CONTEXT.md`                                  | Domain glossary (extended in T06 with the tutor vocabulary)                                |
+| Doc                                           | What it decides                                                                               |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `docs/design/handoff/HANDOFF.md` + `screens/` | The target UI: tokens, components, copy, states, a11y                                         |
+| `docs/design/implementation-map.md`           | Screen → component → route/state mapping, copy table, 50 design gaps with assumed defaults    |
+| `docs/plan/backend-requirements.md`           | Domain model, schema + migrations, API contracts, LLM prompts, DLF measurements               |
+| `docs/agents/tooling-review.md`               | Compiler, ESLint, ast-grep, Zod, Playwright, and pre-commit setup                             |
+| `CONTEXT.md`                                  | Domain glossary + **Module homes** (term → `src/modules` Seam); deepenings in `deepenings.md` |
+| `docs/plan/deepenings.md`                     | Post–T35 deep-module plan (D01–D05)                                                           |
 
 ## Product decisions already made
 
@@ -32,6 +33,8 @@ Turn the CEFR grading demo into the Louisiana French writing tutor designed in `
 | 2. Dialect            | T23–T27 | Standard→Louisiana suggestions with DLF attribution, Dialect checks, Add Dialect Note sheet, Carnet notes list, markdown export                                                     |
 | 3. Memory             | T28–T30 | Weaknesses with trend, Focus du jour driving prompts, Resources                                                                                                                     |
 | 4. Archive and polish | T31–T35 | History redesign, read-only past reviews, persistent Placement Test, cleanup and motion                                                                                             |
+| 5. Host               | T36–T39 | Vercel + Turso — see `vercel-deployment.md` (HITL)                                                                                                                                  |
+| 6. Deepen modules     | D01–D05 | Thin entry points: prompt issuance, evaluate façade, Focus/Weakness façade, learner-dialect context, Session/Draft façade — `docs/plan/deepenings.md`                               |
 
 The first ticket where it feels like a tutor is T22 (Mistakes marked in the text). Dialect awareness lands with T25, and memory with T29.
 

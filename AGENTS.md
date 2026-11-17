@@ -1,5 +1,9 @@
 ## Agent skills
 
+### Domain vocabulary (read first)
+
+**`CONTEXT.md`** at the repo root is the glossary. Use its terms; never the _Avoid_ words. **Module homes** in that file maps each term to its owning Seam under `src/modules/`. How to consume domain docs: `docs/agents/domain.md`.
+
 ### Issue tracker
 
 GitHub Issues (gh CLI). See `docs/agents/issue-tracker.md`.
@@ -7,10 +11,6 @@ GitHub Issues (gh CLI). See `docs/agents/issue-tracker.md`.
 ### Triage labels
 
 Default canonical labels — no overrides. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context layout. See `docs/agents/domain.md`.
 
 ## Engineering rules
 
@@ -58,14 +58,18 @@ Single-context layout. See `docs/agents/domain.md`.
 
 ### Module seams
 
+Prefer **deep modules**: a small **Interface** (what callers must know) hiding a large **Implementation**, at a clear **Seam**. **Depth** = leverage per unit of Interface. **Locality** = change and tests concentrate behind that Seam. An **Adapter** fills a Seam; one Adapter is a hypothetical Seam — don’t invent ports until a second Adapter exists. Deletion test: if deleting the module only moves complexity into callers, it was earning its keep.
+
+- Domain words and term→module map: **`CONTEXT.md`**. Deepening tickets: `docs/plan/deepenings.md` (D01–D05).
 - Components → `@/contracts`, `@/copy`, `@/lib/http`, `@/components/ui` only. Never `@/db`, `@/server`, stores, or `openai`.
-- `src/modules` is framework-free (no `next`, `react`, `@/db`). Only `src/modules/openai-client` imports `openai`.
+- `src/modules` is framework-free (no `next`, `react`). Persistence Adapters under `src/modules/**` may use `@/db`; only `src/modules/openai-client` imports `openai`. Route handlers must not import `@/db`.
 - Route handlers stay thin: parse → call module → persist via repository → respond.
 
 ## Delivery
 
 - Workflow (coordinator, implementers, reviewers, definition of done): `docs/agents/workflow.md`
 - Plan and open owner questions: `docs/plan/plan.md`
+- Module deepenings (post–T35): `docs/plan/deepenings.md` · tickets `D01`–`D05` in `docs/plan/tickets/`
 - Board (source of truth for ticket status and why): `docs/plan/board.md`
 - Ticket specs: `docs/plan/tickets/`
 - UI spec: `docs/design/handoff/HANDOFF.md`, mapped onto the code in `docs/design/implementation-map.md`

@@ -88,6 +88,50 @@ _Avoid_: variant, regionalism, “not Standard French” as the default judgment
 A dialect of French spoken in Louisiana. Coding agents should read `docs/dialect/louisiana-french.md` (generated snapshot of base rules plus learner Dialect Notes). Runtime rules live only in `src/modules/dialect/louisiana-rules.ts`; learner notes live only in the database. The app never reads the markdown back.
 _Avoid_: dialectal French, Creole (it's a dialect of French, not a creole); inline feature lists in this file
 
+**Session**:
+One Writing Prompt plus optional Draft, Student Writing, Evaluation, and Corrections. Status is active, evaluated, or abandoned. Daily Sessions consume quota; Placement Sessions do not.
+_Avoid_: attempt, try, exercise instance
+
+**Daily Quota**:
+At most three daily Writing Prompts per local calendar day (midnight local). Placement Test prompts do not consume it.
+_Avoid_: rate limit, API quota, tokens
+
+**Practice Pin** ("Pratiquer ça"):
+A learner-chosen Weakness category that the next daily Writing Prompt must exercise, then clear.
+_Avoid_: sticky focus, forced topic
+
+**DLF** (Dictionary of Louisiana French):
+Curated lexicon used as positive evidence for Louisiana forms. A missing headword never makes a Mistake by itself.
+_Avoid_: spellchecker dictionary, full French dictionary
+
+**Span**:
+The character range in Student Writing that a Correction quotes and marks.
+_Avoid_: highlight range, selection (UI-only sense)
+
+**Weakness Trend**:
+How a Weakness is moving over recent Sessions: `actif`, `en_progres`, or `tranquille`.
+_Avoid_: score history, graph series
+
+## Module homes
+
+Where each glossary term's behaviour should live. Paths are seams, not alternate definitions — language still comes from the entries above. Deepening plan: `docs/plan/deepenings.md`.
+
+| Term                                                      | Owning module (seam)                                                               | Notes                                                                |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Writing Prompt                                            | `src/modules/prompt-generator`                                                     | Issuance (quota, Focus, persist) must move behind a façade — see D01 |
+| Student Writing / Draft / Session                         | `src/modules/history-store` → Session façade (D05)                                 | Store stays persistence; lifecycle is the deepening                  |
+| Evaluation                                                | `src/modules/writing-evaluator`                                                    | Raw LLM + **post-process** must sit behind one `evaluate` (D02)      |
+| Correction / Mistake / Standard→Louisiana / Dialect check | `src/modules/writing-evaluator` (emit) + `src/modules/correction-service` (status) | Status machine stays in correction-service                           |
+| Span                                                      | `src/modules/writing-evaluator` (`locate-quote`)                                   | Internal to Evaluation post-process after D02                        |
+| Dialect Note / Louisiana French / French Dialect          | `src/modules/dialect`                                                              | One **learner-dialect context** for gen/eval (D04)                   |
+| DLF                                                       | `src/modules/dlf`                                                                  | Lookup index is the deep Interface                                   |
+| Weakness / Weakness Trend / Focus du jour / Practice Pin  | `src/modules/weakness-service`                                                     | Need one Focus/Weakness façade (D03)                                 |
+| Resource                                                  | `src/modules/resources`                                                            | Catalog pick only; model never invents URLs                          |
+| CEFR Level (streak, undo, sources)                        | `src/modules/cefr-tracker`                                                         |                                                                      |
+| Placement Test                                            | `src/modules/placement-test`                                                       | `PlacementService` + pure helpers — durable                          |
+| Daily Quota                                               | `src/modules/quota-manager`                                                        | Keep `quotaTimeZone` inside this module                              |
+| Carnet                                                    | UI composition (`src/components/carnet`)                                           | Not a domain module; composes Weakness + Dialect Note                |
+
 ## Example dialogue
 
 **Dev:** When a user first arrives, how do we know their CEFR Level?

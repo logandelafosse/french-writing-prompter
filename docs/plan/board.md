@@ -4,11 +4,16 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-17 by coordinator (T35 done — Consigne UI redesign complete through T35).
+Last updated: 2026-11-17 by coordinator (deepenings planned D01–D05; hosting still HITL).
 
 ## Ready
 
-_None. Phase 4 polish complete. Next: Phase 5 hosting (T36–T39) after Logan HITL on `docs/plan/vercel-deployment.md`._
+| ID  | Ticket                   | Why                                                                               |
+| --- | ------------------------ | --------------------------------------------------------------------------------- |
+| D02 | Evaluate pipeline façade | No blockers; highest Leverage on the fat evaluate route. Spec `tickets/D02-*.md`. |
+| D03 | Weakness / Focus façade  | No blockers; unblocks cleaner D01. Spec `tickets/D03-*.md`.                       |
+
+_Also planned (Backlog until deps clear): D01 (after D03), D04 (after D02), D05 (after D01 helpful). Hosting T36–T39 waits on `docs/plan/vercel-deployment.md` HITL. Plan: `docs/plan/deepenings.md`._
 
 ## In progress
 
@@ -87,6 +92,18 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 | T33 | Persistent Placement Test (server)            | AFK  | T20, T21   | **Done** — [PR #87](https://github.com/logandelafosse/french-writing-prompter/pull/87) `635d7fc`; closed #35.                                                                                         |
 | T34 | Placement Test screens                        | AFK  | T16, T33   | **Done** — [PR #88](https://github.com/logandelafosse/french-writing-prompter/pull/88) `3bd7545`; closed #36.                                                                                         |
 | T35 | Cleanup, motion, 390 px pass, a11y sweep      | AFK  | T13–T34 UI | **Done** — T35a [PR #89](https://github.com/logandelafosse/french-writing-prompter/pull/89) + T35b [PR #90](https://github.com/logandelafosse/french-writing-prompter/pull/90) `9ee20c6`; closed #37. |
+
+### Phase 6 — Deepen modules
+
+| ID  | Ticket                   | Type | Blocked by    | Why not ready                                                          |
+| --- | ------------------------ | ---- | ------------- | ---------------------------------------------------------------------- |
+| D02 | Evaluate pipeline façade | AFK  | —             | **Ready** — on Ready column.                                           |
+| D03 | Weakness / Focus façade  | AFK  | —             | **Ready** — on Ready column.                                           |
+| D01 | Prompt issuance module   | AFK  | D03 preferred | Wait until Focus façade lands (or wire temporary). `tickets/D01-*.md`. |
+| D04 | Learner-dialect context  | AFK  | D02 preferred | After evaluate owns post-process. `tickets/D04-*.md`.                  |
+| D05 | Session / Draft façade   | AFK  | D01 helpful   | After issuance thins Home’s server edge. `tickets/D05-*.md`.           |
+
+Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CONTEXT.md`](../../CONTEXT.md).
 
 ### Phase 5 — Host (planned, not on board DAG yet)
 
