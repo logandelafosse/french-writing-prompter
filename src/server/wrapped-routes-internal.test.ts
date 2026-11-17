@@ -116,7 +116,7 @@ describe("wrapped API routes return INTERNAL JSON on unexpected errors", () => {
       cefrLevel: "A2",
       localDate: "2026-11-16",
     });
-    vi.spyOn(historyStore, "saveActiveDraft").mockRejectedValueOnce(
+    vi.spyOn(historyStore, "rememberWriting").mockRejectedValueOnce(
       new Error("boom"),
     );
     response = await putDraft(
