@@ -6,6 +6,7 @@ import { historyCopy, historyRowMeta, historyRowTitle } from "@/copy/history";
 import { Button } from "@/components/ui/button";
 import { Notice } from "@/components/states/notice";
 import { SectionLabel } from "@/components/ui/section-label";
+import { TextLink } from "@/components/ui/text-link";
 import { cn } from "@/lib/utils";
 
 export class HistoryRowBoundary extends Component<
@@ -75,6 +76,9 @@ function ExpandedBody({ item }: { item: SessionSummary }) {
         <div className="flex flex-col gap-1.5">
           <SectionLabel>{historyCopy.text(item.wordCount)}</SectionLabel>
           <p lang="fr" className="font-serif text-[18px]/[1.6]">{item.excerpt}</p>
+          {item.displayStatus === "evaluated" ? (
+            <TextLink href={`/historique/${item.id}`} compact>{historyCopy.readAll}</TextLink>
+          ) : null}
         </div>
       ) : null}
       {showCorrections ? (

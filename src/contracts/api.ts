@@ -11,7 +11,7 @@ import {
 } from "@/config/limits";
 import { PromptConstraints } from "./prompt";
 import { PromptMeta } from "./prompt-meta";
-import { SessionStatus, SessionSummary } from "./session";
+import { SessionStatus, SessionSummary, SessionDetail } from "./session";
 
 export const LevelChangeDto = z.object({
   id: z.number().int().positive(),
@@ -179,6 +179,8 @@ export const SessionsGetResponse = z.strictObject({
   nextCursor: z.string().nullable(),
   levelLine: z.string().nullable(),
 });
+
+export const SessionDetailGetResponse = SessionDetail;
 
 export const PlacementPostBody = z.discriminatedUnion("action", [
   z.strictObject({ action: z.literal("start") }),

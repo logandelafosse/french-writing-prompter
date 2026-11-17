@@ -32,6 +32,13 @@ function Boom(): ReactNode {
 }
 
 describe("HistoryRow", () => {
+  it("evaluated excerpt links to the past review", () => {
+    render(<HistoryRow item={evaluated} defaultExpanded />);
+    expect(
+      screen.getByRole("link", { name: historyCopy.readAll }),
+    ).toHaveAttribute("href", "/historique/7");
+  });
+
   it("one throwing row does not blank the list", () => {
     render(
       <div>

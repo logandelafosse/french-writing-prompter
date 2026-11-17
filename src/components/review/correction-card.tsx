@@ -10,19 +10,26 @@ import { ResourceLinks } from "./resource-links";
 const cardClass =
   "rounded-base border-line bg-sheet flex flex-col gap-2 border p-[16px_18px] outline-none";
 
-export function CorrectionCard({
-  correction,
-  onAcknowledge,
-  onPushBack,
-  onConfirm,
-  onReject,
-}: {
+type CorrectionCardProps = {
   correction: Correction;
-  onAcknowledge: () => void;
-  onPushBack?: () => void;
-  onConfirm?: () => void;
-  onReject?: () => void;
-}) {
+} & (
+  | { readOnly: true }
+  | {
+      readOnly?: false;
+      onAcknowledge: () => void;
+      onPushBack?: () => void;
+      onConfirm?: () => void;
+      onReject?: () => void;
+    }
+);
+
+export function CorrectionCard(props: CorrectionCardProps) {
+  const { correction } = props;
+  const readOnly = props.readOnly === true;
+  const onAcknowledge = readOnly ? undefined : props.onAcknowledge;
+  const onPushBack = readOnly ? undefined : props.onPushBack;
+  const onConfirm = readOnly ? undefined : props.onConfirm;
+  const onReject = readOnly ? undefined : props.onReject;
   if (
     correction.status === "confirmed_dialect" ||
     correction.status === "overturned"
@@ -43,7 +50,7 @@ export function CorrectionCard({
     );
   }
   if (correction.kind === "standard") {
-    const done = correction.status === "acknowledged";
+    const done = !readOnly && correction.status === "acknowledged";
     return (
       <article
         id={`correction-${correction.ordinal}`}
@@ -88,13 +95,15 @@ export function CorrectionCard({
             <p className="m-0 text-[15px] leading-normal">
               {correction.explanation}
             </p>
-            <Button
-              variant="secondary"
-              className="self-start"
-              onClick={onAcknowledge}
-            >
-              {reviewCopy.actionAck}
-            </Button>
+            {readOnly ? null : (
+              <Button
+                variant="secondary"
+                className="self-start"
+                onClick={onAcknowledge}
+              >
+                {reviewCopy.actionAck}
+              </Button>
+            )}
           </>
         )}
       </article>
@@ -121,27 +130,31 @@ export function CorrectionCard({
         <p className="m-0 text-[15px] leading-normal">
           {correction.question ?? correction.explanation}
         </p>
-        <div className="flex flex-wrap gap-2 max-sm:flex-col sm:gap-x-4">
-          <Button
-            variant="dialect"
-            className="px-4 text-sm font-semibold max-sm:min-h-[46px] max-sm:w-full max-sm:text-[15px]"
-            onClick={onConfirm}
-          >
-            {reviewCopy.actionConfirm}
-          </Button>
-          <Button
-            variant="secondary"
-            className="max-sm:min-h-[46px] max-sm:w-full max-sm:text-[15px]"
-            onClick={onReject}
-          >
-            {reviewCopy.actionReject}
-          </Button>
-        </div>
+        {readOnly ? (
+          <p className="text-muted m-0 text-[15px]">{reviewCopy.unanswered}</p>
+        ) : (
+          <div className="flex flex-wrap gap-2 max-sm:flex-col sm:gap-x-4">
+            <Button
+              variant="dialect"
+              className="px-4 text-sm font-semibold max-sm:min-h-[46px] max-sm:w-full max-sm:text-[15px]"
+              onClick={onConfirm}
+            >
+              {reviewCopy.actionConfirm}
+            </Button>
+            <Button
+              variant="secondary"
+              className="max-sm:min-h-[46px] max-sm:w-full max-sm:text-[15px]"
+              onClick={onReject}
+            >
+              {reviewCopy.actionReject}
+            </Button>
+          </div>
+        )}
       </article>
     );
   }
-  const done = correction.status === "acknowledged";
-  const showActions = correction.kind === "mistake" && !done;
+  const done = !readOnly && correction.status === "acknowledged";
+  const showActions = !readOnly && correction.kind === "mistake" && !done;
   return (
     <article
       id={`correction-${correction.ordinal}`}
@@ -176,31 +189,26 @@ export function CorrectionCard({
           </>
         )}
       </p>
-      {showActions ? (
+      {showActions || readOnly || correction.status === "confirmed_mistake" ? (
         <>
           <p className="m-0 text-[15px] leading-normal">
             {correction.explanation}
           </p>
           <ResourceLinks resources={correction.resources} layout="column" />
-          <div className="flex flex-wrap items-center gap-1 gap-x-4">
-            <Button
-              variant="secondary"
-              className="self-start"
-              onClick={onAcknowledge}
-            >
-              {reviewCopy.actionAck}
-            </Button>
-            <Button variant="quiet" onClick={onPushBack}>
-              {reviewCopy.actionPushback}
-            </Button>
-          </div>
-        </>
-      ) : correction.status === "confirmed_mistake" ? (
-        <>
-          <p className="m-0 text-[15px] leading-normal">
-            {correction.explanation}
-          </p>
-          <ResourceLinks resources={correction.resources} layout="column" />
+          {showActions ? (
+            <div className="flex flex-wrap items-center gap-1 gap-x-4">
+              <Button
+                variant="secondary"
+                className="self-start"
+                onClick={onAcknowledge}
+              >
+                {reviewCopy.actionAck}
+              </Button>
+              <Button variant="quiet" onClick={onPushBack}>
+                {reviewCopy.actionPushback}
+              </Button>
+            </div>
+          ) : null}
         </>
       ) : (
         <ResourceLinks resources={correction.resources} layout="column" />

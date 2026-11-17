@@ -4,6 +4,7 @@ import {
   formatLevelLine,
   historyTitle,
   mistakeCount,
+  pastReviewMeta,
 } from "./history";
 
 const prompt =
@@ -39,6 +40,30 @@ describe("historyTitle", () => {
         date: "14 novembre",
       }),
     ).not.toContain(prompt);
+  });
+});
+
+const lateUtc = {
+  createdAt: "2026-11-15T04:00:00.000Z",
+  mistakeCount: 2,
+  evaluatedLevel: "B1" as const,
+  promptLevel: "A2" as const,
+};
+
+describe("pastReviewMeta", () => {
+  it("joins weekday date, faute count and level without évaluée", () => {
+    expect(pastReviewMeta(lateUtc, "America/Chicago")).toBe(
+      "Samedi 14 novembre · 2 fautes · B1",
+    );
+  });
+
+  it("uses the given timezone, not UTC, for createdAt", () => {
+    expect(pastReviewMeta(lateUtc, "UTC")).toBe(
+      "Dimanche 15 novembre · 2 fautes · B1",
+    );
+    expect(pastReviewMeta(lateUtc, "America/Chicago")).not.toBe(
+      pastReviewMeta(lateUtc, "UTC"),
+    );
   });
 });
 

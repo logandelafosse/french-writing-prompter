@@ -104,6 +104,13 @@ export const EvaluationV2 = z.strictObject({
 });
 export type EvaluationV2 = z.infer<typeof EvaluationV2>;
 
+export const EvaluationScores = EvaluationV2.pick({
+  overallCefr: true,
+  dimensions: true,
+  nextLevelTip: true,
+});
+export type EvaluationScores = z.infer<typeof EvaluationScores>;
+
 export type StoredEvaluation =
   | { status: "v2"; value: EvaluationV2 }
   | { status: "v1"; value: Evaluation }
@@ -117,6 +124,37 @@ export function parseStoredEvaluation(json: string | null): StoredEvaluation {
   const v1 = parseJson(Evaluation, json);
   if (v1.ok) return { status: "v1", value: v1.value };
   return { status: "malformed" };
+}
+
+export function scoresFromStored(
+  stored: StoredEvaluation,
+): EvaluationScores | null {
+  if (stored.status === "v2") {
+    return {
+      overallCefr: stored.value.overallCefr,
+      dimensions: stored.value.dimensions,
+      nextLevelTip: stored.value.nextLevelTip,
+    };
+  }
+  if (stored.status !== "v1") return null;
+  const d = stored.value.dimensions;
+  const parsed = EvaluationScores.safeParse({
+    overallCefr: stored.value.overall_cefr,
+    dimensions: {
+      grammatical_accuracy: {
+        score: d.grammatical_accuracy.score,
+        comment: d.grammatical_accuracy.comment,
+      },
+      vocabulary: { score: d.vocabulary.score, comment: d.vocabulary.comment },
+      coherence: { score: d.coherence.score, comment: d.coherence.comment },
+      register_style: {
+        score: d.register_style.score,
+        comment: d.register_style.comment,
+      },
+    },
+    nextLevelTip: stored.value.tips.holistic,
+  });
+  return parsed.success ? parsed.data : null;
 }
 
 function placeholderFromDimensions(

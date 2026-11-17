@@ -230,6 +230,114 @@ describe("CorrectionCard dialect_check", () => {
   });
 });
 
+const kinds = ["mistake", "standard", "dialect_check"] as const;
+const statuses = [
+  "open",
+  "acknowledged",
+  "confirmed_mistake",
+  "confirmed_dialect",
+  "overturned",
+] as const;
+
+describe("CorrectionCard readOnly", () => {
+  it("renders no actions for any kind or status", () => {
+    const leftover: string[] = [];
+    for (const kind of kinds) {
+      for (const status of statuses) {
+        const { unmount } = render(
+          <CorrectionCard
+            readOnly
+            correction={
+              kind === "standard"
+                ? standard({
+                    id: `${kind}-${status}`,
+                    ordinal: 1,
+                    quote: "ma voiture",
+                    suggestion: "mon char",
+                    status,
+                  })
+                : kind === "dialect_check"
+                  ? dialect({
+                      id: `${kind}-${status}`,
+                      ordinal: 1,
+                      quote: "a tombé",
+                      suggestion: "est tombé",
+                      status,
+                    })
+                  : mistake({
+                      id: `${kind}-${status}`,
+                      ordinal: 1,
+                      quote: "Les enfant",
+                      suggestion: "Les enfants",
+                      status,
+                    })
+            }
+          />,
+        );
+        if (screen.queryAllByRole("button").length > 0) {
+          leftover.push(`${kind} ${status}`);
+        }
+        unmount();
+      }
+    }
+    expect(leftover).toEqual([]);
+  });
+
+  it("resolved dialect note collapses to one line", () => {
+    const { rerender } = render(
+      <CorrectionCard
+        readOnly
+        correction={dialect({
+          id: "d1",
+          ordinal: 6,
+          quote: "a tombé",
+          suggestion: "est tombé",
+          status: "confirmed_dialect",
+        })}
+      />,
+    );
+    expect(screen.getByText(reviewCopy.savedNote)).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: reviewCopy.savedNoteLink }),
+    ).toHaveAttribute("href", "/carnet");
+
+    rerender(
+      <CorrectionCard
+        readOnly
+        correction={dialect({
+          id: "d1",
+          ordinal: 6,
+          quote: "a tombé",
+          suggestion: "est tombé",
+          status: "overturned",
+        })}
+      />,
+    );
+    expect(screen.getByText(reviewCopy.savedNote)).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: reviewCopy.savedNoteLink }),
+    ).toHaveAttribute("href", "/carnet");
+  });
+
+  it("open dialect check shows its question and Pas répondu", () => {
+    render(
+      <CorrectionCard
+        readOnly
+        correction={dialect({
+          id: "d1",
+          ordinal: 6,
+          quote: "a tombé",
+          suggestion: "est tombé",
+        })}
+      />,
+    );
+    expect(
+      screen.getByText("Ça se dit comme ça chez toi, « a tombé » ?"),
+    ).toBeVisible();
+    expect(screen.getByText(reviewCopy.unanswered)).toBeVisible();
+  });
+});
+
 describe("CorrectionCard mistake pushback", () => {
   it("tags a Focus Mistake with focus du jour", () => {
     render(
