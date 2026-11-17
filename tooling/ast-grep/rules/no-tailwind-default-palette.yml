@@ -8,4 +8,4 @@ rule:
     - kind: template_string
   regex: '\b(bg|text|border|ring|outline|fill|stroke|divide|placeholder|from|via|to|shadow|accent|caret|decoration)-(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-\d{2,3}\b'
 files: ["src/**"]
-ignores: ["src/components/legacy/**", "src/test/lint-fixtures/**"]
+ignores: ["src/test/lint-fixtures/**", "src/styles/theme.test.ts"]

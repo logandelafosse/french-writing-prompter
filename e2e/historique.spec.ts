@@ -6,6 +6,7 @@ import {
   expectNoHorizontalOverflow,
   mainContent,
 } from "./support/prompt-helpers";
+import { formatLevelLine } from "../src/copy/history";
 
 const NOTICE =
   "Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.";
@@ -22,7 +23,15 @@ test("three statuses and malformed notice at 1280 and 390", async ({
     "page",
   );
   await expect(
-    main.getByText("Niveau : A2 depuis le 3 octobre, B1 depuis le 28 octobre."),
+    main.getByText(
+      formatLevelLine(
+        [
+          { id: 2, toLevel: "B1", createdAt: "2026-10-28T18:00:00.000Z" },
+          { id: 1, toLevel: "A2", createdAt: "2026-10-03T18:00:00.000Z" },
+        ],
+        "America/Chicago",
+      ) ?? "",
+    ),
   ).toBeVisible();
   const list = main.getByRole("region", { name: "Séances passées" });
   const evaluated = list.getByRole("button", { name: /récit · 14 novembre/ });

@@ -8,7 +8,7 @@ export const carnetCopy = {
   title: "Carnet",
   weakTitle: "À travailler",
   weakIntro:
-    "Les fautes qui reviennent. « Pratiquer ça » oriente ta prochaine consigne.",
+    "Les fautes qui reviennent. «\u202FPratiquer ça\u202F» oriente ta prochaine consigne.",
   weakEmpty:
     "Rien à travailler pour l'instant. Les fautes qui reviennent vont apparaître icitte.",
   weakToday: "aujourd'hui",
@@ -23,13 +23,13 @@ export const carnetCopy = {
   notesEdit: "Modifier",
   notesDelete: "Supprimer",
   notesEmpty:
-    "Pas encore de notes. Quand le tuteur te demande « Ça se dit comme ça ? », ta réponse vient icitte.",
+    "Pas encore de notes. Quand le tuteur te demande «\u202FÇa se dit comme ça\u202F?\u202F», ta réponse vient icitte.",
   sessionToday: "séance d'aujourd'hui",
   scopeWord: "ce mot seulement",
   scopePattern: "toute la famille",
   metaNew: "nouvelle",
   deleteLabel: "Supprimer cette note",
-  deleteLead: "Supprimer cette note ?",
+  deleteLead: "Supprimer cette note\u202F?",
   deleteBody: "Le tuteur pourra te reprendre là-dessus.",
   deleteKeep: "Garder",
 } as const;

@@ -24,13 +24,29 @@ const constraints = JSON.stringify({
 
 async function createPromptSession(): Promise<number> {
   await setLevel("A2", "manual");
-  const { POST } = await import("../prompt/route");
+  const { POST } = await import("../../../prompt/route");
   const created = await POST(
     new Request("http://localhost/api/prompt", { method: "POST" }),
   );
   expect(created.status).toBe(200);
   const body = await readResponseJson(created, PromptPostResponse);
   return body.session.id;
+}
+
+async function postEvaluate(
+  sessionId: number,
+  text: string,
+  extraHeaders: Record<string, string> = {},
+) {
+  const { POST } = await import("./route");
+  return POST(
+    new Request(`http://localhost/api/sessions/${sessionId}/evaluate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...extraHeaders },
+      body: JSON.stringify({ text }),
+    }),
+    { params: Promise.resolve({ id: String(sessionId) }) },
+  );
 }
 
 describe("evaluate session lifecycle", () => {
@@ -61,20 +77,9 @@ describe("evaluate session lifecycle", () => {
       localDate: "2026-11-16",
     });
 
-    const { POST } = await import("./route");
-    const failed = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-e2e-scenario": "failure",
-        },
-        body: JSON.stringify({
-          writing: "Mon texte à garder.",
-          sessionId: session.id,
-        }),
-      }),
-    );
+    const failed = await postEvaluate(session.id, "Mon texte à garder.", {
+      "x-e2e-scenario": "failure",
+    });
     expect(failed.status).toBe(502);
     expect(failed.headers.get("content-type")).toMatch(/json/);
     const failedBody = await readResponseJson(failed, ErrorEnvelope);
@@ -92,14 +97,7 @@ describe("evaluate session lifecycle", () => {
   it("keeps prompt_level at the generated level and stores the evaluated level on cefr_level", async () => {
     const sessionId = await createPromptSession();
 
-    const { POST } = await import("./route");
-    const evaluated = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ writing: "Un petit texte.", sessionId }),
-      }),
-    );
+    const evaluated = await postEvaluate(sessionId, "Un petit texte.");
     expect(evaluated.status).toBe(200);
 
     const rows = await db
@@ -142,17 +140,7 @@ describe("evaluate session lifecycle", () => {
     });
     expect((await getQuotaState()).remaining).toBe(0);
 
-    const { POST } = await import("./route");
-    const response = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          writing: "Mon brouillon reste.",
-          sessionId: session.id,
-        }),
-      }),
-    );
+    const response = await postEvaluate(session.id, "Mon brouillon reste.");
     expect(response.status).toBe(200);
     expect((await getQuotaState()).remaining).toBe(0);
   });
@@ -160,27 +148,10 @@ describe("evaluate session lifecycle", () => {
   it("returns 409 ALREADY_EVALUATED on a second evaluate", async () => {
     const sessionId = await createPromptSession();
 
-    const { POST } = await import("./route");
-    const requestBody = JSON.stringify({
-      writing: "Un petit texte.",
-      sessionId,
-    });
-    const first = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: requestBody,
-      }),
-    );
+    const first = await postEvaluate(sessionId, "Un petit texte.");
     expect(first.status).toBe(200);
 
-    const second = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: requestBody,
-      }),
-    );
+    const second = await postEvaluate(sessionId, "Un petit texte.");
     expect(second.status).toBe(409);
     const body = await readResponseJson(second, ConflictBody);
     expect(body.code).toBe("ALREADY_EVALUATED");

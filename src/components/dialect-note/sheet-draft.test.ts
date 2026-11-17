@@ -32,13 +32,15 @@ describe("dialectSheetDraft", () => {
         ruleIfDialect: "On dit a tombé.",
         dialectLemma: "tomber",
         dialectExample: "Il a tombé hier.",
-        dialectPattern: "« avoir » avec les verbes de mouvement",
+        dialectPattern: "«\u202Favoir\u202F» avec les verbes de mouvement",
       },
       writing,
     );
     expect(draft.lemma).toBe("tomber");
     expect(draft.example).toBe("Il a tombé hier.");
-    expect(draft.pattern).toBe("« avoir » avec les verbes de mouvement");
+    expect(draft.pattern).toBe(
+      "«\u202Favoir\u202F» avec les verbes de mouvement",
+    );
   });
 });
 

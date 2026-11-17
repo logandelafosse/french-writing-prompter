@@ -10,7 +10,7 @@ const CHICAGO = "America/Chicago";
 
 const BASE_RULE: LouisianaRule = {
   id: "progressive",
-  rule_fr: "Progressif : être après + infinitif.",
+  rule_fr: "Progressif\u202F: être après + infinitif.",
   rule_en: "Present progressive: être après + infinitive.",
   examples: ["je suis après manger"],
   neverFlag: true,

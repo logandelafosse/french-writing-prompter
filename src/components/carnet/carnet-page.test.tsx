@@ -2,6 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { carnetCopy } from "@/copy/carnet";
+import { nnsp } from "@/test/nnsp";
 import type { DialectNote } from "@/contracts/dialect-note";
 import type { Weakness } from "@/contracts/weakness";
 import { CarnetPage } from "./carnet-page";
@@ -10,7 +11,7 @@ const now = () => new Date("2026-11-14T18:00:00-06:00");
 
 const sessionNote: DialectNote = {
   id: 1,
-  rule: "Avec « tomber », on prend l'auxiliaire « avoir » : il a tombé.",
+  rule: "Avec «\u202Ftomber\u202F», on prend l'auxiliaire «\u202Favoir\u202F»\u202F: il a tombé.",
   example: "Mon petit cousin a tombé dans la boue.",
   scope: "word",
   form: "a tombé",
@@ -110,14 +111,14 @@ describe("CarnetPage", () => {
   it("shows the empty-state line when there are no notes", async () => {
     mockCarnet();
     render(<CarnetPage now={now} />);
-    expect(await screen.findByText(carnetCopy.notesEmpty)).toBeVisible();
+    expect(await screen.findByText(carnetCopy.notesEmpty, nnsp)).toBeVisible();
     expect(screen.getByText(carnetCopy.weakEmpty)).toBeVisible();
   });
 
   it("lists a session note with its rule, example and nouvelle", async () => {
     mockCarnet([sessionNote]);
     render(<CarnetPage now={now} />);
-    expect(await screen.findByText(sessionNote.rule)).toBeVisible();
+    expect(await screen.findByText(sessionNote.rule, nnsp)).toBeVisible();
     expect(screen.getByText(sessionNote.example ?? "")).toBeVisible();
     expect(screen.getByText(/séance d'aujourd'hui/)).toBeVisible();
     expect(screen.getByText("nouvelle")).toBeVisible();
@@ -142,14 +143,14 @@ describe("CarnetPage", () => {
         screen.queryByText("Une erreur s'est produite. Réessaie."),
       ).not.toBeInTheDocument();
     });
-    expect(screen.getByText(carnetCopy.notesEmpty)).toBeVisible();
+    expect(screen.getByText(carnetCopy.notesEmpty, nnsp)).toBeVisible();
   });
 
   it("Ajouter une note opens the sheet without T'as écrit", async () => {
     const user = userEvent.setup();
     mockCarnet();
     render(<CarnetPage now={now} />);
-    await screen.findByText(carnetCopy.notesEmpty);
+    await screen.findByText(carnetCopy.notesEmpty, nnsp);
     await user.click(screen.getByRole("button", { name: carnetCopy.notesAdd }));
     const dialog = await screen.findByRole("dialog", {
       name: "Ajouter une note de dialecte",
@@ -161,7 +162,7 @@ describe("CarnetPage", () => {
     const user = userEvent.setup();
     mockCarnet([sessionNote]);
     render(<CarnetPage now={now} />);
-    await screen.findByText(sessionNote.rule);
+    await screen.findByText(sessionNote.rule, nnsp);
     await user.click(
       screen.getByRole("button", { name: carnetCopy.notesEdit }),
     );
@@ -190,7 +191,7 @@ describe("CarnetPage", () => {
       );
     });
     render(<CarnetPage now={now} />);
-    await screen.findByText(sessionNote.rule);
+    await screen.findByText(sessionNote.rule, nnsp);
     await user.click(
       screen.getByRole("button", { name: carnetCopy.notesDelete }),
     );
@@ -202,7 +203,7 @@ describe("CarnetPage", () => {
     ).toHaveFocus();
     await user.keyboard("{Escape}");
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
-    expect(screen.getByText(sessionNote.rule)).toBeVisible();
+    expect(screen.getByText(sessionNote.rule, nnsp)).toBeVisible();
 
     await user.click(
       screen.getByRole("button", { name: carnetCopy.notesDelete }),
@@ -211,7 +212,9 @@ describe("CarnetPage", () => {
       screen.getByRole("button", { name: carnetCopy.notesDelete }),
     );
     await waitFor(() => {
-      expect(screen.queryByText(sessionNote.rule)).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(sessionNote.rule, nnsp),
+      ).not.toBeInTheDocument();
     });
   });
 

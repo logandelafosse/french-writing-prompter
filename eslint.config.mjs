@@ -9,7 +9,6 @@ import jestDom from "eslint-plugin-jest-dom";
 import comments from "@eslint-community/eslint-plugin-eslint-comments/configs";
 import playwright from "eslint-plugin-playwright";
 
-const LEGACY = ["src/components/legacy/**"];
 const TESTS = ["src/**/*.test.{ts,tsx}", "tooling/**/*.test.ts"];
 const LINT_FIXTURES = ["src/test/lint-fixtures/**"];
 
@@ -216,14 +215,6 @@ export default defineConfig([
       "playwright/no-wait-for-timeout": "error",
       "playwright/no-networkidle": "error",
       "playwright/no-force-option": "error",
-    },
-  },
-  {
-    files: LEGACY,
-    rules: {
-      ...Object.fromEntries(
-        Object.keys(jsxA11y.flatConfigs.strict.rules).map((r) => [r, "off"]),
-      ),
     },
   },
   {

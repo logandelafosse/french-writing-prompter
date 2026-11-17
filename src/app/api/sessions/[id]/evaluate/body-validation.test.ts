@@ -18,24 +18,38 @@ async function clearSessions() {
   await db.delete(sessions).execute();
 }
 
-describe("POST /api/evaluate body validation", () => {
+async function postEvaluate(sessionId: number, body: unknown) {
+  const { POST } = await import("./route");
+  return POST(
+    new Request(`http://localhost/api/sessions/${sessionId}/evaluate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }),
+    { params: Promise.resolve({ id: String(sessionId) }) },
+  );
+}
+
+describe("POST /api/sessions/:id/evaluate body validation", () => {
   beforeEach(async () => {
     await clearSessions();
   });
 
-  it("returns 400 naming sessionId when it is missing", async () => {
-    const { POST } = await import("./route");
-    const response = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ writing: "Mon texte." }),
+  it("returns 400 naming text when it is missing", async () => {
+    const session = await saveSession({
+      promptText: "Prompt",
+      promptConstraints: JSON.stringify({
+        cefrLevel: "A2",
+        dialect: DEFAULT_DIALECT,
       }),
-    );
-
+      writingText: null,
+      evaluationJson: null,
+      cefrLevel: "A2",
+    });
+    const response = await postEvaluate(session.id, {});
     expect(response.status).toBe(400);
     const json = await readResponseJson(response, ApiErrorBody);
-    expect(json.error).toMatch(/sessionId/i);
+    expect(json.error).toMatch(/text/i);
   });
 
   it("returns 400 for wrong types and leaves evaluation_json null", async () => {
@@ -50,21 +64,11 @@ describe("POST /api/evaluate body validation", () => {
       cefrLevel: "A2",
     });
 
-    const { POST } = await import("./route");
-    const response = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          writing: 123,
-          sessionId: session.id,
-        }),
-      }),
-    );
+    const response = await postEvaluate(session.id, { text: 123 });
 
     expect(response.status).toBe(400);
     const json = await readResponseJson(response, ApiErrorBody);
-    expect(json.error).toMatch(/writing/i);
+    expect(json.error).toMatch(/text/i);
 
     const stored = await getSession(session.id);
     expect(stored?.evaluationJson).toBeNull();
@@ -83,18 +87,10 @@ describe("POST /api/evaluate body validation", () => {
       cefrLevel: "A2",
     });
 
-    const { POST } = await import("./route");
-    const response = await POST(
-      new Request("http://localhost/api/evaluate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          writing: "texte",
-          sessionId: session.id,
-          extra: true,
-        }),
-      }),
-    );
+    const response = await postEvaluate(session.id, {
+      text: "texte",
+      extra: true,
+    });
 
     expect(response.status).toBe(400);
     const json = await readResponseJson(response, ApiErrorBody);

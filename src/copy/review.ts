@@ -10,11 +10,12 @@ export const reviewCopy = {
   none: "Aucune correction",
   kindMistake: "Faute",
   tagFocus: "focus du jour",
-  carnetCta: (shortName: string) => `« ${shortName} » dans le Carnet →`,
+  carnetCta: (shortName: string) =>
+    `«\u202F${shortName}\u202F» dans le Carnet →`,
   kindStandard: "Français standard",
-  kindDialect: "Ça se dit comme ça ?",
+  kindDialect: "Ça se dit comme ça\u202F?",
   arrow: "→",
-  avant: "avant :",
+  avant: "avant\u202F:",
   dlf: "DLF",
   dlfTitle: "Dictionary of Louisiana French",
   actionAck: "Compris",
@@ -35,8 +36,9 @@ export const reviewCopy = {
   sheetRuleHint: "proposée par le tuteur, c'est toi qui as le dernier mot",
   sheetExample: "Un exemple",
   sheetScope: "Ça vaut pour",
-  sheetScopeWord: (lemma: string) => `Ce mot seulement : « ${lemma} »`,
-  sheetScopePattern: (pattern: string) => `Toute la famille : ${pattern}`,
+  sheetScopeWord: (lemma: string) =>
+    `Ce mot seulement\u202F: «\u202F${lemma}\u202F»`,
+  sheetScopePattern: (pattern: string) => `Toute la famille\u202F: ${pattern}`,
   sheetScopeWordGeneric: "Ce mot seulement",
   sheetScopePatternGeneric: "Toute la famille",
   sheetFooter:
@@ -56,7 +58,7 @@ export const reviewCopy = {
   },
   scoresClosed: "Scores ▸",
   scoresOpen: "Scores ▾",
-  scoresOverall: (level: string) => `Ensemble : ${level}`,
+  scoresOverall: (level: string) => `Ensemble\u202F: ${level}`,
   pourMonter: "Pour monter",
   dimensionLabel: {
     grammatical_accuracy: "Grammaire",

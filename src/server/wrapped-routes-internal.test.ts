@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ErrorEnvelope } from "@/contracts/errors";
-import { EvaluatePostBody } from "@/contracts/api";
 import { db } from "@/db";
 import { corrections, sessions } from "@/db/schema";
 import { readResponseJson } from "@/test/read-response-json";
@@ -15,7 +14,7 @@ import { GET as getSessions } from "@/app/api/sessions/route";
 import { GET as getLevel } from "@/app/api/level/route";
 import { GET as getQuota } from "@/app/api/quota/route";
 import { POST as postPrompt } from "@/app/api/prompt/route";
-import { POST as postEvaluate } from "@/app/api/evaluate/route";
+import { POST as postEvaluate } from "@/app/api/sessions/[id]/evaluate/route";
 import { PUT as putDraft } from "@/app/api/sessions/[id]/draft/route";
 import { saveSession } from "@/modules/history-store/history-store";
 
@@ -93,16 +92,13 @@ describe("wrapped API routes return INTERNAL JSON on unexpected errors", () => {
     vi.spyOn(historyStore, "rememberWriting").mockRejectedValueOnce(
       new Error("boom"),
     );
-    const evaluateBody = EvaluatePostBody.parse({
-      sessionId: session.id,
-      writing: "Mon texte.",
-    });
     response = await postEvaluate(
-      new Request("http://localhost/api/evaluate", {
+      new Request(`http://localhost/api/sessions/${session.id}/evaluate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(evaluateBody),
+        body: JSON.stringify({ text: "Mon texte." }),
       }),
+      { params: Promise.resolve({ id: String(session.id) }) },
     );
     expect(response.status).toBe(500);
     expect((await readResponseJson(response, ErrorEnvelope)).error.code).toBe(

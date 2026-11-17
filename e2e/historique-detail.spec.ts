@@ -6,6 +6,7 @@ import {
   expectNoHorizontalOverflow,
   mainContent,
 } from "./support/prompt-helpers";
+import { reviewCopy } from "../src/copy/review";
 
 const NOTICE =
   "Les corrections de cette séance ont pas pu être relues. Ta consigne et ton texte sont gardés, et le reste de l'Historique marche comme d'habitude.";
@@ -49,7 +50,7 @@ test("three kinds marked, no actions, at 1280 and 390", async ({
   const cards = main.getByRole("region", { name: "Corrections" });
   await expect(cards.getByText("Faute")).toBeVisible();
   await expect(cards.getByText("Français standard")).toBeVisible();
-  await expect(cards.getByText("Ça se dit comme ça ?")).toBeVisible();
+  await expect(cards.getByText(reviewCopy.kindDialect)).toBeVisible();
 
   for (const name of ACTION_NAMES) {
     await expect(main.getByRole("button", { name })).toHaveCount(0);

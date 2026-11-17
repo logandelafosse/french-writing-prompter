@@ -15,15 +15,15 @@ export const homeCopy = {
   quotaNoticeCountdown: (countdown: string) =>
     `La prochaine arrive à minuit, dans ${countdown}.`,
   quotaNoticeDraft:
-    "Ton brouillon reste icitte : tu peux le finir et l'envoyer quand tu veux.",
+    "Ton brouillon reste icitte\u202F: tu peux le finir et l'envoyer quand tu veux.",
   swapDialogLabel: "Changer de consigne",
-  swapDialogLead: "Changer de consigne ?",
+  swapDialogLead: "Changer de consigne\u202F?",
   swapDialogBody: (wordCount: number) =>
     `Ton brouillon de ${wordCount} mots va rester dans l'Historique.`,
   swapKeep: "Garder celle-là",
   swapConfirm: "Changer",
-  placementLink: "Pas sûr ? Fais le test de placement (3 consignes)",
-  aReadyLead: "Prêt pour ta consigne du jour ?",
+  placementLink: "Pas sûr\u202F? Fais le test de placement (3 consignes)",
+  aReadyLead: "Prêt pour ta consigne du jour\u202F?",
   writingLabel: "Ton texte",
   draftSaved: (time: string) => `Brouillon sauvé à ${time}`,
   submit: "Corrige-moi",

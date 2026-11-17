@@ -8,6 +8,7 @@ import {
   PROMPT_FIXTURE_LAFAYETTE,
   PROMPT_FIXTURE_SWAP_NO,
 } from "./support/prompt-helpers";
+import { reviewCopy } from "../src/copy/review";
 
 const mixedWriting = "Maintenant je vas au bayou. Les enfant jouent.";
 const unlocatedWriting = "je vas au bayou. Les enfant jouent.";
@@ -110,7 +111,7 @@ test.describe("review @1280", () => {
     await expect(
       page.getByRole("button", { name: /Scores ▾/ }),
     ).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByText("Ensemble : B1")).toBeVisible();
+    await expect(page.getByText(reviewCopy.scoresOverall("B1"))).toBeVisible();
     await expect(page.getByRole("button", { name: "Grammaire" })).toBeVisible();
     await expect(
       page.getByRole("button", { name: "Vocabulaire" }),

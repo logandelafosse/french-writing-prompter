@@ -10,6 +10,7 @@ import {
 } from "./support/prompt-helpers";
 import { setLevelA1 } from "./support/header-helpers";
 import { expectMobileWritingFooterBelowSheet } from "./support/writing-helpers";
+import { reviewCopy } from "../src/copy/review";
 
 const twelveWords =
   "un deux trois quatre cinq six sept huit neuf dix onze douze";
@@ -58,7 +59,7 @@ test.describe("writing surface @1280", () => {
     const sheet = main.getByRole("region", { name: "Consigne et ton texte" });
     await expect(sheet).toContainText(twelveWords);
     await expect(main.getByRole("button", { name: /Scores ▸/ })).toBeVisible();
-    await expect(main.getByText("Ensemble : B1")).toBeVisible();
+    await expect(main.getByText(reviewCopy.scoresOverall("B1"))).toBeVisible();
     await captureEvidence(page, testInfo, "desktop-writing-submit");
     await main
       .getByRole("button", { name: /Une autre consigne · reste/ })

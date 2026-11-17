@@ -3,6 +3,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { cefrSubLevelFromScore } from "@/contracts/cefr";
 import { reviewCopy } from "@/copy/review";
+import { nnsp } from "@/test/nnsp";
 import { ScoresDisclosure } from "./scores-disclosure";
 
 const evaluation = {
@@ -36,7 +37,7 @@ describe("ScoresDisclosure", () => {
     const toggle = screen.getByRole("button", { name: /Scores/ });
     expect(toggle).toHaveAttribute("aria-expanded", "false");
     expect(
-      screen.getByText(reviewCopy.scoresOverall("B1")),
+      screen.getByText(reviewCopy.scoresOverall("B1"), nnsp),
     ).toBeInTheDocument();
     expect(screen.queryByText("Grammaire")).not.toBeInTheDocument();
 

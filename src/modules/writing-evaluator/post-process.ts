@@ -15,7 +15,7 @@ import { locateQuote, spansOverlap } from "./locate-quote";
 export const EVALUATOR_PROMPT_VERSION = "evaluator@2";
 
 export function dialectCheckQuestion(quote: string): string {
-  return `Ça se dit comme ça chez toi, « ${quote} » ?`;
+  return `Ça se dit comme ça chez toi, «\u202F${quote}\u202F»\u202F?`;
 }
 
 export type PostProcessContext = {
@@ -146,8 +146,7 @@ export function postProcessEvaluation(
         suggestion: row.item.suggestion,
         explanation: row.item.explanation,
         question:
-          row.item.kind === "dialect_check" &&
-          (row.item.question === null || row.item.question.length === 0)
+          row.item.kind === "dialect_check"
             ? dialectCheckQuestion(row.item.quote)
             : row.item.question,
         ruleIfDialect: row.item.rule_if_dialect,

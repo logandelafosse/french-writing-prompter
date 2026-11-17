@@ -2,4 +2,5 @@ id: no-tailwind-default-palette
 valid:
   - "className='bg-sheet text-ink'"
 invalid:
+  - "className='bg-zinc-100'"
   - "className='bg-zinc-900 text-zinc-50'"

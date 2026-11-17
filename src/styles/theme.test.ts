@@ -39,4 +39,18 @@ describe("globals.css theme compilation", () => {
 
     expect(utilities).not.toMatch(/--font-sans:\s*var\(--font-sans\)/);
   });
+
+  it("resets the default palette so zinc utilities do not exist", async () => {
+    const css = readFileSync(path.join(APP_DIR, "globals.css"), "utf-8");
+    expect(css).toMatch(/--color-\*:\s*initial/);
+
+    const compiled = await compile(css, {
+      base: APP_DIR,
+      onDependency: () => {},
+    });
+    const utilities = compiled.build(["bg-zinc-100", "text-emerald-700"]);
+    expect(utilities).not.toMatch(/--color-zinc-100/);
+    expect(utilities).not.toMatch(/\.bg-zinc-100/);
+    expect(utilities).not.toMatch(/--color-emerald-700/);
+  });
 });

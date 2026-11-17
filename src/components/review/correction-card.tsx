@@ -118,7 +118,7 @@ export function CorrectionCard(props: CorrectionCardProps) {
       >
         <div className="text-kind text-dialect flex items-center gap-2.5">
           <span className="rounded-marker-dialect bg-dialect px-[7px] py-0.5 tracking-normal text-white">
-            {correction.ordinal} ?
+            {`${correction.ordinal}\u202F?`}
           </span>
           <span className="uppercase">{reviewCopy.kindDialect}</span>
         </div>

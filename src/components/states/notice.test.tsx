@@ -1,6 +1,7 @@
 import { act } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { homeCopy } from "@/copy/fr";
 import { QuotaNotice } from "./notice";
 
 describe("QuotaNotice", () => {
@@ -23,9 +24,9 @@ describe("QuotaNotice", () => {
     expect(status).toHaveTextContent(
       "La prochaine arrive à minuit, dans 1 h 46.",
     );
-    expect(status).toHaveTextContent(
-      "Ton brouillon reste icitte : tu peux le finir et l'envoyer quand tu veux.",
-    );
+    expect(status).toHaveTextContent(homeCopy.quotaNoticeDraft, {
+      normalizeWhitespace: false,
+    });
   });
 
   it("omits the draft sentence when there is no active session", () => {

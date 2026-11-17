@@ -115,7 +115,7 @@ describe("MarkedText", () => {
     expect(hidden).toHaveClass("sr-only");
     const link = screen.getByRole("link", { name: "à vérifier 6" });
     expect(link).toHaveAttribute("href", "#correction-6");
-    expect(link).toHaveTextContent("6 ?");
+    expect(link).toHaveTextContent("6\u202F?", { normalizeWhitespace: false });
     expect(link).toHaveClass("rounded-marker-dialect");
 
     rerender(

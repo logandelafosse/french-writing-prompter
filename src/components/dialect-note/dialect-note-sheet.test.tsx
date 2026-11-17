@@ -2,6 +2,7 @@ import type { ComponentProps } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { reviewCopy } from "@/copy/review";
 import { DialectNoteSheet } from "./dialect-note-sheet";
 import type { DialectSheetDraft } from "./sheet-draft";
 
@@ -62,7 +63,9 @@ describe("DialectNoteSheet", () => {
       "Mon petit cousin a tombé dans la boue.",
     );
     expect(
-      screen.getByRole("radio", { name: /Ce mot seulement : « a tombé »/ }),
+      screen.getByRole("radio", {
+        name: reviewCopy.sheetScopeWord("a tombé"),
+      }),
     ).toBeChecked();
     expect(
       screen.queryByRole("radio", { name: /Toute la famille/ }),
@@ -73,12 +76,14 @@ describe("DialectNoteSheet", () => {
     await openSheet({
       draft: {
         ...draft,
-        pattern: "« avoir » avec les verbes de mouvement",
+        pattern: "«\u202Favoir\u202F» avec les verbes de mouvement",
       },
     });
     expect(
       screen.getByRole("radio", {
-        name: /Toute la famille : « avoir » avec les verbes de mouvement/,
+        name: reviewCopy.sheetScopePattern(
+          "«\u202Favoir\u202F» avec les verbes de mouvement",
+        ),
       }),
     ).toBeVisible();
   });

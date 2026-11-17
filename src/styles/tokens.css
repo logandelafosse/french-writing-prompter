@@ -1,4 +1,5 @@
 @theme {
+  --color-*: initial;
   --color-white: #ffffff;
   --color-transparent: transparent;
   --color-current: currentColor;
