@@ -8,6 +8,7 @@ import {
   type EvaluatorOutputDraft,
 } from "@/contracts/evaluation";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
+import { emptyDlfIndex } from "@/modules/dlf/lookup";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
 import { WritingEvaluator, type OpenAiClientLike } from "./writing-evaluator";
 
@@ -49,7 +50,7 @@ async function correctionsFrom(raw: EvaluatorOutputDraft, text: string) {
   const result = await new WritingEvaluator(client).evaluate(
     text,
     prompt,
-    DEFAULT_DIALECT,
+    { dialect: DEFAULT_DIALECT, dlf: emptyDlfIndex() },
     {
       sessionId: 7,
       now: () => new Date("2026-11-16T18:00:00.000Z"),

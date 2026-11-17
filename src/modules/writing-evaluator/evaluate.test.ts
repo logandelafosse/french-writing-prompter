@@ -8,7 +8,7 @@ import { countsAsMistake } from "@/contracts/correction";
 import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import type { MistakeCategory } from "@/contracts/mistake-category";
 import { loadDlfLexicon } from "@/modules/dlf/load";
-import type { DlfIndex } from "@/modules/dlf/lookup";
+import { emptyDlfIndex, type DlfIndex } from "@/modules/dlf/lookup";
 import { resourcesFor } from "@/modules/resources/catalog";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
@@ -93,20 +93,21 @@ async function evaluate(
   const client: OpenAiClientLike = {
     chatCompletionJSON: vi.fn().mockResolvedValue(raw),
   };
-  const dlf: DlfIndex | undefined = ctx.lookupDlf
+  const dlf: DlfIndex = ctx.lookupDlf
     ? { lookup: ctx.lookupDlf, cardsForText: () => [] }
-    : undefined;
-  return new WritingEvaluator(client, dlf).evaluate(
+    : emptyDlfIndex();
+  return new WritingEvaluator(client).evaluate(
     ctx.text,
     prompt,
-    DEFAULT_DIALECT,
+    {
+      dialect: DEFAULT_DIALECT,
+      dlf,
+      ...(ctx.dialectNotes !== undefined ? { notes: ctx.dialectNotes } : {}),
+    },
     {
       sessionId: ctx.sessionId,
       now: ctx.now,
       createId: ctx.createId,
-      ...(ctx.dialectNotes !== undefined
-        ? { dialectNotes: ctx.dialectNotes }
-        : {}),
       ...(ctx.focusCategories !== undefined
         ? { focusCategories: ctx.focusCategories }
         : {}),

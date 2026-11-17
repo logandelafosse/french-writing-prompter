@@ -10,7 +10,6 @@ import {
 } from "@/db/schema";
 import { PlacementService } from "./placement-store";
 import { getAiClient } from "@/server/ai-client";
-import { getDlfIndex } from "@/modules/dlf/load";
 import { clearEnvCache } from "@/server/env";
 import {
   getStreakCount,
@@ -30,7 +29,6 @@ async function resetDb() {
 function service(client: OpenAiClientLike = getAiClient("happy")) {
   return new PlacementService({
     client,
-    dlf: getDlfIndex(),
   });
 }
 
@@ -325,7 +323,6 @@ describe("placement service › placement sessions do not count toward the auto-
     await completeRun(
       new PlacementService({
         client: getAiClient("happy"),
-        dlf: getDlfIndex(),
         now: () => placementNow,
       }),
     );

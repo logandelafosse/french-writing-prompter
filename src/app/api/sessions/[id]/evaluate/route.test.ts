@@ -8,8 +8,7 @@ import { clearEnvCache } from "@/server/env";
 import { setLevel } from "@/modules/cefr-tracker/level-store";
 import { saveSession } from "@/modules/history-store/history-store";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
-import { listActiveNotes } from "@/modules/dialect/dialect-notes-store";
-import { getDlfIndex } from "@/modules/dlf/load";
+import { loadLearnerDialectContext } from "@/modules/dialect/learner-dialect-context";
 import { WritingEvaluator } from "@/modules/writing-evaluator/writing-evaluator";
 import { getAiClient } from "@/server/ai-client";
 import { EvaluatePostResponse } from "@/contracts/api";
@@ -40,6 +39,16 @@ async function seedSession() {
     promptLevel: "A2",
   });
 }
+
+describe("evaluate", () => {
+  it("uses context notes without a second notes fetch in the route", () => {
+    const source = readFileSync(
+      join(process.cwd(), "src/app/api/sessions/[id]/evaluate/route.ts"),
+      "utf8",
+    );
+    expect(source).not.toMatch(/listActiveNotes/);
+  });
+});
 
 describe("evaluate route", () => {
   beforeEach(async () => {
@@ -97,13 +106,11 @@ describe("evaluate route", () => {
     if (!constraintsResult.ok) return;
     const moduleResult = await new WritingEvaluator(
       getAiClient("happy"),
-      getDlfIndex(),
     ).evaluate(
       writing,
       { text: "Écris sur le bayou.", constraints: constraintsResult.value },
-      DEFAULT_DIALECT,
+      await loadLearnerDialectContext(),
       {
-        dialectNotes: await listActiveNotes(),
         sessionId: session.id,
         focusCategories: [],
         now: () => new Date("2026-11-16T18:00:00.000Z"),

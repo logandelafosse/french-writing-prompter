@@ -1,5 +1,5 @@
 import type { WritingPrompt } from "@/modules/prompt-generator/prompt-generator";
-import type { FrenchDialect } from "@/modules/prompt-generator/prompt-generator";
+import type { LearnerDialectContext } from "@/modules/dialect/learner-dialect-context";
 import {
   EvaluatorOutputSchema,
   type EvaluationV2,
@@ -9,8 +9,6 @@ import type { Correction } from "@/contracts/correction";
 import type { MistakeCategory } from "@/contracts/mistake-category";
 import type { z } from "zod";
 import { AI_MODEL } from "@/config/ai";
-import { emptyDlfIndex, type DlfIndex } from "@/modules/dlf/lookup";
-import type { LearnerDialectNote } from "@/contracts/dialect-note";
 import { buildEvaluatorPrompt } from "./build-evaluator-prompt";
 import { postProcessEvaluation } from "./post-process";
 
@@ -28,7 +26,6 @@ export interface OpenAiClientLike {
 }
 
 export type EvaluateOptions = {
-  dialectNotes?: readonly LearnerDialectNote[];
   sessionId?: number;
   now?: () => Date;
   createId?: () => string;
@@ -42,24 +39,21 @@ export type EvaluateResult = {
 };
 
 export class WritingEvaluator {
-  constructor(
-    private openai: OpenAiClientLike,
-    private dlf: DlfIndex = emptyDlfIndex(),
-  ) {}
+  constructor(private openai: OpenAiClientLike) {}
 
   async evaluate(
     writing: string,
     prompt: WritingPrompt,
-    dialect: FrenchDialect,
+    context: LearnerDialectContext,
     options: EvaluateOptions = {},
   ): Promise<EvaluateResult> {
-    const dialectNotes = options.dialectNotes ?? [];
+    const dialectNotes = context.notes ?? [];
     const built = buildEvaluatorPrompt({
       writing,
       promptText: prompt.text,
       registre: prompt.meta?.registre ?? null,
-      dialect,
-      dlfCards: this.dlf.cardsForText(writing),
+      dialect: context.dialect,
+      dlfCards: context.dlf.cardsForText(writing),
       dialectNotes,
     });
 
@@ -80,7 +74,7 @@ export class WritingEvaluator {
       sessionId: options.sessionId ?? 0,
       now: options.now ?? (() => new Date()),
       createId: options.createId ?? (() => crypto.randomUUID()),
-      lookupDlf: (word) => this.dlf.lookup(word),
+      lookupDlf: (word) => context.dlf.lookup(word),
       dialectNotes,
       focusCategories: options.focusCategories ?? [],
     });

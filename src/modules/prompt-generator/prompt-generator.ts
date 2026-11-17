@@ -4,11 +4,11 @@ import type { PromptMeta } from "@/contracts/prompt-meta";
 import { GeneratorModelOutput } from "@/contracts/prompt-meta";
 import { AI_MODEL } from "@/config/ai";
 import { WORD_TARGET_BY_LEVEL } from "@/config/limits";
+import type { LearnerDialectContext } from "@/modules/dialect/learner-dialect-context";
 import {
   LEVEL_DESCRIPTIONS,
   renderForGenerator,
 } from "@/modules/dialect/render";
-import type { FrenchDialect } from "@/contracts/prompt";
 import type { MistakeCategory } from "@/contracts/mistake-category";
 import type { z } from "zod";
 
@@ -37,7 +37,7 @@ export class PromptGenerator {
 
   async generate(
     level: CefrLevel,
-    dialect: FrenchDialect,
+    context: LearnerDialectContext,
     options: {
       focus?: readonly {
         id: MistakeCategory;
@@ -47,7 +47,7 @@ export class PromptGenerator {
       recentTopics?: readonly string[];
     } = {},
   ): Promise<WritingPrompt> {
-    const dialectRules = renderForGenerator(dialect);
+    const dialectRules = renderForGenerator(context.dialect);
     const wordTarget = WORD_TARGET_BY_LEVEL[level];
     const focus = options.focus ?? [];
     const recentTopics = options.recentTopics ?? [];
@@ -108,7 +108,7 @@ ${LEVEL_DESCRIPTIONS[level]}`;
       meta,
       constraints: {
         cefrLevel: level,
-        dialect,
+        dialect: context.dialect,
       },
     };
   }

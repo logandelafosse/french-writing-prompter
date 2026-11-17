@@ -1,7 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { PromptGenerator, type OpenAiClientLike } from "./prompt-generator";
+import type { LearnerDialectContext } from "@/modules/dialect/learner-dialect-context";
 import { DEFAULT_DIALECT } from "@/modules/dialect/louisiana-rules";
 import { renderForGenerator } from "@/modules/dialect/render";
+import { emptyDlfIndex } from "@/modules/dlf/lookup";
 import {
   GeneratorModelOutput,
   type GeneratorModelOutput as GeneratorOut,
@@ -41,6 +43,11 @@ function createMockClient(output: GeneratorOut | string): OpenAiClientLike {
   };
 }
 
+const dialectContext: LearnerDialectContext = {
+  dialect: DEFAULT_DIALECT,
+  dlf: emptyDlfIndex(),
+};
+
 describe("PromptGenerator", () => {
   it("generator output schema enforces required French fields and text length", async () => {
     const shortText = GeneratorModelOutput.safeParse({
@@ -62,16 +69,16 @@ describe("PromptGenerator", () => {
     const client = createMockClient("{not json");
     const generator = new PromptGenerator(client);
     await expect(
-      generator.generate("B1", DEFAULT_DIALECT),
+      generator.generate("B1", dialectContext),
     ).rejects.toBeInstanceOf(AiOutputError);
   });
 
   it("generator attaches the server word target", async () => {
     const mockClient = createMockClient(validModelOutput);
     const generator = new PromptGenerator(mockClient);
-    const prompt = await generator.generate("A1", DEFAULT_DIALECT);
+    const prompt = await generator.generate("A1", dialectContext);
     expect(prompt.meta?.wordTarget).toEqual(WORD_TARGET_BY_LEVEL.A1);
-    const b1 = await generator.generate("B1", DEFAULT_DIALECT);
+    const b1 = await generator.generate("B1", dialectContext);
     expect(b1.meta?.wordTarget).toEqual(WORD_TARGET_BY_LEVEL.B1);
   });
 
@@ -80,7 +87,7 @@ describe("PromptGenerator", () => {
       chatCompletionJSON: vi.fn().mockResolvedValue(validModelOutput),
     };
     const generator = new PromptGenerator(mockClient);
-    await generator.generate("B1", DEFAULT_DIALECT);
+    await generator.generate("B1", dialectContext);
     const callArgs = vi.mocked(mockClient.chatCompletionJSON).mock.calls[0];
     const systemMessage = callArgs?.[1].messages.find(
       (m) => m.role === "system",
@@ -100,7 +107,7 @@ describe("PromptGenerator", () => {
       chatCompletionJSON: vi.fn().mockResolvedValue(validModelOutput),
     };
     const generator = new PromptGenerator(mockClient);
-    await generator.generate("B1", DEFAULT_DIALECT, {
+    await generator.generate("B1", dialectContext, {
       focus: [
         {
           id: "imparfait_pc",
