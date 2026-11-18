@@ -4,23 +4,21 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-18 by coordinator (T36 and T38 merged; T37 in progress; T39 fix in review).
+Last updated: 2026-11-18 by coordinator (T39 merged; T37 in review).
 
 ## Ready
 
-_None. T40 stays HITL until T37 and T39 are Done and Logan cuts over in the dashboards._
+_None. T40 stays HITL until T37 is Done and Logan cuts over in the dashboards._
 
 ## In progress
 
-| ID  | Ticket                      | Why                                                                                                                                                                                                      |
-| --- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T37 | Migrate on the Vercel build | Implementer on `ticket/t37-migrate-on-vercel-build`, started 2026-11-18, after T36 merged. Fresh worktree off `github/main`. [#97](https://github.com/logandelafosse/french-writing-prompter/issues/97). |
+_None._
 
 ## In review
 
-| ID  | Ticket                                 | Why                                                                                                                                                            |
-| --- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T39 | CI stays the merge gate (`LEFTHOOK=0`) | [PR #101](https://github.com/logandelafosse/french-writing-prompter/pull/101) fix `a4cb4b4`. Test and tooling re-reviews clear. Waiting on CI for that commit. |
+| ID  | Ticket                      | Why                                                                                                                                                                                   |
+| --- | --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T37 | Migrate on the Vercel build | [PR #104](https://github.com/logandelafosse/french-writing-prompter/pull/104) `5c251b1`. Adversarial, test, and tooling reviews running. Branch `ticket/t37-migrate-on-vercel-build`. |
 
 ## Blocked
 
@@ -106,13 +104,13 @@ Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CON
 
 ### Phase 5 — Host
 
-| ID  | Ticket                                       | Type | Blocked by    | Why not ready                                                                                            |
-| --- | -------------------------------------------- | ---- | ------------- | -------------------------------------------------------------------------------------------------------- |
-| T36 | Remote libsql + refuse file URL on Vercel    | AFK  | —             | **Done** — [PR #103](https://github.com/logandelafosse/french-writing-prompter/pull/103) `347ac32`.      |
-| T37 | Migrate on the Vercel build                  | AFK  | T36           | **In progress** — `ticket/t37-migrate-on-vercel-build`, 2026-11-18.                                      |
-| T38 | AI route `maxDuration` 120                   | AFK  | —             | **Done** — [PR #102](https://github.com/logandelafosse/french-writing-prompter/pull/102) `d114b40`.      |
-| T39 | CI `LEFTHOOK=0`, no vercel deploy in Actions | AFK  | —             | **In review** — [PR #101](https://github.com/logandelafosse/french-writing-prompter/pull/101) `a4cb4b4`. |
-| T40 | Project, secrets, protection, import         | HITL | T36, T37, T38 | Dashboards after AFK tickets; §7 answered. `tickets/T40-vercel-turso-hitl.md`.                           |
+| ID  | Ticket                                       | Type | Blocked by    | Why not ready                                                                                       |
+| --- | -------------------------------------------- | ---- | ------------- | --------------------------------------------------------------------------------------------------- |
+| T36 | Remote libsql + refuse file URL on Vercel    | AFK  | —             | **Done** — [PR #103](https://github.com/logandelafosse/french-writing-prompter/pull/103) `347ac32`. |
+| T37 | Migrate on the Vercel build                  | AFK  | T36           | **In review** — [PR #104](https://github.com/logandelafosse/french-writing-prompter/pull/104).      |
+| T38 | AI route `maxDuration` 120                   | AFK  | —             | **Done** — [PR #102](https://github.com/logandelafosse/french-writing-prompter/pull/102) `d114b40`. |
+| T39 | CI `LEFTHOOK=0`, no vercel deploy in Actions | AFK  | —             | **Done** — [PR #101](https://github.com/logandelafosse/french-writing-prompter/pull/101) `29a4198`. |
+| T40 | Project, secrets, protection, import         | HITL | T36, T37, T38 | Dashboards after AFK tickets; §7 answered. `tickets/T40-vercel-turso-hitl.md`.                      |
 
 Plan: [`docs/plan/vercel-deployment.md`](vercel-deployment.md).
 
@@ -130,6 +128,7 @@ Plan: [`docs/plan/vercel-deployment.md`](vercel-deployment.md).
 
 | ID   | Ticket                                                                                                                                           | Why                                                                                                                                                                                                                                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T39  | CI stays the merge gate ([PR #101](https://github.com/logandelafosse/french-writing-prompter/pull/101))                                          | Merged `29a4198` 2026-11-18. Fix `a4cb4b4`. `prepare` skips lefthook when CI or LEFTHOOK=0. Reviews clear. No learner-visible UI.                                                                                                                                                                        |
 | T38  | AI route maxDuration 120 ([PR #102](https://github.com/logandelafosse/french-writing-prompter/pull/102))                                         | Merged `d114b40` 2026-11-18. `pr:size` 15. Reviews clear. No learner-visible UI.                                                                                                                                                                                                                         |
 | T36  | Remote libsql + refuse file URL on Vercel ([PR #103](https://github.com/logandelafosse/french-writing-prompter/pull/103))                        | Merged `347ac32` 2026-11-18. `pr:size` 57. Reviews clear. No learner-visible UI. Follow-ups: TOOL-PR103-1 embedded `DATABASE_URL` credentials; TOOL-PR103-2 raw `createClient` ast-grep. T37 unblocked.                                                                                                  |
 | D05  | Session / Draft façade ([PR #95](https://github.com/logandelafosse/french-writing-prompter/pull/95))                                             | Merged `719f50b` 2026-11-17. `pr:size` 36. Test fix `3bd4595`. Follow-up: TOOL-PR95-1 keep draft and review callers on the façade. Home unchanged.                                                                                                                                                       |
