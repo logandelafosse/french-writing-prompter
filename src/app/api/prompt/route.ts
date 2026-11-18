@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+import { AI_ROUTE_MAX_DURATION } from "@/config/ai";
 import { PromptPostBody } from "@/contracts/api";
 import { parseRequestBody } from "@/lib/http";
 import { issueDailyPrompt } from "@/modules/prompt-issuance/issuance-store";
 import { getAiClient, scenarioFromRequest } from "@/server/ai-client";
 import { withErrors } from "@/server/with-errors";
+
+export const maxDuration = 120 satisfies typeof AI_ROUTE_MAX_DURATION;
 
 export const POST = withErrors(async function postPrompt(request: Request) {
   const text = await request.text();

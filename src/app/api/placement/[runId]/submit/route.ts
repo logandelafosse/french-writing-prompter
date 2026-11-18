@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { AI_ROUTE_MAX_DURATION } from "@/config/ai";
 import {
   PlacementSubmitBody,
   PlacementSubmitResponse,
@@ -9,6 +10,8 @@ import { withErrors } from "@/server/with-errors";
 import { placementErrorResponse, placementService } from "../../route";
 
 const RunId = z.coerce.number().int().positive();
+
+export const maxDuration = 120 satisfies typeof AI_ROUTE_MAX_DURATION;
 
 export const POST = withErrors(async function postPlacementSubmit(
   request: Request,
