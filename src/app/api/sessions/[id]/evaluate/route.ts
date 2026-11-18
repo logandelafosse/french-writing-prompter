@@ -21,9 +21,12 @@ import { parseJson } from "@/lib/json";
 import { parseRequestBody } from "@/lib/http";
 import { parseStoredFocus } from "@/lib/parse-stored-focus";
 import { parseStoredPromptMeta } from "@/lib/parse-stored-prompt-meta";
+import { AI_ROUTE_MAX_DURATION } from "@/config/ai";
 import { DRAFT_TEXT_MAX } from "@/config/limits";
 
 const SessionId = z.coerce.number().int().positive();
+
+export const maxDuration = 120 satisfies typeof AI_ROUTE_MAX_DURATION;
 
 export const POST = withErrors(async function postSessionEvaluate(
   request: Request,

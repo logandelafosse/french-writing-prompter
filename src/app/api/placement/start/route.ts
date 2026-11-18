@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { AI_ROUTE_MAX_DURATION } from "@/config/ai";
 import { PlacementStartResponse } from "@/contracts/placement";
 import { withErrors } from "@/server/with-errors";
 import { placementErrorResponse, placementService } from "../route";
+
+export const maxDuration = 120 satisfies typeof AI_ROUTE_MAX_DURATION;
 
 export const POST = withErrors(async function postPlacementStart(
   request: Request,
