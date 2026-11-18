@@ -1,5 +1,5 @@
-import { createClient } from "@libsql/client";
 import { backfillSessionsV2 } from "../src/db/backfill-sessions-v2";
+import { createLibsqlClient } from "../src/db/libsql-client";
 import {
   backfillSessionsLocalDate,
   migrateWithBackup,
@@ -8,7 +8,7 @@ import {
 async function main() {
   const databaseUrl = process.env.DATABASE_URL ?? "file:./data.db";
   await migrateWithBackup(databaseUrl);
-  const client = createClient({ url: databaseUrl });
+  const client = createLibsqlClient(databaseUrl);
   try {
     await backfillSessionsLocalDate(client);
     await backfillSessionsV2(client);
