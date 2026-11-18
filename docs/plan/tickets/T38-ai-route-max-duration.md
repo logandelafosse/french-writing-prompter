@@ -10,14 +10,21 @@
 
 **What to build**
 
-`OpenAiClient` uses `timeout: 30000` and `maxRetries: 2`, so one call can last about 90s. Add `AI_ROUTE_MAX_DURATION` in `src/config/ai.ts` (next to `AI_MODEL`) at 120 seconds. Export `maxDuration` from each route that calls `getAiClient()` today: `src/app/api/prompt/route.ts`, `src/app/api/sessions/[id]/evaluate/route.ts`, and the placement start/submit routes that call `getAiClient()`.
+`OpenAiClient` uses `timeout: 30000` and `maxRetries: 2`, so one call can last about 90s. Add `AI_ROUTE_MAX_DURATION` in `src/config/ai.ts` (next to `AI_MODEL`) at 120 seconds. Export `maxDuration` from each route module whose handler can wait on that client:
+
+- `src/app/api/prompt/route.ts`
+- `src/app/api/sessions/[id]/evaluate/route.ts`
+- `src/app/api/placement/start/route.ts`
+- `src/app/api/placement/[runId]/submit/route.ts`
+
+`getAiClient()` lives in `placementService()` in `src/app/api/placement/route.ts`. Start and submit import that helper and are the handlers that call `start()` / `submit()` (generator and evaluator). `GET` on `placement/route.ts` only calls `getCurrent()` and does not wait on the model, so that module does not export `maxDuration`. There is no `src/app/api/evaluate/route.ts` and no `src/app/api/placement/route.ts` POST.
 
 Next may require the exported `maxDuration` to be statically analyzable. If an imported constant is dropped at build, repeat the numeric literal in each route and add a unit test that those literals equal `AI_ROUTE_MAX_DURATION`. One source of the number either way.
 
 **Acceptance criteria**
 
 - [ ] `[unit]` `AI_ROUTE_MAX_DURATION` is greater than or equal to `(timeoutMs / 1000) * (maxRetries + 1)` for the values in `OpenAiClient` (30 × 3 = 90), and the exported value is 120.
-- [ ] `[check]` Each of the three route modules exports `maxDuration` equal to that constant.
+- [ ] `[check]` Each of these route modules exports `maxDuration` equal to that constant: `src/app/api/prompt/route.ts`, `src/app/api/sessions/[id]/evaluate/route.ts`, `src/app/api/placement/start/route.ts`, `src/app/api/placement/[runId]/submit/route.ts`.
 - [ ] `[check]` `npm run build` succeeds with the exports in place.
 - [ ] `[check]` Routes that do not call the AI client (`quota`, `level`, `sessions`) do not export `maxDuration`.
 

@@ -4,21 +4,19 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-18 by coordinator (hosting §7 accepted; T36/T38/T39 Ready).
+Last updated: 2026-11-18 by coordinator (T36, T38, T39 in progress).
 
 ## Ready
 
-| ID  | Ticket                                           | Why                                                                                                                                                        |
-| --- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| T36 | Remote libsql client, file URL refused on Vercel | §7 Q9–Q15 accepted 2026-11-18. Spec `tickets/T36-remote-libsql-vercel-env.md`; [#96](https://github.com/logandelafosse/french-writing-prompter/issues/96). |
-| T38 | Function duration covers the OpenAI client       | No code blockers; Q9 yes. Spec `tickets/T38-ai-route-max-duration.md`; [#98](https://github.com/logandelafosse/french-writing-prompter/issues/98).         |
-| T39 | CI stays the merge gate (`LEFTHOOK=0`)           | No blockers. Spec `tickets/T39-ci-lefthook-merge-gate.md`; [#99](https://github.com/logandelafosse/french-writing-prompter/issues/99).                     |
-
-_Next when deps clear: T37 (after T36), T40 HITL (after T36–T38 + dashboards)._
+_None. T37 moves here when T36 is Done. T40 stays HITL until T36–T38 are Done and Logan cuts over in the dashboards._
 
 ## In progress
 
-_None._
+| ID  | Ticket                                           | Why                                                                                                                                                                                                                                                                   |
+| --- | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T36 | Remote libsql client, file URL refused on Vercel | Implementer on `ticket/t36-remote-libsql-vercel-env`, started 2026-11-18. Fresh worktree off `github/main`. [#96](https://github.com/logandelafosse/french-writing-prompter/issues/96).                                                                               |
+| T38 | Function duration covers the OpenAI client       | Implementer on `ticket/t38-ai-route-max-duration`, started 2026-11-18. Fresh worktree off `github/main`. Spec paths corrected to prompt, evaluate, placement start, and placement submit. [#98](https://github.com/logandelafosse/french-writing-prompter/issues/98). |
+| T39 | CI stays the merge gate (`LEFTHOOK=0`)           | Implementer on `ticket/t39-ci-lefthook-merge-gate`, started 2026-11-18. Fresh worktree off `github/main`. [#99](https://github.com/logandelafosse/french-writing-prompter/issues/99).                                                                                 |
 
 ## In review
 
@@ -110,10 +108,10 @@ Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CON
 
 | ID  | Ticket                                       | Type | Blocked by    | Why not ready                                                                  |
 | --- | -------------------------------------------- | ---- | ------------- | ------------------------------------------------------------------------------ |
-| T36 | Remote libsql + refuse file URL on Vercel    | AFK  | —             | **Ready** — on Ready column.                                                   |
+| T36 | Remote libsql + refuse file URL on Vercel    | AFK  | —             | **In progress** — `ticket/t36-remote-libsql-vercel-env`, 2026-11-18.           |
 | T37 | Migrate on the Vercel build                  | AFK  | T36           | Needs T36 env/token plumbing. `tickets/T37-migrate-on-vercel-build.md`.        |
-| T38 | AI route `maxDuration` 120                   | AFK  | —             | **Ready** — on Ready column.                                                   |
-| T39 | CI `LEFTHOOK=0`, no vercel deploy in Actions | AFK  | —             | **Ready** — on Ready column.                                                   |
+| T38 | AI route `maxDuration` 120                   | AFK  | —             | **In progress** — `ticket/t38-ai-route-max-duration`, 2026-11-18.              |
+| T39 | CI `LEFTHOOK=0`, no vercel deploy in Actions | AFK  | —             | **In progress** — `ticket/t39-ci-lefthook-merge-gate`, 2026-11-18.             |
 | T40 | Project, secrets, protection, import         | HITL | T36, T37, T38 | Dashboards after AFK tickets; §7 answered. `tickets/T40-vercel-turso-hitl.md`. |
 
 Plan: [`docs/plan/vercel-deployment.md`](vercel-deployment.md).
