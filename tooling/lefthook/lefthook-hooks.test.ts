@@ -295,17 +295,31 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     try {
       execFileSync("git", ["init", "--bare", bare], { stdio: "pipe" });
       git(clone!.dir, ["remote", "add", "origin", bare]);
-      // Seed the bare remote without running hooks (LEFTHOOK=0 is ignored by lefthook).
+      // Seed the bare remote without hooks. Strip Actions GIT_* so nested
+      // git does not operate on the outer checkout (setupPush was status 1 on CI).
+      const setupEnv = { ...process.env };
+      for (const key of [
+        "GIT_DIR",
+        "GIT_WORK_TREE",
+        "GIT_INDEX_FILE",
+        "GIT_PREFIX",
+        "LEFTHOOK",
+      ] as const) {
+        delete setupEnv[key];
+      }
       const setupPush = spawnSync(
         "git",
         [...GIT_IDENTITY, "push", "-u", "origin", "HEAD:main", "--no-verify"],
         {
           cwd: clone!.dir,
           encoding: "utf8",
-          env: process.env,
+          env: setupEnv,
         },
       );
-      expect(setupPush.status).toBe(0);
+      expect(
+        setupPush.status,
+        `setupPush failed: status=${setupPush.status}\nstdout=${setupPush.stdout}\nstderr=${setupPush.stderr}`,
+      ).toBe(0);
 
       const rel = "docs/plan/board-scratch.md";
       await writeScratchFile(clone!.dir, rel, "# board\n");
