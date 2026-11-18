@@ -8,11 +8,11 @@ Last updated: 2026-11-18 by coordinator (hosting §7 accepted; T36/T38/T39 Ready
 
 ## Ready
 
-| ID  | Ticket                                           | Why                                                                            |
-| --- | ------------------------------------------------ | ------------------------------------------------------------------------------ |
-| T36 | Remote libsql client, file URL refused on Vercel | §7 Q9–Q15 accepted 2026-11-18. Spec `tickets/T36-remote-libsql-vercel-env.md`. |
-| T38 | Function duration covers the OpenAI client       | No code blockers; Q9 yes. Spec `tickets/T38-ai-route-max-duration.md`.         |
-| T39 | CI stays the merge gate (`LEFTHOOK=0`)           | No blockers. Spec `tickets/T39-ci-lefthook-merge-gate.md`.                     |
+| ID  | Ticket                                           | Why                                                                                                                                                        |
+| --- | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T36 | Remote libsql client, file URL refused on Vercel | §7 Q9–Q15 accepted 2026-11-18. Spec `tickets/T36-remote-libsql-vercel-env.md`; [#96](https://github.com/logandelafosse/french-writing-prompter/issues/96). |
+| T38 | Function duration covers the OpenAI client       | No code blockers; Q9 yes. Spec `tickets/T38-ai-route-max-duration.md`; [#98](https://github.com/logandelafosse/french-writing-prompter/issues/98).         |
+| T39 | CI stays the merge gate (`LEFTHOOK=0`)           | No blockers. Spec `tickets/T39-ci-lefthook-merge-gate.md`; [#99](https://github.com/logandelafosse/french-writing-prompter/issues/99).                     |
 
 _Next when deps clear: T37 (after T36), T40 HITL (after T36–T38 + dashboards)._
 
