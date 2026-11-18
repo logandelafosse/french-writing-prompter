@@ -16,6 +16,10 @@ test("level chip menu works with keyboard and passes axe", async ({
   await expect(page.getByRole("menu")).toBeVisible();
   await arrowToLevelInOpenMenu(page, /C1 · Autonome/);
   await page.keyboard.press("Enter");
+  // Legacy LevelCard is gone; the header chip is the learner-visible level.
+  await expect(
+    page.getByRole("button", { name: "Niveau CECR B1, changer" }),
+  ).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Niveau CECR C1, changer" }),
   ).toBeVisible();

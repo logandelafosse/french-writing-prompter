@@ -5,6 +5,31 @@ export function visibleHeaderQuota(page: Page, text: string | RegExp) {
   return page.getByRole("banner").getByText(text).filter({ visible: true });
 }
 
+export async function expectSingleDesktopHeaderRow(page: Page) {
+  const banner = page.getByRole("banner");
+  const wordmark = banner.getByRole("heading", { level: 1 });
+  const chip = banner.getByRole("button", { name: /Niveau CECR/ });
+  const nav = banner.getByRole("link", { name: "Historique" });
+  const quota = banner.getByText(/Reste \d consignes sur 3/).filter({
+    visible: true,
+  });
+
+  const boxY = async (locator: Locator) => {
+    const box = await locator.boundingBox();
+    return box?.y ?? 0;
+  };
+
+  await expect(async () => {
+    const ys = [
+      await boxY(wordmark),
+      await boxY(chip),
+      await boxY(nav),
+      await boxY(quota),
+    ];
+    expect(Math.max(...ys) - Math.min(...ys)).toBeLessThan(28);
+  }).toPass();
+}
+
 export async function expectTwoMobileHeaderRows(page: Page) {
   const banner = page.getByRole("banner");
   await expect(async () => {
