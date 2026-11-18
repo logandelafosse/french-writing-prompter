@@ -306,6 +306,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
   const [placementLink, setPlacementLink] = useState<PlacementHeaderLink>(null);
   const [levelMenuOpen, setLevelMenuOpen] = useState(false);
   const quotaFetchGen = useRef(0);
+  const levelFetchGen = useRef(0);
 
   const fetchQuota = useCallback(async () => {
     const gen = ++quotaFetchGen.current;
@@ -319,6 +320,18 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const fetchLevel = useCallback(async () => {
+    const gen = ++levelFetchGen.current;
+    const result = await fetchJson("/api/level", LevelGetResponse);
+    if (gen !== levelFetchGen.current) {
+      return;
+    }
+    if (result.ok) {
+      setLevel(result.value.level);
+      setLevelReady(true);
+    }
+  }, []);
+
   const refreshQuota = useCallback(async () => {
     await fetchQuota();
   }, [fetchQuota]);
@@ -326,19 +339,13 @@ export function HeaderShell({ children }: { children: ReactNode }) {
   const refreshShell = useCallback(
     async (optimisticLevel?: CefrLevel) => {
       if (optimisticLevel !== undefined) {
+        levelFetchGen.current += 1;
         setLevel(optimisticLevel);
         setLevelReady(true);
       }
-      const [levelRes] = await Promise.all([
-        fetchJson("/api/level", LevelGetResponse),
-        fetchQuota(),
-      ]);
-      if (levelRes.ok) {
-        setLevel(levelRes.value.level);
-        setLevelReady(true);
-      }
+      await Promise.all([fetchLevel(), fetchQuota()]);
     },
-    [fetchQuota],
+    [fetchLevel, fetchQuota],
   );
 
   const syncFromToday = useCallback((p: TodayGetDto) => {
@@ -356,19 +363,16 @@ export function HeaderShell({ children }: { children: ReactNode }) {
     }
     let cancelled = false;
     async function loadAll() {
-      const levelRes = await fetchJson("/api/level", LevelGetResponse);
+      await fetchLevel();
       if (cancelled) return;
-      if (levelRes.ok) {
-        setLevel(levelRes.value.level);
-        setLevelReady(true);
-      }
       await fetchQuota();
     }
     void loadAll();
     return () => {
       cancelled = true;
+      levelFetchGen.current += 1;
     };
-  }, [fetchQuota, skipHeaderFetch]);
+  }, [fetchLevel, fetchQuota, skipHeaderFetch]);
 
   const onLevelChange = useCallback(
     async (next: CefrLevel) => {
@@ -378,6 +382,7 @@ export function HeaderShell({ children }: { children: ReactNode }) {
         body: JSON.stringify({ level: next }),
       });
       if (result.ok) {
+        levelFetchGen.current += 1;
         setLevel(next);
         setLevelReady(true);
         await refreshQuota();
