@@ -2,6 +2,16 @@ import { describe, it, expect } from "vitest";
 import { resetE2eDatabase } from "../../e2e/support/reset-db";
 import { assertE2eDatabaseUrl } from "./e2e-database";
 
+describe("e2e database guard", () => {
+  it("rejects a turso URL", () => {
+    expect(() =>
+      assertE2eDatabaseUrl("libsql://consigne-preview.turso.io"),
+    ).toThrow(
+      /E2E requires a file: DATABASE_URL, got libsql:\/\/consigne-preview\.turso\.io/,
+    );
+  });
+});
+
 describe("assertE2eDatabaseUrl", () => {
   it("throws when DATABASE_URL points outside .e2e/", () => {
     expect(() => assertE2eDatabaseUrl("file:./data.db")).toThrow(
