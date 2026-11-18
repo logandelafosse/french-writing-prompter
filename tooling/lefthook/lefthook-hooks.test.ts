@@ -23,6 +23,7 @@ const SYNC_FROM_WORKING_TREE = [
   "package.json",
   "package-lock.json",
   "opencode.json",
+  "scripts/install-hooks.mjs",
 ] as const;
 
 const GIT_IDENTITY = [
@@ -133,10 +134,13 @@ async function writeScratchFile(
 }
 
 function runHooksInstall(cwd: string): void {
+  const env: NodeJS.ProcessEnv = { ...process.env };
+  delete env.CI;
+  delete env.LEFTHOOK;
   const install = spawnSync("npm", ["ci"], {
     cwd,
     stdio: "pipe",
-    env: { ...process.env },
+    env,
   });
   if (install.status !== 0) {
     throw new Error(install.stderr?.toString() || "npm ci failed");
