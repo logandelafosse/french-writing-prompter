@@ -1,5 +1,7 @@
 # T19 — Error and offline states
 
+GitHub issue: #21
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T17        | ~340                    |

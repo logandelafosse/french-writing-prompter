@@ -1,5 +1,7 @@
 # T18 — Quota exhausted, swap confirm, session statuses
 
+GitHub issue: #20
+
 | Phase | Type              | Blocked by | Production lines (est.) |
 | ----- | ----------------- | ---------- | ----------------------- |
 | 1     | AFK (Q8 answered) | T17        | ~330                    |

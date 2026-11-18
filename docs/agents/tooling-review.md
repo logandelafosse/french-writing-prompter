@@ -1484,4 +1484,4 @@ Full write-up: `docs/agents/session-retro.md`. **TOOL-SESSION-2** and **TOOL-SES
 | ID              | Pri | Summary                                                                                                |
 | --------------- | --- | ------------------------------------------------------------------------------------------------------ |
 | TOOL-SESSION-10 | P0  | **Done** — `pr:size` merge-base is `refs/remotes/<github-remote>/main`; refuse ambiguous `origin/main` |
-| TOOL-SESSION-11 | P0  | `sync-ticket-issues` reads an explicit issue id and refuses pull requests; drop ticket number + 2      |
+| TOOL-SESSION-11 | P0  | **Done** — explicit `GitHub issue: #n` in ticket files; refuse PR / title mismatch                     |

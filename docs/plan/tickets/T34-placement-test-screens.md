@@ -1,5 +1,7 @@
 # T34 — Placement Test screens
 
+GitHub issue: #36
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 4     | AFK  | T16, T33   | ~400                    |

@@ -1,5 +1,7 @@
 # T27 — Dialect Notes markdown export
 
+GitHub issue: #29
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 2     | AFK  | T26        | ~120                    |

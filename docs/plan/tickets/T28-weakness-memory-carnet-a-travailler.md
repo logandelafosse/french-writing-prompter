@@ -1,5 +1,7 @@
 # T28 — Weakness memory and Carnet "À travailler"
 
+GitHub issue: #30
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 3     | AFK  | T22, T26   | ~300                    |

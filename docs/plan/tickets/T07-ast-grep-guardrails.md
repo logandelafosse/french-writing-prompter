@@ -1,5 +1,7 @@
 # T07 — ast-grep guardrails
 
+GitHub issue: #9
+
 | Phase | Type | Blocked by | Production lines (est.)                                                       |
 | ----- | ---- | ---------- | ----------------------------------------------------------------------------- |
 | 0     | AFK  | T06        | ~40 in `src` (import paths after the legacy move); ~400 YAML rules and config |

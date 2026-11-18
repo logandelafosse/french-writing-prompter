@@ -1,5 +1,7 @@
 # T36 — Remote libsql client, file URL refused on Vercel
 
+GitHub issue: #96
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 5     | AFK  | —          | ~120                    |

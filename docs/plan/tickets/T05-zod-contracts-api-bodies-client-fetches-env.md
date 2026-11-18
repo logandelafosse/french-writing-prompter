@@ -1,5 +1,7 @@
 # T05 — Zod contracts for API bodies, client fetches, env
 
+GitHub issue: #7
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 0     | AFK  | T04        | ~300                    |

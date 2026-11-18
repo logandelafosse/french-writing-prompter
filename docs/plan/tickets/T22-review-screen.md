@@ -1,5 +1,7 @@
 # T22 — Review screen: marked text, Mistake cards, Scores
 
+GitHub issue: #24
+
 | Phase | Type              | Blocked by | Production lines (est.)                             |
 | ----- | ----------------- | ---------- | --------------------------------------------------- |
 | 1     | AFK (Q5 answered) | T16, T21   | ~500 (at the limit; see split note in Out of scope) |

@@ -1,5 +1,7 @@
 # T21a — Corrections table, EvaluationV2 contracts, and parseStoredEvaluation
 
+GitHub issue: #23
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T06, T17   | ~230                    |

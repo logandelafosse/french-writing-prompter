@@ -1,5 +1,7 @@
 # T30 — Resource catalog and links
 
+GitHub issue: #32
+
 | Phase | Type              | Blocked by | Production lines (est.)       |
 | ----- | ----------------- | ---------- | ----------------------------- |
 | 3     | AFK (Q7 answered) | T28        | ~200 (excluding catalog data) |

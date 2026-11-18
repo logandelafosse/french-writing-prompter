@@ -1,5 +1,7 @@
 # T04 — Zod contracts for LLM output and stored JSON
 
+GitHub issue: #6
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 0     | AFK  | T02        | ~300                    |

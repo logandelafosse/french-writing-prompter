@@ -1,5 +1,7 @@
 # T31 — History redesign
 
+GitHub issue: #33
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 4     | AFK  | T18, T22   | ~420                    |

@@ -1,5 +1,7 @@
 # T38 — Function duration covers the OpenAI client
 
+GitHub issue: #98
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 5     | AFK  | —          | ~40                     |

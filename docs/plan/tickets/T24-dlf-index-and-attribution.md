@@ -1,5 +1,7 @@
 # T24 — DLF lexicon, grader context, and attribution
 
+GitHub issue: #26
+
 | Phase | Type              | Blocked by | Production lines (est.) |
 | ----- | ----------------- | ---------- | ----------------------- |
 | 2     | AFK (Q6 answered) | T23        | ~250                    |

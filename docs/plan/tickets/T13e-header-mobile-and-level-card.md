@@ -1,5 +1,7 @@
 # T13e — Mobile header rows + level card sync after legacy PUT
 
+GitHub issue: #56
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T13c       | ~60                     |

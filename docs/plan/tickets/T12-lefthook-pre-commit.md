@@ -1,5 +1,7 @@
 # T12 — Lefthook pre-commit
 
+GitHub issue: #14
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 0     | AFK  | T08        | ~30 config              |

@@ -1,5 +1,7 @@
 # T17 — Session lifecycle and draft autosave
 
+GitHub issue: #19
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T16        | ~400                    |

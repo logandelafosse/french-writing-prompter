@@ -1,5 +1,7 @@
 # T13c — Header PR #52 review fixes
 
+GitHub issue: #53
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T13        | ~120                    |

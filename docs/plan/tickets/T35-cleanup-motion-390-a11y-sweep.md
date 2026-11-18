@@ -1,5 +1,7 @@
 # T35 — Cleanup, motion, 390 px pass, a11y sweep
 
+GitHub issue: #37
+
 | Phase | Type | Blocked by         | Production lines (est.)                               |
 | ----- | ---- | ------------------ | ----------------------------------------------------- |
 | 4     | AFK  | T13–T34 UI tickets | ~450 (mostly deletions and CSS); see split note below |

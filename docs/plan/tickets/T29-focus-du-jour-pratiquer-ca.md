@@ -1,5 +1,7 @@
 # T29 — Focus du jour driving prompts; "Pratiquer ça"
 
+GitHub issue: #31
+
 | Phase | Type | Blocked by | Production lines (est.)       |
 | ----- | ---- | ---------- | ----------------------------- |
 | 3     | AFK  | T15, T28   | ~420 (close to the 500 limit) |
