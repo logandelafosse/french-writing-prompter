@@ -84,7 +84,7 @@ Coordinator habits (first retro, with the T36–T39 corrections applied):
 - Read the board from `github/main` (`git show github/main:docs/plan/board.md`). Corrected 2026-11-18: `origin` is a local bare repo, and a local branch named `origin/main` is stale.
 - Dispatch implementers from a **fresh worktree** off `github/main`. Leave a dirty primary checkout untouched.
 - Leave the implementer model unset. The Task tool rejects `cursor-grok-4.6-high-fast`. Do not pass `composer-2.5-fast`.
-- Prefer **docs-only** board pushes with CI/lefthook that skip full gates when the diff is only `docs/**` (once TOOL-SESSION-2/5 land).
+- Prefer **docs-only** board pushes. CI skips the `e2e` job on `push` to `main` when the diff is only `docs/**`. Lefthook `pre-push` skips `npm run check` for the same diffs. `LEFTHOOK=0` is not required for those pushes.
 - Do not use `LEFTHOOK=0` except emergencies; never for mixed `src/` commits.
 - Post **blocking** review summaries as a **GitHub PR comment** so fix commits are traceable without the chat transcript.
 

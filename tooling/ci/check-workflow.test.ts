@@ -180,6 +180,26 @@ describe("check workflow", () => {
     expect(workflowProblems(workflow)).toEqual([]);
   });
 
+  it("publishes docs-only from the check job after detecting a push diff", () => {
+    const body = jobBody("check");
+    expect(body).toMatch(
+      /outputs:\n {6}docs-only: \$\{\{ steps\.docs-only\.outputs\.docs-only \}\}/,
+    );
+    expect(body).toMatch(/id: docs-only\n {8}if: github\.event_name == 'push'/);
+    expect(body).toMatch(
+      /npx tsx tooling\/ci\/docs-only-cli\.ts --github-output/,
+    );
+  });
+
+  it("skips e2e only when the check job reports a docs-only push", () => {
+    const body = jobBody("e2e");
+    expect(body).toMatch(/^ {4}needs: check$/m);
+    expect(body).toMatch(
+      /if: \$\{\{ needs\.check\.outputs\.docs-only != 'true' \}\}/,
+    );
+    expect(body).not.toMatch(/github\.event_name == 'pull_request'/);
+  });
+
   it("does not treat a comment as the LEFTHOOK env", () => {
     const body = [
       "    env:",

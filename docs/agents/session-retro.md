@@ -55,10 +55,10 @@ Scope: PRs [#75](https://github.com/logandelafosse/french-writing-prompter/pull/
 | ID             | Pri | Change                                                              |
 | -------------- | --- | ------------------------------------------------------------------- |
 | TOOL-SESSION-1 | P0  | `writingField` + ast-grep ban substring label in e2e                |
-| TOOL-SESSION-2 | P0  | CI: docs-only `main` push skips e2e                                 |
+| TOOL-SESSION-2 | P0  | CI: docs-only `main` push skips e2e (**done**)                      |
 | TOOL-SESSION-3 | P0  | Offline opencode schema test                                        |
 | TOOL-SESSION-4 | P0  | dev/migrate env loading without OpenAI for local DB                 |
-| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip                                    |
+| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip (**done**)                         |
 | TOOL-SESSION-6 | P1  | `ticket-worktree` + board from `origin/main`                        |
 | TOOL-SESSION-7 | P1  | `pr:size` file list + split thresholds                              |
 | TOOL-SESSION-8 | P1  | Diff-scoped review briefs + PR comment trail (keep all 3 reviewers) |
@@ -109,8 +109,13 @@ T33–T35 and D01–D05 are outside this hosting arc and are not inventoried her
 ### Recommendations (prioritized)
 
 1. **P0 — TOOL-SESSION-10.** In `tooling/pr-size/run-pr-size.ts`, stop passing the name `origin/main` to `git merge-base`. Resolve the remote whose fetch URL is `github.com/logandelafosse/french-writing-prompter` (`github` in agent worktrees, `origin` in Actions) and merge-base `refs/remotes/<that-remote>/main`. Exit 1 when that remote is missing. Print the ref name in the result message. Add a case in `tooling/pr-size/pr-size.integration.test.ts` that calls `runPrSize` with no `baseRef`: a stale `refs/heads/origin/main` plus `refs/remotes/github/main` at the true base must report the small total. A second case, GitHub remote named `origin` and no local branch of that name, must still pass so `check.yml` keeps working. TOOL-SESSION-6 still says to read the board from `origin/main`; when that script is written, use `github/main`.
+<<<<<<< HEAD
 2. **P0 — TOOL-SESSION-11.** Delete `issueOf = (id) => Number(id.slice(1)) + 2` in `scripts/sync-ticket-issues.ts`. Read an explicit issue number from the ticket file. Before `gh issue edit`, run `gh issue view <n> --json title,isPullRequest` and exit non-zero when `isPullRequest` is true or the title does not contain the ticket id. Until that guard exists, do not run the script for T36–T39.
 3. **Docs-only gates stay TOOL-SESSION-2 (P0) and TOOL-SESSION-5 (P1).** This session did not make them worse. `lefthook.yml` `pre-push` is still full `npm run check`, and `check.yml` still runs e2e on every push to `main`. T39's install wrapper does not skip either gate. It only shows that `LEFTHOOK=0` never was a docs-push escape hatch: the lefthook binary ignores it. No new row.
+=======
+2. **P0 — TOOL-SESSION-11.** Delete `issueOf = (id) => Number(id.slice(1)) + 2` in `scripts/sync-ticket-issues.mjs`. Read an explicit issue number from the ticket file. Before `gh issue edit`, run `gh issue view <n> --json title,isPullRequest` and exit non-zero when `isPullRequest` is true or the title does not contain the ticket id. Until that guard exists, do not run the script for T36–T39.
+3. **Docs-only gates (TOOL-SESSION-2 P0, TOOL-SESSION-5 P1) landed.** `check.yml` skips the `e2e` job on `push` to `main` when `tooling/ci/docs-only-cli.ts --github-output` reports `docs-only=true` (`docs/**` only). Pull requests still run e2e. Lefthook `pre-push` skips `npm run check` when `--skip-push` exits 0 for the same diffs. `LEFTHOOK=0` is not required for docs board pushes.
+>>>>>>> 1d636e1 (tooling: skip e2e and pre-push check on docs-only pushes)
 4. **P2 — TOOL-SESSION-12 and TOOL-SESSION-13.** Follow-ups from #104. The merged behavior already refuses a `file:` URL inside `runVercelBuild` and keeps `npm run build` as `next build`.
 5. **Workflow, this commit.** Board reads use `github/main`. The implementer model stays unset: the Task tool rejects `cursor-grok-4.6-high-fast`, and `composer-2.5-fast` stays unused. TOOL-SESSION-11 lands explicit `GitHub issue: #n` lines and refuses PR / title mismatches.
 

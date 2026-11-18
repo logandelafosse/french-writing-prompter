@@ -1468,10 +1468,10 @@ Full write-up: `docs/agents/session-retro.md`. Prioritize **TOOL-SESSION-1**–*
 | ID             | Pri | Summary                                                                        |
 | -------------- | --- | ------------------------------------------------------------------------------ |
 | TOOL-SESSION-1 | P0  | `writingField` + ban substring `getByLabel('Ton texte')` in e2e                |
-| TOOL-SESSION-2 | P0  | Skip e2e on docs-only `main` push                                              |
+| TOOL-SESSION-2 | P0  | Skip e2e on docs-only `main` push (**done**)                                   |
 | TOOL-SESSION-3 | P0  | No network fetch in lefthook schema test                                       |
 | TOOL-SESSION-4 | P0  | `npm run dev` / migrate without requiring OpenAI for local DB                  |
-| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip                                               |
+| TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip (**done**)                                    |
 | TOOL-SESSION-6 | P1  | `ticket-worktree` script                                                       |
 | TOOL-SESSION-7 | P1  | `pr:size` top files + split thresholds                                         |
 | TOOL-SESSION-8 | P1  | Document diff-scoped review briefs in workflow; GitHub PR comment for blockers |
@@ -1479,7 +1479,7 @@ Full write-up: `docs/agents/session-retro.md`. Prioritize **TOOL-SESSION-1**–*
 
 ### Session retro (T36–T39, 2026-11-18)
 
-Full write-up: `docs/agents/session-retro.md`. **TOOL-SESSION-2** and **TOOL-SESSION-5** stayed open and are unchanged: docs-only board pushes still run lefthook `pre-push` (`npm run check`, ~60s) and GitHub e2e. T39's `scripts/install-hooks.mjs` does not skip those gates.
+Full write-up: `docs/agents/session-retro.md`. **TOOL-SESSION-2** and **TOOL-SESSION-5** are done: docs-only `main` pushes skip GitHub e2e, and lefthook `pre-push` skips `npm run check`. `LEFTHOOK=0` is not required for those pushes. T39's `scripts/install-hooks.mjs` still only skips hook install.
 
 | ID              | Pri | Summary                                                                                                |
 | --------------- | --- | ------------------------------------------------------------------------------------------------------ |

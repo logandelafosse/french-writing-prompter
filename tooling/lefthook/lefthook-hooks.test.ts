@@ -24,6 +24,8 @@ const SYNC_FROM_WORKING_TREE = [
   "package-lock.json",
   "opencode.json",
   "scripts/install-hooks.mjs",
+  "tooling/ci/docs-only.ts",
+  "tooling/ci/docs-only-cli.ts",
 ] as const;
 
 const GIT_IDENTITY = [
@@ -284,6 +286,45 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     expect(committed).not.toMatch(/no   extra   spaces/);
 
     git(clone!.dir, ["reset", "--hard", "HEAD~1"]);
+  });
+
+  it("skips npm run check on a docs-only pre-push", async () => {
+    await resetClone();
+    const bareParent = await mkdtemp(path.join(tmpdir(), "fwp-bare-"));
+    const bare = path.join(bareParent, "remote.git");
+    try {
+      execFileSync("git", ["init", "--bare", bare], { stdio: "pipe" });
+      git(clone!.dir, ["remote", "add", "origin", bare]);
+      const setupPush = spawnSync(
+        "git",
+        [...GIT_IDENTITY, "push", "-u", "origin", "HEAD:main"],
+        {
+          cwd: clone!.dir,
+          encoding: "utf8",
+          env: { ...process.env, LEFTHOOK: "0" },
+        },
+      );
+      expect(setupPush.status).toBe(0);
+
+      const rel = "docs/plan/board-scratch.md";
+      await writeScratchFile(clone!.dir, rel, "# board\n");
+      git(clone!.dir, ["add", rel]);
+      const committed = tryGitCommit(clone!.dir, "docs board");
+      expect(committed.ok).toBe(true);
+
+      await writeScratchFile(
+        clone!.dir,
+        "src/lib/hooks-docs-push-poison.ts",
+        `export const broken: number = "not-a-number";\n`,
+      );
+
+      const push = tryGitPush(clone!.dir);
+      expect(push.ok).toBe(true);
+      expect(push.output).not.toMatch(/error TS\d+/i);
+      expect(push.output).toMatch(/skip|docs-only/i);
+    } finally {
+      await rm(bareParent, { recursive: true, force: true });
+    }
   });
 
   it("runs npm run check on pre-push and fails when check would fail", async () => {

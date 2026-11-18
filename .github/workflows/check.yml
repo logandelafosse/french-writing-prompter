@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       LEFTHOOK: "0"
+    outputs:
+      docs-only: ${{ steps.docs-only.outputs.docs-only }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -21,6 +23,13 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - name: Detect docs-only push
+        id: docs-only
+        if: github.event_name == 'push'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+        run: npx tsx tooling/ci/docs-only-cli.ts --github-output
       - run: npm run check
       - run: npm run build
 
@@ -32,6 +41,7 @@ jobs:
 
   e2e:
     needs: check
+    if: ${{ needs.check.outputs.docs-only != 'true' }}
     runs-on: ubuntu-latest
     env:
       LEFTHOOK: "0"
