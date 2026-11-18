@@ -377,6 +377,24 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
   });
 });
 
+const OPENCODE_SCHEMA_URL = "https://opencode.ai/config.json";
+const MODELS_DEV_SCHEMA_URL = "https://models.dev/model-schema.json";
+
+const JsonSchemaDocument = z.record(z.string(), z.unknown());
+
+async function readVendoredSchema(fileName: string) {
+  const filePath = path.join(root, "tooling/opencode/fixtures", fileName);
+  const parsed = parseJson(
+    JsonSchemaDocument,
+    await readFile(filePath, "utf8"),
+  );
+  expect(parsed.ok).toBe(true);
+  if (!parsed.ok) {
+    throw new Error(`Invalid vendored schema ${fileName}`);
+  }
+  return parsed.value;
+}
+
 describe("opencode.json destructive escapes", () => {
   it("denies --no-verify, force push, rm -rf, and sqlite3 data.db", async () => {
     const raw = await readFile(path.join(root, "opencode.json"), "utf8");
@@ -390,18 +408,23 @@ describe("opencode.json destructive escapes", () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const config = parsed.value;
-    const schemaResponse = await fetch(config.$schema);
-    expect(schemaResponse.ok).toBe(true);
-    const schema = (await schemaResponse.json()) as object;
+    expect(config.$schema).toBe(OPENCODE_SCHEMA_URL);
+
+    const schema = await readVendoredSchema("config.schema.json");
+    const modelSchema = await readVendoredSchema("model.schema.json");
+    const localSchemas = new Map<string, Record<string, unknown>>([
+      [OPENCODE_SCHEMA_URL, schema],
+      [MODELS_DEV_SCHEMA_URL, modelSchema],
+    ]);
     const ajv = new Ajv2020({
       allErrors: true,
       strict: false,
       loadSchema: async (uri) => {
-        const response = await fetch(uri);
-        if (!response.ok) {
-          throw new Error(`Failed to load schema ${uri}`);
+        const loaded = localSchemas.get(uri);
+        if (!loaded) {
+          throw new Error(`Unexpected schema URI (offline test): ${uri}`);
         }
-        return response.json() as Promise<object>;
+        return loaded;
       },
     });
     const validate = await ajv.compileAsync(schema);
