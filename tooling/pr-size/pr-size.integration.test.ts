@@ -99,4 +99,80 @@ describe("runPrSize integration", () => {
       fs.rmSync(repoDir, { recursive: true, force: true });
     }
   });
+
+  it("sizes against refs/remotes/github/main when a stale local origin/main exists", () => {
+    const repoDir = fs.mkdtempSync(path.join(os.tmpdir(), "pr-size-"));
+    try {
+      initRepo(repoDir);
+      writeLines(path.join(repoDir, "src", "stale.ts"), 1);
+      commitAll(repoDir, "stale origin/main");
+      const staleSha = runInRepo(repoDir, "git rev-parse HEAD").trim();
+
+      writeLines(path.join(repoDir, "src", "later.ts"), 800);
+      commitAll(repoDir, "true github/main");
+      const trueBaseSha = runInRepo(repoDir, "git rev-parse HEAD").trim();
+
+      runInRepo(repoDir, "git checkout -b feature");
+      writeLines(path.join(repoDir, "src", "feature.ts"), 7);
+      commitAll(repoDir, "feature");
+
+      runInRepo(repoDir, `git branch origin/main ${staleSha}`);
+      runInRepo(
+        repoDir,
+        "git remote add github https://github.com/logandelafosse/french-writing-prompter.git",
+      );
+      runInRepo(
+        repoDir,
+        `git update-ref refs/remotes/github/main ${trueBaseSha}`,
+      );
+
+      const result = withoutHookGitEnv(() => runPrSize({ cwd: repoDir }));
+      expect(result.total).toBe(7);
+      expect(result.exitCode).toBe(0);
+      expect(result.message).toContain("refs/remotes/github/main");
+    } finally {
+      fs.rmSync(repoDir, { recursive: true, force: true });
+    }
+  });
+
+  it("sizes against refs/remotes/origin/main when the GitHub remote is named origin", () => {
+    const repoDir = fs.mkdtempSync(path.join(os.tmpdir(), "pr-size-"));
+    try {
+      scaffoldMainWithFeature(repoDir);
+      writeLines(path.join(repoDir, "src", "feature.ts"), 11);
+      commitAll(repoDir, "feature");
+      const mainSha = runInRepo(repoDir, "git rev-parse main").trim();
+
+      runInRepo(
+        repoDir,
+        "git remote add origin https://github.com/logandelafosse/french-writing-prompter.git",
+      );
+      runInRepo(repoDir, `git update-ref refs/remotes/origin/main ${mainSha}`);
+
+      const result = withoutHookGitEnv(() => runPrSize({ cwd: repoDir }));
+      expect(result.total).toBe(11);
+      expect(result.exitCode).toBe(0);
+      expect(result.message).toContain("refs/remotes/origin/main");
+    } finally {
+      fs.rmSync(repoDir, { recursive: true, force: true });
+    }
+  });
+
+  it("exits 1 when no GitHub remote is configured", () => {
+    const repoDir = fs.mkdtempSync(path.join(os.tmpdir(), "pr-size-"));
+    try {
+      scaffoldMainWithFeature(repoDir);
+      writeLines(path.join(repoDir, "src", "feature.ts"), 3);
+      commitAll(repoDir, "feature");
+
+      const result = withoutHookGitEnv(() => runPrSize({ cwd: repoDir }));
+      expect(result.exitCode).toBe(1);
+      expect(result.total).toBe(0);
+      expect(result.message).toContain(
+        "github.com/logandelafosse/french-writing-prompter",
+      );
+    } finally {
+      fs.rmSync(repoDir, { recursive: true, force: true });
+    }
+  });
 });

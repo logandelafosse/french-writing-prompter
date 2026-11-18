@@ -116,11 +116,11 @@ T33–T35 and D01–D05 are outside this hosting arc and are not inventoried her
 
 ### TOOL-SESSION backlog (T36–T39 arc)
 
-| ID              | Pri | Change                                                                                            |
-| --------------- | --- | ------------------------------------------------------------------------------------------------- |
-| TOOL-SESSION-10 | P0  | `pr:size` merge-base is `refs/remotes/<github-remote>/main`; refuse ambiguous `origin/main`       |
-| TOOL-SESSION-11 | P0  | `sync-ticket-issues` reads an explicit issue id and refuses pull requests; drop ticket number + 2 |
-| TOOL-SESSION-12 | P2  | #104 follow-up: test spawns the Vercel build wrapper                                              |
-| TOOL-SESSION-13 | P2  | #104 follow-up: fail if a future `prebuild` script calls migrate                                  |
+| ID              | Pri | Change                                                                                                 |
+| --------------- | --- | ------------------------------------------------------------------------------------------------------ |
+| TOOL-SESSION-10 | P0  | **Done** — `pr:size` merge-base is `refs/remotes/<github-remote>/main`; refuse ambiguous `origin/main` |
+| TOOL-SESSION-11 | P0  | `sync-ticket-issues` reads an explicit issue id and refuses pull requests; drop ticket number + 2      |
+| TOOL-SESSION-12 | P2  | #104 follow-up: test spawns the Vercel build wrapper                                                   |
+| TOOL-SESSION-13 | P2  | #104 follow-up: fail if a future `prebuild` script calls migrate                                       |
 
 Reviewer: session-efficiency review of the T37 hosting arc.
