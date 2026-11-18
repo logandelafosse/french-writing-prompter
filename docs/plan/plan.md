@@ -33,7 +33,7 @@ Turn the CEFR grading demo into the Louisiana French writing tutor designed in `
 | 2. Dialect            | T23–T27 | Standard→Louisiana suggestions with DLF attribution, Dialect checks, Add Dialect Note sheet, Carnet notes list, markdown export                                                     |
 | 3. Memory             | T28–T30 | Weaknesses with trend, Focus du jour driving prompts, Resources                                                                                                                     |
 | 4. Archive and polish | T31–T35 | History redesign, read-only past reviews, persistent Placement Test, cleanup and motion                                                                                             |
-| 5. Host               | T36–T39 | Vercel + Turso — see `vercel-deployment.md` (HITL)                                                                                                                                  |
+| 5. Host               | T36–T40 | Vercel + Turso — §7 accepted 2026-11-18; see `vercel-deployment.md`                                                                                                                 |
 | 6. Deepen modules     | D01–D05 | Thin entry points: prompt issuance, evaluate façade, Focus/Weakness façade, learner-dialect context, Session/Draft façade — `docs/plan/deepenings.md`                               |
 
 The first ticket where it feels like a tutor is T22 (Mistakes marked in the text). Dialect awareness lands with T25, and memory with T29.
@@ -44,20 +44,27 @@ T00 → T01 → T02 → T04 → T05 → T06 → T09 → T10 → T11 → T13 → 
 
 Parallel lanes once their blockers are done: T03/T07/T08/T12 (tooling), T18–T20 (robustness and level service), T23/T24 (Standard + DLF), T27 (export), T30–T35.
 
-## Owner decisions still open
+## Owner decisions
 
-Tickets that depend on one of these are HITL and stay `Blocked` until it is answered. Each has a default so work can proceed if Logan accepts it.
+Tickets that depended on these stayed HITL until answered. Hosting Q9–Q15 accepted 2026-11-18.
 
-| ID  | Question                                                                                                                                                                                                                                 | Default if accepted | Blocks        |
-| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- | ------------- |
-| Q1  | ~~Repo name, visibility, submodule or ignore~~ **Answered 2026-11-15:** private `logandelafosse/french-writing-prompter`; parent ignores the folder                                                                                      | —                   | T00 (done)    |
-| Q2  | ~~Louisiana base rules and CEFR level descriptions~~ **Answered 2026-11-15:** 12 rules, DLF spelling (`-autres`), DLF-sourced vocabulary, subjunctive accepted but never required; full list in the T06 spec                             | —                   | T06           |
-| Q3  | ~~App name~~ **Answered 2026-11-15:** feature **Consigne** under product **Louisiana Languages**; tab title `Consigne · Louisiana Languages`                                                                                             | —                   | T13           |
-| Q4  | ~~Mistake category taxonomy~~ **Answered 2026-11-15:** §1.1 as-is for v1 (15 + `autre`)                                                                                                                                                  | —                   | T21           |
-| Q5  | ~~Score display~~ **Answered 2026-11-15:** CECR sub-levels per dimension + hover/tap “what it is / pour monter”; holistic tip inside Scores                                                                                              | —                   | T22           |
-| Q6  | ~~DLF inheritance~~ **Answered 2026-11-15:** DLF-extract publishes a **lexicon artifact** (headwords, glosses, LA examples); Consigne pins a version and injects relevant entries into grader prompts. Not spellings-only; not submodule | —                   | T24           |
-| Q7  | ~~Resource catalog~~ **Answered 2026-11-15:** general free French grammar + CI starter catalog; Logan edits in PR; LA-specific CI not required for v1                                                                                    | —                   | T30           |
-| Q8  | ~~Word target / swap / Placement memory~~ **Answered 2026-11-15:** A1 10–20, A2 80–120, B1–C2 250–300 (soft); swap uses a daily slot; Placement Mistakes feed Weakness memory                                                            | —                   | T15, T18, T28 |
+| ID  | Question                                                                                                                                                                                                                                 | Decision | Blocks        |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- | ------------- |
+| Q1  | ~~Repo name, visibility, submodule or ignore~~ **Answered 2026-11-15:** was private; repo made **public** 2026-11-17 for Actions minutes; parent ignores the folder                                                                      | —        | T00 (done)    |
+| Q2  | ~~Louisiana base rules and CEFR level descriptions~~ **Answered 2026-11-15:** 12 rules, DLF spelling (`-autres`), DLF-sourced vocabulary, subjunctive accepted but never required; full list in the T06 spec                             | —        | T06           |
+| Q3  | ~~App name~~ **Answered 2026-11-15:** feature **Consigne** under product **Louisiana Languages**; tab title `Consigne · Louisiana Languages`                                                                                             | —        | T13           |
+| Q4  | ~~Mistake category taxonomy~~ **Answered 2026-11-15:** §1.1 as-is for v1 (15 + `autre`)                                                                                                                                                  | —        | T21           |
+| Q5  | ~~Score display~~ **Answered 2026-11-15:** CECR sub-levels per dimension + hover/tap “what it is / pour monter”; holistic tip inside Scores                                                                                              | —        | T22           |
+| Q6  | ~~DLF inheritance~~ **Answered 2026-11-15:** DLF-extract publishes a **lexicon artifact** (headwords, glosses, LA examples); Consigne pins a version and injects relevant entries into grader prompts. Not spellings-only; not submodule | —        | T24           |
+| Q7  | ~~Resource catalog~~ **Answered 2026-11-15:** general free French grammar + CI starter catalog; Logan edits in PR; LA-specific CI not required for v1                                                                                    | —        | T30           |
+| Q8  | ~~Word target / swap / Placement memory~~ **Answered 2026-11-15:** A1 10–20, A2 80–120, B1–C2 250–300 (soft); swap uses a daily slot; Placement Mistakes feed Weakness memory                                                            | —        | T15, T18, T28 |
+| Q9  | ~~Vercel plan / maxDuration 120~~ **Answered 2026-11-18:** yes                                                                                                                                                                           | —        | T38, T40      |
+| Q10 | ~~Preview fake AI + shared preview DB~~ **Answered 2026-11-18:** yes                                                                                                                                                                     | —        | T40           |
+| Q11 | ~~APP_TIME_ZONE America/Chicago on Vercel~~ **Answered 2026-11-18:** yes                                                                                                                                                                 | —        | T40           |
+| Q12 | ~~Import data.db vs empty Turso~~ **Answered 2026-11-18:** agree — inspect first; residue → empty; real writing → manual dump                                                                                                            | —        | T40           |
+| Q13 | ~~Laptop stays on file:./data.db~~ **Answered 2026-11-18:** yes                                                                                                                                                                          | —        | T40           |
+| Q14 | ~~Hostname~~ **Answered 2026-11-18:** agree — `*.vercel.app` + Deployment Protection                                                                                                                                                     | —        | T40           |
+| Q15 | ~~Deployment Protection before real writing~~ **Answered 2026-11-18:** yes                                                                                                                                                               | —        | T40           |
 
 ## Models
 

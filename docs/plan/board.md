@@ -4,11 +4,17 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-17 by coordinator (D05 merged; deepenings D01–D05 done).
+Last updated: 2026-11-18 by coordinator (hosting §7 accepted; T36/T38/T39 Ready).
 
 ## Ready
 
-_None. Hosting T36–T39 waits on `docs/plan/vercel-deployment.md` HITL. Plan: `docs/plan/deepenings.md`._
+| ID  | Ticket                                           | Why                                                                            |
+| --- | ------------------------------------------------ | ------------------------------------------------------------------------------ |
+| T36 | Remote libsql client, file URL refused on Vercel | §7 Q9–Q15 accepted 2026-11-18. Spec `tickets/T36-remote-libsql-vercel-env.md`. |
+| T38 | Function duration covers the OpenAI client       | No code blockers; Q9 yes. Spec `tickets/T38-ai-route-max-duration.md`.         |
+| T39 | CI stays the merge gate (`LEFTHOOK=0`)           | No blockers. Spec `tickets/T39-ci-lefthook-merge-gate.md`.                     |
+
+_Next when deps clear: T37 (after T36), T40 HITL (after T36–T38 + dashboards)._
 
 ## In progress
 
@@ -100,11 +106,17 @@ _None. HITL tickets below wait on owner questions as well as their blockers._
 
 Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CONTEXT.md`](../../CONTEXT.md).
 
-### Phase 5 — Host (planned, not on board DAG yet)
+### Phase 5 — Host
 
-| ID / draft | Ticket                 | Type | Blocked by | Why not ready                                                                                           |
-| ---------- | ---------------------- | ---- | ---------- | ------------------------------------------------------------------------------------------------------- |
-| T36–T39    | Vercel + Turso hosting | AFK  | Logan Qs   | Spec [`docs/plan/vercel-deployment.md`](vercel-deployment.md); coordinator files tickets after §7 HITL. |
+| ID  | Ticket                                       | Type | Blocked by    | Why not ready                                                                  |
+| --- | -------------------------------------------- | ---- | ------------- | ------------------------------------------------------------------------------ |
+| T36 | Remote libsql + refuse file URL on Vercel    | AFK  | —             | **Ready** — on Ready column.                                                   |
+| T37 | Migrate on the Vercel build                  | AFK  | T36           | Needs T36 env/token plumbing. `tickets/T37-migrate-on-vercel-build.md`.        |
+| T38 | AI route `maxDuration` 120                   | AFK  | —             | **Ready** — on Ready column.                                                   |
+| T39 | CI `LEFTHOOK=0`, no vercel deploy in Actions | AFK  | —             | **Ready** — on Ready column.                                                   |
+| T40 | Project, secrets, protection, import         | HITL | T36, T37, T38 | Dashboards after AFK tickets; §7 answered. `tickets/T40-vercel-turso-hitl.md`. |
+
+Plan: [`docs/plan/vercel-deployment.md`](vercel-deployment.md).
 
 ### Phase 4 — Archive and polish
 

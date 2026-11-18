@@ -1,8 +1,8 @@
 # Vercel deployment
 
-Status: proposal · Date: 2026-11-15 · App: Consigne (`logandelafosse/french-writing-prompter`, private)
+Status: **§7 accepted 2026-11-18** · App: Consigne (`logandelafosse/french-writing-prompter`, public)
 
-This is a plan for hosting the existing Next.js app. Filing it changes no application code, no board column, and no `plan.md`. T36–T39 can be filed on the defaults in §7. T40 stays blocked until Logan accepts those defaults. The coordinator copies the tickets onto the board at that point.
+Hosting plan for the Next.js app. Tickets: `docs/plan/tickets/T36-*.md` … `T40-*.md`. AFK work is T36–T39; T40 is HITL cutover in the dashboards after those land.
 
 The repo is **Next.js 16.2.6** and **React 19.2.4** (`package.json`). The Vercel framework preset is still Next.js. `next.config.ts` is empty, which is what we want: there is no `output: "export"`, and the app has server route handlers (`src/app/api/prompt`, `evaluate`, `placement`, `quota`, `level`, `sessions`). Node.js on Vercel matches CI: `.github/workflows/check.yml` pins Node 20. There is no `engines` field; the Vercel project setting is the pin. Leave `engines` alone so a newer local Node keeps working.
 
@@ -201,7 +201,7 @@ Deployment Protection (Vercel Authentication, Logan's account) is on for Preview
 
 Phase 5. Estimates are production lines, tests excluded, same budget as the rest of the board (`npm run pr:size`, 500). File them as sub-issues of GitHub #1 when Logan accepts §7. Do not pre-assign issue numbers.
 
-T36 and T38 can start immediately. T37 follows T36. T39 follows nothing and should land before T12 so `LEFTHOOK=0` is already in the workflow. T40 is HITL and waits on T36–T38 plus the answers in §7.
+T36, T38, and T39 can start immediately (T12 already landed — T39 still adds `LEFTHOOK=0` to Actions). T37 follows T36. T40 is HITL cutover after T36–T38 and the accepted §7 answers.
 
 ### T36 — Remote libsql client, file URL refused on Vercel
 
@@ -422,14 +422,14 @@ Logan does this in the dashboards. No application code unless a dump command has
 
 ## 7. Open questions for Logan
 
-Defaults are what the tickets assume if you accept them. T40 stays blocked until you say so. T36–T39 can merge on the defaults.
+**Answered 2026-11-18** (Logan). Tickets may proceed on these decisions.
 
-| ID  | Question                                                                                                                                                                                                                 | Default if accepted                                                                                                                                            | Blocks |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| Q9  | Which Vercel plan is the project on, and does it allow a Node route `maxDuration` of 120? `OpenAiClient` can run ~90s (`timeout` 30s, `maxRetries` 2). A lower platform cap returns HTML and skips the app's error JSON. | You confirm before the first production Evaluation. T38 still lands the export. If the account rejects 120, we raise the plan or lower retries in a follow-up. | T40    |
-| Q10 | Preview per PR with `AI_CLIENT=fake` and one shared preview database?                                                                                                                                                    | Yes. Production is the only place that calls OpenAI.                                                                                                           | T40    |
-| Q11 | Is `America/Chicago` the quota timezone on Vercel?                                                                                                                                                                       | Yes. Matches `TZ=America/Chicago` in `npm test` and US Central (UTC−6 / UTC−5).                                                                                | T40    |
-| Q12 | Copy local `data.db` into production Turso, or start empty? Backend requirements §0 D9 described that file as test residue (session 35, `{"score": 5}`). Confirm what is in it now before any copy.                      | Inspect first. Residue means start empty. Real writing means one manual dump, then a row-count check. Never an automatic import from CI.                       | T40    |
-| Q13 | Keep `npm run dev` on `file:./data.db` after production exists?                                                                                                                                                          | Yes. The laptop and Vercel are two databases. `.env` on the laptop does not get the Turso URL, so `predev` cannot migrate production.                          | T40    |
-| Q14 | Hostname?                                                                                                                                                                                                                | The default `*.vercel.app` names, behind Deployment Protection. A custom domain is a later ticket.                                                             | T40    |
-| Q15 | Turn on Deployment Protection before any real writing is stored on Turso? The routes have no auth of their own.                                                                                                          | Yes, on Preview and Production.                                                                                                                                | T40    |
+| ID  | Question                                                 | Decision                                                                                                                          | Blocks |
+| --- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| Q9  | Vercel plan / `maxDuration` 120?                         | **Yes** — account allows 120s. T38 lands the export; T40 verifies on first prod deploy.                                           | T40    |
+| Q10 | Preview per PR, `AI_CLIENT=fake`, one shared preview DB? | **Yes.** Production is the only OpenAI caller.                                                                                    | T40    |
+| Q11 | Quota TZ `America/Chicago` on Vercel?                    | **Yes.**                                                                                                                          | T40    |
+| Q12 | Import `data.db` into prod Turso, or start empty?        | **Agree with default** — inspect first; residue → start empty; real writing → one manual dump + row-count check. Never CI import. | T40    |
+| Q13 | Keep laptop `npm run dev` on `file:./data.db`?           | **Yes** — two databases; laptop `.env` stays on the file URL.                                                                     | T40    |
+| Q14 | Hostname?                                                | **Agree with default** — `*.vercel.app` behind Deployment Protection; custom domain later.                                        | T40    |
+| Q15 | Deployment Protection before real Turso writing?         | **Yes** — Preview and Production.                                                                                                 | T40    |
