@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+import { loadEnvFile } from "node:process";
 import { z } from "zod";
 
 function isRemoteDatabaseUrl(url: string): boolean {
@@ -8,6 +11,12 @@ function isRemoteDatabaseUrl(url: string): boolean {
   const scheme = url.slice(0, colon).toLowerCase();
   return scheme === "libsql" || scheme === "https";
 }
+
+const DbClientEnvSchema = z.object({
+  VITEST: z.string().optional(),
+  APP_TIME_ZONE: z.string().optional(),
+  LIBSQL_AUTH_TOKEN: z.string().optional(),
+});
 
 const EnvSchema = z
   .object({
@@ -63,6 +72,7 @@ const EnvSchema = z
   });
 
 type AppEnv = z.infer<typeof EnvSchema>;
+type DbClientEnv = z.infer<typeof DbClientEnvSchema>;
 
 export class EnvError extends Error {
   readonly variableNames: string[];
@@ -75,6 +85,28 @@ export class EnvError extends Error {
 }
 
 let cached: AppEnv | undefined;
+let cachedDbClient: DbClientEnv | undefined;
+
+/** DB/migrate bootstrap — no OpenAI key required. */
+export function getDbClientEnv(): DbClientEnv {
+  if (cachedDbClient) return cachedDbClient;
+
+  const parsed = DbClientEnvSchema.safeParse({
+    VITEST: process.env.VITEST,
+    APP_TIME_ZONE: process.env.APP_TIME_ZONE,
+    LIBSQL_AUTH_TOKEN: process.env.LIBSQL_AUTH_TOKEN,
+  });
+
+  if (!parsed.success) {
+    const names = [
+      ...new Set(parsed.error.issues.map((issue) => String(issue.path[0]))),
+    ];
+    throw new EnvError(names, z.prettifyError(parsed.error));
+  }
+
+  cachedDbClient = parsed.data;
+  return cachedDbClient;
+}
 
 export function getEnv(): AppEnv {
   if (cached) return cached;
@@ -107,6 +139,22 @@ export function getEnv(): AppEnv {
   return cached;
 }
 
+/** Load `.env` from cwd when present (does not override existing vars). */
+export function loadDotEnvIfPresent(
+  cwd: string = process.cwd(),
+  load: (envPath: string) => void = (envPath) => {
+    loadEnvFile(envPath);
+  },
+): boolean {
+  const envPath = path.resolve(cwd, ".env");
+  if (!fs.existsSync(envPath)) {
+    return false;
+  }
+  load(envPath);
+  return true;
+}
+
 export function clearEnvCache(): void {
   cached = undefined;
+  cachedDbClient = undefined;
 }

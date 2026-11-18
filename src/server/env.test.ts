@@ -1,5 +1,14 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { describe, it, expect, afterEach, vi } from "vitest";
-import { clearEnvCache, getEnv, EnvError } from "./env";
+import {
+  clearEnvCache,
+  getDbClientEnv,
+  getEnv,
+  loadDotEnvIfPresent,
+  EnvError,
+} from "./env";
 
 const TOKEN_MUST_NOT_APPEAR = "turso-secret-do-not-log";
 
@@ -12,6 +21,49 @@ function captureEnvError(): EnvError {
   }
   throw new Error("expected getEnv to throw EnvError");
 }
+
+describe("getDbClientEnv", () => {
+  afterEach(() => {
+    clearEnvCache();
+    vi.unstubAllEnvs();
+  });
+
+  it("allows missing OPENAI_API_KEY for local SQLite bootstrap", () => {
+    clearEnvCache();
+    vi.stubEnv("OPENAI_API_KEY", undefined);
+    vi.stubEnv("AI_CLIENT", "openai");
+    vi.stubEnv("LIBSQL_AUTH_TOKEN", "turso-secret-do-not-log");
+    vi.stubEnv("APP_TIME_ZONE", "America/Chicago");
+
+    expect(getDbClientEnv()).toMatchObject({
+      LIBSQL_AUTH_TOKEN: "turso-secret-do-not-log",
+      APP_TIME_ZONE: "America/Chicago",
+    });
+  });
+});
+
+describe("loadDotEnvIfPresent", () => {
+  it("loads .env from cwd when the file exists", () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "dotenv-"));
+    const envPath = path.join(dir, ".env");
+    fs.writeFileSync(envPath, "DOTENV_PROBE=from-file\n");
+    const loaded: string[] = [];
+
+    expect(
+      loadDotEnvIfPresent(dir, (filePath) => {
+        loaded.push(filePath);
+      }),
+    ).toBe(true);
+    expect(loaded).toEqual([envPath]);
+
+    expect(
+      loadDotEnvIfPresent(path.join(dir, "missing"), () => {
+        loaded.push("should-not-run");
+      }),
+    ).toBe(false);
+    expect(loaded).toEqual([envPath]);
+  });
+});
 
 describe("getEnv", () => {
   afterEach(() => {

@@ -6,6 +6,7 @@ import {
   backfillSessionsLocalDate,
   migrateWithBackup,
 } from "../src/db/migrate-run";
+import { loadDotEnvIfPresent } from "../src/server/env";
 
 export async function migrateDatabase(databaseUrl: string): Promise<void> {
   await migrateWithBackup(databaseUrl);
@@ -19,6 +20,7 @@ export async function migrateDatabase(databaseUrl: string): Promise<void> {
 }
 
 async function main(): Promise<void> {
+  loadDotEnvIfPresent();
   const databaseUrl = process.env.DATABASE_URL ?? "file:./data.db";
   await migrateDatabase(databaseUrl);
 }
