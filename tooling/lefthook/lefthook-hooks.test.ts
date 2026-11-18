@@ -24,6 +24,8 @@ const SYNC_FROM_WORKING_TREE = [
   "package-lock.json",
   "opencode.json",
   "scripts/install-hooks.mjs",
+  "tooling/ci/docs-only.ts",
+  "tooling/ci/docs-only-cli.ts",
 ] as const;
 
 const GIT_IDENTITY = [
@@ -284,6 +286,70 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     expect(committed).not.toMatch(/no   extra   spaces/);
 
     git(clone!.dir, ["reset", "--hard", "HEAD~1"]);
+  });
+
+  it("skips npm run check on a docs-only pre-push", async () => {
+    await resetClone();
+    const bareParent = await mkdtemp(path.join(tmpdir(), "fwp-bare-"));
+    const bare = path.join(bareParent, "remote.git");
+    try {
+      execFileSync("git", ["init", "--bare", bare], { stdio: "pipe" });
+      git(clone!.dir, ["remote", "add", "origin", bare]);
+      // Match Actions: clone of a detached checkout leaves HEAD detached.
+      git(clone!.dir, ["checkout", "--detach", "HEAD"]);
+      // Seed the bare remote without hooks. Strip Actions GIT_* so nested
+      // git does not operate on the outer checkout (setupPush was status 1 on CI).
+      const setupEnv = { ...process.env };
+      for (const key of [
+        "GIT_DIR",
+        "GIT_WORK_TREE",
+        "GIT_INDEX_FILE",
+        "GIT_PREFIX",
+        "LEFTHOOK",
+      ] as const) {
+        delete setupEnv[key];
+      }
+      // Fully qualify the dest ref: detached HEAD cannot push as `HEAD:main`.
+      const setupPush = spawnSync(
+        "git",
+        [
+          ...GIT_IDENTITY,
+          "push",
+          "-u",
+          "origin",
+          "HEAD:refs/heads/main",
+          "--no-verify",
+        ],
+        {
+          cwd: clone!.dir,
+          encoding: "utf8",
+          env: setupEnv,
+        },
+      );
+      expect(
+        setupPush.status,
+        `setupPush failed: status=${setupPush.status}\nstdout=${setupPush.stdout}\nstderr=${setupPush.stderr}`,
+      ).toBe(0);
+
+      const rel = "docs/plan/board-scratch.md";
+      await writeScratchFile(clone!.dir, rel, "# board\n");
+      git(clone!.dir, ["add", rel]);
+      const committed = tryGitCommit(clone!.dir, "docs board");
+      expect(committed.ok).toBe(true);
+
+      await writeScratchFile(
+        clone!.dir,
+        "src/lib/hooks-docs-push-poison.ts",
+        `export const broken: number = "not-a-number";\n`,
+      );
+
+      const push = tryGitPush(clone!.dir);
+      expect(push.ok).toBe(true);
+      expect(push.output).not.toMatch(/error TS\d+/i);
+      expect(push.output).toMatch(/skip|docs-only/i);
+    } finally {
+      await rm(bareParent, { recursive: true, force: true });
+    }
   });
 
   it("runs npm run check on pre-push and fails when check would fail", async () => {
