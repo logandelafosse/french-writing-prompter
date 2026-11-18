@@ -295,13 +295,14 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     try {
       execFileSync("git", ["init", "--bare", bare], { stdio: "pipe" });
       git(clone!.dir, ["remote", "add", "origin", bare]);
+      // Seed the bare remote without running hooks (LEFTHOOK=0 is ignored by lefthook).
       const setupPush = spawnSync(
         "git",
-        [...GIT_IDENTITY, "push", "-u", "origin", "HEAD:main"],
+        [...GIT_IDENTITY, "push", "-u", "origin", "HEAD:main", "--no-verify"],
         {
           cwd: clone!.dir,
           encoding: "utf8",
-          env: { ...process.env, LEFTHOOK: "0" },
+          env: process.env,
         },
       );
       expect(setupPush.status).toBe(0);
