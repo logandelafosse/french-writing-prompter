@@ -1476,3 +1476,12 @@ Full write-up: `docs/agents/session-retro.md`. Prioritize **TOOL-SESSION-1**–*
 | TOOL-SESSION-7 | P1  | `pr:size` top files + split thresholds                                         |
 | TOOL-SESSION-8 | P1  | Document diff-scoped review briefs in workflow; GitHub PR comment for blockers |
 | TOOL-SESSION-9 | P2  | Export TZ regression test                                                      |
+
+### Session retro (T36–T39, 2026-11-18)
+
+Full write-up: `docs/agents/session-retro.md`. **TOOL-SESSION-2** and **TOOL-SESSION-5** stayed open and are unchanged: docs-only board pushes still run lefthook `pre-push` (`npm run check`, ~60s) and GitHub e2e. T39's `scripts/install-hooks.mjs` does not skip those gates.
+
+| ID              | Pri | Summary                                                                                           |
+| --------------- | --- | ------------------------------------------------------------------------------------------------- |
+| TOOL-SESSION-10 | P0  | `pr:size` merge-base is `refs/remotes/<github-remote>/main`; refuse ambiguous `origin/main`       |
+| TOOL-SESSION-11 | P0  | `sync-ticket-issues` reads an explicit issue id and refuses pull requests; drop ticket number + 2 |

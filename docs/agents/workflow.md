@@ -4,13 +4,13 @@ How the UI redesign (and later work) gets built by agents. The board is `docs/pl
 
 ## Roles
 
-| Role                 | Model                                                     | Owns                                                                                                                                                                            |
-| -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Coordinator          | Grok 4.7 high (`grok-4.7-high-fast`)                      | The board. Picks the next ticket, dispatches implementers and reviewers, records every status change and why. Never writes production code.                                     |
-| Implementer          | Router default, or Grok 4.6 (`cursor-grok-4.6-high-fast`) | One ticket on one branch. TDD, Playwright validation, PR. Do not pin Composer 2.5 — leave model unset for router auto-decide, or pass Grok 4.6 explicitly.                      |
-| Adversarial reviewer | Grok 4.7 high (`grok-4.7-high-fast`)                      | Spec adherence and bug hunting on the PR diff. (Opus paused — no utilization left.)                                                                                             |
-| Test reviewer        | Grok 4.7 high (`grok-4.7-high-fast`)                      | Test quality: duplication, terseness, usefulness, slop.                                                                                                                         |
-| Tooling reviewer     | Grok 4.7 high (`grok-4.7-high-fast`)                      | Where a lint rule, ast-grep rule, type, or **deterministic script** would have prevented a finding or cut agent toil/confusion (also scans session-retro TOOL-SESSION backlog). |
+| Role                 | Model                                | Owns                                                                                                                                                                            |
+| -------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Coordinator          | Grok 4.7 high (`grok-4.7-high-fast`) | The board. Picks the next ticket, dispatches implementers and reviewers, records every status change and why. Never writes production code.                                     |
+| Implementer          | Unset (inherits the parent)          | One ticket on one branch. TDD, Playwright validation, PR. Leave the model unset. The Task tool rejects `cursor-grok-4.6-high-fast`. Do not pass `composer-2.5-fast`.            |
+| Adversarial reviewer | Grok 4.7 high (`grok-4.7-high-fast`) | Spec adherence and bug hunting on the PR diff. (Opus paused — no utilization left.)                                                                                             |
+| Test reviewer        | Grok 4.7 high (`grok-4.7-high-fast`) | Test quality: duplication, terseness, usefulness, slop.                                                                                                                         |
+| Tooling reviewer     | Grok 4.7 high (`grok-4.7-high-fast`) | Where a lint rule, ast-grep rule, type, or **deterministic script** would have prevented a finding or cut agent toil/confusion (also scans session-retro TOOL-SESSION backlog). |
 
 The three reviewers run in parallel on the same PR and never see each other's output.
 
@@ -45,7 +45,7 @@ Every card carries a one-line **why** for its current column, updated on every m
 
 A ticket moves to `Ready` only when every ticket in its "Blocked by" list is `Done`. Tickets marked HITL stay in `Blocked` until Logan answers the open question recorded on the card.
 
-**GitHub mirror.** Each ticket is a sub-issue of the parent spec issue #1 (issue number = ticket number + 2), with native "blocked by" links. `board.md` stays the source of truth for status and why. On every move the coordinator also comments the same why on the issue; the PR body says `Closes #<n>`; triage labels follow `docs/agents/triage-labels.md` (`needs-info` while an owner question is open, `ready-for-agent` once answered). If a ticket spec changes, edit the file in `docs/plan/tickets/`, then run `node scripts/sync-ticket-issues.mjs <ID> …` to rebuild the issue body from it (the Parent and Blocked-by header is kept).
+**GitHub mirror.** Each ticket is a sub-issue of the parent spec issue #1 (issue number = ticket number + 2 on the early sequence only), with native "blocked by" links. Hosting tickets T36–T39 are issues #96–#99. `board.md` stays the source of truth for status and why. On every move the coordinator also comments the same why on the issue; the PR body says `Closes #<n>`; triage labels follow `docs/agents/triage-labels.md` (`needs-info` while an owner question is open, `ready-for-agent` once answered). If a ticket spec changes, edit the file in `docs/plan/tickets/`, then run `node scripts/sync-ticket-issues.mjs <ID> …` to rebuild the issue body from it (the Parent and Blocked-by header is kept). Do not run that script for T36–T39 until TOOL-SESSION-11: it still adds 2, and running it for T38 wrote the T38 spec onto PR #40.
 
 The coordinator keeps at most three tickets `In progress` at once, and never two that touch the same module seam.
 
@@ -53,7 +53,7 @@ The coordinator keeps at most three tickets `In progress` at once, and never two
 
 1. **Dispatch.** Coordinator moves the card to `In progress` and hands the implementer: the ticket file, `CONTEXT.md`, `docs/design/handoff/HANDOFF.md`, `docs/design/implementation-map.md`, `docs/plan/backend-requirements.md`, and this file.
 2. **Red, green, refactor.** Implementer follows the `tdd` skill: one failing test per acceptance criterion before production code, then the smallest change that passes, then refactor with tests green. LLM calls are always faked (injected client or route interception); no test touches `data.db` or OpenAI.
-3. **Size gate.** Production code diff (excluding tests, fixtures, docs, generated files, lockfiles), as measured by `npm run pr:size`, must stay under 500 lines. If it won't fit, the implementer stops and the coordinator splits the ticket. The only exception is a mechanical change with no behaviour change (for example the Prettier pass in T03): the coordinator may apply the `size-exempt` PR label, and records why on the card. `pr:size` counts `src/` only; for config- or rule-heavy tickets (ast-grep YAML, ESLint, CI, hooks) the adversarial reviewer estimates the non-test size against the same 500-line budget.
+3. **Size gate.** Production code diff (excluding tests, fixtures, docs, generated files, lockfiles), as measured by `npm run pr:size`, must stay under 500 lines. If it won't fit, the implementer stops and the coordinator splits the ticket. The only exception is a mechanical change with no behaviour change (for example the Prettier pass in T03): the coordinator may apply the `size-exempt` PR label, and records why on the card. `pr:size` counts `src/` only; for config- or rule-heavy tickets (ast-grep YAML, ESLint, CI, hooks) the adversarial reviewer estimates the non-test size against the same 500-line budget. Until TOOL-SESSION-10 lands, a worktree total against `origin/main` is the stale local branch. Compare `github/main`. GitHub CI already measures that base.
 4. **Local gate.** `npm run check` (typecheck, lint, ast-grep, unit tests) passes.
 5. **Playwright gate.** Every acceptance criterion that a learner can see has a Playwright spec that passes against `npm run dev` with OpenAI mocked. Screenshots for UI tickets go into the PR body (`pr-ui-evidence` skill). Desktop 1280 px and mobile 390 px for any screen work.
 6. **PR.** One PR per ticket, linking the ticket file (`.github/pull_request_template.md`). **What a learner sees** is mandatory: embed screenshots and/or a short video per the **pr-ui-evidence** skill (`~/.cursor/skills/pr-ui-evidence/SKILL.md`) when anything learner-visible changes; otherwise write “no learner-visible UI change” and why. Evidence lives in `docs/evidence/<issue-number>/` on the PR branch; link with **GitHub blob URLs** on the PR branch (`docs/evidence/README.md`) — not `raw.githubusercontent.com` or mobile-broken relative image embeds. Card moves to `In review`.
@@ -77,12 +77,14 @@ Every **five tickets merged to `main`**, the coordinator runs a **session effici
 
 Output: append to `docs/agents/session-retro.md` (dated section + **TOOL-SESSION-N** backlog). Mirror P0–P1 session items into `docs/agents/tooling-review.md`. Update the retro footer: **next retro after ticket X**.
 
-**Counter:** last retro after **T32** (2026-11-16). **Next:** after **T37** merges (or when Logan asks).
+**Counter:** last retro after **T37** (2026-11-18, hosting arc T36–T39). **Next:** after five further merges to `main`, or when Logan asks. T40 is HITL and is not an AFK ticket, so it does not count toward those five.
 
-Coordinator habits from the first retro (see `session-retro.md`):
+Coordinator habits (first retro, with the T36–T39 corrections applied):
 
-- Read the board only from `origin/main` (`git show origin/main:docs/plan/board.md`).
-- Dispatch implementers from a **fresh worktree** off `main`, not from a dirty primary checkout.
+- Read the board from `github/main` (`git show github/main:docs/plan/board.md`). Corrected 2026-11-18: `origin` is a local bare repo, and a local branch named `origin/main` is stale.
+- Dispatch implementers from a **fresh worktree** off `github/main`. Leave a dirty primary checkout untouched.
+- Leave the implementer model unset. The Task tool rejects `cursor-grok-4.6-high-fast`. Do not pass `composer-2.5-fast`.
+- Do not run `scripts/sync-ticket-issues.mjs` for T36–T39 (issues #96–#99) until TOOL-SESSION-11.
 - Prefer **docs-only** board pushes with CI/lefthook that skip full gates when the diff is only `docs/**` (once TOOL-SESSION-2/5 land).
 - Do not use `LEFTHOOK=0` except emergencies; never for mixed `src/` commits.
 - Post **blocking** review summaries as a **GitHub PR comment** so fix commits are traceable without the chat transcript.
