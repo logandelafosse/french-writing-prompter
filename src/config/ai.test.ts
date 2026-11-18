@@ -26,7 +26,7 @@ describe("AI_ROUTE_MAX_DURATION", () => {
     );
     const budgetSeconds = openAiClientBudgetSeconds(source);
 
-    expect(budgetSeconds).toBe(90);
+    expect(budgetSeconds).toBe(120);
     expect(AI_ROUTE_MAX_DURATION).toBe(120);
     expect(AI_ROUTE_MAX_DURATION).toBeGreaterThanOrEqual(budgetSeconds);
   });

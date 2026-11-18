@@ -22,8 +22,9 @@ export class OpenAiClient {
       const { OPENAI_API_KEY } = getEnv();
       this.openai = new OpenAI({
         apiKey: OPENAI_API_KEY ?? "",
-        maxRetries: 2,
-        timeout: 30000,
+        // gpt-6.1-terra Evaluation JSON often needs ~40s; 30s timed out on prod.
+        maxRetries: 1,
+        timeout: 60_000,
       });
     }
     return this.openai;
