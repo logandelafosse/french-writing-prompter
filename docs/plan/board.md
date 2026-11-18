@@ -4,11 +4,11 @@ Maintained by the coordinator (see `docs/agents/workflow.md`). Every card states
 
 GitHub mirror: parent spec [#1](https://github.com/logandelafosse/french-writing-prompter/issues/1); every ticket is a sub-issue numbered **ticket + 2** (T00 = #2, T35 = #37), with native "blocked by" links matching the tables below.
 
-Last updated: 2026-11-18 by coordinator (T36–T39 merged; T40 left for Logan).
+Last updated: 2026-11-18 by coordinator (T40 cutover Done — production live behind Vercel Auth).
 
 ## Ready
 
-_None. T40 is HITL. Logan cuts over in the Vercel and Turso dashboards._
+_None. Phase 5 Host is Done. Next work is redesign follow-ups / TOOL backlog, not hosting._
 
 ## In progress
 
@@ -102,13 +102,13 @@ Plan: [`docs/plan/deepenings.md`](deepenings.md). Glossary + module homes: [`CON
 
 ### Phase 5 — Host
 
-| ID  | Ticket                                       | Type | Blocked by    | Why not ready                                                                                        |
-| --- | -------------------------------------------- | ---- | ------------- | ---------------------------------------------------------------------------------------------------- |
-| T36 | Remote libsql + refuse file URL on Vercel    | AFK  | —             | **Done** — [PR #103](https://github.com/logandelafosse/french-writing-prompter/pull/103) `347ac32`.  |
-| T37 | Migrate on the Vercel build                  | AFK  | T36           | **Done** — [PR #104](https://github.com/logandelafosse/french-writing-prompter/pull/104) `cbc0d8a`.  |
-| T38 | AI route `maxDuration` 120                   | AFK  | —             | **Done** — [PR #102](https://github.com/logandelafosse/french-writing-prompter/pull/102) `d114b40`.  |
-| T39 | CI `LEFTHOOK=0`, no vercel deploy in Actions | AFK  | —             | **Done** — [PR #101](https://github.com/logandelafosse/french-writing-prompter/pull/101) `29a4198`.  |
-| T40 | Project, secrets, protection, import         | HITL | T36, T37, T38 | **Blocked — HITL.** T36–T38 are Done. Logan does the dashboards. `tickets/T40-vercel-turso-hitl.md`. |
+| ID  | Ticket                                       | Type | Blocked by    | Why not ready                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| --- | -------------------------------------------- | ---- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T36 | Remote libsql + refuse file URL on Vercel    | AFK  | —             | **Done** — [PR #103](https://github.com/logandelafosse/french-writing-prompter/pull/103) `347ac32`.                                                                                                                                                                                                                                                                                                                            |
+| T37 | Migrate on the Vercel build                  | AFK  | T36           | **Done** — [PR #104](https://github.com/logandelafosse/french-writing-prompter/pull/104) `cbc0d8a`.                                                                                                                                                                                                                                                                                                                            |
+| T38 | AI route `maxDuration` 120                   | AFK  | —             | **Done** — [PR #102](https://github.com/logandelafosse/french-writing-prompter/pull/102) `d114b40`.                                                                                                                                                                                                                                                                                                                            |
+| T39 | CI `LEFTHOOK=0`, no vercel deploy in Actions | AFK  | —             | **Done** — [PR #101](https://github.com/logandelafosse/french-writing-prompter/pull/101) `29a4198`.                                                                                                                                                                                                                                                                                                                            |
+| T40 | Project, secrets, protection, import         | HITL | T36, T37, T38 | **Done** — 2026-11-18. Prod `https://consigne-seven.vercel.app` (Vercel Auth all deployments). Turso `consigne` + `consigne-preview` @ `aws-us-east-2` (ord unavailable). Node **22.x** (20.x discontinued on Vercel). Import: real writing from `data.db` (sha256 unchanged). `main` requires `check`+`e2e`. Follow-up: OpenAI usage cap in dashboard; preview `/api/prompt` can 500 on libsql rollback after fixture insert. |
 
 Plan: [`docs/plan/vercel-deployment.md`](vercel-deployment.md).
 
@@ -126,6 +126,7 @@ Plan: [`docs/plan/vercel-deployment.md`](vercel-deployment.md).
 
 | ID   | Ticket                                                                                                                                           | Why                                                                                                                                                                                                                                                                                                      |
 | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| T40  | Project, secrets, protection, import ([#100](https://github.com/logandelafosse/french-writing-prompter/issues/100))                              | HITL cutover 2026-11-18. Prod+preview Turso migrated; `data.db` imported (2 sessions); persistence verified; SSO challenges anonymous; preview uses fixture AI on separate DB; branch protection `check`+`e2e`. No app PR.                                                                               |
 | T37  | Migrate on the Vercel build ([PR #104](https://github.com/logandelafosse/french-writing-prompter/pull/104))                                      | Merged `cbc0d8a` 2026-11-18. `pr:size` 61. Adversarial clear. Non-blocking: TOOL-PR104-1 forbid `prebuild` migrate; TOOL-PR104-2 spawn the wrapper. Vercel preview red until T40. No learner-visible UI. Session retro `035890a`.                                                                        |
 | T39  | CI stays the merge gate ([PR #101](https://github.com/logandelafosse/french-writing-prompter/pull/101))                                          | Merged `29a4198` 2026-11-18. Fix `a4cb4b4`. `prepare` skips lefthook when CI or LEFTHOOK=0. Reviews clear. No learner-visible UI.                                                                                                                                                                        |
 | T38  | AI route maxDuration 120 ([PR #102](https://github.com/logandelafosse/french-writing-prompter/pull/102))                                         | Merged `d114b40` 2026-11-18. `pr:size` 15. Reviews clear. No learner-visible UI.                                                                                                                                                                                                                         |
