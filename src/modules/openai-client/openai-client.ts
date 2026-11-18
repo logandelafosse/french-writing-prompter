@@ -24,7 +24,7 @@ export class OpenAiClient {
         apiKey: OPENAI_API_KEY ?? "",
         // gpt-6.1-terra Evaluation JSON often needs ~40s; 30s timed out on prod.
         maxRetries: 1,
-        timeout: 60_000,
+        timeout: 60000,
       });
     }
     return this.openai;
