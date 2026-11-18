@@ -5,6 +5,7 @@ import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
 import { seedResourceWeaknesses } from "./support/resources-seed";
 import { carnetCopy } from "../src/copy/carnet";
+import { writingField } from "./support/writing-helpers";
 
 const writing = "Mon petit cousin a tombé dans la boue. Les enfant jouent.";
 const savedRule =
@@ -14,7 +15,7 @@ const savedExample = "Mon petit cousin a tombé dans la boue.";
 async function saveReviewNote(page: import("@playwright/test").Page) {
   await generateFirstPrompt(page);
   const main = mainContent(page);
-  await main.getByLabel("Ton texte").fill(writing);
+  await writingField(main).fill(writing);
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
   await page.getByRole("button", { name: "Oui, c'est à nous-autres" }).click();
@@ -152,7 +153,7 @@ async function evaluateWriting(
   text: string,
 ) {
   const main = mainContent(page);
-  await main.getByLabel("Ton texte").fill(text);
+  await writingField(main).fill(text);
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
 }
@@ -182,7 +183,7 @@ test("two genre Mistakes show under À travailler and a pushed-back category doe
   await main
     .getByRole("button", { name: /Une autre consigne · reste/ })
     .click();
-  await expect(main.getByLabel("Ton texte", { exact: true })).toBeEditable();
+  await expect(writingField(main)).toBeEditable();
   await evaluateWriting(page, weaknessWriting);
 
   await page.goto("/carnet");

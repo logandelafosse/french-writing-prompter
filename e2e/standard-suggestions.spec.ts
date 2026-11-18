@@ -3,6 +3,7 @@ import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
+import { writingField } from "./support/writing-helpers";
 
 const writing = "J'arrive avec ma voiture. Les enfant jouent.";
 const explanation =
@@ -10,7 +11,7 @@ const explanation =
 
 async function submitStandardWriting(page: import("@playwright/test").Page) {
   const main = mainContent(page);
-  await main.getByLabel("Ton texte").fill(writing);
+  await writingField(main).fill(writing);
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
 }

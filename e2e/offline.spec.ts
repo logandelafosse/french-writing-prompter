@@ -10,6 +10,7 @@ import {
 } from "./support/prompt-helpers";
 
 import { FETCH_TIMEOUT_MS } from "../src/config/limits";
+import { writingField } from "./support/writing-helpers";
 
 const writing = "Le bayou au matin est calme.";
 const hungFetchNoticeMs = FETCH_TIMEOUT_MS + 3_000;
@@ -37,7 +38,7 @@ test.describe("offline @1280", () => {
     await scenario("happy");
     await generateFirstPrompt(page);
     const main = mainContent(page);
-    const area = main.getByLabel("Ton texte");
+    const area = writingField(main);
     await area.fill(writing);
     await expect(
       main.getByText(/Brouillon sauvé à/).filter({ visible: true }),
@@ -84,9 +85,9 @@ test.describe("offline @390", () => {
     await scenario("happy");
     await generateFirstPrompt(page);
     const main = mainContent(page);
-    await main.getByLabel("Ton texte").fill(writing);
+    await writingField(main).fill(writing);
     await context.setOffline(true);
-    await main.getByLabel("Ton texte").pressSequentially(".");
+    await writingField(main).pressSequentially(".");
     const retry = main.getByRole("button", { name: "Réessayer" });
     await expect(retry).toBeVisible();
     await expectTouchTarget(retry);

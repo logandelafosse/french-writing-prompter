@@ -4,6 +4,7 @@ import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { setLevelB1, visibleHeaderQuota } from "./support/header-helpers";
 import { mainContent } from "./support/prompt-helpers";
+import { writingField } from "./support/writing-helpers";
 
 const WRITING =
   "Je reste dans une petite maison à Lafayette. J'aime la galerie le matin.";
@@ -92,7 +93,7 @@ test("placement.spec › first run start to result at 1280 and 390", async ({
   await captureEvidence(page, testInfo, "step-1");
   await expectNoAxeViolations(page);
 
-  await main.getByLabel("Ton texte").fill(WRITING);
+  await writingField(main).fill(WRITING);
   await expect(next).toBeEnabled();
   await next.click();
   await expectStepChrome(page, 2);
@@ -100,13 +101,13 @@ test("placement.spec › first run start to result at 1280 and 390", async ({
     page.getByRole("link", { name: "Finir plus tard" }),
   ).toBeVisible();
 
-  await main.getByLabel("Ton texte").fill(WRITING);
+  await writingField(main).fill(WRITING);
   await main.getByRole("button", { name: "Consigne suivante" }).click();
   await expectStepChrome(page, 3);
   const seeLevel = main.getByRole("button", { name: "Voir mon niveau" });
   await expect(seeLevel).toBeVisible();
   await expect(seeLevel).toBeDisabled();
-  await main.getByLabel("Ton texte").fill(WRITING);
+  await writingField(main).fill(WRITING);
   await expect(seeLevel).toBeEnabled();
   await seeLevel.click();
 
@@ -136,7 +137,7 @@ test("placement.spec › first run start to result at 1280 and 390", async ({
   await expect(
     page.getByRole("button", { name: "Donne-moi une consigne" }),
   ).toBeVisible();
-  await expect(page.getByLabel("Ton texte")).toHaveCount(0);
+  await expect(writingField(page)).toHaveCount(0);
 });
 
 test("placement.spec › reload resumes step and draft", async ({
@@ -149,22 +150,22 @@ test("placement.spec › reload resumes step and draft", async ({
   await page.getByRole("button", { name: "Commencer" }).click();
   const main = mainContent(page);
   await expectStepChrome(page, 1);
-  await main.getByLabel("Ton texte").fill(WRITING);
+  await writingField(main).fill(WRITING);
   await main.getByRole("button", { name: "Consigne suivante" }).click();
   await expectStepChrome(page, 2);
   const draft = "Sur la galerie je bois mon café.";
-  await main.getByLabel("Ton texte").fill(draft);
+  await writingField(main).fill(draft);
   await expect(
     main.getByText(/Brouillon sauvé à/).filter({ visible: true }),
   ).toBeVisible();
   await page.reload();
   await expectStepChrome(page, 2);
-  await expect(main.getByLabel("Ton texte")).toHaveValue(draft);
+  await expect(writingField(main)).toHaveValue(draft);
   await page.getByRole("link", { name: "Finir plus tard" }).click();
   await expect(page).toHaveURL(/\/$/);
   await page.goto("/placement");
   await expectStepChrome(page, 2);
-  await expect(mainContent(page).getByLabel("Ton texte")).toHaveValue(draft);
+  await expect(writingField(mainContent(page))).toHaveValue(draft);
 });
 
 test("placement.spec › redirects when a level exists", async ({
@@ -187,7 +188,7 @@ test("placement.spec › submit failure keeps the text and shows retry", async (
   await page.getByRole("button", { name: "Commencer" }).click();
   const main = mainContent(page);
   await expectStepChrome(page, 1);
-  await main.getByLabel("Ton texte").fill(WRITING);
+  await writingField(main).fill(WRITING);
   let fail = true;
   await page.route("**/api/placement/**/submit", async (route) => {
     if (route.request().method() !== "POST") {
@@ -207,6 +208,6 @@ test("placement.spec › submit failure keeps the text and shows retry", async (
   await expect(
     alert.getByRole("button", { name: "Essayer encore" }),
   ).toBeVisible();
-  await expect(main.getByLabel("Ton texte")).toHaveValue(WRITING);
+  await expect(writingField(main)).toHaveValue(WRITING);
   await expectStepChrome(page, 1);
 });

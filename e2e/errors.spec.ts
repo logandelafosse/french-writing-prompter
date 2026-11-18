@@ -3,6 +3,7 @@ import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { visibleHeaderQuota } from "./support/header-helpers";
+import { writingField } from "./support/writing-helpers";
 import {
   expectNoHorizontalOverflow,
   generateFirstPrompt,
@@ -38,7 +39,7 @@ test.describe("errors @1280", () => {
     await scenario("happy");
     await generateFirstPrompt(page);
     const main = mainContent(page);
-    const area = main.getByLabel("Ton texte");
+    const area = writingField(main);
     await area.fill(writing);
 
     let fail = true;
@@ -117,7 +118,7 @@ test.describe("errors @390", () => {
     await scenario("happy");
     await generateFirstPrompt(page);
     const main = mainContent(page);
-    await main.getByLabel("Ton texte").fill(writing);
+    await writingField(main).fill(writing);
 
     await page.route("**/api/sessions/*/evaluate", async (route) => {
       if (route.request().method() === "POST") {

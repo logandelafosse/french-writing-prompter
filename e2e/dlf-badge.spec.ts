@@ -2,13 +2,14 @@ import { test, expect } from "./support/fixtures";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
 import { captureEvidence } from "./support/evidence";
+import { writingField } from "./support/writing-helpers";
 
 async function submitWriting(
   page: import("@playwright/test").Page,
   text: string,
 ) {
   const main = mainContent(page);
-  await main.getByLabel("Ton texte").fill(text);
+  await writingField(main).fill(text);
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
 }

@@ -4,6 +4,7 @@ import { captureEvidence } from "./support/evidence";
 import { seedAdvancementStreakTwoOfThree } from "./support/advancement-seed";
 import { mainContent } from "./support/prompt-helpers";
 import type { E2eScenario } from "../src/server/ai-client";
+import { writingField } from "./support/writing-helpers";
 
 async function setScenario(
   page: import("@playwright/test").Page,
@@ -14,7 +15,7 @@ async function setScenario(
 
 async function submitWriting(page: import("@playwright/test").Page) {
   const main = mainContent(page);
-  const area = main.getByLabel("Ton texte");
+  const area = writingField(main);
   await area.fill(
     "Aujourd'hui, je parle de ma famille en Louisiane avec des phrases simples mais correctes.",
   );

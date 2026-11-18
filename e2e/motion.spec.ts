@@ -5,18 +5,15 @@ import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
 import { seedPastReview } from "./support/history-seed";
 import { reviewCopy } from "../src/copy/review";
+import { writingField } from "./support/writing-helpers";
 
 const mixedWriting = "Maintenant je vas au bayou. Les enfant jouent.";
 const dialectWriting =
   "Mon petit cousin a tombé dans la boue. Les enfant jouent.";
 
-function writingField(page: Page) {
-  return page.getByRole("textbox", { name: "Ton texte", exact: true });
-}
-
 async function submitWriting(page: Page, text: string) {
   const main = mainContent(page);
-  await writingField(page).fill(text);
+  await writingField(main).fill(text);
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
 }

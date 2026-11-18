@@ -2,7 +2,10 @@ import { TodayGetResponse } from "../src/contracts/today";
 import { test, expect } from "./support/fixtures";
 import { captureEvidence } from "./support/evidence";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
-import { expectDraftStatusOnItsOwnLine } from "./support/writing-helpers";
+import {
+  writingField,
+  expectDraftStatusOnItsOwnLine,
+} from "./support/writing-helpers";
 
 const draftText = "Le bayou au matin est calme.";
 
@@ -16,7 +19,7 @@ test.describe("draft autosave @1280", () => {
     await scenario("happy");
     await generateFirstPrompt(page);
     const main = mainContent(page);
-    await main.getByLabel("Ton texte").fill(draftText);
+    await writingField(main).fill(draftText);
     const status = main
       .getByText(/Brouillon sauvé à \d+ h \d{2}/)
       .filter({ visible: true });
@@ -24,7 +27,7 @@ test.describe("draft autosave @1280", () => {
     const stamp = await status.innerText();
     await captureEvidence(page, testInfo, "draft-saved");
     await page.reload();
-    await expect(main.getByLabel("Ton texte")).toHaveValue(draftText);
+    await expect(writingField(main)).toHaveValue(draftText);
     await expect(main.getByText(stamp).filter({ visible: true })).toBeVisible();
     await captureEvidence(page, testInfo, "draft-reloaded");
   });
@@ -32,7 +35,7 @@ test.describe("draft autosave @1280", () => {
   test("history round trip keeps the draft", async ({ page, scenario }) => {
     await scenario("happy");
     await generateFirstPrompt(page);
-    await mainContent(page).getByLabel("Ton texte").fill(draftText);
+    await writingField(mainContent(page)).fill(draftText);
     await page.getByRole("link", { name: "Historique" }).click();
     const historique = mainContent(page);
     await expect(
@@ -42,7 +45,7 @@ test.describe("draft autosave @1280", () => {
       historique.getByRole("region", { name: "Séances passées" }),
     ).toBeVisible();
     await page.getByRole("link", { name: /^Consigne/ }).click();
-    await expect(page.getByLabel("Ton texte")).toHaveValue(draftText);
+    await expect(writingField(page)).toHaveValue(draftText);
   });
 
   test("a newer local copy replaces the server draft", async ({
@@ -52,7 +55,7 @@ test.describe("draft autosave @1280", () => {
     await scenario("happy");
     await generateFirstPrompt(page);
     const main = mainContent(page);
-    await main.getByLabel("Ton texte").fill("Texte déjà sur le serveur.");
+    await writingField(main).fill("Texte déjà sur le serveur.");
     await expect(
       main.getByText(/Brouillon sauvé à/).filter({ visible: true }),
     ).toBeVisible();
@@ -75,9 +78,7 @@ test.describe("draft autosave @1280", () => {
     });
 
     await page.reload();
-    await expect(main.getByLabel("Ton texte")).toHaveValue(
-      "Texte gardé sur l'appareil.",
-    );
+    await expect(writingField(main)).toHaveValue("Texte gardé sur l'appareil.");
     await expect
       .poll(async () => {
         const response = await page.request.get("/api/today");
@@ -99,7 +100,7 @@ test.describe("draft status @390", () => {
     await scenario("happy");
     await generateFirstPrompt(page);
     const main = mainContent(page);
-    await main.getByLabel("Ton texte").fill("un deux trois");
+    await writingField(main).fill("un deux trois");
     const status = main
       .getByText(/Brouillon sauvé à/)
       .filter({ visible: true });

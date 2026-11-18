@@ -2,6 +2,7 @@ import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { visibleHeaderQuota, setLevelB1 } from "./support/header-helpers";
+import { writingField } from "./support/writing-helpers";
 import {
   expectNoHorizontalOverflow,
   generateFirstPrompt,
@@ -25,7 +26,7 @@ test.describe("swap confirm @1280", () => {
     await generateFirstPrompt(page);
     const main = mainContent(page);
     await expect(visibleHeaderQuota(page, /Reste 2/)).toBeVisible();
-    const area = main.getByLabel("Ton texte");
+    const area = writingField(main);
     await area.fill(fortyWords);
     await main
       .getByRole("button", { name: "↻ Une autre consigne", exact: true })
@@ -55,7 +56,7 @@ test.describe("swap confirm @1280", () => {
       .click();
     await main.getByRole("button", { name: "Changer", exact: true }).click();
     await expect(main.getByText(PROMPT_FIXTURE_SWAP_NO)).toBeVisible();
-    await expect(main.getByLabel("Ton texte")).toHaveValue("");
+    await expect(writingField(main)).toHaveValue("");
     await expect(visibleHeaderQuota(page, /Reste 1/)).toBeVisible();
     await captureEvidence(page, testInfo, "after-swap-1280");
   });
@@ -74,7 +75,7 @@ test.describe("swap confirm @1280", () => {
       main.getByRole("alertdialog", { name: "Changer de consigne" }),
     ).toHaveCount(0);
     await expect(main.getByText(PROMPT_FIXTURE_SWAP_NO)).toBeVisible();
-    await expect(main.getByLabel("Ton texte")).toHaveValue("");
+    await expect(writingField(main)).toHaveValue("");
   });
 });
 
@@ -95,7 +96,7 @@ test.describe("swap confirm @390", () => {
       mainContent(page).getByText(PROMPT_FIXTURE_LAFAYETTE),
     ).toBeVisible();
     const main = mainContent(page);
-    await main.getByLabel("Ton texte").fill(fortyWords);
+    await writingField(main).fill(fortyWords);
     await main
       .getByRole("button", { name: "↻ Une autre consigne", exact: true })
       .click();
