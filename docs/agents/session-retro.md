@@ -54,10 +54,10 @@ Scope: PRs [#75](https://github.com/logandelafosse/french-writing-prompter/pull/
 
 | ID             | Pri | Change                                                              |
 | -------------- | --- | ------------------------------------------------------------------- |
-| TOOL-SESSION-1 | P0  | `writingField` + ast-grep ban substring label in e2e                |
+| TOOL-SESSION-1 | P0  | **Done** — `writingField` + ast-grep ban                            |
 | TOOL-SESSION-2 | P0  | CI: docs-only `main` push skips e2e (**done**)                      |
-| TOOL-SESSION-3 | P0  | Offline opencode schema test                                        |
-| TOOL-SESSION-4 | P0  | dev/migrate env loading without OpenAI for local DB                 |
+| TOOL-SESSION-3 | P0  | **Done** — vendored opencode schema offline                         |
+| TOOL-SESSION-4 | P0  | **Done** — migrate/file DB without OPENAI                           |
 | TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip (**done**)                         |
 | TOOL-SESSION-6 | P1  | `ticket-worktree` + board from `origin/main`                        |
 | TOOL-SESSION-7 | P1  | `pr:size` file list + split thresholds                              |
