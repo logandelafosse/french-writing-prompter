@@ -1,7 +1,10 @@
 import os from "node:os";
 import path from "node:path";
 import { describe, it, expect } from "vitest";
-import { databaseUrlToFilePath } from "@/db/database-url";
+import {
+  assertVitestDatabaseUrl,
+  databaseUrlToFilePath,
+} from "@/db/database-url";
 
 describe("databaseUrlToFilePath", () => {
   it("resolves file URLs to absolute paths", () => {
@@ -28,5 +31,19 @@ describe("databaseUrlToFilePath", () => {
     const sample = path.join(os.tmpdir(), "fwp-backup-check.db");
     const fileUrl = `file:${sample}`;
     expect(databaseUrlToFilePath(fileUrl)).toBe(path.resolve(sample));
+  });
+});
+
+describe("assertVitestDatabaseUrl", () => {
+  it("still rejects libsql", () => {
+    expect(() =>
+      assertVitestDatabaseUrl("libsql://consigne.turso.io", true),
+    ).toThrow("Refusing to open libsql://consigne.turso.io under Vitest");
+    expect(() =>
+      assertVitestDatabaseUrl("http://consigne.turso.io", true),
+    ).toThrow("Refusing to open http://consigne.turso.io under Vitest");
+    expect(() =>
+      assertVitestDatabaseUrl("https://consigne.turso.io", true),
+    ).toThrow("Refusing to open https://consigne.turso.io under Vitest");
   });
 });
