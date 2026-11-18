@@ -6,6 +6,7 @@
     "dev": "next dev --hostname 0.0.0.0",
     "predev": "tsx scripts/migrate.ts",
     "build": "next build",
+    "build:vercel": "tsx scripts/build-vercel.ts && next build",
     "start": "next start",
     "prestart": "tsx scripts/migrate.ts",
     "lint": "eslint --max-warnings=0",
