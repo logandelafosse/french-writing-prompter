@@ -45,7 +45,7 @@ Every card carries a one-line **why** for its current column, updated on every m
 
 A ticket moves to `Ready` only when every ticket in its "Blocked by" list is `Done`. Tickets marked HITL stay in `Blocked` until Logan answers the open question recorded on the card.
 
-**GitHub mirror.** Each ticket is a sub-issue of the parent spec issue #1 (issue number = ticket number + 2 on the early sequence only), with native "blocked by" links. Hosting tickets T36–T39 are issues #96–#99. `board.md` stays the source of truth for status and why. On every move the coordinator also comments the same why on the issue; the PR body says `Closes #<n>`; triage labels follow `docs/agents/triage-labels.md` (`needs-info` while an owner question is open, `ready-for-agent` once answered). If a ticket spec changes, edit the file in `docs/plan/tickets/`, then run `node scripts/sync-ticket-issues.mjs <ID> …` to rebuild the issue body from it (the Parent and Blocked-by header is kept). Do not run that script for T36–T39 until TOOL-SESSION-11: it still adds 2, and running it for T38 wrote the T38 spec onto PR #40.
+**GitHub mirror.** Each ticket is a sub-issue of the parent spec issue #1 (issue number = ticket number + 2 on the early sequence only), with native "blocked by" links. Hosting tickets T36–T39 are issues #96–#99. `board.md` stays the source of truth for status and why. On every move the coordinator also comments the same why on the issue; the PR body says `Closes #<n>`; triage labels follow `docs/agents/triage-labels.md` (`needs-info` while an owner question is open, `ready-for-agent` once answered). If a ticket spec changes, edit the file in `docs/plan/tickets/`, then run `npx tsx scripts/sync-ticket-issues.ts <ID> …` to rebuild the issue body from it (the Parent and Blocked-by header is kept). Ticket files must include `GitHub issue: #<n>`; the script refuses PRs and title mismatches (TOOL-SESSION-11).
 
 The coordinator keeps at most three tickets `In progress` at once, and never two that touch the same module seam.
 
@@ -84,7 +84,6 @@ Coordinator habits (first retro, with the T36–T39 corrections applied):
 - Read the board from `github/main` (`git show github/main:docs/plan/board.md`). Corrected 2026-11-18: `origin` is a local bare repo, and a local branch named `origin/main` is stale.
 - Dispatch implementers from a **fresh worktree** off `github/main`. Leave a dirty primary checkout untouched.
 - Leave the implementer model unset. The Task tool rejects `cursor-grok-4.6-high-fast`. Do not pass `composer-2.5-fast`.
-- Do not run `scripts/sync-ticket-issues.mjs` for T36–T39 (issues #96–#99) until TOOL-SESSION-11.
 - Prefer **docs-only** board pushes with CI/lefthook that skip full gates when the diff is only `docs/**` (once TOOL-SESSION-2/5 land).
 - Do not use `LEFTHOOK=0` except emergencies; never for mixed `src/` commits.
 - Post **blocking** review summaries as a **GitHub PR comment** so fix commits are traceable without the chat transcript.

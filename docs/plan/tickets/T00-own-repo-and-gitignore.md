@@ -1,5 +1,7 @@
 # T00 — Own repo and gitignore
 
+GitHub issue: #2
+
 | Phase | Type      | Blocked by | Production lines (est.) |
 | ----- | --------- | ---------- | ----------------------- |
 | 0     | HITL (Q1) | None       | ~15                     |

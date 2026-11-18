@@ -1,5 +1,7 @@
 # T13 — App header, level menu, local-midnight quota
 
+GitHub issue: #15
+
 | Phase | Type              | Blocked by    | Production lines (est.) |
 | ----- | ----------------- | ------------- | ----------------------- |
 | 1     | AFK (Q3 answered) | T06, T10, T11 | ~420                    |

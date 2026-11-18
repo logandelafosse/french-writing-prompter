@@ -1,5 +1,7 @@
 # T01 — Isolated test DB and generated migrations
 
+GitHub issue: #3
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 0     | AFK  | T00        | ~150                    |

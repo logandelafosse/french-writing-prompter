@@ -1,5 +1,7 @@
 # T37 — Migrate on the Vercel build
 
+GitHub issue: #97
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 5     | AFK  | T36        | ~80                     |

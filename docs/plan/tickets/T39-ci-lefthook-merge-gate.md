@@ -1,5 +1,7 @@
 # T39 — CI stays the merge gate
 
+GitHub issue: #99
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 5     | AFK  | —          | ~15                     |

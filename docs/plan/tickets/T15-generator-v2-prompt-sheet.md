@@ -1,5 +1,7 @@
 # T15 — Generator v2 with structured prompt meta; prompt sheet
 
+GitHub issue: #17
+
 | Phase | Type              | Blocked by | Production lines (est.) |
 | ----- | ----------------- | ---------- | ----------------------- |
 | 1     | AFK (Q8 answered) | T14        | ~320                    |

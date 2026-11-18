@@ -1,5 +1,7 @@
 # T13f — Level card vs stale `GET /api/level`
 
+GitHub issue: #58
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T13e       | ~40                     |

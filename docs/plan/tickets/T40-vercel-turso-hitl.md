@@ -1,5 +1,7 @@
 # T40 — Project, secrets, protection, import
 
+GitHub issue: #100
+
 | Phase | Type | Blocked by            | Production lines (est.) |
 | ----- | ---- | --------------------- | ----------------------- |
 | 5     | HITL | T36, T37, T38, Q9–Q15 | ~0                      |

@@ -1,5 +1,7 @@
 # T21 — Evaluator v2: Corrections, quote location, French output
 
+GitHub issue: #23
+
 | Phase | Type              | Blocked by | Production lines (est.) |
 | ----- | ----------------- | ---------- | ----------------------- |
 | 1     | AFK (Q4 answered) | T06, T17   | ~480                    |

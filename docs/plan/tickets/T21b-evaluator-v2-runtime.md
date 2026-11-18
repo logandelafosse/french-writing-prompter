@@ -1,5 +1,7 @@
 # T21b — Evaluator v2 runtime, routes, and fixtures
 
+GitHub issue: #23
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T21a       | ~450                    |

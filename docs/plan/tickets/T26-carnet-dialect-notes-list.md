@@ -1,5 +1,7 @@
 # T26 — Carnet page with Dialect Notes list
 
+GitHub issue: #28
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 2     | AFK  | T25        | ~320                    |

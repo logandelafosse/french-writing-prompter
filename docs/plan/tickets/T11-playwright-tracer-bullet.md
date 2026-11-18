@@ -1,5 +1,7 @@
 # T11 — Playwright tracer bullet with fake AI client and axe
 
+GitHub issue: #13
+
 | Phase | Type | Blocked by | Production lines (est.)                                             |
 | ----- | ---- | ---------- | ------------------------------------------------------------------- |
 | 0     | AFK  | T05        | ~200 in `src` and config (e2e specs, helpers and fixtures excluded) |

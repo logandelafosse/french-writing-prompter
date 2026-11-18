@@ -1,5 +1,7 @@
 # T13g — Wordmark 44px touch target (PR #57 regression)
 
+GitHub issue: #59
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T13e       | ~10                     |

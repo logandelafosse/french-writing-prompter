@@ -1,5 +1,7 @@
 # T13d — T13c e2e and acceptance hardening
 
+GitHub issue: #55
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T13c       | ~40 (tests/fixtures)    |

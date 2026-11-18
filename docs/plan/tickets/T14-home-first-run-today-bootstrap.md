@@ -1,5 +1,7 @@
 # T14 — Home first run and `/api/today` bootstrap
 
+GitHub issue: #16
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T13        | ~380                    |

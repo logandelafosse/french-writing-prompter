@@ -1,5 +1,7 @@
 # T33 — Persistent Placement Test (server)
 
+GitHub issue: #35
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 4     | AFK  | T20, T21   | ~380                    |

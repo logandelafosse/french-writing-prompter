@@ -1,5 +1,7 @@
 # T20 — Level service with durable streak and undoable advancement
 
+GitHub issue: #22
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 1     | AFK  | T14        | ~300                    |

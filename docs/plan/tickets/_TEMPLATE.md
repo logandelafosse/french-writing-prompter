@@ -1,5 +1,7 @@
 # T00 — Title in domain vocabulary
 
+GitHub issue: #<n>
+
 | Phase | Type            | Blocked by       | Production lines (est.) |
 | ----- | --------------- | ---------------- | ----------------------- |
 | 0     | AFK / HITL (Qn) | T00, T00 or None | ~000                    |

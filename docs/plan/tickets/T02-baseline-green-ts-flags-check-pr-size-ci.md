@@ -1,5 +1,7 @@
 # T02 — Baseline green: TS flags, `check`, `pr:size`, CI
 
+GitHub issue: #4
+
 | Phase | Type | Blocked by | Production lines (est.) |
 | ----- | ---- | ---------- | ----------------------- |
 | 0     | AFK  | T01        | ~120                    |

@@ -1,5 +1,7 @@
 # T08 — ESLint hardening and AGENTS.md engineering rules
 
+GitHub issue: #10
+
 | Phase | Type | Blocked by | Production lines (est.)            |
 | ----- | ---- | ---------- | ---------------------------------- |
 | 0     | AFK  | T05, T07   | ~150 config + ~150 violation fixes |
