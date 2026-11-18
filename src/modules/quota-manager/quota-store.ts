@@ -6,7 +6,7 @@ import {
   nextLocalMidnightIso,
   todayLocalDateKey,
 } from "@/lib/dates";
-import { getEnv } from "@/server/env";
+import { getDbClientEnv } from "@/server/env";
 import { first } from "@/lib/first";
 import { and, eq, sql } from "drizzle-orm";
 import type { LibSQLDatabase } from "drizzle-orm/libsql";
@@ -22,7 +22,7 @@ export type QuotaState = {
 type DbLike = Pick<LibSQLDatabase<typeof schema>, "select" | "insert">;
 
 export function quotaTimeZone(): string {
-  const configured = getEnv().APP_TIME_ZONE;
+  const configured = getDbClientEnv().APP_TIME_ZONE;
   return configured ?? appTimeZone();
 }
 

@@ -10,9 +10,10 @@ describe("createLibsqlClient", () => {
     vi.resetModules();
   });
 
-  it("forwards authToken", async () => {
+  it("forwards authToken without requiring OPENAI_API_KEY", async () => {
     vi.stubEnv("VITEST", undefined);
-    vi.stubEnv("AI_CLIENT", "fake");
+    vi.stubEnv("AI_CLIENT", "openai");
+    vi.stubEnv("OPENAI_API_KEY", undefined);
     vi.stubEnv("LIBSQL_AUTH_TOKEN", "turso-secret-do-not-log");
     // setup-db already loaded @libsql/client; reload so this file's mock applies.
     vi.resetModules();

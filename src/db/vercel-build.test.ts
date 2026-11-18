@@ -114,6 +114,7 @@ describe("vercel deploy config", () => {
     const migrate = readFileSync(path.join(root, "scripts/migrate.ts"), "utf8");
     expect(migrate).toMatch(/DATABASE_URL \?\? "file:\.\/data\.db"/);
     expect(migrate).toContain("migrateWithBackup");
+    expect(migrate).toContain("loadDotEnvIfPresent");
     expect(migrate).not.toContain("for the Vercel build");
 
     const wrapper = readFileSync(
