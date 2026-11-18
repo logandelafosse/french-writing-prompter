@@ -295,6 +295,8 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
     try {
       execFileSync("git", ["init", "--bare", bare], { stdio: "pipe" });
       git(clone!.dir, ["remote", "add", "origin", bare]);
+      // Match Actions: clone of a detached checkout leaves HEAD detached.
+      git(clone!.dir, ["checkout", "--detach", "HEAD"]);
       // Seed the bare remote without hooks. Strip Actions GIT_* so nested
       // git does not operate on the outer checkout (setupPush was status 1 on CI).
       const setupEnv = { ...process.env };
@@ -307,9 +309,17 @@ describe("lefthook git hooks", { timeout: 600_000 }, () => {
       ] as const) {
         delete setupEnv[key];
       }
+      // Fully qualify the dest ref: detached HEAD cannot push as `HEAD:main`.
       const setupPush = spawnSync(
         "git",
-        [...GIT_IDENTITY, "push", "-u", "origin", "HEAD:main", "--no-verify"],
+        [
+          ...GIT_IDENTITY,
+          "push",
+          "-u",
+          "origin",
+          "HEAD:refs/heads/main",
+          "--no-verify",
+        ],
         {
           cwd: clone!.dir,
           encoding: "utf8",
