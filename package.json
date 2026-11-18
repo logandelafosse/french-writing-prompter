@@ -26,7 +26,7 @@
     "pr:size": "tsx scripts/pr-size.ts",
     "dialect:export": "TZ=America/Chicago AI_CLIENT=fake tsx scripts/dialect-export.ts",
     "dlf:fetch": "tsx scripts/dlf-fetch.ts",
-    "prepare": "lefthook install"
+    "prepare": "node scripts/install-hooks.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
