@@ -1,0 +1,11 @@
+id: no-e2e-ton-texte-getbylabel
+language: Tsx
+severity: error
+message: "Use writingField(scope) from e2e/support/writing-helpers.ts — getByLabel('Ton texte') substring-matches review aria-label."
+rule:
+  any:
+    - pattern: $SCOPE.getByLabel("Ton texte")
+    - pattern: $SCOPE.getByLabel("Ton texte", $$$)
+    - pattern: $SCOPE.getByLabel('Ton texte')
+    - pattern: $SCOPE.getByLabel('Ton texte', $$$)
+files: ["e2e/**"]

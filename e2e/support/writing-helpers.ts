@@ -1,5 +1,10 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { mainContent } from "./prompt-helpers";
+
+/** Exact accessible name — avoids substring clash with review "Consigne et ton texte". */
+export function writingField(scope: Page | Locator): Locator {
+  return scope.getByRole("textbox", { name: "Ton texte", exact: true });
+}
 
 function requireBox(
   box: { y: number; height: number } | null,
@@ -25,7 +30,7 @@ export async function expectDraftStatusOnItsOwnLine(page: Page) {
 /** @390 px: full-width meter track and submit footer sit below the writing sheet. */
 export async function expectMobileWritingFooterBelowSheet(page: Page) {
   const main = mainContent(page);
-  const area = main.getByLabel("Ton texte");
+  const area = writingField(main);
   const submit = main
     .getByRole("button", { name: "Corrige-moi" })
     .filter({ visible: true });

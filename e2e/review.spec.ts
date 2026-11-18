@@ -9,6 +9,7 @@ import {
   PROMPT_FIXTURE_SWAP_NO,
 } from "./support/prompt-helpers";
 import { reviewCopy } from "../src/copy/review";
+import { writingField } from "./support/writing-helpers";
 
 const mixedWriting = "Maintenant je vas au bayou. Les enfant jouent.";
 const unlocatedWriting = "je vas au bayou. Les enfant jouent.";
@@ -18,7 +19,7 @@ async function submitWriting(
   text: string,
 ) {
   const main = mainContent(page);
-  await main.getByLabel("Ton texte").fill(text);
+  await writingField(main).fill(text);
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
 }
@@ -137,7 +138,7 @@ test.describe("review @1280", () => {
       .getByRole("button", { name: /Une autre consigne · reste/ })
       .click();
     await expect(main.getByText(PROMPT_FIXTURE_SWAP_NO)).toBeVisible();
-    await expect(main.getByLabel("Ton texte", { exact: true })).toBeEditable();
+    await expect(writingField(main)).toBeEditable();
     await expect(main.getByRole("heading", { name: "Évaluation" })).toHaveCount(
       0,
     );

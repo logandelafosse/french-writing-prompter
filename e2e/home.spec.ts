@@ -2,6 +2,7 @@ import { test, expect } from "./support/fixtures";
 import { expectNoAxeViolations, LEGACY_AXE_DISABLED } from "./support/axe";
 import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
+import { writingField } from "./support/writing-helpers";
 import {
   PROMPT_FIXTURE_LAFAYETTE,
   mainContent,
@@ -26,7 +27,7 @@ test("learner generates a prompt, writes, and sees the Evaluation and the Histor
   await expectNoAxeViolations(page, LEGACY_AXE_DISABLED);
   await captureEvidence(page, testInfo, "generated-prompt");
 
-  await page.getByLabel("Ton texte").fill(HAPPY_WRITING);
+  await writingField(page).fill(HAPPY_WRITING);
   await page.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
   await captureEvidence(page, testInfo, "evaluation");
@@ -52,7 +53,7 @@ test("malformed AI output shows an error and retry recovers", async ({
   await page.getByRole("button", { name: /A2/i }).click();
   await page.getByRole("button", { name: "Donne-moi une consigne" }).click();
   await expect(page.getByText(PROMPT_SNIPPET)).toBeVisible();
-  await page.getByLabel("Ton texte").fill(HAPPY_WRITING);
+  await writingField(page).fill(HAPPY_WRITING);
 
   await scenario("malformed");
   await page.getByRole("button", { name: "Corrige-moi" }).click();

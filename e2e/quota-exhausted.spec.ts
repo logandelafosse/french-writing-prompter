@@ -9,6 +9,7 @@ import {
   PROMPT_FIXTURE_LAFAYETTE,
 } from "./support/prompt-helpers";
 import { homeCopy } from "../src/copy/fr";
+import { writingField } from "./support/writing-helpers";
 
 async function openThirdPrompt(page: Page) {
   await page.goto("/");
@@ -53,7 +54,7 @@ test.describe("quota exhausted @1280", () => {
       visibleHeaderQuota(page, /3 consignes sur 3 prises/),
     ).toBeVisible();
 
-    const area = main.getByLabel("Ton texte");
+    const area = writingField(main);
     await area.fill("Le brouillon du soir reste là.");
     const submit = main.getByRole("button", { name: "Corrige-moi" });
     await expect(submit).toBeEnabled();
@@ -85,7 +86,7 @@ test.describe("quota exhausted @390", () => {
         exact: true,
       }),
     ).toBeDisabled();
-    await main.getByLabel("Ton texte").fill("Un brouillon court.");
+    await writingField(main).fill("Un brouillon court.");
     await expectNoHorizontalOverflow(page);
     await captureEvidence(page, testInfo, "quota-notice-390");
   });

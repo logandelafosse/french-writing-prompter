@@ -6,6 +6,7 @@ import { captureEvidence } from "./support/evidence";
 import { setLevelB1 } from "./support/header-helpers";
 import { seedFocusWeaknesses } from "./support/focus-seed";
 import { expectEvaluationWithScores } from "./support/home-helpers";
+import { writingField } from "./support/writing-helpers";
 import {
   PROMPT_FIXTURE_LAFAYETTE,
   generateFirstPrompt,
@@ -60,9 +61,9 @@ test("review tags a Focus Mistake and the Carnet CTA jumps to the Weakness", asy
   await scenario("focus");
   await generateFirstPrompt(page);
   const main = mainContent(page);
-  await main
-    .getByLabel("Ton texte")
-    .fill("Maintenant je vas au bayou. Les enfant jouent.");
+  await writingField(main).fill(
+    "Maintenant je vas au bayou. Les enfant jouent.",
+  );
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
 

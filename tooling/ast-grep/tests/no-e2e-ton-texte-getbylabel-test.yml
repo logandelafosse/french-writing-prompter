@@ -1,0 +1,16 @@
+id: no-e2e-ton-texte-getbylabel
+valid:
+  - |
+    import { writingField } from "./support/writing-helpers";
+    await writingField(main).fill("ok");
+  - |
+    await main.getByRole("textbox", { name: "Ton texte", exact: true }).fill("ok");
+  - |
+    await dialog.getByLabel("Le mot ou la tournure").fill("icitte");
+invalid:
+  - |
+    await main.getByLabel("Ton texte").fill("bad");
+  - |
+    await main.getByLabel("Ton texte", { exact: true }).fill("bad");
+  - |
+    await page.getByLabel('Ton texte').fill("bad");

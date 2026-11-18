@@ -4,6 +4,7 @@ import { captureEvidence } from "./support/evidence";
 import { expectEvaluationWithScores } from "./support/home-helpers";
 import { generateFirstPrompt, mainContent } from "./support/prompt-helpers";
 import { reviewCopy } from "../src/copy/review";
+import { writingField } from "./support/writing-helpers";
 
 const writing = "Mon petit cousin a tombé dans la boue. Les enfant jouent.";
 const repeatWriting = "Il a tombé hier.";
@@ -13,7 +14,7 @@ async function submitWriting(
   text: string,
 ) {
   const main = mainContent(page);
-  await main.getByLabel("Ton texte").fill(text);
+  await writingField(main).fill(text);
   await main.getByRole("button", { name: "Corrige-moi" }).click();
   await expectEvaluationWithScores(page);
 }
@@ -187,7 +188,7 @@ test.describe("dialect checks @1280", () => {
     await main
       .getByRole("button", { name: /Une autre consigne · reste/ })
       .click();
-    await expect(main.getByLabel("Ton texte", { exact: true })).toBeEditable();
+    await expect(writingField(main)).toBeEditable();
     await submitWriting(page, repeatWriting);
     await expect(page.getByText("a tombé")).toBeVisible();
     await expect(page.getByRole("article")).toHaveCount(0);
