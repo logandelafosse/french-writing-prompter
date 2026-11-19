@@ -1463,14 +1463,14 @@ Non-blocking for T25b merge. Prioritize **TOOL-PR78-1** and **TOOL-PR78-2** befo
 
 ### Session retro (T23–T27, 2026-11-16)
 
-Full write-up: `docs/agents/session-retro.md`. Prioritize **TOOL-SESSION-1**–**4** before the next review-heavy e2e wave.
+Full write-up: `docs/agents/session-retro.md`. **TOOL-SESSION-1**–**5** done (writingField, docs-only gates, offline schema, migrate without OpenAI).
 
 | ID             | Pri | Summary                                                                        |
 | -------------- | --- | ------------------------------------------------------------------------------ |
-| TOOL-SESSION-1 | P0  | `writingField` + ban substring `getByLabel('Ton texte')` in e2e                |
+| TOOL-SESSION-1 | P0  | **Done** — `writingField` + ban getByLabel Ton texte                           |
 | TOOL-SESSION-2 | P0  | Skip e2e on docs-only `main` push (**done**)                                   |
-| TOOL-SESSION-3 | P0  | No network fetch in lefthook schema test                                       |
-| TOOL-SESSION-4 | P0  | `npm run dev` / migrate without requiring OpenAI for local DB                  |
+| TOOL-SESSION-3 | P0  | **Done** — vendored opencode schema offline                                    |
+| TOOL-SESSION-4 | P0  | **Done** — migrate/file DB without OPENAI                                      |
 | TOOL-SESSION-5 | P1  | Lefthook docs-only pre-push skip (**done**)                                    |
 | TOOL-SESSION-6 | P1  | `ticket-worktree` script                                                       |
 | TOOL-SESSION-7 | P1  | `pr:size` top files + split thresholds                                         |
